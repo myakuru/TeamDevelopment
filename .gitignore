@@ -1,0 +1,56 @@
+# Visual Studio
+.vs/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.ipch
+.vsconfig
+
+# コンパイルの中間ファイル
+*.o
+*.obj
+*.pch
+*.gch
+*.slo
+*.lo
+
+# ライブラリファイル
+*.lib
+*.a
+*.la
+*.lai
+*.dll
+*.so
+*.dylib
+
+# 実行ファイル
+*.exe
+*.out
+*.app
+*.ipa
+
+# Xcode
+*.xcodeproj
+*.xcworkspace
+
+# Unreal Engine の中間生成物
+Intermediate/
+DerivedDataCache/
+Saved/
+Build/
+Binaries/
+Content/Paks/
+
+# ソースアセット（必要に応じて調整）
+SourceArt/**/*.png
+SourceArt/**/*.tga
+
+# マップビルドデータ
+*_BuiltData.uasset
+
+# その他
+*.DS_Store
+desktop.ini
