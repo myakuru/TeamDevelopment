@@ -94,6 +94,9 @@ void AEnemyBase::OnDeath()
 	if (GameProgress) {
 		GameProgress->AddKillCount();
 	}
+
+	//@©g‚ğƒŒƒxƒ‹‚©‚çÁ‚·
+	Destroy();
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)
