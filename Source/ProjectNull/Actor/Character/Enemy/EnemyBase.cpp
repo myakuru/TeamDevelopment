@@ -86,6 +86,7 @@ void AEnemyBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight)
 {
+	if (EnemyStatus.KnockBackFlg)return;
 	// 吹き飛ばしに使う数値を決める
 	int knockBackPowerLevel = AttackPower - EnemyWeight;
 	if (knockBackPowerLevel < 0)
@@ -140,6 +141,18 @@ void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPow
 	// どこかに当たったら停止
 	if (HitResult.bBlockingHit)
 	{
+		AActor* HitActor = HitResult.GetActor();
+
+		if (HitActor)
+		{
+			// プレイヤー or エネミーなら無視
+			if (HitActor->IsA(ACharacter::StaticClass()) ||
+				HitActor->IsA(AEnemyBase::StaticClass()))
+			{
+				return; // 停止しない
+			}
+		}
+
 		EnemyStatus.KnockBackFlg = false;
 		EnemyStatus.KNockBackVelocity = FVector::ZeroVector;
 		UE_LOG(LogTemp, Warning, TEXT("=== ノックバック停止 ==="));

@@ -43,30 +43,6 @@ public:
 	bool	KnockBackFlg = false;
 };
 
-//USTRUCT(BlueprintType)
-//struct FKnockBackData :public FTableRowBase
-//{
-//	GENERATED_BODY()
-//
-//public:
-//
-//	// 吹き飛び速度
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	float LaunchSpeed = 500.0f;
-//
-//	// 打ち上げ角度
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	float LaunchAngleDeg = 45.0f;
-//
-//	// 水平方向の減速
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	float Deceleration = 300.0f;
-//
-//	// 重力倍率
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	float GravityScale = 1.0f;
-//};
-
 //　敵管理クラス
 class UEnemyManagerSubsystem;
 
