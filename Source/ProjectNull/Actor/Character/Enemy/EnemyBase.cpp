@@ -3,6 +3,7 @@
 
 #include "EnemyBase.h"
 #include "../../../System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
+#include "../../../System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h"
 
 
 
@@ -27,6 +28,12 @@ void AEnemyBase::BeginPlay()
 	if (EnemyManager) {
 		EnemyManager->RegisterEnemy(this);
 	}
+
+	//　ゲームの進行管理クラスの情報取得
+	GameProgress = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
+
+	//　ゲームの進行の進行に合わせて敵パラメータを更新
+	UpdateParams();
 }
 
 void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
@@ -46,6 +53,20 @@ void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
 
 	//　座標を更新
 	SetActorLocation(CalculateNextActorLocation(EnemyStatus.MoveDir,EnemyStatus.MoveSpeed,DeltaTime), true);
+}
+
+void AEnemyBase::UpdateParams()
+{
+	if (!GameProgress) { return; }
+
+	//　倒した敵数を元に
+	const int32 killCount = GameProgress->GetKillCount();
+
+	//　ヒットポイントの更新
+	EnemyStatus.FinalHP = EnemyStatus.HPScaling.GetFinalValue(killCount);
+
+	//　攻撃力の更新
+	EnemyStatus.FinalAttack = EnemyStatus.AttackScaling.GetFinalValue(killCount);
 }
 
 // Called every frame
@@ -68,6 +89,14 @@ void AEnemyBase::OnDeath()
 	if (EnemyManager) {
 		EnemyManager->RemoveEnemy(this);
 	}
+
+	//　敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
+	if (GameProgress) {
+		GameProgress->AddKillCount();
+	}
+
+	//　自身をレベルから消す
+	Destroy();
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)
