@@ -41,12 +41,6 @@ APlayer_Todo::APlayer_Todo()
 	check(ThirdPersonCameraComponent != nullptr);
 	ThirdPersonCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	ThirdPersonCameraComponent->bUsePawnControlRotation = false; // ブームが回転を処理する
-
-	// 三人称用メッシュ（もし別メッシュを使うならThirdPersonに設定）
-	ThirdPersonMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ThirdPersonMeshComponent"));
-	check(ThirdPersonMeshComponent != nullptr);
-	ThirdPersonMeshComponent->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::FirstPerson;
-	ThirdPersonMeshComponent->SetupAttachment(GetMesh());
 }
 
 // Called when the game starts or when spawned
@@ -69,13 +63,6 @@ void APlayer_Todo::BeginPlay()
 		PlayerController->bShowMouseCursor = false;
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
-
-	// 三人称メッシュはオーナーにだけ見えるようにする（必要に応じて調整）
-	ThirdPersonMeshComponent->SetOnlyOwnerSee(true);
-
-	// アニメーションブループリントをセット
-	ThirdPersonMeshComponent->SetAnimInstanceClass(ThirdPersonAnimBlueprint->GeneratedClass);
-
 }
 
 // Called every frame
@@ -103,9 +90,9 @@ void APlayer_Todo::Move(const FInputActionValue& Value)
 	if (Controller)
 	{
 		// コントローラの回転（カメラの向き）に合わせて前方向と右方向を決める（公式テンプレ挙動）
-		const FRotator YawRot(0, Controller->GetControlRotation().Yaw, 0);
-		const FVector ForwardDirection = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
-		const FVector RightDirection = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
+		const FRotator	YawRot(0, Controller->GetControlRotation().Yaw, 0);
+		const FVector	ForwardDirection = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
+		const FVector	RightDirection = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
 
 		AddMovementInput(ForwardDirection, MovementValue.Y);
 		AddMovementInput(RightDirection, MovementValue.X);
@@ -120,7 +107,7 @@ void APlayer_Todo::Look(const FInputActionValue& Value)
 	if (Controller)
 	{
 		// ここでは生のマウスデルタをコントローラ回転へ渡す（Sensitivity は必要なら掛ける）
-		AddControllerYawInput(LookAxisValue.X);
-		AddControllerPitchInput(LookAxisValue.Y);
+		AddControllerYawInput	(LookAxisValue.X);
+		AddControllerPitchInput	(LookAxisValue.Y);
 	}
 }
