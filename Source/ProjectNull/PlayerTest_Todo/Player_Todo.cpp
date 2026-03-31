@@ -92,7 +92,7 @@ void APlayer_Todo::Move(const FInputActionValue& Value)
 		// コントローラの回転（カメラの向き）に合わせて前方向と右方向を決める（公式テンプレ挙動）
 		const FRotator	YawRot(0, Controller->GetControlRotation().Yaw, 0);
 		const FVector	ForwardDirection = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
-		const FVector	RightDirection = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
+		const FVector	RightDirection = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y); 
 
 		AddMovementInput(ForwardDirection, MovementValue.Y);
 		AddMovementInput(RightDirection, MovementValue.X);
