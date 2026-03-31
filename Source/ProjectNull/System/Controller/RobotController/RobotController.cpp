@@ -28,11 +28,11 @@ void ARobotController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* enhacedInput = Cast<UEnhancedInputComponent>(InputComponent)) 
+	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(InputComponent)) 
 	{
-		enhacedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
-		enhacedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
-		enhacedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ARobotController::Jump);
+		enhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
+		enhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
+		enhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ARobotController::Jump);
 	}
 }
 
