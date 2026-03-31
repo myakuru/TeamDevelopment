@@ -25,8 +25,6 @@ APlayer_Todo::APlayer_Todo()
 	{
 		// 移動方向に合わせてキャラクターを回転させる
 		GetCharacterMovement()->bOrientRotationToMovement = true;
-		// 回転速度（テンプレは 540）
-		GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 	}
 
 	// カメラブーム（スプリングアーム）
@@ -37,8 +35,6 @@ APlayer_Todo::APlayer_Todo()
 	// ブームはコントローラ回転を使う（カメラを回す）
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->bDoCollisionTest = true;
-	CameraBoom->bEnableCameraLag = true;
-	CameraBoom->CameraLagSpeed = 1.0f;			// カメラの追従速度
 
 	// カメラコンポーネント（ブームのソケットにアタッチ）
 	ThirdPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCameraComponent"));
@@ -74,10 +70,12 @@ void APlayer_Todo::BeginPlay()
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
 
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("We are using Player_Todo (ThirdPerson template behavior)."));
-	}
+	// 三人称メッシュはオーナーにだけ見えるようにする（必要に応じて調整）
+	ThirdPersonMeshComponent->SetOnlyOwnerSee(true);
+
+	// アニメーションブループリントをセット
+	ThirdPersonMeshComponent->SetAnimInstanceClass(ThirdPersonAnimBlueprint->GeneratedClass);
+
 }
 
 // Called every frame
@@ -122,8 +120,7 @@ void APlayer_Todo::Look(const FInputActionValue& Value)
 	if (Controller)
 	{
 		// ここでは生のマウスデルタをコントローラ回転へ渡す（Sensitivity は必要なら掛ける）
-		const float Sensitivity = 1.0f;
-		AddControllerYawInput(LookAxisValue.X * Sensitivity);
-		AddControllerPitchInput(LookAxisValue.Y * Sensitivity);
+		AddControllerYawInput(LookAxisValue.X);
+		AddControllerPitchInput(LookAxisValue.Y);
 	}
 }

@@ -9,6 +9,7 @@ class USpringArmComponent;
 class USkeletalMeshComponent;
 class UInputMappingContext;
 class UInputAction;
+class UAnimBlueprint;
 struct FInputActionValue;
 
 UCLASS()
@@ -34,6 +35,9 @@ protected:
 	// コンポーネント
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimBlueprint* ThirdPersonAnimBlueprint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* ThirdPersonCameraComponent;
