@@ -7,6 +7,40 @@
 #include "EnemyBase.generated.h"
 
 /// <summary>
+/// 敵ステータスのスケーリング情報
+/// </summary>
+USTRUCT(BlueprintType)
+struct FStatScaling
+{
+	GENERATED_BODY()
+
+public:
+	//　基礎数値
+	UPROPERTY(EditAnywhere)
+	int32 Base = 100;
+
+	//　倍率
+	UPROPERTY(EditAnywhere)
+	float Scale = 1.0f;
+
+	//　倍率増加量
+	UPROPERTY(EditAnywhere)
+	float ScalePerKill = 0.005f;
+
+	/// <summary>
+	/// 基礎数値 * 倍率
+	/// </summary>
+	/// <returns>最終的な数値を返す</returns>
+	int32 GetFinalValue(int32 Count)
+	{
+		Scale = 1.0f + Count * ScalePerKill;
+		return static_cast<int32>(Base * Scale);
+	}
+};
+
+
+
+/// <summary>
 /// 敵基本ステータス
 /// </summary>
 USTRUCT(BlueprintType)
@@ -26,11 +60,31 @@ public:
 	//　回転補間速度
 	UPROPERTY(EditAnywhere)
 	float	RotationInterpSpeed = 5.0f;
+
+	//　最終的なヒットポイント
+	UPROPERTY(EditAnywhere)
+	int32	FinalHP = 100;
+
+	//　スケーリング計算用ヒットポイント
+	UPROPERTY(EditAnywhere)
+	FStatScaling HPScaling;
+
+	//　最終的な攻撃力
+	UPROPERTY(EditAnywhere)
+	int32	FinalAttack = 1;
+
+	//　スケーリング計算用攻撃力
+	UPROPERTY(EditAnywhere)
+	FStatScaling AttackScaling;
+
 };
 
 
 //　敵管理クラス
 class UEnemyManagerSubsystem;
+
+//　ゲームの進行管理クラス
+class UGameProgressSubsystem;
 
 
 /// <summary>
@@ -58,10 +112,21 @@ protected:
 	virtual void MoveToPlayer(const FVector& PlayerLocation, float DeltaTime);
 
 	/// <summary>
+	/// 敵（自身）のパラメータを更新する
+	/// </summary>
+	virtual void UpdateParams();
+
+	/// <summary>
 	/// 敵管理クラスのポインタ
 	/// </summary>
 	UPROPERTY()
 	UEnemyManagerSubsystem* EnemyManager;
+
+	/// <summary>
+	/// ゲームの進行管理クラスのポインタ
+	/// </summary>
+	UPROPERTY()
+	UGameProgressSubsystem* GameProgress;
 
 	/// <summary>
 	/// 敵基本ステータス
