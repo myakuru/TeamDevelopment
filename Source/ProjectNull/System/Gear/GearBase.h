@@ -4,19 +4,58 @@
 #include "UObject/Object.h"
 #include "GearBase.generated.h"
 
+
+//　ギアのステータス構造体
+USTRUCT(BlueprintType)
+struct FGearStatus
+{
+	GENERATED_BODY()
+public:
+
+	FGearStatus():
+		Duration(0.0f),
+		CoolTime(0.0f)
+	{
+	
+	}
+public:
+
+	//　ギア持続時間
+	UPROPERTY(EditAnywhere)
+	float Duration;
+
+	//　ギアのクールタイム
+	UPROPERTY(EditAnywhere)
+	float CoolTime;
+};
+
+
 //　プレイヤーのギアコンポーネントクラス
 class UPlayerGearComponent;
 
 //　プレイヤーの中間基底クラス
 class APlayerBase;
 
+//　ギアの状態の基底クラス
+class UGearStateBase;
 
+
+/// <summary>
+/// ギアの基底クラス
+/// </summary>
 UCLASS()
 class PROJECTNULL_API UGearBase : public UObject
 {
 	GENERATED_BODY()
 	
 public:
+
+	UGearBase();
+
+public:
+
+	//　ギアの最大レベル
+	static constexpr int32 kMaxGearLevel = 4;
 
 	/// <summary>
 	/// 初期化処理
@@ -25,9 +64,8 @@ public:
 
 	/// <summary>
 	/// ギアの実行
-	/// ※純粋仮想関数であり、派生クラスで必ず実装する必要がある
 	/// </summary>
-	virtual void Execute() PURE_VIRTUAL(UAttackBase::Execute, );
+	virtual void Execute(int32 CurrentGearLevel);
 
 	/// <summary>
 	/// 更新処理
@@ -36,13 +74,18 @@ public:
 	virtual void Update(float DeltaTime);
 
 	//　ゲッター
-	bool CanExecute() const { return bCanExecute; }
-	
+	bool CanExecute()			const { return bCanExecute; }
+	bool BlocksMovement()		const { return bBlocksMovement; }
+	bool IsActive()				const { return bIsActive; }
+	bool IsMovementBlocked()	const { return bBlocksMovement; }
+
+	//　セッター
+	void SetBlocksMovement(bool Flg)	{ bBlocksMovement = Flg; }
+	void SetCanExecute(bool Flg)		{ bCanExecute = Flg; }
+
 protected:
-	
-	/// <summary>
-	/// 持ち主のプレイヤーのポインタ
-	/// </summary>
+
+	// 持ち主のプレイヤーのポインタ
 	UPROPERTY()
 	APlayerBase* OwnerPlayer;
 
@@ -50,29 +93,34 @@ protected:
 	UPROPERTY()
 	UPlayerGearComponent* OwnerGearComponent;
 
+private:
+
+	virtual void ResetParams();
+
+
+	//　ギアの状態の配列
+	UPROPERTY(EditAnywhere, Instanced)
+	TArray<UGearStateBase*> GearStates;
+
+	//　ギアのステータスの配列
+	UPROPERTY(EditAnywhere)
+	TArray<FGearStatus> GearStatuses;
+
+	//　実行されたギアのレベル
+	int32 ExecutedGearLevel;
+
 	//　ギアを実行できるかどうか
 	bool bCanExecute;
 
-	//　ギアの効果が終了したかどうか
-	bool bIsFinished;
+	//　経過時間
+	float ElapsedTime;
 
-	//　ギア持続時間
-	UPROPERTY(EditAnywhere)
-	float Duration;
+	//　ギアが実行中かどうか
+	bool bIsActive;
+
+	//　ギアによって移動をブロックするかどうか
+	bool bBlocksMovement;
 
 	//　ギアの持続時間を管理するタイマーハンドル
 	FTimerHandle DurationTimerHandle;
-
-private:
-
-	//　ギアのレベルに応じた効果の適用
-	//　4段階のためメソッドを4つ用意するだけの簡単で分かりすい実装
-	//　※純粋仮想関数であり、派生クラスで必ず実装する必要がある
-	virtual void ApplyLv1() PURE_VIRTUAL(UAttackBase::Execute, );
-	virtual void ApplyLv2() PURE_VIRTUAL(UAttackBase::Execute, );
-	virtual void ApplyLv3() PURE_VIRTUAL(UAttackBase::Execute, );
-	virtual void ApplyLv4() PURE_VIRTUAL(UAttackBase::Execute, );
-
-	virtual void ResetParams() {}
-
 };

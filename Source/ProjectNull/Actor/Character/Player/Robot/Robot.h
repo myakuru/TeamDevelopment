@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -10,7 +8,7 @@
 ///　ロボット（ワールド内の自身が操作するキャラクター）のクラス
 /// </summary>
 UCLASS()
-class PROJECTNULL_API ARobot : public APlayerBase
+class PROJECTNULL_API ARobot final : public APlayerBase
 {
 	GENERATED_BODY()
 	

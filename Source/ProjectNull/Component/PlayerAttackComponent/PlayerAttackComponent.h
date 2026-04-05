@@ -59,5 +59,4 @@ private:
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<UAttackBase*> PlayerAttacks;
 
-	
 };

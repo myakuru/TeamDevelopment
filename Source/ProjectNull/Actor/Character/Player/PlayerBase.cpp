@@ -1,10 +1,9 @@
 #include "PlayerBase.h"
 
-#include "GameFramework\SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "../../../Component/PlayerAttackComponent/PlayerAttackComponent.h"
-#include "../../../Component/PlayerGearComponent/PlayerGearComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
+#include "ProjectNull/Component/PlayerAttackComponent/PlayerAttackComponent.h"
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
@@ -39,7 +38,8 @@ APlayerBase::APlayerBase()
 
 
 	AttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>("Attack");
-	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
+	GearComponent	= CreateDefaultSubobject<UPlayerGearComponent>("Gear");
+
 }
 
 void APlayerBase::BeginPlay()
@@ -72,3 +72,25 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 }
 
+void APlayerBase::Move(const FVector2d& InputVector)
+{
+	if (!CanMove()) { return; }
+
+	const FRotator yawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
+
+	const FVector forward = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
+	const FVector right = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
+
+	AddMovementInput(forward, InputVector.Y);
+	AddMovementInput(right, InputVector.X);
+}
+
+bool APlayerBase::CanMove()
+{
+	if(GearComponent && GearComponent->IsMovementBlockedByGear())
+	{
+		return false;
+	}
+
+	return true;
+}

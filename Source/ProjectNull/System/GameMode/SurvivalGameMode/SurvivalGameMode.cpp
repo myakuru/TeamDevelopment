@@ -1,9 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "SurvivalGameMode.h"
 
-#include "../../Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
+#include "ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
+
 
 ASurvivalGameMode::ASurvivalGameMode()
 {
