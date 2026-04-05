@@ -44,6 +44,11 @@ public:
 	/// <returns>“G”</returns>
 	int32 GetEnemyNum() const { return EnemyGruntList.Num(); }
 
+	/// <summary>
+	/// “G‚ğ‚Ü‚Æ‚ß‚éƒŠƒXƒg
+	/// </summary>
+	TArray<AEnemyBase*> GetEnemyList() const { return EnemyGruntList; }	
+
 private:
 
 	/// <summary>
