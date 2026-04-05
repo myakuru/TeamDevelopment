@@ -15,9 +15,9 @@ URingPulseSlashAttack::URingPulseSlashAttack()
 
 void URingPulseSlashAttack::Start()
 {
-	bIsActive = true;
-	CurrentAngle = 0.0f;
-	ElapsedTime = 0.0f;
+	bIsActive		= true;
+	CurrentAngle	= 0.0f;
+	ElapsedTime		= 0.0f;
 }
 
 bool URingPulseSlashAttack::UpdateAttack(float DeltaTime)

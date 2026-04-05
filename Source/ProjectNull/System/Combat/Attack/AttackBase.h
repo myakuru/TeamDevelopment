@@ -32,7 +32,7 @@ public:
 	/// <param name="DeltaTime">デルタタイム</param>
 	virtual void Update(float DeltaTime) { return; }
 
-
+	//　ゲッター
 	bool CanExecute() const { return bCanExecute; }
 
 protected:

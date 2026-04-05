@@ -1,14 +1,15 @@
 #include "AutoAttack.h"
 
-#include "../../../../Actor/Character/Enemy/EnemyBase.h"
-#include "../../../../Actor/Character/Player/PlayerBase.h"
-#include "../../../../System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
-#include "../../../../Utility/DebugDrawLibrary/DebugDrawLibrary.h"
-#include "../RingPulseSlashAttack/RingPulseSlashAttack.h"
-
-#include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
+#include "ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h"
+#include "ProjectNull/Actor/Character/Enemy/EnemyBase.h"
+#include "ProjectNull/Actor/Character/Player/PlayerBase.h"
+#include "ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
+#include "ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h"
+
 
 UAutoAttack::UAutoAttack()
 	: AutoAttackInterval(5.0f)
@@ -33,6 +34,7 @@ void UAutoAttack::Initialize(AActor* Owner)
 
 void UAutoAttack::Execute()
 {
+	return;
 }
 
 void UAutoAttack::Update(float DeltaTime)
@@ -49,15 +51,6 @@ void UAutoAttack::Update(float DeltaTime)
 		UpdateAutoAttack(DeltaTime, *ConeSlashParams, enemyManager);
 	}
 
-	if (AutoAttackParamsMap.Contains(EAutoAttackType::Front) && AutoAttackParamsMap[EAutoAttackType::Front]) {
-		
-			if (NiagaraComp) {
-				UE_LOG(LogTemp, Warning, TEXT("setworld"));
-
-				NiagaraComp->SetWorldLocation(OwnerActor->GetActorLocation());
-			}
-			
-	}
 }
 
 void UAutoAttack::StartAutoAttack()
@@ -65,17 +58,23 @@ void UAutoAttack::StartAutoAttack()
 	if (!OwnerActor) { return; }
 
 	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front) && AutoAttackParamsMap[EAutoAttackType::Front]){
+
 		AutoAttackParamsMap[EAutoAttackType::Front]->Start();
+
+		if (AutoFrontEffect) {
+			UNiagaraFunctionLibrary::SpawnSystemAttached(
+				AutoFrontEffect,
+				OwnerActor->GetRootComponent(),
+				NAME_None,
+				FVector::ZeroVector,
+				FRotator::ZeroRotator,
+				EAttachLocation::KeepRelativeOffset,
+				true
+			);
+		}
 	}
 
-	if(AutoFrontEffect)	{
-		/*NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			AutoFrontEffect,
-			OwnerActor->GetActorLocation(),
-			OwnerActor->GetActorRotation()
-		);*/
-	}
+	
 
 	//　前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
@@ -90,6 +89,19 @@ void UAutoAttack::StartAutoRingAttack()
 {
 	if (AutoAttackParamsMap.Contains(EAutoAttackType::Ring) && AutoAttackParamsMap[EAutoAttackType::Ring]) {
 		AutoAttackParamsMap[EAutoAttackType::Ring]->Start();
+
+		if (AutoRingEffect) {
+			UNiagaraFunctionLibrary::SpawnSystemAttached(
+				AutoRingEffect,
+				OwnerActor->GetRootComponent(),
+				NAME_None,
+				FVector::ZeroVector,
+				FRotator::ZeroRotator,
+				EAttachLocation::KeepRelativeOffset,
+				true
+			);
+		}
+
 	}
 }
 void UAutoAttack::UpdateAutoAttack(float DeltaTime, URingPulseSlashAttack& RingPulseSlashAttack, UEnemyManagerSubsystem* EnemyManager)
@@ -145,6 +157,7 @@ bool UAutoAttack::IsEnemyInConeRange(AActor* Enemy, const FVector& PlayerLocatio
 		return false;
 	}
 
+	//　ベクトル正規化
 	ToEnemy.Normalize();
 
 	//　角度チェック

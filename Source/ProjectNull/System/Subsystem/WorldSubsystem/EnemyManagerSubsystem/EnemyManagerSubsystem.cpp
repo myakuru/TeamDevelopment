@@ -1,10 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "EnemyManagerSubsystem.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "../../../../Actor/Character/Enemy/EnemyBase.h"
+#include "ProjectNull/Actor/Character/Enemy/EnemyBase.h"
+
 
 void UEnemyManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {

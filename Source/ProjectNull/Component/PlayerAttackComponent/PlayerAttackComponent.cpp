@@ -1,44 +1,31 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "PlayerAttackComponent.h"
 
-
-
-#include "../../System/Combat/Attack/AttackBase.h"
-#include "../../System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h"
+#include "ProjectNull/System/Combat/Attack/AttackBase.h"
+#include "ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h"
 
 UPlayerAttackComponent::UPlayerAttackComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	
 }
-
 
 void UPlayerAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//AddAttack<URingPulseSlashAttack>();
-
+	//　攻撃クラスの初期化
 	for(auto& attack : PlayerAttacks)
 	{
 		if (!attack) { continue; }
 		attack->Initialize(GetOwner());
-	}
-
-
-	
+	}	
 }
-
 
 void UPlayerAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	//　攻撃クラスの更新
 	for(auto& attack : PlayerAttacks)
 	{
 		if (!attack) { continue; }
@@ -47,7 +34,6 @@ void UPlayerAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		{
 			attack->Execute();
 		}
-
 		attack->Update(DeltaTime);
 	}
 }

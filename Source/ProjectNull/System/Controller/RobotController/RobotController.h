@@ -14,6 +14,8 @@ class UInputMappingContext;
 class UInputAction;
 
 
+class UPlayerHUDWidget;
+
 /// <summary>
 /// ロボット（プレイヤー）のコントローラークラス
 /// ロボットの操作や入力処理を担当するクラス
@@ -29,8 +31,8 @@ public:
 
 protected:
 
-	virtual void BeginPlay() override;
-	virtual void SetupInputComponent() override;
+	virtual void BeginPlay()			override;
+	virtual void SetupInputComponent()	override;
 
 private:
 
@@ -57,6 +59,11 @@ private:
 	/// <param name="LookActionValue">入力値</param>
 	void Jump(const FInputActionValue& JumpActionValue);
 
+	/// <summary>
+	/// ギアの実行関数　01
+	/// </summary>
+	/// <param name="GearActionValue01">入力値</param>
+	void GearExecute01(const FInputActionValue& GearActionValue01);
 
 	//　入力マッピングコンテキスト
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -74,6 +81,16 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> JumpAction;
 
+	//　ギア入力アクション　01
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> GearAction01;
+
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UPlayerHUDWidget> PlayerHUDClass;
+
+	UPROPERTY()
+	UPlayerHUDWidget* PlayerHUD;
 
 
 };

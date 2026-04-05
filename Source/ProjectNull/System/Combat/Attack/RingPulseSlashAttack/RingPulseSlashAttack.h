@@ -19,6 +19,38 @@ public:
 
 public:
 
+	/// <summary>
+	/// 開始の際の初期化
+	/// </summary>
+	void Start();
+
+	/// <summary>
+	/// 更新処理
+	/// </summary>
+	/// <param name="DeltaTime">デルタタイム</param>
+	/// /// <returns>更新結果</returns>
+	bool UpdateAttack(float DeltaTime);
+
+	/// <summary>
+	/// 攻撃方向の計算
+	/// </summary>
+	/// <param name="forwardVector">前方方向</param>
+	/// <returns>計算結果</returns>
+	FVector CalcAttackDir(const FVector& forwardVector) const;
+
+	/// <summary>
+	/// 半径の二乗を取得
+	/// </summary>
+	/// <returns>半径の二乗</returns>
+	inline float GetRadiusSquared() const { return Radius * Radius; }
+
+	/// <summary>
+	/// 扇角のcos値
+	/// </summary>
+	/// <returns>扇角のcos値</returns>
+	inline float GetConeCosine() const { return FMath::Cos(FMath::DegreesToRadians(ConeAngle)); }
+
+
 	// 攻撃の持続時間（秒）
 	UPROPERTY(EditAnywhere)
 	float Duration;
@@ -48,36 +80,5 @@ public:
 	//　現在の角度
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
-
-	/// <summary>
-	/// 開始の際の初期化
-	/// </summary>
-	void Start();
-
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	/// <param name="DeltaTime">デルタタイム</param>
-	/// /// <returns>更新結果</returns>
-	bool UpdateAttack(float DeltaTime);
-
-	/// <summary>
-	/// 攻撃方向の計算
-	/// </summary>
-	/// <param name="forwardVector">前方方向</param>
-	/// <returns>計算結果</returns>
-	FVector CalcAttackDir(const FVector& forwardVector) const;
-
-	/// <summary>
-	/// 半径の二乗を取得
-	/// </summary>
-	/// <returns>半径の二乗</returns>
-	inline float GetRadiusSquared() const { return Radius * Radius;}
-
-	/// <summary>
-	/// 扇角のcos値
-	/// </summary>
-	/// <returns>扇角のcos値</returns>
-	inline float GetConeCosine() const { return FMath::Cos(FMath::DegreesToRadians(ConeAngle)); }
 
 };
