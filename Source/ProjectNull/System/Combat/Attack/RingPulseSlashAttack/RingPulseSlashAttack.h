@@ -81,4 +81,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
 
+	//　ノックバックの強さ
+	UPROPERTY(EditAnywhere)
+	float KnockbackPower;
+
 };

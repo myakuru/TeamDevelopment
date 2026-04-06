@@ -108,6 +108,7 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 	{
 		knockBackPowerLevel = 0;
 	}
+
 	const FName RowName = FName(*FString::FromInt(knockBackPowerLevel));
 
 	// RowName‚©‚çŒ^•t‚ÅŽæ“¾

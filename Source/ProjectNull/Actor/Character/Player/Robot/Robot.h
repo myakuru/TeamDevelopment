@@ -8,7 +8,7 @@
 ///　ロボット（ワールド内の自身が操作するキャラクター）のクラス
 /// </summary>
 UCLASS()
-class PROJECTNULL_API ARobot final : public APlayerBase
+class PROJECTNULL_API ARobot : public APlayerBase
 {
 	GENERATED_BODY()
 	

@@ -110,7 +110,13 @@ class PROJECTNULL_API AEnemyBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AEnemyBase();
-	
+public:
+
+	/// <summary>
+	/// 敵（自身）が吹き飛ばされる処理
+	/// </summary>
+	virtual void SetKnockBackData(const FVector& playerLocation, float AttackPower, float EnemyWeight);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -142,11 +148,6 @@ protected:
 	//	bool bFromSweep,							// Sweepかどうか
 	//	const FHitResult& SweepResult				// 当たりの詳細判定
 	//);
-
-	/// <summary>
-	/// 敵（自身）が吹き飛ばされる処理
-	/// </summary>
-	virtual void SetKnockBackData(const FVector& playerLocation, float AttackPower, float EnemyWeight);
 
 	/// <summary>
 	/// 敵が吹き飛ばされている状態の処理
