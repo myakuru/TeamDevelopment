@@ -38,14 +38,14 @@ public:
 
 private:
 
-	// 他のActorと重なった際に呼ばれる関数
-	virtual void OnOverlap(
-		UPrimitiveComponent* OverlappedComponent,	// 自分側のコリジョン
-		AActor* OtherActor,							// 触れてきたアクタ
-		UPrimitiveComponent* OtherComp,				// 触れてきた側のコンポーネント
-		int32 OtherBodyIndex,						// ボディ番号（基本使わない）
-		bool bFromSweep,							// Sweepかどうか
-		const FHitResult& SweepResult				// 当たりの詳細判定
-	) override;
+	//// 他のActorと重なった際に呼ばれる関数
+	//virtual void OnOverlap(
+	//	UPrimitiveComponent* OverlappedComponent,	// 自分側のコリジョン
+	//	AActor* OtherActor,							// 触れてきたアクタ
+	//	UPrimitiveComponent* OtherComp,				// 触れてきた側のコンポーネント
+	//	int32 OtherBodyIndex,						// ボディ番号（基本使わない）
+	//	bool bFromSweep,							// Sweepかどうか
+	//	const FHitResult& SweepResult				// 当たりの詳細判定
+	//) override;
 
 };

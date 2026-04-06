@@ -9,7 +9,6 @@
 AEnemySpawner::AEnemySpawner()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void AEnemySpawner::SpawnEnemy()
@@ -74,6 +73,7 @@ bool AEnemySpawner::IsIntersectingStaticObjects(FHitResult& HitResult, FVector& 
 	//　衝突していたら衝突した座標を出現座標にする
 	if (isIntersect) {
 		SpawnLocationXY = HitResult.Location;
+		SpawnLocationXY.Z += SpawnParams.SpawnHeightOffset;
 	}
 
 	return isIntersect;

@@ -12,6 +12,38 @@ class UCapsuleComponent;
 class UPrimitiveComponent;
 
 /// <summary>
+/// 敵ステータスのスケーリング情報
+/// </summary>
+USTRUCT(BlueprintType)
+struct FStatScaling
+{
+	GENERATED_BODY()
+
+public:
+	//　基礎数値
+	UPROPERTY(EditAnywhere)
+	int32 Base = 100;
+
+	//　倍率
+	UPROPERTY(EditAnywhere)
+	float Scale = 1.0f;
+
+	//　倍率増加量
+	UPROPERTY(EditAnywhere)
+	float ScalePerKill = 0.005f;
+
+	/// <summary>
+	/// 基礎数値 * 倍率
+	/// </summary>
+	/// <returns>最終的な数値を返す</returns>
+	int32 GetFinalValue(int32 Count)
+	{
+		Scale = 1.0f + Count * ScalePerKill;
+		return static_cast<int32>(Base * Scale);
+	}
+};
+
+/// <summary>
 /// 敵基本ステータス
 /// </summary>
 USTRUCT(BlueprintType)
@@ -32,6 +64,22 @@ public:
 	UPROPERTY(EditAnywhere)
 	float	RotationInterpSpeed = 5.0f;
 
+	//　最終的なヒットポイント
+	UPROPERTY(EditAnywhere)
+	int32	FinalHP = 100;
+
+	//　スケーリング計算用ヒットポイント
+	UPROPERTY(EditAnywhere)
+	FStatScaling HPScaling;
+
+	//　最終的な攻撃力
+	UPROPERTY(EditAnywhere)
+	int32	FinalAttack = 1;
+
+	//　スケーリング計算用攻撃力
+	UPROPERTY(EditAnywhere)
+	FStatScaling AttackScaling;
+
 	// エネミーの重量
 	UPROPERTY(EditAnywhere)
 	float	KnockBackWeight = 1.0;
@@ -46,6 +94,8 @@ public:
 //　敵管理クラス
 class UEnemyManagerSubsystem;
 
+//　ゲームの進行管理クラス
+class UGameProgressSubsystem;
 
 /// <summary>
 /// 敵の中間基底クラス
@@ -72,21 +122,26 @@ protected:
 	virtual void MoveToPlayer(const FVector& PlayerLocation, float DeltaTime);
 
 	/// <summary>
+	/// 敵（自身）のパラメータを更新する
+	/// </summary>
+	virtual void UpdateParams();
+
+	/// <summary>
 	/// SphereCollisionを取得して使うための関数
 	/// <summary>
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Collision")
 	UCapsuleComponent* CapsuleCollision;
 
-	// 他のActorと重なった際に呼ばれる関数
-	UFUNCTION()
-	virtual void OnOverlap(
-		UPrimitiveComponent* OverlappedComponent,	// 自分側のコリジョン
-		AActor* OtherActor,							// 触れてきたアクタ
-		UPrimitiveComponent* OtherComp,				// 触れてきた側のコンポーネント
-		int32 OtherBodyIndex,						// ボディ番号（基本使わない）
-		bool bFromSweep,							// Sweepかどうか
-		const FHitResult& SweepResult				// 当たりの詳細判定
-	);
+	//// 他のActorと重なった際に呼ばれる関数
+	//UFUNCTION()
+	//virtual void OnOverlap(
+	//	UPrimitiveComponent* OverlappedComponent,	// 自分側のコリジョン
+	//	AActor* OtherActor,							// 触れてきたアクタ
+	//	UPrimitiveComponent* OtherComp,				// 触れてきた側のコンポーネント
+	//	int32 OtherBodyIndex,						// ボディ番号（基本使わない）
+	//	bool bFromSweep,							// Sweepかどうか
+	//	const FHitResult& SweepResult				// 当たりの詳細判定
+	//);
 
 	/// <summary>
 	/// 敵（自身）が吹き飛ばされる処理
@@ -107,6 +162,12 @@ protected:
 	/// </summary>
 	UPROPERTY()
 	UEnemyManagerSubsystem* EnemyManager;
+
+	/// <summary>
+	/// ゲームの進行管理クラスのポインタ
+	/// </summary>
+	UPROPERTY()
+	UGameProgressSubsystem* GameProgress;
 
 	/// <summary>
 	/// 敵基本ステータス

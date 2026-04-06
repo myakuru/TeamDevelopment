@@ -47,18 +47,18 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 	MoveToPlayer(playerLocation,DeltaTime);
 }
 
-void AEnemyGruntBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (Cast<ACharacter>(OtherActor))
-	{
-		//float KnockBackPower = 10.0f;
-		//const FVector ActorLocation = OtherActor->GetActorLocation();
-		//// プレイヤーと接触したら吹き飛ばされる
-		//const float distanceToPlayer = FVector::Distance(ActorLocation, GetActorLocation());
-		//const FVector knockBackDir = GetActorLocation() - ActorLocation;
-		//KnockBack(knockBackDir, KnockBackPower, 1.0f);
-		UE_LOG(LogTemp, Warning, TEXT("=== AEnemyGruntBase Overlap ==="));
-		SetKnockBackData(OtherActor->GetActorLocation(), 2, 1);
-	}
-}
-
+//void AEnemyGruntBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (Cast<ACharacter>(OtherActor))
+//	{
+//		//float KnockBackPower = 10.0f;
+//		//const FVector ActorLocation = OtherActor->GetActorLocation();
+//		//// プレイヤーと接触したら吹き飛ばされる
+//		//const float distanceToPlayer = FVector::Distance(ActorLocation, GetActorLocation());
+//		//const FVector knockBackDir = GetActorLocation() - ActorLocation;
+//		//KnockBack(knockBackDir, KnockBackPower, 1.0f);
+//		UE_LOG(LogTemp, Warning, TEXT("=== AEnemyGruntBase Overlap ==="));
+//		SetKnockBackData(OtherActor->GetActorLocation(), 2, 1);
+//	}
+//}
+//

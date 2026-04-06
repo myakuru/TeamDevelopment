@@ -56,6 +56,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	float RayEndDepth = 2000.0f;
 
+	/// <summary>
+	/// 出現座標のオフセット
+	/// </summary>
+	UPROPERTY(EditAnywhere)
+	float SpawnHeightOffset = 150.0f;
+
 };
 
 //　敵（一般兵/雑魚）の中間基底クラス

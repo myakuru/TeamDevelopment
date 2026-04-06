@@ -3,6 +3,7 @@
 
 #include "EnemyBase.h"
 #include "../../../System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
+#include "../../../System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -40,23 +41,37 @@ void AEnemyBase::BeginPlay()
 	}
 
 	// 当たり判定の設定
-	{
-		// 自身のアクタについているSphereComponentを探す
-		CapsuleCollision = FindComponentByClass<UCapsuleComponent>();
+	//{
+	//	// 自身のアクタについているSphereComponentを探す
+	//	CapsuleCollision = FindComponentByClass<UCapsuleComponent>();
 
-		// SphereCollisionの中にデータがあれば｛｝内を実行する
-		if (CapsuleCollision)
-		{
-			// オーバーラップ開始時にonOverlap関数を呼ぶように設定
-			CapsuleCollision->OnComponentBeginOverlap.AddDynamic
-			(
-				this,
-				&AEnemyBase::OnOverlap
-			);
+	//	// SphereCollisionの中にデータがあれば｛｝内を実行する
+	//	if (CapsuleCollision)
+	//	{
+	//		// オーバーラップ開始時にonOverlap関数を呼ぶように設定
+	//		CapsuleCollision->OnComponentBeginOverlap.AddDynamic
+	//		(
+	//			this,
+	//			&AEnemyBase::OnOverlap
+	//		);
 
-			UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase BeginPlay ==="));
-		}
-	}
+	//		UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase BeginPlay ==="));
+	//	}
+	//}
+}
+
+void AEnemyBase::UpdateParams()
+{
+	if (!GameProgress) { return; }
+
+	//　倒した敵数を元に
+	const int32 killCount = GameProgress->GetKillCount();
+
+	//　ヒットポイントの更新
+	EnemyStatus.FinalHP = EnemyStatus.HPScaling.GetFinalValue(killCount);
+
+	//　攻撃力の更新
+	EnemyStatus.FinalAttack = EnemyStatus.AttackScaling.GetFinalValue(killCount);
 }
 
 void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
@@ -78,15 +93,15 @@ void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
 	SetActorLocation(CalculateNextActorLocation(EnemyStatus.MoveDir,EnemyStatus.MoveSpeed,DeltaTime), true);
 }
 
-void AEnemyBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	// ほかのアクタと重なったら派生先でKnockBack関数を呼び出す
-	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase OnOverlap ==="));
-}
+//void AEnemyBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	// ほかのアクタと重なったら派生先でKnockBack関数を呼び出す
+//	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase OnOverlap ==="));
+//}
 
 void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight)
 {
-	if (EnemyStatus.KnockBackFlg)return;
+	if (EnemyStatus.KnockBackFlg) { return; }
 	// 吹き飛ばしに使う数値を決める
 	int knockBackPowerLevel = AttackPower - EnemyWeight;
 	if (knockBackPowerLevel < 0)
@@ -178,6 +193,14 @@ void AEnemyBase::OnDeath()
 	if (EnemyManager) {
 		EnemyManager->RemoveEnemy(this);
 	}
+
+	//　敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
+	if (GameProgress) {
+		GameProgress->AddKillCount();
+	}
+
+	//　自身をレベルから消す
+	Destroy();
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)
