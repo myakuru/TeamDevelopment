@@ -4,12 +4,14 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
 #include "ProjectNull/Component/PlayerAttackComponent/PlayerAttackComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
 		AttackComponent(nullptr),
-		GearComponent(nullptr)
+		GearComponent(nullptr),
+		MaxAcceleration(2100.0f)
 {
 	//Å@================================================================
 	//Å@é©êgÇÃê›íË
@@ -39,7 +41,6 @@ APlayerBase::APlayerBase()
 
 	AttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>("Attack");
 	GearComponent	= CreateDefaultSubobject<UPlayerGearComponent>("Gear");
-
 }
 
 void APlayerBase::BeginPlay()
@@ -57,6 +58,10 @@ void APlayerBase::BeginPlay()
 
 	Super::BeginPlay();
 	
+	if(auto* movement = GetCharacterMovement())
+	{
+		movement->MaxAcceleration = MaxAcceleration;
+	}
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -83,6 +88,15 @@ void APlayerBase::Move(const FVector2d& InputVector)
 
 	AddMovementInput(forward, InputVector.Y);
 	AddMovementInput(right, InputVector.X);
+}
+
+void APlayerBase::ResetMovementParameters()
+{
+	if (auto* movement = GetCharacterMovement())
+	{
+		movement->SetMovementMode(MOVE_Walking);
+		movement->MaxAcceleration = MaxAcceleration;
+	}
 }
 
 bool APlayerBase::CanMove()

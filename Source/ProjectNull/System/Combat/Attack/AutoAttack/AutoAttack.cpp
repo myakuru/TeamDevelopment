@@ -139,7 +139,7 @@ void UAutoAttack::UpdateAutoAttack(float DeltaTime, URingPulseSlashAttack& RingP
 		//@“G‚ªî”ÍˆÍ“à‚É‚¢‚é‚©”»’è
 		if (IsEnemyInConeRange(enemy, playerLocation, attackDir, RingPulseSlashAttack))
 		{
-			enemy->OnDeath();
+			enemy->SetKnockBackData(playerLocation, RingPulseSlashAttack.KnockbackPower,1.0f);
 		}
 	}
 }

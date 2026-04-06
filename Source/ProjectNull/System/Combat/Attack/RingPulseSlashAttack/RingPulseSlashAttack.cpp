@@ -9,6 +9,7 @@ URingPulseSlashAttack::URingPulseSlashAttack()
 	, ConeAngle(30.0f)
 	, bIsActive(false)
 	, CurrentAngle(0.0f)
+	, KnockbackPower(2.0f)
 {
 	
 }

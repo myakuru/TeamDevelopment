@@ -34,6 +34,12 @@ protected:
 	virtual void BeginPlay()			override;
 	virtual void SetupInputComponent()	override;
 
+	/// <summary>
+	/// ギアの実行関数　01
+	/// </summary>
+	/// <param name="GearActionValue01">入力値</param>
+	virtual void GearExecute01(const FInputActionValue& GearActionValue01);
+
 private:
 
 	/// <summary>
@@ -59,12 +65,7 @@ private:
 	/// <param name="LookActionValue">入力値</param>
 	void Jump(const FInputActionValue& JumpActionValue);
 
-	/// <summary>
-	/// ギアの実行関数　01
-	/// </summary>
-	/// <param name="GearActionValue01">入力値</param>
-	void GearExecute01(const FInputActionValue& GearActionValue01);
-
+	
 	//　入力マッピングコンテキスト
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputContext;
