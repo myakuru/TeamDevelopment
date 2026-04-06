@@ -2,7 +2,8 @@
 
 
 #include "EnemyBase.h"
-#include "../../../System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
+#include "ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
+#include "ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -41,21 +42,21 @@ void AEnemyBase::BeginPlay()
 
 	// 当たり判定の設定
 	{
-		// 自身のアクタについているSphereComponentを探す
-		CapsuleCollision = FindComponentByClass<UCapsuleComponent>();
+		//// 自身のアクタについているSphereComponentを探す
+		//CapsuleCollision = FindComponentByClass<UCapsuleComponent>();
 
-		// SphereCollisionの中にデータがあれば｛｝内を実行する
-		if (CapsuleCollision)
-		{
-			// オーバーラップ開始時にonOverlap関数を呼ぶように設定
-			CapsuleCollision->OnComponentBeginOverlap.AddDynamic
-			(
-				this,
-				&AEnemyBase::OnOverlap
-			);
+		//// SphereCollisionの中にデータがあれば｛｝内を実行する
+		//if (CapsuleCollision)
+		//{
+		//	// オーバーラップ開始時にonOverlap関数を呼ぶように設定
+		//	CapsuleCollision->OnComponentBeginOverlap.AddDynamic
+		//	(
+		//		this,
+		//		&AEnemyBase::OnOverlap
+		//	);
 
-			UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase BeginPlay ==="));
-		}
+		//	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase BeginPlay ==="));
+		//}
 	}
 }
 
@@ -176,9 +177,18 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void AEnemyBase::OnDeath()
 {
 	//　敵が死んだ際に敵管理クラス経由でリストから自身を削除する
-	if (EnemyManager) {
+	if (EnemyManager) 
+	{
 		EnemyManager->RemoveEnemy(this);
 	}
+
+	//　敵が死んだ際に倒した敵数カウントアップする
+	if (UGameProgressSubsystem* gameProgress = GetWorld()->GetSubsystem<UGameProgressSubsystem>()) 
+	{
+		gameProgress->AddKillCount();
+	}
+
+
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)

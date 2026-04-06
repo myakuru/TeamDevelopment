@@ -56,6 +56,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	float RayEndDepth = 2000.0f;
 
+	/// <summary>
+	/// 出現座標Zのオフセット
+	/// </summary>
+	UPROPERTY(EditAnywhere)
+	float SpawnOffsetZ = 150.0f;
+
 };
 
 //　敵（一般兵/雑魚）の中間基底クラス
@@ -76,7 +82,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	virtual void Tick(float DeltaTime) override;
 
 	/// <summary>
 	/// 敵出現制御処理
@@ -113,5 +118,4 @@ private:
 	/// 敵を一定時間ごとにスポーンするタイマーID
 	/// </summary>
 	FTimerHandle SpawnTimerHandle;
-
 };
