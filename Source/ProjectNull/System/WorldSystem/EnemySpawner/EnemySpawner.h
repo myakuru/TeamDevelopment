@@ -57,10 +57,10 @@ public:
 	float RayEndDepth = 2000.0f;
 
 	/// <summary>
-	/// 出現座標のオフセット
+	/// 出現座標Zのオフセット
 	/// </summary>
 	UPROPERTY(EditAnywhere)
-	float SpawnHeightOffset = 150.0f;
+	float SpawnOffsetZ = 150.0f;
 
 };
 
@@ -82,7 +82,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	virtual void Tick(float DeltaTime) override;
 
 	/// <summary>
 	/// 敵出現制御処理
@@ -119,5 +118,4 @@ private:
 	/// 敵を一定時間ごとにスポーンするタイマーID
 	/// </summary>
 	FTimerHandle SpawnTimerHandle;
-
 };

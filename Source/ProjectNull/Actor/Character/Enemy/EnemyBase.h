@@ -89,6 +89,14 @@ public:
 
 	// エネミーが吹き飛び中の判定フラグ
 	bool	KnockBackFlg = false;
+
+	//　経験値
+	UPROPERTY(EditAnywhere)
+	int EXP;
+
+	//　ギアエネルギー
+	UPROPERTY(EditAnywhere)
+	int GearEnergy;
 };
 
 //　敵管理クラス
