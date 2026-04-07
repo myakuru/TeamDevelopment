@@ -1,17 +1,28 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "EnemySpawner.h"
+
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "ProjectNull/Actor/Character/Enemy/EnemyGrunt/EnemyGruntBase.h"
 
-#include "../../../Actor/Character/Enemy/EnemyGrunt/EnemyGruntBase.h"
 
-// Sets default values
 AEnemySpawner::AEnemySpawner()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+}
+
+void AEnemySpawner::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//　出現タイマーをセット
+	GetWorld()->GetTimerManager().SetTimer(
+		SpawnTimerHandle,
+		this,
+		&AEnemySpawner::SpawnEnemy,
+		SpawnParams.SpawnInterval,
+		true);
 
 }
 
@@ -23,7 +34,7 @@ void AEnemySpawner::SpawnEnemy()
 	//　プレイヤーの情報を取得する（0番:1P）
 	const APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!pPlayerPawn) { return; }
-	
+
 	//　プレイヤーの場所（Location）
 	const FVector playerLocation = pPlayerPawn->GetActorLocation();
 
@@ -36,9 +47,8 @@ void AEnemySpawner::SpawnEnemy()
 	//　Rayが静的なオブジェクトに衝突していて
 	//	衝突している場所が地面または坂の傾きの場合は（壁などでない場合）
 	//　敵を出現させる
-	if (IsIntersectingStaticObjects(hitResult,spawnLocation)
+	if (IsIntersectingStaticObjects(hitResult, spawnLocation)
 		&& hitResult.Normal.Z > SpawnParams.MinGroundNormalZ) {
-
 		//　情報に基づいてアクターを出現させる
 		AEnemyGruntBase* enemyGrunt = GetWorld()->SpawnActor<AEnemyGruntBase>(
 			EnemyClass,
@@ -68,39 +78,41 @@ FVector AEnemySpawner::CalculateEnemySpawnPointInRing(const FVector& Center) con
 bool AEnemySpawner::IsIntersectingStaticObjects(FHitResult& HitResult, FVector& SpawnLocationXY)
 {
 	//　Rayの座標を求める
-	FVector rayStart	= SpawnLocationXY + FVector(0.0f, 0.0f, SpawnParams.RayStartHeight);
-	FVector rayEnd		= SpawnLocationXY - FVector(0.0f, 0.0f, SpawnParams.RayEndDepth);
+	FVector rayStart = SpawnLocationXY + FVector(0.0f, 0.0f, SpawnParams.RayStartHeight);
+	FVector rayEnd = SpawnLocationXY - FVector(0.0f, 0.0f, SpawnParams.RayEndDepth);
 
 	//　Rayがワールドの静的オブジェクトに衝突しているか調べる
-	const bool isIntersect = GetWorld()->LineTraceSingleByChannel(HitResult, rayStart, rayEnd, ECC_WorldStatic);
+	const bool isIntersect = GetWorld()->LineTraceSingleByChannel(HitResult, rayStart, rayEnd, ECollisionChannel::ECC_Visibility);
 
 	//　衝突していたら衝突した座標を出現座標にする
-	if (isIntersect) {
+	if (isIntersect)
+	{
 		SpawnLocationXY = HitResult.Location;
+		SpawnLocationXY.Z += SpawnParams.SpawnOffsetZ;
 	}
 
 	return isIntersect;
 }
 
-// Called when the game starts or when spawned
-void AEnemySpawner::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	//　出現タイマーをセット
-	GetWorld()->GetTimerManager().SetTimer(
-		SpawnTimerHandle,
-		this,
-		&AEnemySpawner::SpawnEnemy,
-		SpawnParams.SpawnInterval,
-		true);
-
-}
-
-// Called every frame
-void AEnemySpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
+//
+//void AEnemySpawner::Tick(float DeltaTime)
+//{
+//	//　プレイヤーの情報を取得する（0番:1P）
+//	const APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+//	if (!pPlayerPawn) { return; }
+//
+//	//　プレイヤーの場所（Location）
+//	const FVector playerLocation = pPlayerPawn->GetActorLocation();
+//
+//	//　出現座標XY
+//	FVector spawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
+//
+//	//　Rayの座標を求める
+//	FVector rayStart = spawnLocation + FVector(0.0f, 0.0f, SpawnParams.RayStartHeight);
+//	FVector rayEnd = spawnLocation - FVector(0.0f, 0.0f, SpawnParams.RayEndDepth);
+//
+//	Super::Tick(DeltaTime);
+//	DrawDebugLine(GetWorld(), rayStart, rayEnd, FColor::Green, false, 0.1f, 0, 2);
+//
+//}
 

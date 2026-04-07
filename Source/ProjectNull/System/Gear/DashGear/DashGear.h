@@ -4,6 +4,7 @@
 #include "../GearBase.h"
 #include "DashGear.generated.h"
 
+
 /// <summary>
 /// ダッシュギアクラス
 /// </summary>
@@ -18,18 +19,8 @@ public:
 
 public:
 
-	void Initialize(class APlayerBase* Player, class UPlayerGearComponent* GearComponent) override;
-	void Update(float DeltaTime)	override;
-	void Execute()					override;
-
-private:
-
-	void ApplyLv1()					override;
-	void ApplyLv2()					override;
-	void ApplyLv3()					override;
-	void ApplyLv4()					override;
-	void ResetParams()				override;
-
-	bool FrontDash();
+	void Initialize(class APlayerBase* Player, class UPlayerGearComponent* GearComponent)	override;
+	void Execute(int32 CurrentGearLevel)													override;
+	void Update(float DeltaTime)															override;
 
 };

@@ -1,7 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "GameProgressSubsystem.h"
+
 
 void UGameProgressSubsystem::AddKillCount(int32 Value)
 {

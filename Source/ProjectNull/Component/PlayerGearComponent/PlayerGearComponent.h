@@ -28,10 +28,22 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/// <summary>
+	/// ギアによって移動がブロックされているかどうかを判定する
+	/// </summary>
+	/// <returns>移動がブロックされている場合はtrue、そうでない場合はfalse</returns>
+	bool IsMovementBlockedByGear() const;
+
+	void ExecuteGear(int32 GearIndex);
+
+	//　セッター
 	//　プレイヤー（持ち主）をセットするメソッド
 	inline void SetOwnerPlayer(APlayerBase* Player) { OwnerPlayer = Player; }
 
+	//　ゲッター
+	inline const TArray<UGearBase*>& GetPlayerGears() const { return PlayerGears; }
 	inline int32 GetCurrentGearLevel() const { return CurrentGearLevel; }
+
 private:
 
 	//　プレイヤー（持ち主）のポインタ
@@ -43,5 +55,7 @@ private:
 	TArray<UGearBase*> PlayerGears;
 
 	//　現在ギアのレベル
+	UPROPERTY(EditAnywhere)
+
 	int32 CurrentGearLevel;
 };

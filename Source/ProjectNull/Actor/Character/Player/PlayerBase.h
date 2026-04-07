@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerBase.generated.h"
 
+
 //　カメラスプリングアームコンポーネント
 class USpringArmComponent;
 
@@ -15,7 +16,6 @@ class UPlayerAttackComponent;
 
 //　ギアコンポーネント
 class UPlayerGearComponent;
-
 
 /// <summary>
 ///　プレイヤー（ワールド内の自身が操作するキャラクター）の中間基底クラス
@@ -34,10 +34,36 @@ protected:
 
 public:
 
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/// <summary>
+	/// 移動処理
+	/// </summary>
+	/// <param name="InputVector">入力値に基づいてのベクトルXY</param>
+	void Move(const FVector2d& InputVector);
+
+
+	/// <summary>
+	/// 移動関連のパラメータをリセットする関数
+	/// </summary>
+	void ResetMovementParameters();
+	
+	//　ゲッター
+	inline UPlayerGearComponent* GetGearComponent() const { return GearComponent; }
+
+
 private:
+
+	/// <summary>
+	/// 移動できるかどうかを判定する
+	/// </summary>
+	/// <returns>移動できるならtrue,移動できないならfalse</returns>
+	bool CanMove();
+
+	//　最大加速度
+	UPROPERTY(EditAnywhere)
+	float MaxAcceleration;
 
 	//　================================================================
 	//　プレイヤーのコンポーネント
@@ -58,5 +84,4 @@ private:
 	//　ギアコンポーネント
 	UPROPERTY(VisibleAnywhere,Category = "Gear")
 	UPlayerGearComponent* GearComponent;
-
 };
