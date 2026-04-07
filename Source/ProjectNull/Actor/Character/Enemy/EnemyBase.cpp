@@ -15,6 +15,7 @@ AEnemyBase::AEnemyBase()
 	
 }
 
+
 // Called when the game starts or when spawned
 void AEnemyBase::BeginPlay()
 {
@@ -58,6 +59,9 @@ void AEnemyBase::BeginPlay()
 		//	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase BeginPlay ==="));
 		//}
 	}
+
+	// ゲームの進行に合わせて敵パラメータを設定
+	UpdateParams();
 }
 
 void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
@@ -79,11 +83,25 @@ void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
 	SetActorLocation(CalculateNextActorLocation(EnemyStatus.MoveDir,EnemyStatus.MoveSpeed,DeltaTime), true);
 }
 
-void AEnemyBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AEnemyBase::UpdateParams()
 {
-	// ほかのアクタと重なったら派生先でKnockBack関数を呼び出す
-	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase OnOverlap ==="));
+	if (!GameProgress) { return; }
+
+	// 倒した敵数を元に
+	const int32 killCount = GameProgress->GetKillCount();
+
+	// ヒットポイントの更新
+	EnemyStatus.FinalHP = EnemyStatus.HPScaling.GetFinalValue(killCount);
+
+	// 攻撃力の更新
+	EnemyStatus.FinalAttack = EnemyStatus.AttackScaling.GetFinalValue(killCount);
 }
+
+//void AEnemyBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	// ほかのアクタと重なったら派生先でKnockBack関数を呼び出す
+//	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase OnOverlap ==="));
+//}
 
 void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight)
 {
@@ -100,7 +118,6 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 	// RowNameから型付で取得
 	const FKnockBackData* KnockBackData =
 		KnockBackDataTable->FindRow<FKnockBackData>(RowName, TEXT("KnockBack"));
-	
 	if (!KnockBackData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("KnockBack row not found: %s"), *RowName.ToString());
@@ -122,6 +139,17 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 	EnemyStatus.KnockBackFlg = true;
 
 	UE_LOG(LogTemp, Warning, TEXT("=== ノックバック初期値完了 ==="));
+}
+
+void AEnemyBase::SetTakeDamaged(int32 AttackPower)
+{
+	// 簡易的に渡された値分,FinalHPを減算
+	EnemyStatus.FinalHP -= AttackPower;
+
+	if (EnemyStatus.FinalHP <= 0)
+	{
+		OnDeath();
+	}
 }
 
 void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime)
@@ -177,18 +205,17 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void AEnemyBase::OnDeath()
 {
 	//　敵が死んだ際に敵管理クラス経由でリストから自身を削除する
-	if (EnemyManager) 
-	{
+	if (EnemyManager) {
 		EnemyManager->RemoveEnemy(this);
 	}
 
-	//　敵が死んだ際に倒した敵数カウントアップする
-	if (UGameProgressSubsystem* gameProgress = GetWorld()->GetSubsystem<UGameProgressSubsystem>()) 
-	{
-		gameProgress->AddKillCount();
+	//　敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
+	if (GameProgress) {
+		GameProgress->AddKillCount();
 	}
 
-
+	//　自身をレベルから消す
+	Destroy();
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)

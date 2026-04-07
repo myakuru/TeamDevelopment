@@ -125,6 +125,14 @@ public:
 	/// </summary>
 	virtual void SetKnockBackData(const FVector& playerLocation, float AttackPower, float EnemyWeight);
 
+// エビ追加
+public:
+
+	/// <summary>
+	/// 敵（自身) がダメージを受ける処理
+	/// </summary>
+	virtual void SetTakeDamaged(int32 AttackPower = 1);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
