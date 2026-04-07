@@ -1,11 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "RobotController.h"
 
-#include "../../../Actor/Character/Player/Robot/Robot.h"
-#include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "ProjectNull/System/Gear/GearBase.h"
+#include "ProjectNull/Actor/Character/Player/Robot/Robot.h"
+#include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
+#include "ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h"
+
 
 ARobotController::ARobotController()
 	:	InputContext(nullptr),
@@ -22,17 +24,28 @@ void ARobotController::BeginPlay()
 
 	// 入力マッピングコンテキスト関連の初期化
 	InitializeInputContext();
+
+	if (PlayerHUDClass)
+	{
+		PlayerHUD = CreateWidget<UPlayerHUDWidget>(this, PlayerHUDClass);
+
+		if (PlayerHUD)
+		{
+			PlayerHUD->AddToViewport();
+		}
+	}
 }
 
 void ARobotController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(InputComponent)) 
+	if (UEnhancedInputComponent* enhacedInput = Cast<UEnhancedInputComponent>(InputComponent)) 
 	{
-		enhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
-		enhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
-		enhancedInput->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ARobotController::Jump);
+		enhacedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
+		enhacedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
+		enhacedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ARobotController::Jump);
+		enhacedInput->BindAction(GearAction01, ETriggerEvent::Started, this, &ARobotController::GearExecute01);
 	}
 }
 
@@ -48,18 +61,10 @@ void ARobotController::InitializeInputContext()
 
 void ARobotController::Move(const FInputActionValue& MoveActionValue)
 {
-	const FVector2d inputVector = MoveActionValue.Get<FVector2D>();
-	const FRotator	yawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
+	APlayerBase* controlledPlayer = Cast<APlayerBase>(GetCharacter());
+	if (!controlledPlayer) { return; }
 
-	const FVector forward	= FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
-	const FVector right		= FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
-
-
-	if (APawn* controlledPawn = GetPawn())
-	{
-		controlledPawn->AddMovementInput(forward, inputVector.Y);
-		controlledPawn->AddMovementInput(right, inputVector.X);
-	}
+	controlledPlayer->Move(MoveActionValue.Get<FVector2D>());
 }
 
 void ARobotController::Look(const FInputActionValue& LookActionValue)
@@ -71,9 +76,22 @@ void ARobotController::Look(const FInputActionValue& LookActionValue)
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
+	//　ジャンプの実行
 	if (ACharacter* controlledCharacter = GetCharacter())
 	{
 		controlledCharacter->Jump();
+	}
+}
+
+void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
+{
+	UE_LOG(LogTemp, Warning, TEXT("aaaaa"));
+	if (APlayerBase* controlledPlayer = Cast<APlayerBase>(GetCharacter()))
+	{
+		if (UPlayerGearComponent* gearComponent = controlledPlayer->GetGearComponent())
+		{
+			gearComponent->ExecuteGear(0);
+		}
 	}
 }
 

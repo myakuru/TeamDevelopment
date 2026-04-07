@@ -14,8 +14,8 @@ class URingPulseSlashAttack;
 //　Niagaraエフェクトクラス
 class UNiagaraSystem;
 
-class UNiagaraComponent;
 
+//　自動攻撃種類
 UENUM(BlueprintType)
 enum class EAutoAttackType : uint8
 {
@@ -28,7 +28,7 @@ enum class EAutoAttackType : uint8
 /// 自動攻撃クラス
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
-class PROJECTNULL_API UAutoAttack : public UAttackBase
+class PROJECTNULL_API UAutoAttack final : public UAttackBase
 {
 	GENERATED_BODY()
 
@@ -84,15 +84,26 @@ private:
 	UPROPERTY(EditAnywhere, Instanced)
 	TMap<EAutoAttackType,URingPulseSlashAttack*> AutoAttackParamsMap;
 
-	////　扇状（前方）自動斬撃攻撃のパラメータ
-	UPROPERTY(EditAnywhere, Category = "Effect")
-	UNiagaraSystem* AutoFrontEffect;
-
-	UNiagaraComponent* NiagaraComp;
+	//　================================================================
+	//　タイマー関連
+	//　================================================================
 
 	//　前方扇状自動攻撃タイマー
 	FTimerHandle AutoFrontConeAttackTimerHandle;
 
 	//　前方扇状自動攻撃からの周囲攻撃遅延タイマー
 	FTimerHandle FrontToRingDelayTimerHandle;
+
+	//　================================================================
+	//　エフェクト関連
+	//　================================================================
+
+	//　扇状（前方）自動斬撃攻撃のエフェクト
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	UNiagaraSystem* AutoFrontEffect;
+
+	//　周囲2段階（リング状に移動）攻撃のエフェクト
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	UNiagaraSystem* AutoRingEffect;
+
 };

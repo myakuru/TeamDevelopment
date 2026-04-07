@@ -1,16 +1,17 @@
 #include "PlayerBase.h"
 
-#include "GameFramework\SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "../../../Component/PlayerAttackComponent/PlayerAttackComponent.h"
-#include "../../../Component/PlayerGearComponent/PlayerGearComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
+#include "ProjectNull/Component/PlayerAttackComponent/PlayerAttackComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
 		AttackComponent(nullptr),
-		GearComponent(nullptr)
+		GearComponent(nullptr),
+		MaxAcceleration(2100.0f)
 {
 	//Å@================================================================
 	//Å@é©êgÇÃê›íË
@@ -39,7 +40,7 @@ APlayerBase::APlayerBase()
 
 
 	AttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>("Attack");
-	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
+	GearComponent	= CreateDefaultSubobject<UPlayerGearComponent>("Gear");
 }
 
 void APlayerBase::BeginPlay()
@@ -57,6 +58,10 @@ void APlayerBase::BeginPlay()
 
 	Super::BeginPlay();
 	
+	if(auto* movement = GetCharacterMovement())
+	{
+		movement->MaxAcceleration = MaxAcceleration;
+	}
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -72,3 +77,34 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 }
 
+void APlayerBase::Move(const FVector2d& InputVector)
+{
+	if (!CanMove()) { return; }
+
+	const FRotator yawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
+
+	const FVector forward = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
+	const FVector right = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
+
+	AddMovementInput(forward, InputVector.Y);
+	AddMovementInput(right, InputVector.X);
+}
+
+void APlayerBase::ResetMovementParameters()
+{
+	if (auto* movement = GetCharacterMovement())
+	{
+		movement->SetMovementMode(MOVE_Walking);
+		movement->MaxAcceleration = MaxAcceleration;
+	}
+}
+
+bool APlayerBase::CanMove()
+{
+	if(GearComponent && GearComponent->IsMovementBlockedByGear())
+	{
+		return false;
+	}
+
+	return true;
+}

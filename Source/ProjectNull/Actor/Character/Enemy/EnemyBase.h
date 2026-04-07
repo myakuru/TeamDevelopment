@@ -2,9 +2,14 @@
 
 #pragma once
 
+#include "../../../System/DataTable/KnockBackData/KnockBackData.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyBase.generated.h"
+
+// 前方宣言
+class UCapsuleComponent;
+class UPrimitiveComponent;
 
 /// <summary>
 /// 敵ステータスのスケーリング情報
@@ -37,8 +42,6 @@ public:
 		return static_cast<int32>(Base * Scale);
 	}
 };
-
-
 
 /// <summary>
 /// 敵基本ステータス
@@ -77,15 +80,30 @@ public:
 	UPROPERTY(EditAnywhere)
 	FStatScaling AttackScaling;
 
-};
+	// エネミーの重量
+	UPROPERTY(EditAnywhere)
+	float	KnockBackWeight = 1.0;
 
+	// ノックバック方向
+	FVector KNockBackVelocity = FVector::ZeroVector;
+
+	// エネミーが吹き飛び中の判定フラグ
+	bool	KnockBackFlg = false;
+
+	//　経験値
+	UPROPERTY(EditAnywhere)
+	int EXP;
+
+	//　ギアエネルギー
+	UPROPERTY(EditAnywhere)
+	int GearEnergy;
+};
 
 //　敵管理クラス
 class UEnemyManagerSubsystem;
 
 //　ゲームの進行管理クラス
 class UGameProgressSubsystem;
-
 
 /// <summary>
 /// 敵の中間基底クラス
@@ -100,7 +118,13 @@ class PROJECTNULL_API AEnemyBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AEnemyBase();
-	
+public:
+
+	/// <summary>
+	/// 敵（自身）が吹き飛ばされる処理
+	/// </summary>
+	virtual void SetKnockBackData(const FVector& playerLocation, float AttackPower, float EnemyWeight);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -115,6 +139,32 @@ protected:
 	/// 敵（自身）のパラメータを更新する
 	/// </summary>
 	virtual void UpdateParams();
+
+	/// <summary>
+	/// SphereCollisionを取得して使うための関数
+	/// <summary>
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Collision")
+	UCapsuleComponent* CapsuleCollision;
+
+	//// 他のActorと重なった際に呼ばれる関数
+	//UFUNCTION()
+	//virtual void OnOverlap(
+	//	UPrimitiveComponent* OverlappedComponent,	// 自分側のコリジョン
+	//	AActor* OtherActor,							// 触れてきたアクタ
+	//	UPrimitiveComponent* OtherComp,				// 触れてきた側のコンポーネント
+	//	int32 OtherBodyIndex,						// ボディ番号（基本使わない）
+	//	bool bFromSweep,							// Sweepかどうか
+	//	const FHitResult& SweepResult				// 当たりの詳細判定
+	//);
+
+	/// <summary>
+	/// 敵が吹き飛ばされている状態の処理
+	/// </summary>
+	virtual void MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime);
+
+	// DataTable 参照
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "KnockBack")
+	UDataTable* KnockBackDataTable;
 
 	/// <summary>
 	/// 敵管理クラスのポインタ
@@ -133,6 +183,8 @@ protected:
 	/// </summary>
 	UPROPERTY(EditAnywhere)
 	FEnemyStatus EnemyStatus;
+
+	FVector LanchVelocity;
 
 public:	
 	// Called every frame
