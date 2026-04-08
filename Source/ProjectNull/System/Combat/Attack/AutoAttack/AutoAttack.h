@@ -11,8 +11,8 @@ class UEnemyManagerSubsystem;
 //　円型の斬撃攻撃クラス
 class URingPulseSlashAttack;
 
-//　Niagaraエフェクトクラス
-class UNiagaraSystem;
+//　浮遊武器エフェクトクラス
+class UFloatingWeaponEffect;
 
 
 //　自動攻撃種類
@@ -72,6 +72,7 @@ private:
 	/// <returns>敵が扇範囲かどうか</returns>
 	bool IsEnemyInConeRange(AActor* Enemy, const FVector& PlayerLocation, const FVector& AttackDir, const URingPulseSlashAttack& RingPulseSlashAttack) const;
 
+	
 	//　自動攻撃の間隔時間
 	UPROPERTY(EditAnywhere)
 	float AutoAttackInterval;
@@ -85,6 +86,14 @@ private:
 	TMap<EAutoAttackType,URingPulseSlashAttack*> AutoAttackParamsMap;
 
 	//　================================================================
+	//　エフェクト関連
+	//　================================================================
+
+	//　浮遊武器エフェクトクラスのマップ配列
+	UPROPERTY(EditAnywhere, Instanced)
+	TMap<EAutoAttackType, UFloatingWeaponEffect*> FloatingWeaponMap;
+
+	//　================================================================
 	//　タイマー関連
 	//　================================================================
 
@@ -93,17 +102,5 @@ private:
 
 	//　前方扇状自動攻撃からの周囲攻撃遅延タイマー
 	FTimerHandle FrontToRingDelayTimerHandle;
-
-	//　================================================================
-	//　エフェクト関連
-	//　================================================================
-
-	//　扇状（前方）自動斬撃攻撃のエフェクト
-	UPROPERTY(EditAnywhere, Category = "Effect")
-	UNiagaraSystem* AutoFrontEffect;
-
-	//　周囲2段階（リング状に移動）攻撃のエフェクト
-	UPROPERTY(EditAnywhere, Category = "Effect")
-	UNiagaraSystem* AutoRingEffect;
 
 };
