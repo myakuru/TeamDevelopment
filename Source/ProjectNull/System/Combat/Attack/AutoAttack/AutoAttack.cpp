@@ -4,11 +4,13 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
-#include "ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h"
-#include "ProjectNull/Actor/Character/Enemy/EnemyBase.h"
-#include "ProjectNull/Actor/Character/Player/PlayerBase.h"
-#include "ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
-#include "ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h"
+#include <ProjectNull/Actor/Character/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Character/Player/PlayerBase.h>
+#include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h>
+#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
+
 
 
 UAutoAttack::UAutoAttack()
@@ -21,6 +23,23 @@ UAutoAttack::UAutoAttack()
 void UAutoAttack::Initialize(AActor* Owner)
 {
 	UAttackBase::Initialize(Owner);
+
+
+	if (FloatingWeaponMap.Contains(EAutoAttackType::Front))
+	{
+		if (auto* floatingWeapon = FloatingWeaponMap[EAutoAttackType::Front])
+		{
+			floatingWeapon->SetOwnerAttack(AutoAttackParamsMap[EAutoAttackType::Front]);
+		}
+	}
+
+	if (FloatingWeaponMap.Contains(EAutoAttackType::Ring))
+	{
+		if (auto* floatingWeapon = FloatingWeaponMap[EAutoAttackType::Ring])
+		{
+			floatingWeapon->SetOwnerAttack(AutoAttackParamsMap[EAutoAttackType::Ring]);
+		}
+	}
 
 	//　自動攻撃のタイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
@@ -43,12 +62,20 @@ void UAutoAttack::Update(float DeltaTime)
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!enemyManager) { return; }
 
-
-	for(auto& [type,ConeSlashParams] : AutoAttackParamsMap)
+	//　自動攻撃の更新
+	for(auto& [type,coneSlashParams] : AutoAttackParamsMap)
 	{
-		if (!ConeSlashParams) { continue; }
+		if (!coneSlashParams) { continue; }
 
-		UpdateAutoAttack(DeltaTime, *ConeSlashParams, enemyManager);
+		UpdateAutoAttack(DeltaTime, *coneSlashParams, enemyManager);
+	}
+
+	//　浮遊武器の更新
+	for (auto& [type, floatingWeapon] : FloatingWeaponMap)
+	{
+		if (!floatingWeapon) { continue; }
+
+		floatingWeapon->Update(OwnerActor);
 	}
 
 }
@@ -57,23 +84,17 @@ void UAutoAttack::StartAutoAttack()
 {
 	if (!OwnerActor) { return; }
 
-	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front) && AutoAttackParamsMap[EAutoAttackType::Front]){
-
-		AutoAttackParamsMap[EAutoAttackType::Front]->Start();
-
-		if (AutoFrontEffect) {
-			UNiagaraFunctionLibrary::SpawnSystemAttached(
-				AutoFrontEffect,
-				OwnerActor->GetRootComponent(),
-				NAME_None,
-				FVector::ZeroVector,
-				FRotator::ZeroRotator,
-				EAttachLocation::KeepRelativeOffset,
-				true
-			);
-		}
+	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front)
+		&& AutoAttackParamsMap[EAutoAttackType::Front])
+	{
+		AutoAttackParamsMap[EAutoAttackType::Front]->Start();	
 	}
 
+	if (FloatingWeaponMap.Contains(EAutoAttackType::Front)
+		&& FloatingWeaponMap[EAutoAttackType::Front]) 
+	{
+		FloatingWeaponMap[EAutoAttackType::Front]->Start(OwnerActor->GetRootComponent());
+	}
 	
 
 	//　前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット
@@ -87,41 +108,31 @@ void UAutoAttack::StartAutoAttack()
 
 void UAutoAttack::StartAutoRingAttack()
 {
-	if (AutoAttackParamsMap.Contains(EAutoAttackType::Ring) && AutoAttackParamsMap[EAutoAttackType::Ring]) {
-		AutoAttackParamsMap[EAutoAttackType::Ring]->Start();
-
-		if (AutoRingEffect) {
-			UNiagaraFunctionLibrary::SpawnSystemAttached(
-				AutoRingEffect,
-				OwnerActor->GetRootComponent(),
-				NAME_None,
-				FVector::ZeroVector,
-				FRotator::ZeroRotator,
-				EAttachLocation::KeepRelativeOffset,
-				true
-			);
-		}
-
+	if (FloatingWeaponMap.Contains(EAutoAttackType::Ring)
+		&& FloatingWeaponMap[EAutoAttackType::Ring])
+	{
+		FloatingWeaponMap[EAutoAttackType::Ring]->Start(OwnerActor->GetRootComponent());
 	}
 }
 void UAutoAttack::UpdateAutoAttack(float DeltaTime, URingPulseSlashAttack& RingPulseSlashAttack, UEnemyManagerSubsystem* EnemyManager)
 {
-	if (!OwnerActor) { return; }
-	if (!EnemyManager) { return; }
+	if (!OwnerActor)	{ return; }
+	if (!EnemyManager)	{ return; }
 
 
 	if (!RingPulseSlashAttack.UpdateAttack(DeltaTime)) { return; }
 
 	//　プレイヤーの座標と前方ベクトルを取得
-	const FVector playerLocation = OwnerActor->GetActorLocation();
-	const FVector forwardVector = OwnerActor->GetActorForwardVector();
+	const FVector playerLocation	= OwnerActor->GetActorLocation();
+	const FVector forwardVector		= OwnerActor->GetActorForwardVector();
 
 	//　攻撃方向ベクトル
 	const FVector attackDir = RingPulseSlashAttack.CalcAttackDir(forwardVector);
 
 	{
 		//　攻撃範囲をデバッグラインで可視化
-		UDebugDrawLibrary::DrawDebugFan(
+		UDebugDrawLibrary::DrawDebugFan
+		(
 			GetWorld(),
 			playerLocation,
 			attackDir,
@@ -149,19 +160,20 @@ bool UAutoAttack::IsEnemyInConeRange(AActor* Enemy, const FVector& PlayerLocatio
 	if (!Enemy) { return false; }
 
 	//　敵へのベクトル
-	FVector ToEnemy = Enemy->GetActorLocation() - PlayerLocation;
+	FVector toEnemy = Enemy->GetActorLocation() - PlayerLocation;
 
 	//　距離チェック
-	if (ToEnemy.SizeSquared() > RingPulseSlashAttack.GetRadiusSquared())
+	if (toEnemy.SizeSquared() > RingPulseSlashAttack.GetRadiusSquared())
 	{
 		return false;
 	}
 
 	//　ベクトル正規化
-	ToEnemy.Normalize();
+	toEnemy.Normalize();
 
 	//　角度チェック
-	float Dot = FVector::DotProduct(AttackDir, ToEnemy);
+	const float dot = FVector::DotProduct(AttackDir, toEnemy);
 
-	return Dot > RingPulseSlashAttack.GetConeCosine();
+	return dot > RingPulseSlashAttack.GetConeCosine();
 }
+
