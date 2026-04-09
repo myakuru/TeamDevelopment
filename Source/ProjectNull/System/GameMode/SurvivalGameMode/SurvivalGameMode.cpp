@@ -15,6 +15,7 @@ ASurvivalGameMode::ASurvivalGameMode()
 void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
 	if (IsValid(WidgetClass))
 	{
 		// PlayerHUDWidgetクラスのインスタンスを生成
