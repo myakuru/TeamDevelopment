@@ -43,9 +43,11 @@ bool URingPulseSlashAttack::UpdateAttack(float DeltaTime)
 	return true;
 }
 
-bool URingPulseSlashAttack::CanDeactivate() const
+bool URingPulseSlashAttack::CanDeactivate()
 {
 	bool canDeactivate = (bIsActive != bPrevActive) && !bIsActive;
+	bPrevActive = bIsActive;
+
 	return canDeactivate;
 }
 

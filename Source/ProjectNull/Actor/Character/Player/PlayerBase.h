@@ -17,6 +17,29 @@ class UPlayerAttackComponent;
 //　ギアコンポーネント
 class UPlayerGearComponent;
 
+USTRUCT(BlueprintType)
+struct FExpSystem
+{
+	GENERATED_BODY()
+
+public:
+
+	FExpSystem():
+		CurrentExp(0)
+	{ }
+
+public:
+
+	void AddExp(int32 AddValue)
+	{
+		CurrentExp += AddValue;
+	}
+
+	UPROPERTY(EditAnywhere)
+	int32 CurrentExp;
+};
+
+
 /// <summary>
 ///　プレイヤー（ワールド内の自身が操作するキャラクター）の中間基底クラス
 /// </summary>
@@ -43,14 +66,9 @@ public:
 	/// <param name="InputVector">入力値に基づいてのベクトルXY</param>
 	void Move(const FVector2d& InputVector);
 
-
-	/// <summary>
-	/// 移動関連のパラメータをリセットする関数
-	/// </summary>
-	void ResetMovementParameters();
-	
 	//　ゲッター
-	inline UPlayerGearComponent* GetGearComponent() const { return GearComponent; }
+	inline UPlayerGearComponent*	GetGearComponent() const { return GearComponent; }
+	inline FExpSystem				GetEXPSystem() const { return ExpSystem; }
 
 
 private:
@@ -61,9 +79,8 @@ private:
 	/// <returns>移動できるならtrue,移動できないならfalse</returns>
 	bool CanMove();
 
-	//　最大加速度
-	UPROPERTY(EditAnywhere)
-	float MaxAcceleration;
+	//　経験値関連構造体
+	FExpSystem ExpSystem;
 
 	//　================================================================
 	//　プレイヤーのコンポーネント

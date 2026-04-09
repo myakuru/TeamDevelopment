@@ -31,10 +31,5 @@ private:
 
 	void MoveUp(float Value);
 
-	void StartBoost();
-	void StopBoost();
-
-	// ‘¬“x
-	float NormalSpeed;
-	float BoostSpeed;
+	
 };

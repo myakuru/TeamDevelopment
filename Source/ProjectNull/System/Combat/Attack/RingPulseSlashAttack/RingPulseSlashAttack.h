@@ -36,7 +36,7 @@ public:
 	/// 無効かどうか（非アクティブかどうか１フレーム）
 	/// </summary>
 	/// <returns>無効になったフレームならtrue 無効になったフレームでないならfalse</returns>
-	bool CanDeactivate() const;
+	bool CanDeactivate();
 
 	/// <summary>
 	/// 前フレームアクティブフラグの更新

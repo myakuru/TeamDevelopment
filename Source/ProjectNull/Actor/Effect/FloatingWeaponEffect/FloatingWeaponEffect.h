@@ -5,6 +5,15 @@
 #include "UObject/Object.h"
 #include "FloatingWeaponEffect.generated.h"
 
+//　
+//UENUM(BlueprintType)
+//enum class EFloatingWeaponState : uint8
+//{
+//	Front,
+//	Ring,
+//	Count UMETA(Hidden)
+//};
+
 //　Niagaraエフェクトクラス
 class UNiagaraSystem;
 
@@ -13,6 +22,9 @@ class UNiagaraComponent;
 
 //　リング状斬撃攻撃クラス
 class URingPulseSlashAttack;
+
+//　浮遊武器の状態基底クラス
+class UFloatingWeaponStateBase;
 
 
 /// <summary>
@@ -84,4 +96,12 @@ private:
 	//　エフェクトの回転オフセット
 	UPROPERTY(EditAnywhere)
 	FRotator RotatorOffset;
+
+	//　浮遊武器の状態の配列
+	//UPROPERTY(EditAnywhere, Instanced)
+	//TMap< UFloatingWeaponStateBase*> FloatingWeaponStates;
+
+	//　現在の浮遊武器状態
+	UPROPERTY()
+	UFloatingWeaponStateBase* CurrentFloatingWeaponState;
 };

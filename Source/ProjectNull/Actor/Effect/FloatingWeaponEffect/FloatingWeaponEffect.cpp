@@ -44,7 +44,7 @@ void UFloatingWeaponEffect::Update(AActor* OwnerActor)
 	}
 	
 	//　PrevActiveフラグの更新
-	OwnerAttack->UpdatePrevActiveFlg();
+//	OwnerAttack->UpdatePrevActiveFlg();
 
 	//　プレイヤーの座標
 	const FVector playerLocation		= OwnerActor->GetActorLocation();
@@ -59,6 +59,8 @@ void UFloatingWeaponEffect::Update(AActor* OwnerActor)
 
 	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + OwnerAttack->CurrentAngle;
 	Transform.SetRotation(RotatorOffset.Quaternion());
+
+	//CurrentFloatingWeaponState = 
 
 	UpdateTransform();
 }
