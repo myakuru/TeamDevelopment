@@ -13,7 +13,8 @@ ARobotController::ARobotController()
 	:	InputContext(nullptr),
 		MoveAction(nullptr),
 		LookAction(nullptr),
-		JumpAction(nullptr)
+		JumpAction(nullptr),
+		PlayerHUD(nullptr)
 {
 	bReplicates = true;
 }
@@ -25,15 +26,8 @@ void ARobotController::BeginPlay()
 	// 入力マッピングコンテキスト関連の初期化
 	InitializeInputContext();
 
-	if (PlayerHUDClass)
-	{
-		PlayerHUD = CreateWidget<UPlayerHUDWidget>(this, PlayerHUDClass);
-
-		if (PlayerHUD)
-		{
-			PlayerHUD->AddToViewport();
-		}
-	}
+	// UIの初期化
+	InitializeUI();
 }
 
 void ARobotController::SetupInputComponent()
@@ -91,6 +85,22 @@ void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 		if (UPlayerGearComponent* gearComponent = controlledPlayer->GetGearComponent())
 		{
 			gearComponent->ExecuteGear(0);
+		}
+	}
+}
+
+// UIの初期化関数
+void ARobotController::InitializeUI()
+{
+
+	if (IsLocalController() && PlayerHUDClass)
+	{
+		PlayerHUD		= CreateWidget<UPlayerHUDWidget>	(this, PlayerHUDClass);
+
+		// HUDの表示
+		if (PlayerHUD)
+		{
+			PlayerHUD->AddToViewport();
 		}
 	}
 }

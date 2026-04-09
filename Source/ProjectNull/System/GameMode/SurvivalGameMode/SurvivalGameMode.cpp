@@ -15,18 +15,6 @@ ASurvivalGameMode::ASurvivalGameMode()
 void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	if (IsValid(WidgetClass))
-	{
-		// PlayerHUDWidgetクラスのインスタンスを生成
-		PlayerHUDWidget = Cast<UPlayerHUDWidget>(CreateWidget(GetWorld(), WidgetClass));
-
-		if (PlayerHUDWidget != nullptr)
-		{
-			// 生成したPlayerHUDWidgetをビューポートに追加
-			PlayerHUDWidget->AddToViewport();
-		}
-
-	}
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)

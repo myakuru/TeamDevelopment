@@ -29,6 +29,9 @@ public:
 
 	ARobotController();
 
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHUD; }
+
 protected:
 
 	virtual void BeginPlay()			override;
@@ -65,7 +68,11 @@ private:
 	/// <param name="LookActionValue">入力値</param>
 	void Jump(const FInputActionValue& JumpActionValue);
 
-	
+	/// <summary>
+	/// UIの初期化関数
+	/// </summary>
+	void InitializeUI();
+
 	//　入力マッピングコンテキスト
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputContext;
@@ -86,12 +93,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> GearAction01;
 
-
-	UPROPERTY(EditAnywhere)
+	// プレイヤーHUDウィジェットクラス
+	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UPlayerHUDWidget> PlayerHUDClass;
 
+	// プレイヤーHUDウィジェットのインスタンス
 	UPROPERTY()
-	UPlayerHUDWidget* PlayerHUD;
-
+	TObjectPtr<UPlayerHUDWidget> PlayerHUD;
 
 };
