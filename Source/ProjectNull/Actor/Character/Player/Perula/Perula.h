@@ -18,4 +18,16 @@ public:
 	// Sets default values for this character's properties
 	APerula();
 
+	UPROPERTY()
+	class UPlayerHUDWidget* PlayerHUDWidget;
+
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void BeginPlay() override;
+
+private:
+
+	int32 MaxHp			= 100;
+	int32 CurrentHp		= 100;
+
 };
