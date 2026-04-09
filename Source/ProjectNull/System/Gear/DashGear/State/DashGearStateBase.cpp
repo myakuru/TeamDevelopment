@@ -105,7 +105,8 @@ void UDashGearStateBase::UpdateDashAttack()
 
 		if (DistSq <= DashAttackRangeSquared)
 		{
-			enemy->OnDeath();
+			enemy->SetKnockBackData(playerLocation,3,1);
+			enemy->SetTakeDamaged();
 		}
 	}
 

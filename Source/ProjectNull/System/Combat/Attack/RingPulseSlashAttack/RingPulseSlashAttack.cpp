@@ -9,6 +9,7 @@ URingPulseSlashAttack::URingPulseSlashAttack()
 	, ConeAngle(30.0f)
 	, bIsActive(false)
 	, CurrentAngle(0.0f)
+	, StartAngle(0.0f)
 	, KnockbackPower(2.0f)
 {
 	
@@ -17,7 +18,7 @@ URingPulseSlashAttack::URingPulseSlashAttack()
 void URingPulseSlashAttack::Start()
 {
 	bIsActive		= true;
-	CurrentAngle	= 0.0f;
+	CurrentAngle	= StartAngle;
 	ElapsedTime		= 0.0f;
 }
 
@@ -42,9 +43,22 @@ bool URingPulseSlashAttack::UpdateAttack(float DeltaTime)
 	return true;
 }
 
+bool URingPulseSlashAttack::CanDeactivate()
+{
+	bool canDeactivate = (bIsActive != bPrevActive) && !bIsActive;
+	bPrevActive = bIsActive;
+
+	return canDeactivate;
+}
+
+void URingPulseSlashAttack::UpdatePrevActiveFlg()
+{
+	bPrevActive = bIsActive;
+}
+
 FVector URingPulseSlashAttack::CalcAttackDir(const FVector& forwardVector) const
 {
-	const float angle = bRotate ? CurrentAngle : 0.0f;
+	const float angle = bRotate ? CurrentAngle : StartAngle;
 	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
 }
 

@@ -5,6 +5,7 @@
 #include "../RobotController.h"
 #include "DebugPlayerController.generated.h"
 
+class ARobot;
 
 UCLASS()
 class PROJECTNULL_API ADebugPlayerController : public ARobotController
@@ -25,11 +26,6 @@ private:
 	void ChangeDebugMode(const FInputActionValue& ActionValue);
 
 	/// <summary>
-	/// デバッグ用パラメータの設定関数
-	/// </summary>
-	void SetDebugParameter();
-
-	/// <summary>
 	/// 上方向への移動入力処理関数
 	/// </summary>
 	/// <param name="ActionValue">入力値</param>
@@ -47,7 +43,9 @@ private:
 	//　デバッグモードかどうかのフラグ
 	bool bIsDebugMode;
 
-	//　デバッグ用の移動速度
 	UPROPERTY(EditAnywhere)
-	float DebugMaxAcceleration;
+	TSubclassOf<ARobot> GameClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ARobot> DebugClass;
 };

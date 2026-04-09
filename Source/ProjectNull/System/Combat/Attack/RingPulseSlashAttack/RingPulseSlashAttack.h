@@ -5,6 +5,7 @@
 #include "RingPulseSlashAttack.generated.h"
 
 
+
 /// <summary>
 /// 円型の斬撃攻撃クラス
 /// </summary>
@@ -30,6 +31,17 @@ public:
 	/// <param name="DeltaTime">デルタタイム</param>
 	/// /// <returns>更新結果</returns>
 	bool UpdateAttack(float DeltaTime);
+
+	/// <summary>
+	/// 無効かどうか（非アクティブかどうか１フレーム）
+	/// </summary>
+	/// <returns>無効になったフレームならtrue 無効になったフレームでないならfalse</returns>
+	bool CanDeactivate();
+
+	/// <summary>
+	/// 前フレームアクティブフラグの更新
+	/// </summary>
+	void UpdatePrevActiveFlg();
 
 	/// <summary>
 	/// 攻撃方向の計算
@@ -77,9 +89,16 @@ public:
 	//　実行中かどうか
 	bool bIsActive;
 
+	//　前フレーム実行中かどうか
+	bool bPrevActive;
+
 	//　現在の角度
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
+
+	//　始める角度
+	UPROPERTY(EditAnywhere)
+	float StartAngle;
 
 	//　ノックバックの強さ
 	UPROPERTY(EditAnywhere)

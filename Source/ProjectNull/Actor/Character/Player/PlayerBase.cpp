@@ -10,8 +10,7 @@ APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
 		AttackComponent(nullptr),
-		GearComponent(nullptr),
-		MaxAcceleration(2100.0f)
+		GearComponent(nullptr)
 {
 	//@================================================================
 	//@Ž©g‚ÌÝ’è
@@ -57,11 +56,8 @@ void APlayerBase::BeginPlay()
 	}
 
 	Super::BeginPlay();
-	
-	if(auto* movement = GetCharacterMovement())
-	{
-		movement->MaxAcceleration = MaxAcceleration;
-	}
+
+	//2100
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -88,15 +84,6 @@ void APlayerBase::Move(const FVector2d& InputVector)
 
 	AddMovementInput(forward, InputVector.Y);
 	AddMovementInput(right, InputVector.X);
-}
-
-void APlayerBase::ResetMovementParameters()
-{
-	if (auto* movement = GetCharacterMovement())
-	{
-		movement->SetMovementMode(MOVE_Walking);
-		movement->MaxAcceleration = MaxAcceleration;
-	}
 }
 
 bool APlayerBase::CanMove()

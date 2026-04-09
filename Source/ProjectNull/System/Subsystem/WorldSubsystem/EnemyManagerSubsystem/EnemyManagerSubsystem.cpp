@@ -31,8 +31,10 @@ void UEnemyManagerSubsystem::UpdateEnemies(float DeltaTime)
 	if (!pPlayerPawn) { return; }
 
 	//　すべて敵の更新メソッドを呼ぶ
-	for (AEnemyBase* enemy : EnemyGruntList) {
-		if (enemy) {
+	for (AEnemyBase* enemy : EnemyGruntList) 
+	{
+		if (enemy) 
+		{
 			enemy->OnUpdate(pPlayerPawn, DeltaTime);
 		}
 	}
