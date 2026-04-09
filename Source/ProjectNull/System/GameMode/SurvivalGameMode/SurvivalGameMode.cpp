@@ -1,12 +1,32 @@
 
 #include "SurvivalGameMode.h"
 
-#include "ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+
+// HpWidgetクラスのインクルード
+#include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 
 
 ASurvivalGameMode::ASurvivalGameMode()
 {
 	PrimaryActorTick.bCanEverTick = true;
+}
+
+void ASurvivalGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	if (IsValid(WidgetClass))
+	{
+		// PlayerHUDWidgetクラスのインスタンスを生成
+		PlayerHUDWidget = Cast<UPlayerHUDWidget>(CreateWidget(GetWorld(), WidgetClass));
+
+		if (PlayerHUDWidget != nullptr)
+		{
+			// 生成したPlayerHUDWidgetをビューポートに追加
+			PlayerHUDWidget->AddToViewport();
+		}
+
+	}
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)

@@ -18,4 +18,14 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class Types")
+	TSubclassOf<UUserWidget> WidgetClass;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Runtime")
+	class UPlayerHUDWidget* PlayerHUDWidget;
+
+	void BeginPlay() override;
+
 };
