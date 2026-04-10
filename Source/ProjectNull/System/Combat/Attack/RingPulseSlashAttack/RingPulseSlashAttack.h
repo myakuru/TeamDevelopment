@@ -38,6 +38,8 @@ public:
 	/// <returns>無効になったフレームならtrue 無効になったフレームでないならfalse</returns>
 	bool CanDeactivate();
 
+	bool IsActiveFirstFrame();
+
 	/// <summary>
 	/// 前フレームアクティブフラグの更新
 	/// </summary>
