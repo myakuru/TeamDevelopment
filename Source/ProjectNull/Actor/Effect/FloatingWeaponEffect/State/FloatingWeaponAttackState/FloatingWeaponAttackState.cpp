@@ -1,23 +1,23 @@
 
-
-#include "FloatingWeaponStandState.h"
+#include "FloatingWeaponAttackState.h"
 
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 #include <ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h>
 
-UFloatingWeaponStandState::UFloatingWeaponStandState()
+UFloatingWeaponAttackState::UFloatingWeaponAttackState()
 {
 }
 
-void UFloatingWeaponStandState::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 
 	auto* attack = Owner->GetOwnerAttack();
 
-	if (attack->IsActiveFirstFrame())
+	//　攻撃が消えたらエフェクト消す
+	if (attack->CanDeactivate())
 	{
-		Owner->ChangeState(EFloatingWeaponState::Attack);
+		Owner->ChangeState(EFloatingWeaponState::Stand);
 		return;
 	}
 
@@ -25,15 +25,14 @@ void UFloatingWeaponStandState::Update(AActor* OwnerActor, float DeltaTime)
 	const FVector playerLocation = OwnerActor->GetActorLocation();
 	//　プレイヤーが向いてる方向
 	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
-	const FVector playerRightVector = OwnerActor->GetActorRightVector();
 	//　攻撃方向からのオフセット位置
-	const FVector offsetLocation = playerRightVector * OffsetDist;
+	const FVector offsetLocation = attack->CalcAttackDir(playerForwardVector) * RadiusOffset;
 	//　浮遊武器の最終位置
 	const FVector resultLocation = playerLocation + offsetLocation;
 
-	Transform.SetLocation(resultLocation);
-	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw;
+	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + attack->CurrentAngle;
 
+	Transform.SetLocation(resultLocation);
 	Transform.SetRotation(RotatorOffset.Quaternion());
 
 	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
