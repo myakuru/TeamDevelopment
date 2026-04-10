@@ -51,14 +51,6 @@ bool URingPulseSlashAttack::CanDeactivate()
 	return canDeactivate;
 }
 
-bool URingPulseSlashAttack::IsActiveFirstFrame()
-{
-	bool canDeactivate = (bIsActive != bPrevActive) && bIsActive;
-	bPrevActive = bIsActive;
-
-	return canDeactivate;
-}
-
 void URingPulseSlashAttack::UpdatePrevActiveFlg()
 {
 	bPrevActive = bIsActive;

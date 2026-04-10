@@ -30,7 +30,6 @@ void UAutoAttack::Initialize(AActor* Owner)
 		if (auto* floatingWeapon = FloatingWeaponMap[EAutoAttackType::Front])
 		{
 			floatingWeapon->SetOwnerAttack(AutoAttackParamsMap[EAutoAttackType::Front]);
-			floatingWeapon->Start(OwnerActor->GetRootComponent());
 		}
 	}
 
@@ -42,13 +41,6 @@ void UAutoAttack::Initialize(AActor* Owner)
 		}
 	}
 
-
-	for (auto& [type, floatingWeapon] : FloatingWeaponMap)
-	{
-		if (!floatingWeapon) { continue; }
-		floatingWeapon->Initialize();
-	}
-
 	//　自動攻撃のタイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		AutoFrontConeAttackTimerHandle,
@@ -57,12 +49,6 @@ void UAutoAttack::Initialize(AActor* Owner)
 		AutoAttackInterval,
 		true);
 
-
-	/*if (FloatingWeaponMap.Contains(EAutoAttackType::Front)
-		&& FloatingWeaponMap[EAutoAttackType::Front])
-	{
-		FloatingWeaponMap[EAutoAttackType::Front]->Start(OwnerActor->GetRootComponent());
-	}*/
 }
 
 void UAutoAttack::Execute()
@@ -89,7 +75,7 @@ void UAutoAttack::Update(float DeltaTime)
 	{
 		if (!floatingWeapon) { continue; }
 
-		floatingWeapon->Update(OwnerActor,DeltaTime);
+		floatingWeapon->Update(OwnerActor);
 	}
 
 }
@@ -104,7 +90,11 @@ void UAutoAttack::StartAutoAttack()
 		AutoAttackParamsMap[EAutoAttackType::Front]->Start();	
 	}
 
-	
+	if (FloatingWeaponMap.Contains(EAutoAttackType::Front)
+		&& FloatingWeaponMap[EAutoAttackType::Front]) 
+	{
+		FloatingWeaponMap[EAutoAttackType::Front]->Start(OwnerActor->GetRootComponent());
+	}
 	
 
 	//　前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット

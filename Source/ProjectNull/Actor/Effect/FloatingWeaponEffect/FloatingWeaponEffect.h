@@ -5,14 +5,14 @@
 #include "UObject/Object.h"
 #include "FloatingWeaponEffect.generated.h"
 
-
-UENUM(BlueprintType)
-enum class EFloatingWeaponState : uint8
-{
-	Stand,
-	Attack,
-	Count UMETA(Hidden)
-};
+//　
+//UENUM(BlueprintType)
+//enum class EFloatingWeaponState : uint8
+//{
+//	Front,
+//	Ring,
+//	Count UMETA(Hidden)
+//};
 
 //　Niagaraエフェクトクラス
 class UNiagaraSystem;
@@ -39,8 +39,6 @@ public:
 	UFloatingWeaponEffect();
 public:
 
-	void Initialize();
-
 	/// <summary>
 	/// エフェクト再生開始
 	/// </summary>
@@ -50,21 +48,11 @@ public:
 	/// 更新
 	/// </summary>
 	/// <param name="OwnerActor">持ち主のクラス</param>
-	void Update(AActor* OwnerActor,float DeltaTime);
-
-	/// <summary>
-	/// 状態の遷移
-	/// </summary>
-	/// <param name="State">ステート種類</param>
-	void ChangeState(EFloatingWeaponState State);
-
+	void Update(AActor* OwnerActor);
 
 	//　セッター
 	inline void SetOwnerAttack(URingPulseSlashAttack* Owner) { OwnerAttack = Owner; }
-	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
 
-	//　ゲッター
-	inline URingPulseSlashAttack* GetOwnerAttack() const { return OwnerAttack; }
 private:
 
 	/// <summary>
@@ -110,14 +98,10 @@ private:
 	FRotator RotatorOffset;
 
 	//　浮遊武器の状態の配列
-	UPROPERTY(EditAnywhere, Instanced)
-	TMap<EFloatingWeaponState,UFloatingWeaponStateBase*> States;
+	//UPROPERTY(EditAnywhere, Instanced)
+	//TMap< UFloatingWeaponStateBase*> FloatingWeaponStates;
 
 	//　現在の浮遊武器状態
 	UPROPERTY()
-	UFloatingWeaponStateBase* CurrentState;
-
-	//　
-	UPROPERTY(EditAnywhere)
-	FVector StandLocation;
+	UFloatingWeaponStateBase* CurrentFloatingWeaponState;
 };
