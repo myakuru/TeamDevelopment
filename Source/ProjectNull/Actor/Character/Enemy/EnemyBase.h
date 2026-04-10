@@ -92,11 +92,11 @@ public:
 
 	//　経験値
 	UPROPERTY(EditAnywhere)
-	int EXP;
+	int EXP = 0;
 
 	//　ギアエネルギー
 	UPROPERTY(EditAnywhere)
-	int GearEnergy;
+	int GearEnergy = 0;
 };
 
 //　敵管理クラス
