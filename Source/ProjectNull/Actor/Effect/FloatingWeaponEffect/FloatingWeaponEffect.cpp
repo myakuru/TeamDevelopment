@@ -33,7 +33,7 @@ void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 		true);
 }
 
-void UFloatingWeaponEffect::Update(AActor* OwnerActor)
+void UFloatingWeaponEffect::Update(AActor* OwnerActor, float DeltaTime)
 {
 	if (!OwnerActor || !OwnerAttack) { return; }
 

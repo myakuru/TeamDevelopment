@@ -75,7 +75,7 @@ void UAutoAttack::Update(float DeltaTime)
 	{
 		if (!floatingWeapon) { continue; }
 
-		floatingWeapon->Update(OwnerActor);
+		floatingWeapon->Update(OwnerActor, DeltaTime);
 	}
 
 }
