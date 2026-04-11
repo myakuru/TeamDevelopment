@@ -6,9 +6,10 @@
 #include "NiagaraFunctionLibrary.h"
 
 #include <ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h>
+#include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h>
 
 
-UFloatingWeaponEffect::UFloatingWeaponEffect():
+UFloatingWeaponEffect::UFloatingWeaponEffect() :
 	OwnerAttack(nullptr),
 	EffectSystem(nullptr),
 	EffectComponent(nullptr),
@@ -19,9 +20,20 @@ UFloatingWeaponEffect::UFloatingWeaponEffect():
 
 }
 
+void UFloatingWeaponEffect::Initialize()
+{
+	/*for (auto& [type, state] : State)
+	{
+		if (!state) { continue; }
+		state->SetOnwer(this);
+	}*/
+	//ChangeState(EFloatingWeaponState::Stand);
+}
+
 void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 {
 	if (!CanSpawn()) { return; }
+
 	//　エフェクトの再生開始
 	EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		EffectSystem,
@@ -33,36 +45,19 @@ void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 		true);
 }
 
-void UFloatingWeaponEffect::Update(AActor* OwnerActor)
+void UFloatingWeaponEffect::Update(AActor* OwnerActor, float DeltaTime)
 {
-	if (!OwnerActor || !OwnerAttack) { return; }
+	/*if (!OwnerActor || !OwnerAttack || !CurrentState) { return; }
 
-	//　攻撃が消えたらエフェクト消す
-	if (OwnerAttack->CanDeactivate())
-	{
-		Deactivate();
-	}
-	
-	//　PrevActiveフラグの更新
-//	OwnerAttack->UpdatePrevActiveFlg();
+	CurrentState->Update(DeltaTime);
 
-	//　プレイヤーの座標
-	const FVector playerLocation		= OwnerActor->GetActorLocation();
-	//　プレイヤーが向いてる方向
-	const FVector playerForwardVector	= OwnerActor->GetActorForwardVector();
-	//　攻撃方向からのオフセット位置
-	const FVector offsetLocation		= OwnerAttack->CalcAttackDir(playerForwardVector) * RadiusOffset;
-	//　浮遊武器の最終位置
-	const FVector resultLocation		= playerLocation + offsetLocation;
-	
-	Transform.SetLocation(resultLocation);
+	UpdateTransform();*/
+}
 
-	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + OwnerAttack->CurrentAngle;
-	Transform.SetRotation(RotatorOffset.Quaternion());
-
-	//CurrentFloatingWeaponState = 
-
-	UpdateTransform();
+void UFloatingWeaponEffect::ChangeState(EFloatingWeaponState State)
+{
+	/*if (!StateMap.Contains(State) || !StateMap[State]) { return; }
+	CurrentState = StateMap[State];*/
 }
 
 void UFloatingWeaponEffect::UpdateTransform()
