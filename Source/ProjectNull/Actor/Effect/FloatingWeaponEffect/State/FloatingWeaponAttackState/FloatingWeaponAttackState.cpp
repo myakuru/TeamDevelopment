@@ -14,20 +14,20 @@ void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 
 	auto* attack = Owner->GetOwnerAttack();
 
-	// 攻撃が消えたらエフェクト消す
+	//　攻撃が消えたらエフェクト消す
 	if (attack->CanDeactivate())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Stand);
 		return;
 	}
 
-	// プレイヤーの座標
+	//　プレイヤーの座標
 	const FVector playerLocation = OwnerActor->GetActorLocation();
-	// プレイヤーが向いてる方向
+	//　プレイヤーが向いてる方向
 	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
-	// 攻撃方向からのオフセット位置
+	//　攻撃方向からのオフセット位置
 	const FVector offsetLocation = attack->CalcAttackDir(playerForwardVector) * RadiusOffset;
-	// 浮遊武器の最終位置
+	//　浮遊武器の最終位置
 	const FVector resultLocation = playerLocation + offsetLocation;
 
 	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + attack->CurrentAngle;

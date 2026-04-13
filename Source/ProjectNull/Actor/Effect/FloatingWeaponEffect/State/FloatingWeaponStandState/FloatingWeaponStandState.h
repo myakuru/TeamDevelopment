@@ -6,7 +6,7 @@
 #include "FloatingWeaponStandState.generated.h"
 
 /// <summary>
-// 浮遊武器の待機状態クラス
+//　浮遊武器の待機状態クラス
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponStandState final : public UFloatingWeaponStateBase
