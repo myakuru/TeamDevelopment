@@ -1,16 +1,14 @@
-
 #include "RingPulseSlashAttack.h"
 
-
-URingPulseSlashAttack::URingPulseSlashAttack()
-	: bRotate(false)
-	, RotationSpeed(1000.0f)
-	, Radius(300.0f)
-	, ConeAngle(30.0f)
-	, bIsActive(false)
-	, CurrentAngle(0.0f)
-	, StartAngle(0.0f)
-	, KnockbackPower(2.0f)
+URingPulseSlashAttack::URingPulseSlashAttack():
+	bRotate(false),
+	RotationSpeed(1000.0f),
+	Radius(300.0f),
+	ConeAngle(30.0f),
+	bIsActive(false),
+	CurrentAngle(0.0f),
+	StartAngle(0.0f),
+	KnockbackPower(2.0f)
 {
 	
 }
@@ -28,13 +26,11 @@ bool URingPulseSlashAttack::UpdateAttack(float DeltaTime)
 
 	ElapsedTime += DeltaTime;
 
-	// ‰ñ“]ˆ—
 	if (bRotate)
 	{
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
 
-	// I—¹”»’è
 	if (ElapsedTime >= Duration)
 	{
 		bIsActive = false;
@@ -47,7 +43,13 @@ bool URingPulseSlashAttack::CanDeactivate()
 {
 	bool canDeactivate = (bIsActive != bPrevActive) && !bIsActive;
 	bPrevActive = bIsActive;
+	return canDeactivate;
+}
 
+bool URingPulseSlashAttack::IsActiveFirstFrame()
+{
+	bool canDeactivate = (bIsActive != bPrevActive) && bIsActive;
+	bPrevActive = bIsActive;
 	return canDeactivate;
 }
 
