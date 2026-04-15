@@ -39,7 +39,7 @@ bool URingPulseSlashAttack::UpdateAttack(float DeltaTime)
 	{
 		bIsActive = false;
 	}
-
+	
 	return true;
 }
 
