@@ -5,16 +5,16 @@
 #include "PlayerBase.generated.h"
 
 
-//　カメラスプリングアームコンポーネント
+// カメラスプリングアームコンポーネント
 class USpringArmComponent;
 
-//　カメラコンポーネント
+// カメラコンポーネント
 class UCameraComponent;
 
-//　攻撃コンポーネント
+// 攻撃コンポーネント
 class UPlayerAttackComponent;
 
-//　ギアコンポーネント
+// ギアコンポーネント
 class UPlayerGearComponent;
 
 USTRUCT(BlueprintType)
@@ -41,7 +41,7 @@ public:
 
 
 /// <summary>
-///　プレイヤー（ワールド内の自身が操作するキャラクター）の中間基底クラス
+/// プレイヤー（ワールド内の自身が操作するキャラクター）の中間基底クラス
 /// </summary>
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACharacter
@@ -66,7 +66,7 @@ public:
 	/// <param name="InputVector">入力値に基づいてのベクトルXY</param>
 	void Move(const FVector2d& InputVector);
 
-	//　ゲッター
+	// ゲッター
 	inline UPlayerGearComponent*	GetGearComponent() const { return GearComponent; }
 	inline FExpSystem				GetEXPSystem() const { return ExpSystem; }
 
@@ -79,26 +79,26 @@ private:
 	/// <returns>移動できるならtrue,移動できないならfalse</returns>
 	bool CanMove();
 
-	//　経験値関連構造体
+	// 経験値関連構造体
 	FExpSystem ExpSystem;
 
 	//　================================================================
-	//　プレイヤーのコンポーネント
+	// プレイヤーのコンポーネント
 	//　================================================================
 	
-	//　カメラスプリングアームコンポーネント
+	// カメラスプリングアームコンポーネント
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	USpringArmComponent* SpringArmComponent;
 
-	//　カメラコンポーネント
+	// カメラコンポーネント
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	UCameraComponent* CameraComponent;
 
-	//　攻撃コンポーネント
+	// 攻撃コンポーネント
 	UPROPERTY(VisibleAnywhere,Category = "Attack")
 	UPlayerAttackComponent* AttackComponent;
 
-	//　ギアコンポーネント
+	// ギアコンポーネント
 	UPROPERTY(VisibleAnywhere,Category = "Gear")
 	UPlayerGearComponent* GearComponent;
 };

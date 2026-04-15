@@ -41,7 +41,7 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 		coolTime = GearStatuses[stateIndex].CoolTime;
 	}
 
-	//　クールタイムの開始
+	// クールタイムの開始
 	GetWorld()->GetTimerManager().SetTimer(
 		DurationTimerHandle,
 		this,

@@ -70,37 +70,37 @@ public:
 	// 経過時間
 	float ElapsedTime;
 
-	//　回転するかどうか
+	// 回転するかどうか
 	UPROPERTY(EditAnywhere)
 	bool bRotate;
 
-	//　回転速度（度/秒）
+	// 回転速度（度/秒）
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
-	//　攻撃半径
+	// 攻撃半径
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
-	//　扇の広さ（角度）
+	// 扇の広さ（角度）
 	UPROPERTY(EditAnywhere)
 	float ConeAngle;
 
-	//　実行中かどうか
+	// 実行中かどうか
 	bool bIsActive;
 
-	//　前フレーム実行中かどうか
+	// 前フレーム実行中かどうか
 	bool bPrevActive;
 
-	//　現在の角度
+	// 現在の角度
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
 
-	//　始める角度
+	// 始める角度
 	UPROPERTY(EditAnywhere)
 	float StartAngle;
 
-	//　ノックバックの強さ
+	// ノックバックの強さ
 	UPROPERTY(EditAnywhere)
 	float KnockbackPower;
 

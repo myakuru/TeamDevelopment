@@ -3,23 +3,20 @@
 
 #include "CoreMinimal.h"
 #include "../FloatingWeaponStateBase.h"
-#include "FloatingWeaponStandState.generated.h"
+#include "FloatingWeaponAttackState.generated.h"
 
 /// <summary>
-// 浮遊武器の待機状態クラス
+// 浮遊武器の攻撃状態クラス
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
-class PROJECTNULL_API UFloatingWeaponStandState final : public UFloatingWeaponStateBase
+class PROJECTNULL_API UFloatingWeaponAttackState final : public UFloatingWeaponStateBase
 {
 	GENERATED_BODY()
-	
-public:
-	UFloatingWeaponStandState();
-public:
 
+public:
+	UFloatingWeaponAttackState();
+public:
 	void Update(AActor* OwnerActor,float DeltaTime)override;
 private:
-
-	UPROPERTY(EditAnywhere)
-	float OffsetDist;
+	
 };

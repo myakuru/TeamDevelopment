@@ -13,7 +13,7 @@ void UPlayerAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//　攻撃クラスの初期化
+	// 攻撃クラスの初期化
 	for(auto& attack : PlayerAttacks)
 	{
 		if (!attack) { continue; }
@@ -25,7 +25,7 @@ void UPlayerAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//　攻撃クラスの更新
+	// 攻撃クラスの更新
 	for(auto& attack : PlayerAttacks)
 	{
 		if (!attack) { continue; }

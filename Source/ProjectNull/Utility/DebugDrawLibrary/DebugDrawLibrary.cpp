@@ -6,14 +6,14 @@ void UDebugDrawLibrary::DrawDebugFan(UWorld* World, FVector Center, FVector Forw
 {
 	float HalfAngle = AngleDeg * 0.5f;
 
-	//　左端と右端
+	// 左端と右端
 	FVector LeftDir = Forward.RotateAngleAxis(-HalfAngle, FVector::UpVector);
 	FVector RightDir = Forward.RotateAngleAxis(HalfAngle, FVector::UpVector);
 
 	DrawDebugLine(World, Center, Center + LeftDir * Radius, FColor::Green, false, 0.1f, 0, 2);
 	DrawDebugLine(World, Center, Center + RightDir * Radius, FColor::Green, false, 0.1f, 0, 2);
 
-	//　扇のカーブ部分
+	// 扇のカーブ部分
 	float Step = AngleDeg / Segments;
 
 	FVector PrevPoint = Center + LeftDir * Radius;

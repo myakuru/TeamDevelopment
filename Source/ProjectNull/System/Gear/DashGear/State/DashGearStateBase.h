@@ -4,7 +4,7 @@
 #include "../../State/GearStateBase.h"
 #include "DashGearStateBase.generated.h"
 
-//　Niagaraエフェクトクラス
+// Niagaraエフェクトクラス
 class UNiagaraSystem;
 
 
@@ -37,7 +37,7 @@ protected:
 	/// </summary>
 	void PlayDashEffect();
 
-	//　扇状（前方）自動斬撃攻撃のエフェクト
+	// 扇状（前方）自動斬撃攻撃のエフェクト
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	UNiagaraSystem* DashEffect;
 
@@ -48,15 +48,15 @@ private:
 	/// </summary>
 	void UpdateDashAttack();
 
-	//　ダッシュ攻撃の距離の二乗（比較用）
+	// ダッシュ攻撃の距離の二乗（比較用）
 	UPROPERTY(EditAnywhere)
 	float DashAttackRangeSquared;
 
-	//　ダッシュの速度
+	// ダッシュの速度
 	UPROPERTY(EditAnywhere)
 	float DashSpeed;
 
-	//　ダッシュエフェクトの持続時間
+	// ダッシュエフェクトの持続時間
 	UPROPERTY(EditAnywhere)
 	float DashEffectDuration;
 };
