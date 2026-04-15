@@ -117,7 +117,6 @@ private:
 	UPROPERTY()
 	UFloatingWeaponStateBase* CurrentState;
 
-	//
 	UPROPERTY(EditAnywhere)
 	FVector StandLocation;
 };

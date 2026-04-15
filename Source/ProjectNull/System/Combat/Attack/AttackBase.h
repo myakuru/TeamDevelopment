@@ -42,7 +42,7 @@ protected:
 	/// </summary>
 	UPROPERTY()
 	AActor* OwnerActor;
-
+	
 	// UŒ‚‚ğÀs‚Å‚«‚é‚©‚Ç‚¤‚©
 	bool bCanExecute;
 };
