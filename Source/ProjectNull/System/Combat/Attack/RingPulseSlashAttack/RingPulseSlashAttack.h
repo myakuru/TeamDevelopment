@@ -4,8 +4,6 @@
 #include "../AttackBase.h"
 #include "RingPulseSlashAttack.generated.h"
 
-
-
 /// <summary>
 /// 円型の斬撃攻撃クラス
 /// </summary>
@@ -35,7 +33,7 @@ public:
 	/// <summary>
 	/// 無効かどうか（非アクティブかどうか１フレーム）
 	/// </summary>
-	/// <returns>無効になったフレームならtrue 無効になったフレームでないならfalse</returns>
+	/// <returns>無効になったフレームならtrue、無効になったフレームでないならfalse</returns>
 	bool CanDeactivate();
 
 	/// <summary>
