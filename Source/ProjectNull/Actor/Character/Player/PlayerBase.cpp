@@ -13,17 +13,17 @@ APlayerBase::APlayerBase()
 		GearComponent(nullptr)
 {
 	//　================================================================
-	//　自身の設定
+	// 自身の設定
 	//　================================================================
 
-	//　Tickを有効にする
+	// Tickを有効にする
 	PrimaryActorTick.bCanEverTick = true;
 
-	//　コントローラーのYaw回転をキャラクターに反映させない
+	// コントローラーのYaw回転をキャラクターに反映させない
 	bUseControllerRotationYaw = false;
 
 	//　================================================================
-	//　カメラスプリングアームコンポーネントの作成と設定
+	// カメラスプリングアームコンポーネントの作成と設定
 	//　================================================================
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
@@ -31,7 +31,7 @@ APlayerBase::APlayerBase()
 	SpringArmComponent->bUsePawnControlRotation = true;
 
 	//　================================================================
-	//　カメラコンポーネントの作成と設定
+	// カメラコンポーネントの作成と設定
 	//　================================================================
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
 	CameraComponent->SetupAttachment(SpringArmComponent);
@@ -57,7 +57,6 @@ void APlayerBase::BeginPlay()
 
 	Super::BeginPlay();
 
-	//2100
 }
 
 void APlayerBase::Tick(float DeltaTime)

@@ -64,7 +64,7 @@ public:
 
 };
 
-//　敵（一般兵/雑魚）の中間基底クラス
+// 敵（一般兵/雑魚）の中間基底クラス
 class AEnemyGruntBase;
 
 /// <summary>
@@ -109,7 +109,7 @@ private:
 	TSubclassOf<AEnemyGruntBase> EnemyClass;
 
 	/// <summary>
-	///　出現パラメータ
+	/// 出現パラメータ
 	/// </summary>
 	UPROPERTY(EditAnywhere)
 	FSpawnParams SpawnParams;

@@ -28,13 +28,13 @@ bool URingPulseSlashAttack::UpdateAttack(float DeltaTime)
 
 	ElapsedTime += DeltaTime;
 
-	//@‰ñ“]ˆ—
+	// ‰ñ“]ˆ—
 	if (bRotate)
 	{
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
 
-	//@I—¹”»’è
+	// I—¹”»’è
 	if (ElapsedTime >= Duration)
 	{
 		bIsActive = false;

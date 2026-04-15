@@ -5,11 +5,11 @@
 #include "UObject/Object.h"
 #include "FloatingWeaponStateBase.generated.h"
 
-//　浮遊武器クラス
+// 浮遊武器クラス
 class UFloatingWeaponEffect;
 
 /// <summary>
-//　浮遊武器の状態基底クラス
+// 浮遊武器の状態基底クラス
 /// </summary>
 UCLASS()
 class PROJECTNULL_API UFloatingWeaponStateBase : public UObject
@@ -30,7 +30,7 @@ public:
 	/// <param name="DeltaTime">デルタタイム</param>
 	virtual void Update(AActor* OwnerActor, float DeltaTime);
 
-	//　セッター
+	// セッター
 	inline void SetOnwer(UFloatingWeaponEffect* SetOwner) { Owner = SetOwner; }
 
 protected:
@@ -41,11 +41,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FTransform Transform;
 
-	//　エフェクトの半径オフセット
+	// エフェクトの半径オフセット
 	UPROPERTY(EditAnywhere)
 	float RadiusOffset;
 
-	//　エフェクトの回転オフセット
+	// エフェクトの回転オフセット
 	UPROPERTY(EditAnywhere)
 	FRotator RotatorOffset;
 

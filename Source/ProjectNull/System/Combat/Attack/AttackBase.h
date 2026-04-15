@@ -43,6 +43,6 @@ protected:
 	UPROPERTY()
 	AActor* OwnerActor;
 
-	//@UŒ‚‚ðŽÀs‚Å‚«‚é‚©‚Ç‚¤‚©
+	// UŒ‚‚ðŽÀs‚Å‚«‚é‚©‚Ç‚¤‚©
 	bool bCanExecute;
 };

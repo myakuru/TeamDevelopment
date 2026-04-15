@@ -34,7 +34,7 @@ void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 {
 	if (!CanSpawn()) { return; }
 
-	//　エフェクトの再生開始
+	// エフェクトの再生開始
 	EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		EffectSystem,
 		RootComponent,

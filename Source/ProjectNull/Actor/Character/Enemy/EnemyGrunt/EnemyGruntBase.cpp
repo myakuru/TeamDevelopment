@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "EnemyGruntBase.h"
 
@@ -34,7 +32,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	//　プレイヤーの座標を取得
+	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
 
 	if (EnemyStatus.KnockBackFlg)
@@ -43,7 +41,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 		return;
 	}
 
-	//　プレイヤーへ向かう処理を更新
+	// プレイヤーへ向かう処理を更新
 	MoveToPlayer(playerLocation,DeltaTime);
 }
 

@@ -29,15 +29,15 @@ public:
 
 private:
 
-	//　1回目ダッシュの閾値範囲
+	// 1回目ダッシュの閾値範囲
 	UPROPERTY(EditAnywhere)
 	FThresholdRange FirstDashThresholdRange;
 
-	//　2回目ダッシュの閾値範囲
+	// 2回目ダッシュの閾値範囲
 	UPROPERTY(EditAnywhere)
 	FThresholdRange SecondDashThresholdRange;
 
-	//　経過時間
+	// 経過時間
 	float ElapsedTime;
 
 };

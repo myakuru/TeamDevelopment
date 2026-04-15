@@ -5,7 +5,7 @@
 #include "KnockBackData.generated.h"
 
 /// <summary>
-///  DataTable用の構造体をC++で作成する場合は親クラスにFTableRowBaseを指定
+/// DataTable用の構造体をC++で作成する場合は親クラスにFTableRowBaseを指定
 /// </summary>
 USTRUCT(Blueprintable)
 struct PROJECTNULL_API FKnockBackData : public FTableRowBase
