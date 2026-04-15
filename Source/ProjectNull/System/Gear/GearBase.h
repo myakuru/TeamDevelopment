@@ -20,11 +20,11 @@ public:
 	}
 public:
 
-	//　ギア持続時間
+	// ギア持続時間
 	UPROPERTY(EditAnywhere)
 	float Duration;
 
-	//　ギアのクールタイム
+	// ギアのクールタイム
 	UPROPERTY(EditAnywhere)
 	float CoolTime;
 };
