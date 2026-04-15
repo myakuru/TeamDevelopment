@@ -22,8 +22,6 @@ public:
 
 public:
 
-
-
 	/// <summary>
 	/// XV
 	/// </summary>
