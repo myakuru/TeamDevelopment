@@ -7,7 +7,6 @@
 // コントローラークラスのインクルード
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 
-// Sets default values
 APerula::APerula()
 {
 	if (GetCharacterMovement())

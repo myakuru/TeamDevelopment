@@ -70,7 +70,7 @@ void ARobotController::Look(const FInputActionValue& LookActionValue)
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
-	//　ジャンプの実行
+	// ジャンプの実行
 	if (ACharacter* controlledCharacter = GetCharacter())
 	{
 		controlledCharacter->Jump();

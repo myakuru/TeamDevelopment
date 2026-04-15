@@ -22,7 +22,7 @@ private:
 	virtual void SetupInputComponent()	override;
 	virtual void GearExecute01(const FInputActionValue& GearActionValue01) override;
 
-	//　デバッグモードの切り替え関数
+	// デバッグモードの切り替え関数
 	void ChangeDebugMode(const FInputActionValue& ActionValue);
 
 	/// <summary>
@@ -32,15 +32,15 @@ private:
 	void MoveUp(const FInputActionValue& ActionValue);
 
 
-	//　上方向への移動入力アクション
+	// 上方向への移動入力アクション
 	UPROPERTY(EditAnywhere, Category = "DebugInput")
 	TObjectPtr<UInputAction> MoveUpAction;
 
-	//　デバッグモード切り替え入力アクション
+	// デバッグモード切り替え入力アクション
 	UPROPERTY(EditAnywhere, Category = "DebugInput")
 	TObjectPtr<UInputAction> ChangeDebugModeAction;
 
-	//　デバッグモードかどうかのフラグ
+	// デバッグモードかどうかのフラグ
 	bool bIsDebugMode;
 
 	UPROPERTY(EditAnywhere)

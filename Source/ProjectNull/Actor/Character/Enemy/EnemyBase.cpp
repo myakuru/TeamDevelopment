@@ -1,30 +1,25 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "EnemyBase.h"
 #include "ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
 #include "ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h"
 #include "Components/CapsuleComponent.h"
 
-// Sets default values
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
 }
 
 
-// Called when the game starts or when spawned
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//　敵管理クラスの情報取得
+	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 
-	//　敵が生成された際に敵管理クラス経由でリストへ登録する
+	// 敵が生成された際に敵管理クラス経由でリストへ登録する
 	if (EnemyManager) {
 		EnemyManager->RegisterEnemy(this);
 	}
@@ -69,17 +64,17 @@ void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
 	EnemyStatus.MoveDir = PlayerLocation - GetActorLocation();
 	EnemyStatus.MoveDir.Normalize();
 	
-	//　移動方向へ補間する回転を計算
+	// 移動方向へ補間する回転を計算
 	const FRotator calcResultRotation = CalculateRotationToMoveDirection(
 										GetActorRotation(),
 										EnemyStatus.MoveDir.Rotation(),
 										EnemyStatus.RotationInterpSpeed,
 										DeltaTime);
 
-	//　回転を更新
+	// 回転を更新
 	SetActorRotation(calcResultRotation);
 
-	//　座標を更新
+	// 座標を更新
 	SetActorLocation(CalculateNextActorLocation(EnemyStatus.MoveDir,EnemyStatus.MoveSpeed,DeltaTime), true);
 }
 
@@ -189,13 +184,11 @@ void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPow
 	}
 }
 
-// Called every frame
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-// Called to bind functionality to input
 void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -204,17 +197,17 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AEnemyBase::OnDeath()
 {
-	//　敵が死んだ際に敵管理クラス経由でリストから自身を削除する
+	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
 	if (EnemyManager) {
 		EnemyManager->RemoveEnemy(this);
 	}
 
-	//　敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
+	// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
 	if (GameProgress) {
 		GameProgress->AddKillCount();
 	}
 
-	//　自身をレベルから消す
+	// 自身をレベルから消す
 	Destroy();
 }
 

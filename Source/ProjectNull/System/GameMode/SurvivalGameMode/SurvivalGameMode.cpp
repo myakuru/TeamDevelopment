@@ -21,10 +21,10 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//　敵管理クラスの情報取得
+	// 敵管理クラスの情報取得
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	
-	//　敵管理クラスの更新メソッドを呼ぶ（毎フレーム）
+	// 敵管理クラスの更新メソッドを呼ぶ（毎フレーム）
 	if (enemyManager) {
 		UE_LOG(LogTemp, Warning, TEXT("num %d"), enemyManager->GetEnemyNum());
 		enemyManager->UpdateEnemies(DeltaTime);

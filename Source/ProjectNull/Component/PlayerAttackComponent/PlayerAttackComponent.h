@@ -5,10 +5,10 @@
 #include "PlayerAttackComponent.generated.h"
 
 
-//　プレイヤークラス
+// プレイヤークラス
 class APlayerBase;
 
-//　攻撃基底クラス
+// 攻撃基底クラス
 class UAttackBase;
 
 
@@ -29,7 +29,7 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	//　プレイヤー（持ち主）をセットするメソッド
+	// セッター
 	inline void SetOwnerPlayer(APlayerBase* Player) { OwnerPlayer = Player; }
 
 private:
@@ -51,11 +51,11 @@ private:
 	AttackType* FindAttack();
 
 
-	//　プレイヤー（持ち主）のポインタ
+	// プレイヤー（持ち主）のポインタ
 	UPROPERTY()
 	APlayerBase* OwnerPlayer;
 
-	//　プレイヤーの攻撃クラスの配列
+	// プレイヤーの攻撃クラスの配列
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<UAttackBase*> PlayerAttacks;
 

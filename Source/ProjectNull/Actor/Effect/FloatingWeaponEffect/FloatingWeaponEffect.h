@@ -14,16 +14,16 @@ enum class EFloatingWeaponState : uint8
 	Count UMETA(Hidden)
 };
 
-//　Niagaraエフェクトクラス
+// Niagaraエフェクトクラス
 class UNiagaraSystem;
 
-//　Niagaraコンポーネントクラス
+// Niagaraコンポーネントクラス
 class UNiagaraComponent;
 
-//　リング状斬撃攻撃クラス
+// リング状斬撃攻撃クラス
 class URingPulseSlashAttack;
 
-//　浮遊武器の状態基底クラス
+// 浮遊武器の状態基底クラス
 class UFloatingWeaponStateBase;
 
 
@@ -59,11 +59,11 @@ public:
 	void ChangeState(EFloatingWeaponState State);
 
 
-	//　セッター
+	// セッター
 	inline void SetOwnerAttack(URingPulseSlashAttack* Owner) { OwnerAttack = Owner; }
 	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
 
-	//　ゲッター
+	// ゲッター
 	inline URingPulseSlashAttack* GetOwnerAttack() const { return OwnerAttack; }
 private:
 
@@ -85,35 +85,35 @@ private:
 
 
 
-	//　基準とする攻撃クラス
+	// 基準とする攻撃クラス
 	UPROPERTY()
 	URingPulseSlashAttack* OwnerAttack;
 
-	//　Niagaraシステム
+	// Niagaraシステム
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* EffectSystem;
 
-	//　Niagaraコンポーネント
+	// Niagaraコンポーネント
 	UPROPERTY()
 	UNiagaraComponent* EffectComponent;
 
-	//　エフェクトのTransform
+	// エフェクトのTransform
 	UPROPERTY(EditAnywhere)
 	FTransform Transform;
 
-	//　エフェクトの半径オフセット
+	// エフェクトの半径オフセット
 	UPROPERTY(EditAnywhere)
 	float RadiusOffset;
 
-	//　エフェクトの回転オフセット
+	// エフェクトの回転オフセット
 	UPROPERTY(EditAnywhere)
 	FRotator RotatorOffset;
 
-	//　浮遊武器の状態の配列
+	// 浮遊武器の状態の配列
 	UPROPERTY(EditAnywhere, Instanced)
 	TMap<EFloatingWeaponState, UFloatingWeaponStateBase*> States;
 
-	//　現在の浮遊武器状態
+	// 現在の浮遊武器状態
 	UPROPERTY()
 	UFloatingWeaponStateBase* CurrentState;
 
