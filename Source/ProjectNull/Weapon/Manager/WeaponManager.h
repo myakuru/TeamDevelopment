@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include"../Instance/WeaponInstance.h"
+#include"../Data/WeaponData.h"
 #include "WeaponManager.generated.h"
 
 /**
@@ -18,7 +19,7 @@ class PROJECTNULL_API UWeaponManager : public UObject
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void Initialize(const TArray<FWeaponInstance>& InWeapons);
+	void Initialize(const TArray<FWeaponInstance>& InWeapons, UDataTable* InDataTable);
 
 	UFUNCTION(BlueprintCallable)
 	const TArray<FWeaponInstance>& GetWeapons() const;
@@ -26,8 +27,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddWeapon(const FWeaponInstance& NewWeapon);
 
+	UFUNCTION(BlueprintCallable)
+	bool GetWeaponMaster(FName WeaponId,FWeaponData& OutData)const;
+
+	
+
 private:
 
 	UPROPERTY()
 	TArray<FWeaponInstance> m_Weapons;
+
+	UPROPERTY(EditAnywhere, Category = "Data")
+	UDataTable* WeaponDataTable;
 };
