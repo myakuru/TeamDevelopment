@@ -11,10 +11,12 @@
 // プレイヤーのHPバーのウィジェットクラスのヘッダーファイルをインクルード
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHpBarWidget/PlayerHpBarWidget.h>
 
+// タイマーのUIクラスのヘッダーファイルをインクルード
+#include <ProjectNull/UI/PlayerHUDWidget/GameTimerWidget/GameTimerWidget.h>
 
 void UPlayerHUDWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+	GameTimer->StartTimer(3600.0f);
 
 	if (ActionButton)
 	{

@@ -16,21 +16,21 @@ class PROJECTNULL_API UGameTimerWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-protected:
+public:
 
 	UFUNCTION(BlueprintCallable, Category = "Game Timer")
 	void StartTimer(float Duration);
 
-	UPROPERTY()
+protected:
+
+	UPROPERTY(BlueprintReadOnly, Category = "Timer")
 	FString TimerText;
 
 private:
 
 	void CountDownTimer();
 
-	float RemainingTime;
-
-	// タイマーハンドル
+	float RemainingTime = 0.0f;	// タイマーハンドル
 	FTimerHandle CountdownTimerHandle;
 	
 };
