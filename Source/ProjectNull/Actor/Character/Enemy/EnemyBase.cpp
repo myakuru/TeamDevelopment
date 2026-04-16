@@ -6,6 +6,9 @@
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
+	,	GameProgress(nullptr)
+	,	EnemyStatus(FEnemyStatus())
+	,	LanchVelocity(FVector::ZeroVector)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
@@ -62,6 +65,7 @@ void AEnemyBase::BeginPlay()
 void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
 {
 	EnemyStatus.MoveDir = PlayerLocation - GetActorLocation();
+	EnemyStatus.DistancePlayer = EnemyStatus.MoveDir.Size();
 	EnemyStatus.MoveDir.Normalize();
 	
 	// 移動方向へ補間する回転を計算
@@ -130,8 +134,9 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 	FVector LanchDir = HorizontalDir * FMath::Cos(Rad) + FVector::UpVector * FMath::Sin(Rad);
 	LanchDir.Normalize();
 
-	EnemyStatus.KNockBackVelocity = LanchDir * KnockBackData->LaunchSpeed;
-	EnemyStatus.KnockBackFlg = true;
+	EnemyStatus.KNockBackVelocity	= LanchDir * KnockBackData->LaunchSpeed;
+	EnemyStatus.KnockBackFlg		= true;
+	EnemyStatus.CanAttack			= false;
 
 	UE_LOG(LogTemp, Warning, TEXT("=== ノックバック初期値完了 ==="));
 }
@@ -209,6 +214,22 @@ void AEnemyBase::OnDeath()
 
 	// 自身をレベルから消す
 	Destroy();
+}
+
+void AEnemyBase::CheckCanAttack()
+{
+	// 既に攻撃可能なら処理を終了
+	//if (CanAttack()) { return; }
+
+	// プレイヤーとの距離が攻撃可能距離内か
+	if (EnemyStatus.DistancePlayer < EnemyStatus.AttackDistance)
+	{
+		EnemyStatus.CanAttack = true;
+	}
+	else
+	{
+		EnemyStatus.CanAttack = false;
+	}
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)

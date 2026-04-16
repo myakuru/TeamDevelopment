@@ -43,6 +43,9 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 
 	// プレイヤーへ向かう処理を更新
 	MoveToPlayer(playerLocation,DeltaTime);
+
+	// 攻撃可能か判断
+	CheckCanAttack();
 }
 
 //void AEnemyGruntBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
