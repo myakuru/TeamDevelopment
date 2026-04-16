@@ -220,7 +220,7 @@ private:
 	FVector CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime);
 
 	/// <summary>
-	///@ˆÚ“®•ûŒü‚Ö•âŠÔ‚µ‚½‰ñ“]‚ğŒvZ 
+	/// ˆÚ“®•ûŒü‚Ö•âŠÔ‚µ‚½‰ñ“]‚ğŒvZ 
 	/// </summary>
 	/// <param name="CurrentRotation">Œ»İ‚Ì‰ñ“]</param>
 	/// <param name="TargetRotation">Œü‚©‚¤‚×‚«‰ñ“]</param>

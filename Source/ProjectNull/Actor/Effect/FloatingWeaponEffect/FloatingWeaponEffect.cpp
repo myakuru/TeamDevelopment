@@ -9,7 +9,7 @@
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h>
 
 
-UFloatingWeaponEffect::UFloatingWeaponEffect() :
+UFloatingWeaponEffect::UFloatingWeaponEffect():
 	OwnerAttack(nullptr),
 	EffectSystem(nullptr),
 	EffectComponent(nullptr),
@@ -17,17 +17,17 @@ UFloatingWeaponEffect::UFloatingWeaponEffect() :
 	RadiusOffset(200.0f),
 	RotatorOffset(FRotator())
 {
-
+	
 }
 
 void UFloatingWeaponEffect::Initialize()
 {
-	/*for (auto& [type, state] : State)
+	for (auto& [type, state] : States)
 	{
 		if (!state) { continue; }
 		state->SetOnwer(this);
-	}*/
-	//ChangeState(EFloatingWeaponState::Stand);
+	}
+	ChangeState(EFloatingWeaponState::Stand);
 }
 
 void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
@@ -47,17 +47,17 @@ void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 
 void UFloatingWeaponEffect::Update(AActor* OwnerActor, float DeltaTime)
 {
-	/*if (!OwnerActor || !OwnerAttack || !CurrentState) { return; }
+	if (!OwnerActor || !OwnerAttack || !CurrentState) { return; }
 
-	CurrentState->Update(DeltaTime);
+	CurrentState->Update(OwnerActor,DeltaTime);
 
-	UpdateTransform();*/
+	UpdateTransform();
 }
 
 void UFloatingWeaponEffect::ChangeState(EFloatingWeaponState State)
 {
-	/*if (!StateMap.Contains(State) || !StateMap[State]) { return; }
-	CurrentState = StateMap[State];*/
+	if (!States.Contains(State) || !States[State]) { return; }
+	CurrentState = States[State];
 }
 
 void UFloatingWeaponEffect::UpdateTransform()

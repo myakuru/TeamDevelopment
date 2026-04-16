@@ -50,7 +50,7 @@ public:
 	/// 更新
 	/// </summary>
 	/// <param name="OwnerActor">持ち主のクラス</param>
-	void Update(AActor* OwnerActor, float DeltaTime);
+	void Update(AActor* OwnerActor,float DeltaTime);
 
 	/// <summary>
 	/// 状態の遷移
@@ -111,13 +111,12 @@ private:
 
 	// 浮遊武器の状態の配列
 	UPROPERTY(EditAnywhere, Instanced)
-	TMap<EFloatingWeaponState, UFloatingWeaponStateBase*> States;
+	TMap<EFloatingWeaponState,UFloatingWeaponStateBase*> States;
 
 	// 現在の浮遊武器状態
 	UPROPERTY()
 	UFloatingWeaponStateBase* CurrentState;
 
-	//
 	UPROPERTY(EditAnywhere)
 	FVector StandLocation;
 };

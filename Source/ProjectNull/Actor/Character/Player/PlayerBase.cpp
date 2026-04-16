@@ -12,9 +12,9 @@ APlayerBase::APlayerBase()
 		AttackComponent(nullptr),
 		GearComponent(nullptr)
 {
-	//　================================================================
+	// ================================================================
 	// 自身の設定
-	//　================================================================
+	// ================================================================
 
 	// Tickを有効にする
 	PrimaryActorTick.bCanEverTick = true;
@@ -22,17 +22,17 @@ APlayerBase::APlayerBase()
 	// コントローラーのYaw回転をキャラクターに反映させない
 	bUseControllerRotationYaw = false;
 
-	//　================================================================
+	// ================================================================
 	// カメラスプリングアームコンポーネントの作成と設定
-	//　================================================================
+	// ================================================================
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
 	SpringArmComponent->TargetArmLength = 600.0f;
 	SpringArmComponent->bUsePawnControlRotation = true;
 
-	//　================================================================
+	// ================================================================
 	// カメラコンポーネントの作成と設定
-	//　================================================================
+	// ================================================================
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->bUsePawnControlRotation = false;

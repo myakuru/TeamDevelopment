@@ -14,7 +14,7 @@ void UPlayerGearComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//　ギアの初期化
+	// ギアの初期化
 	for (auto& gear : PlayerGears)
 	{
 		if (!gear) { continue; }
@@ -26,7 +26,7 @@ void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//　ギアの更新
+	// ギアの更新
 	for(auto& gear : PlayerGears)
 	{
 		if (!gear) { continue; }
@@ -37,7 +37,7 @@ void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 bool UPlayerGearComponent::IsMovementBlockedByGear() const
 {
-	//　ギアの中に移動をブロックするものがあるかどうかを判定
+	// ギアの中に移動をブロックするものがあるかどうかを判定
 	for (auto& gear : PlayerGears)
 	{
 		if (!gear) { continue; }

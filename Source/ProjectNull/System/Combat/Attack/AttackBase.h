@@ -32,7 +32,7 @@ public:
 	/// <param name="DeltaTime">デルタタイム</param>
 	virtual void Update(float DeltaTime) { return; }
 
-	//　ゲッター
+	// ゲッター
 	bool CanExecute() const { return bCanExecute; }
 
 protected:
@@ -42,7 +42,7 @@ protected:
 	/// </summary>
 	UPROPERTY()
 	AActor* OwnerActor;
-
+	
 	// 攻撃を実行できるかどうか
 	bool bCanExecute;
 };
