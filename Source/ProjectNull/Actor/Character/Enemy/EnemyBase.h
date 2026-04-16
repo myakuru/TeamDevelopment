@@ -81,7 +81,7 @@ public:
 
 	// エネミーの重量
 	UPROPERTY(EditAnywhere)
-	float	KnockBackWeight = 1.0f;
+	float	KnockBackWeight = 1.0;
 
 	// ノックバック方向
 	FVector KNockBackVelocity = FVector::ZeroVector;
@@ -96,16 +96,6 @@ public:
 	// ギアエネルギー
 	UPROPERTY(EditAnywhere)
 	int GearEnergy;
-
-	// プレイヤーとの距離
-	float DistancePlayer = 0.0f;
-
-	// 攻撃可能距離
-	UPROPERTY(EditAnywhere)
-	float AttackDistance = 20.0f;
-
-	// 攻撃可能フラグ
-	bool CanAttack = false;
 };
 
 // 敵管理クラス
@@ -132,6 +122,9 @@ public:
 	/// 敵（自身）が吹き飛ばされる処理
 	/// </summary>
 	virtual void SetKnockBackData(const FVector& playerLocation, float AttackPower, float EnemyWeight);
+
+// エビ追加
+public:
 
 	/// <summary>
 	/// 敵（自身) がダメージを受ける処理
@@ -214,17 +207,6 @@ public:
 	/// 自身が死んだ際の処理
 	/// </summary>
 	virtual void OnDeath();
-
-	/// <summary>
-	/// 攻撃可能かを決める処理
-	/// </summary>
-	virtual void CheckCanAttack();
-
-public:
-
-	// 攻撃可能か
-	virtual void SetCanAttack(bool CanAttack) { EnemyStatus.CanAttack = CanAttack; }
-	virtual bool CanAttack()const { return EnemyStatus.CanAttack; }
 
 private:
 

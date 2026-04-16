@@ -17,6 +17,7 @@ UAutoAttack::UAutoAttack()
 	: AutoAttackInterval(5.0f)
 	, FrontToRingDelay(1.0f)
 {
+	
 }
 
 void UAutoAttack::Initialize(AActor* Owner)
@@ -48,7 +49,7 @@ void UAutoAttack::Initialize(AActor* Owner)
 		floatingWeapon->Initialize();
 	}
 
-	// ï¿½ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½Ìƒ^ï¿½Cï¿½}ï¿½[ï¿½ï¿½Zï¿½bï¿½g
+	// Ž©“®UŒ‚‚Ìƒ^ƒCƒ}[‚ðƒZƒbƒg
 	GetWorld()->GetTimerManager().SetTimer(
 		AutoFrontConeAttackTimerHandle,
 		this,
@@ -71,11 +72,11 @@ void UAutoAttack::Execute()
 
 void UAutoAttack::Update(float DeltaTime)
 {
-	// ï¿½Gï¿½Ç—ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½Ìï¿½ï¿½æ“¾
+	// “GŠÇ—ƒNƒ‰ƒX‚Ìî•ñŽæ“¾
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!enemyManager) { return; }
 
-	// ï¿½ï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ÌXï¿½V
+	// Ž©“®UŒ‚‚ÌXV
 	for(auto& [type,coneSlashParams] : AutoAttackParamsMap)
 	{
 		if (!coneSlashParams) { continue; }
@@ -83,7 +84,7 @@ void UAutoAttack::Update(float DeltaTime)
 		UpdateAutoAttack(DeltaTime, *coneSlashParams, enemyManager);
 	}
 
-	// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½ÌXï¿½V
+	// •‚—V•Ší‚ÌXV
 	for (auto& [type, floatingWeapon] : FloatingWeaponMap)
 	{
 		if (!floatingWeapon) { continue; }
@@ -106,7 +107,7 @@ void UAutoAttack::StartAutoAttack()
 	
 	
 
-	// ï¿½Oï¿½ï¿½ï¿½ï¿½óŽ©“ï¿½ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌŽï¿½ï¿½ÍUï¿½ï¿½ï¿½xï¿½ï¿½ï¿½^ï¿½Cï¿½}ï¿½[ï¿½ï¿½Zï¿½bï¿½g
+	// ‘O•ûîóŽ©“®UŒ‚‚©‚ç‚ÌŽüˆÍUŒ‚’x‰„ƒ^ƒCƒ}[‚ðƒZƒbƒg
 	GetWorld()->GetTimerManager().SetTimer(
 		FrontToRingDelayTimerHandle,
 		this,
@@ -123,67 +124,67 @@ void UAutoAttack::StartAutoRingAttack()
 		FloatingWeaponMap[EAutoAttackType::Ring]->Start(OwnerActor->GetRootComponent());
 	}
 }
-
-void UAutoAttack::Execute()
+void UAutoAttack::UpdateAutoAttack(float DeltaTime, URingPulseSlashAttack& RingPulseSlashAttack, UEnemyManagerSubsystem* EnemyManager)
 {
-	return;
-}
+	if (!OwnerActor)	{ return; }
+	if (!EnemyManager)	{ return; }
 
-void UAutoAttack::Update(float DeltaTime,APlayerBase* Player,UEnemyManagerSubsystem* EnemyManager)
-{
-	if (!EnemyManager) { return; }
 
-	for(auto& [type,ConeSlashParams] : AutoAttackParamsMap)
+	if (!RingPulseSlashAttack.UpdateAttack(DeltaTime)) { return; }
+
+	// ƒvƒŒƒCƒ„[‚ÌÀ•W‚Æ‘O•ûƒxƒNƒgƒ‹‚ðŽæ“¾
+	const FVector playerLocation	= OwnerActor->GetActorLocation();
+	const FVector forwardVector		= OwnerActor->GetActorForwardVector();
+
+	// UŒ‚•ûŒüƒxƒNƒgƒ‹
+	const FVector attackDir = RingPulseSlashAttack.CalcAttackDir(forwardVector);
+
 	{
-		if (!ConeSlashParams) { continue; }
+		// UŒ‚”ÍˆÍ‚ðƒfƒoƒbƒOƒ‰ƒCƒ“‚Å‰ÂŽ‹‰»
+		UDebugDrawLibrary::DrawDebugFan
+		(
+			GetWorld(),
+			playerLocation,
+			attackDir,
+			RingPulseSlashAttack.Radius,
+			RingPulseSlashAttack.ConeAngle,
+			10
+		);
+	}
 
-		if (!ConeSlashParams->UpdateAttack(DeltaTime)) { continue; }
+	// “GƒŠƒXƒg‚ðƒ‹[ƒv‚µ‚ÄAUŒ‚”ÍˆÍ“à‚Ì“G‚Éƒ_ƒ[ƒW‚ð—^‚¦‚é
+	for (auto& enemy : EnemyManager->GetEnemyList())
+	{
+		if (!enemy) { continue; }
 
-		ConeSlashParams->AttackJudge(Player, EnemyManager);
-
-		//UpdateAutoAttack(DeltaTime, *ConeSlashParams, EnemyManager);
+		// “G‚ªî”ÍˆÍ“à‚É‚¢‚é‚©”»’è
+		if (IsEnemyInConeRange(enemy, playerLocation, attackDir, RingPulseSlashAttack))
+		{
+			enemy->SetKnockBackData(playerLocation, RingPulseSlashAttack.KnockbackPower,1.0f);
+			enemy->SetTakeDamaged(10);
+		}
 	}
 }
 
-
-void UAutoAttack::UpdateAutoAttack(float DeltaTime, UFanAttackBase& RingPulseSlashAttack, UEnemyManagerSubsystem* EnemyManager)
+bool UAutoAttack::IsEnemyInConeRange(AActor* Enemy, const FVector& PlayerLocation, const FVector& AttackDir, const URingPulseSlashAttack& RingPulseSlashAttack) const
 {
-	//if (!OwnerActor) { return; }
-	//if (!EnemyManager) { return; }
+	if (!Enemy) { return false; }
 
-	//if (!RingPulseSlashAttack.UpdateAttack(DeltaTime)) { return; }
+	// “G‚Ö‚ÌƒxƒNƒgƒ‹
+	FVector toEnemy = Enemy->GetActorLocation() - PlayerLocation;
 
-	////ï¿½@ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½Wï¿½Æ‘Oï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½æ“¾
-	//const FVector playerLocation	= OwnerActor->GetActorLocation();
-	//const FVector forwardVector		= OwnerActor->GetActorForwardVector();
+	// ‹——£ƒ`ƒFƒbƒN
+	if (toEnemy.SizeSquared() > RingPulseSlashAttack.GetRadiusSquared())
+	{
+		return false;
+	}
 
-	////ï¿½@ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½
-	//const FVector attackDir = RingPulseSlashAttack.CalcAttackDir(forwardVector);
+	// ƒxƒNƒgƒ‹³‹K‰»
+	toEnemy.Normalize();
 
-	//{
-	//	//ï¿½@ï¿½Uï¿½ï¿½ï¿½ÍˆÍ‚ï¿½fï¿½oï¿½bï¿½Oï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Å‰ÂŽï¿½ï¿½ï¿½
-	//	UDebugDrawLibrary::DrawDebugFan(
-	//		GetWorld(),
-	//		playerLocation,
-	//		attackDir,
-	//		RingPulseSlashAttack.Radius,
-	//		RingPulseSlashAttack.ConeAngle,
-	//		10
-	//	);
-	//}
+	// Šp“xƒ`ƒFƒbƒN
+	const float dot = FVector::DotProduct(AttackDir, toEnemy);
 
-	////ï¿½@ï¿½Gï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½[ï¿½vï¿½ï¿½ï¿½ÄAï¿½Uï¿½ï¿½ï¿½ÍˆÍ“ï¿½Ì“Gï¿½Éƒ_ï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½^ï¿½ï¿½ï¿½ï¿½
-	//for (auto& enemy : EnemyManager->GetEnemyList())
-	//{
-	//	if (!enemy) { continue; }
-
-	//	//ï¿½@ï¿½Gï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ÍˆÍ“ï¿½É‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½ï¿½
-	//	if (RingPulseSlashAttack.IsTargetInRange(enemy, playerLocation, attackDir))
-	//	{
-	//		enemy->SetKnockBackData(playerLocation, RingPulseSlashAttack.KnockbackPower,1.0f);
-
-	//		// ï¿½_ï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½^ï¿½ï¿½ï¿½ï¿½()
-	//		enemy->SetTakeDamaged(10);
-	//	}
-	//}
+	return dot > RingPulseSlashAttack.GetConeCosine();
 }
+
