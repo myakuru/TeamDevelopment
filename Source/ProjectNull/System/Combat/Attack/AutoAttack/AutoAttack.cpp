@@ -6,10 +6,10 @@
 
 #include <ProjectNull/Actor/Character/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/Player/PlayerBase.h>
+#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
-#include <ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h>
-#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
 
 
 
@@ -17,13 +17,19 @@ UAutoAttack::UAutoAttack()
 	: AutoAttackInterval(5.0f)
 	, FrontToRingDelay(1.0f)
 {
-	
 }
 
 void UAutoAttack::Initialize(AActor* Owner)
 {
 	UAttackBase::Initialize(Owner);
 
+	// è‡ªå‹•æ”»æ’ƒã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚¯ãƒ©ã‚¹ã‚’åˆæœŸåŒ–
+	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
+	{
+		if (!ConeSlashParams) { continue; }
+
+		ConeSlashParams->Initialize(Owner);
+	}
 
 	if (FloatingWeaponMap.Contains(EAutoAttackType::Front))
 	{
@@ -49,7 +55,7 @@ void UAutoAttack::Initialize(AActor* Owner)
 		floatingWeapon->Initialize();
 	}
 
-	// Ž©“®UŒ‚‚Ìƒ^ƒCƒ}[‚ðƒZƒbƒg
+	//ã€€è‡ªå‹•æ”»æ’ƒã®ã‚¿ã‚¤ãƒžãƒ¼ã‚’ã‚»ãƒƒãƒˆ
 	GetWorld()->GetTimerManager().SetTimer(
 		AutoFrontConeAttackTimerHandle,
 		this,
@@ -70,21 +76,20 @@ void UAutoAttack::Execute()
 	return;
 }
 
-void UAutoAttack::Update(float DeltaTime)
+void UAutoAttack::Update(float DeltaTime, APlayerBase* Player, UEnemyManagerSubsystem* EnemyManager)
 {
-	// “GŠÇ—ƒNƒ‰ƒX‚Ìî•ñŽæ“¾
-	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!enemyManager) { return; }
+	if (!EnemyManager) { return; }
 
-	// Ž©“®UŒ‚‚ÌXV
-	for(auto& [type,coneSlashParams] : AutoAttackParamsMap)
+	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
 	{
-		if (!coneSlashParams) { continue; }
+		if (!ConeSlashParams) { continue; }
 
-		UpdateAutoAttack(DeltaTime, *coneSlashParams, enemyManager);
+		if (!ConeSlashParams->UpdateAttack(DeltaTime)) { continue; }
+
+		ConeSlashParams->AttackJudge(Player, EnemyManager);
 	}
 
-	// •‚—V•Ší‚ÌXV
+	// 
 	for (auto& [type, floatingWeapon] : FloatingWeaponMap)
 	{
 		if (!floatingWeapon) { continue; }
@@ -107,7 +112,7 @@ void UAutoAttack::StartAutoAttack()
 	
 	
 
-	// ‘O•ûîóŽ©“®UŒ‚‚©‚ç‚ÌŽüˆÍUŒ‚’x‰„ƒ^ƒCƒ}[‚ðƒZƒbƒg
+	//ã€€å‰æ–¹æ‰‡çŠ¶è‡ªå‹•æ”»æ’ƒã‹ã‚‰ã®å‘¨å›²æ”»æ’ƒé…å»¶ã‚¿ã‚¤ãƒžãƒ¼ã‚’ã‚»ãƒƒãƒˆ
 	GetWorld()->GetTimerManager().SetTimer(
 		FrontToRingDelayTimerHandle,
 		this,
@@ -124,67 +129,3 @@ void UAutoAttack::StartAutoRingAttack()
 		FloatingWeaponMap[EAutoAttackType::Ring]->Start(OwnerActor->GetRootComponent());
 	}
 }
-void UAutoAttack::UpdateAutoAttack(float DeltaTime, URingPulseSlashAttack& RingPulseSlashAttack, UEnemyManagerSubsystem* EnemyManager)
-{
-	if (!OwnerActor)	{ return; }
-	if (!EnemyManager)	{ return; }
-
-
-	if (!RingPulseSlashAttack.UpdateAttack(DeltaTime)) { return; }
-
-	// ƒvƒŒƒCƒ„[‚ÌÀ•W‚Æ‘O•ûƒxƒNƒgƒ‹‚ðŽæ“¾
-	const FVector playerLocation	= OwnerActor->GetActorLocation();
-	const FVector forwardVector		= OwnerActor->GetActorForwardVector();
-
-	// UŒ‚•ûŒüƒxƒNƒgƒ‹
-	const FVector attackDir = RingPulseSlashAttack.CalcAttackDir(forwardVector);
-
-	{
-		// UŒ‚”ÍˆÍ‚ðƒfƒoƒbƒOƒ‰ƒCƒ“‚Å‰ÂŽ‹‰»
-		UDebugDrawLibrary::DrawDebugFan
-		(
-			GetWorld(),
-			playerLocation,
-			attackDir,
-			RingPulseSlashAttack.Radius,
-			RingPulseSlashAttack.ConeAngle,
-			10
-		);
-	}
-
-	// “GƒŠƒXƒg‚ðƒ‹[ƒv‚µ‚ÄAUŒ‚”ÍˆÍ“à‚Ì“G‚Éƒ_ƒ[ƒW‚ð—^‚¦‚é
-	for (auto& enemy : EnemyManager->GetEnemyList())
-	{
-		if (!enemy) { continue; }
-
-		// “G‚ªî”ÍˆÍ“à‚É‚¢‚é‚©”»’è
-		if (IsEnemyInConeRange(enemy, playerLocation, attackDir, RingPulseSlashAttack))
-		{
-			enemy->SetKnockBackData(playerLocation, RingPulseSlashAttack.KnockbackPower,1.0f);
-			enemy->SetTakeDamaged(10);
-		}
-	}
-}
-
-bool UAutoAttack::IsEnemyInConeRange(AActor* Enemy, const FVector& PlayerLocation, const FVector& AttackDir, const URingPulseSlashAttack& RingPulseSlashAttack) const
-{
-	if (!Enemy) { return false; }
-
-	// “G‚Ö‚ÌƒxƒNƒgƒ‹
-	FVector toEnemy = Enemy->GetActorLocation() - PlayerLocation;
-
-	// ‹——£ƒ`ƒFƒbƒN
-	if (toEnemy.SizeSquared() > RingPulseSlashAttack.GetRadiusSquared())
-	{
-		return false;
-	}
-
-	// ƒxƒNƒgƒ‹³‹K‰»
-	toEnemy.Normalize();
-
-	// Šp“xƒ`ƒFƒbƒN
-	const float dot = FVector::DotProduct(AttackDir, toEnemy);
-
-	return dot > RingPulseSlashAttack.GetConeCosine();
-}
-
