@@ -9,6 +9,9 @@
 // Sets default values
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
+	,	GameProgress(nullptr)
+	,	EnemyStatus(FEnemyStatus())
+	,	LanchVelocity(FVector::ZeroVector)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;

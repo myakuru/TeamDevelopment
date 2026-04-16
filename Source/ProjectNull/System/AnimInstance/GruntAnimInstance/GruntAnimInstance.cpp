@@ -2,7 +2,12 @@
 
 
 #include "GruntAnimInstance.h"
-#include "ProjectNull/Actor/Character/Enemy/EnemyGrunt/EnemyGruntBase.h"
+#include <ProjectNull/Actor/Character/Enemy/EnemyGrunt/EnemyGruntBase.h>
+
+UGruntAnimInstance::UGruntAnimInstance():
+	CanAttack(false)
+{
+}
 
 void UGruntAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {

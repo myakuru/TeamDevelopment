@@ -22,6 +22,8 @@ protected:
 
 public:
 
+	UGruntAnimInstance();
+
 	// –ˆƒtƒŒ[ƒ€ˆ—
 	virtual void NativeUpdateAnimation(float DeltaTime)	override;
 };

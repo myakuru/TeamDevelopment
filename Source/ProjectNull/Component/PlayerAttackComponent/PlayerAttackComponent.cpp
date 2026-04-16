@@ -1,9 +1,12 @@
 #include "PlayerAttackComponent.h"
 
-#include "ProjectNull/System/Combat/Attack/AttackBase.h"
-#include "ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h"
+#include <ProjectNull/System/Combat/Attack/AttackBase.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 UPlayerAttackComponent::UPlayerAttackComponent()
+	:	OwnerPlayer(nullptr)
+	,	PlayerAttacks(TArray<UAttackBase*>())
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -23,6 +26,10 @@ void UPlayerAttackComponent::BeginPlay()
 
 void UPlayerAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	// 敵管理クラスの情報取得
+	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+	if (!enemyManager) { return; }
+
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	//　攻撃クラスの更新
@@ -34,7 +41,7 @@ void UPlayerAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		{
 			attack->Execute();
 		}
-		attack->Update(DeltaTime);
+		attack->Update(DeltaTime, nullptr, enemyManager);
 	}
 }
 

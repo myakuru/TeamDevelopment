@@ -4,24 +4,30 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
-#include "ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h"
-#include "ProjectNull/Actor/Character/Enemy/EnemyBase.h"
-#include "ProjectNull/Actor/Character/Player/PlayerBase.h"
-#include "ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
-#include "ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h"
+#include <ProjectNull/Actor/Character/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Character/Player/PlayerBase.h>
+#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 
 UAutoAttack::UAutoAttack()
 	: AutoAttackInterval(5.0f)
 	, FrontToRingDelay(1.0f)
 {
-	
 }
 
 void UAutoAttack::Initialize(AActor* Owner)
 {
 	UAttackBase::Initialize(Owner);
 
+	// 自動攻撃要素にオーナーをセット
+	// マージ前には消す
+	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
+	{
+		ConeSlashParams->Initialize(Owner);
+	}
+	
 	//　自動攻撃のタイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		AutoFrontConeAttackTimerHandle,
@@ -29,27 +35,6 @@ void UAutoAttack::Initialize(AActor* Owner)
 		&UAutoAttack::StartAutoAttack,
 		AutoAttackInterval,
 		true);
-
-}
-
-void UAutoAttack::Execute()
-{
-	return;
-}
-
-void UAutoAttack::Update(float DeltaTime)
-{
-	//　敵管理クラスの情報取得
-	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!enemyManager) { return; }
-
-
-	for(auto& [type,ConeSlashParams] : AutoAttackParamsMap)
-	{
-		if (!ConeSlashParams) { continue; }
-
-		UpdateAutoAttack(DeltaTime, *ConeSlashParams, enemyManager);
-	}
 
 }
 
@@ -102,70 +87,69 @@ void UAutoAttack::StartAutoRingAttack()
 				true
 			);
 		}
-
 	}
 }
-void UAutoAttack::UpdateAutoAttack(float DeltaTime, URingPulseSlashAttack& RingPulseSlashAttack, UEnemyManagerSubsystem* EnemyManager)
+
+void UAutoAttack::Execute()
 {
-	if (!OwnerActor) { return; }
+	return;
+}
+
+void UAutoAttack::Update(float DeltaTime,APlayerBase* Player,UEnemyManagerSubsystem* EnemyManager)
+{
 	if (!EnemyManager) { return; }
 
-
-	if (!RingPulseSlashAttack.UpdateAttack(DeltaTime)) { return; }
-
-	//　プレイヤーの座標と前方ベクトルを取得
-	const FVector playerLocation = OwnerActor->GetActorLocation();
-	const FVector forwardVector = OwnerActor->GetActorForwardVector();
-
-	//　攻撃方向ベクトル
-	const FVector attackDir = RingPulseSlashAttack.CalcAttackDir(forwardVector);
-
+	for(auto& [type,ConeSlashParams] : AutoAttackParamsMap)
 	{
-		//　攻撃範囲をデバッグラインで可視化
-		UDebugDrawLibrary::DrawDebugFan(
-			GetWorld(),
-			playerLocation,
-			attackDir,
-			RingPulseSlashAttack.Radius,
-			RingPulseSlashAttack.ConeAngle,
-			10
-		);
-	}
+		if (!ConeSlashParams) { continue; }
 
-	//　敵リストをループして、攻撃範囲内の敵にダメージを与える
-	for (auto& enemy : EnemyManager->GetEnemyList())
-	{
-		if (!enemy) { continue; }
+		if (!ConeSlashParams->UpdateAttack(DeltaTime)) { continue; }
 
-		//　敵が扇範囲内にいるか判定
-		if (IsEnemyInConeRange(enemy, playerLocation, attackDir, RingPulseSlashAttack))
-		{
-			enemy->SetKnockBackData(playerLocation, RingPulseSlashAttack.KnockbackPower,1.0f);
+		ConeSlashParams->AttackJudge(Player, EnemyManager);
 
-			// ダメージを与える()
-			enemy->SetTakeDamaged(10);
-		}
+		//UpdateAutoAttack(DeltaTime, *ConeSlashParams, EnemyManager);
 	}
 }
 
-bool UAutoAttack::IsEnemyInConeRange(AActor* Enemy, const FVector& PlayerLocation, const FVector& AttackDir, const URingPulseSlashAttack& RingPulseSlashAttack) const
+
+void UAutoAttack::UpdateAutoAttack(float DeltaTime, UFanAttackBase& RingPulseSlashAttack, UEnemyManagerSubsystem* EnemyManager)
 {
-	if (!Enemy) { return false; }
+	//if (!OwnerActor) { return; }
+	//if (!EnemyManager) { return; }
 
-	//　敵へのベクトル
-	FVector ToEnemy = Enemy->GetActorLocation() - PlayerLocation;
+	//if (!RingPulseSlashAttack.UpdateAttack(DeltaTime)) { return; }
 
-	//　距離チェック
-	if (ToEnemy.SizeSquared() > RingPulseSlashAttack.GetRadiusSquared())
-	{
-		return false;
-	}
+	////　プレイヤーの座標と前方ベクトルを取得
+	//const FVector playerLocation	= OwnerActor->GetActorLocation();
+	//const FVector forwardVector		= OwnerActor->GetActorForwardVector();
 
-	//　ベクトル正規化
-	ToEnemy.Normalize();
+	////　攻撃方向ベクトル
+	//const FVector attackDir = RingPulseSlashAttack.CalcAttackDir(forwardVector);
 
-	//　角度チェック
-	float Dot = FVector::DotProduct(AttackDir, ToEnemy);
+	//{
+	//	//　攻撃範囲をデバッグラインで可視化
+	//	UDebugDrawLibrary::DrawDebugFan(
+	//		GetWorld(),
+	//		playerLocation,
+	//		attackDir,
+	//		RingPulseSlashAttack.Radius,
+	//		RingPulseSlashAttack.ConeAngle,
+	//		10
+	//	);
+	//}
 
-	return Dot > RingPulseSlashAttack.GetConeCosine();
+	////　敵リストをループして、攻撃範囲内の敵にダメージを与える
+	//for (auto& enemy : EnemyManager->GetEnemyList())
+	//{
+	//	if (!enemy) { continue; }
+
+	//	//　敵が攻撃範囲内にいるか判定
+	//	if (RingPulseSlashAttack.IsTargetInRange(enemy, playerLocation, attackDir))
+	//	{
+	//		enemy->SetKnockBackData(playerLocation, RingPulseSlashAttack.KnockbackPower,1.0f);
+
+	//		// ダメージを与える()
+	//		enemy->SetTakeDamaged(10);
+	//	}
+	//}
 }

@@ -56,6 +56,5 @@ private:
 
 	//@Œ»İƒMƒA‚ÌƒŒƒxƒ‹
 	UPROPERTY(EditAnywhere)
-
 	int32 CurrentGearLevel;
 };

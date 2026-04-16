@@ -3,8 +3,10 @@
 #include "ProjectNull\System\Gear\GearBase.h"
 
 
-UPlayerGearComponent::UPlayerGearComponent():
-	CurrentGearLevel(1)
+UPlayerGearComponent::UPlayerGearComponent()
+	:	OwnerPlayer(nullptr)
+	,	PlayerGears(TArray<UGearBase*>())
+	,	CurrentGearLevel(1)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 

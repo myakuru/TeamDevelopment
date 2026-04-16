@@ -9,7 +9,7 @@
 class UEnemyManagerSubsystem;
 
 //　円型の斬撃攻撃クラス
-class URingPulseSlashAttack;
+class UFanAttackBase;
 
 //　Niagaraエフェクトクラス
 class UNiagaraSystem;
@@ -40,7 +40,9 @@ public:
 
 	void Initialize(AActor* Owner)	override;
 	void Execute()					override;
-	void Update(float DeltaTime)	override;
+	void Update(float DeltaTime,
+				APlayerBase* Player = nullptr,
+				UEnemyManagerSubsystem* EnemyManager = nullptr)	override;
 
 private:
 
@@ -60,17 +62,7 @@ private:
 	/// <param name="DeltaTime">デルタタイム</param>
 	/// <param name="ConeSlashParams">扇状斬撃攻撃のパラメータ</param>
 	/// <param name="EnemyManager">敵管理クラス</param>
-	void UpdateAutoAttack(float DeltaTime, URingPulseSlashAttack& RingPulseSlashAttack, class UEnemyManagerSubsystem* EnemyManager);
-
-	/// <summary>
-	/// 敵が扇範囲内にいるか判定
-	/// </summary>
-	/// <param name="Enemy">敵のポインタ</param>
-	/// <param name="PlayerLocation">プレイヤーの座標</param>
-	/// <param name="AttackDir">プレイヤーの攻撃方向</param>
-	/// <param name="ConeSlashParams">扇状斬撃攻撃のパラメータ</param>
-	/// <returns>敵が扇範囲かどうか</returns>
-	bool IsEnemyInConeRange(AActor* Enemy, const FVector& PlayerLocation, const FVector& AttackDir, const URingPulseSlashAttack& RingPulseSlashAttack) const;
+	void UpdateAutoAttack(float DeltaTime, UFanAttackBase& RingPulseSlashAttack, class UEnemyManagerSubsystem* EnemyManager);
 
 	//　自動攻撃の間隔時間
 	UPROPERTY(EditAnywhere)
@@ -82,7 +74,7 @@ private:
 
 	//　自動攻撃のパラメータマップ配列
 	UPROPERTY(EditAnywhere, Instanced)
-	TMap<EAutoAttackType,URingPulseSlashAttack*> AutoAttackParamsMap;
+	TMap<EAutoAttackType, UFanAttackBase*> AutoAttackParamsMap;
 
 	//　================================================================
 	//　タイマー関連
