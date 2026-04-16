@@ -11,6 +11,7 @@ class APlayerBase;
 // 攻撃基底クラス
 class UAttackBase;
 
+
 /// <summary>
 /// プレイヤー（ワールド内の自身が操作するキャラクター）の攻撃コンポーネントクラス
 /// </summary>
@@ -40,7 +41,7 @@ private:
 	/// <returns>作成した攻撃クラス</returns>
 	template<typename AttackType>
 	AttackType* AddAttack();
-
+	
 	/// <summary>
 	/// リストから攻撃クラスを検索して取得
 	/// </summary>
