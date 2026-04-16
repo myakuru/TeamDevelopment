@@ -6,10 +6,10 @@
 
 #include <ProjectNull/Actor/Character/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/Player/PlayerBase.h>
+#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
-#include <ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h>
-#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
 
 
 
@@ -23,6 +23,13 @@ void UAutoAttack::Initialize(AActor* Owner)
 {
 	UAttackBase::Initialize(Owner);
 
+	// 自動攻撃のパラメータクラスを初期化
+	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
+	{
+		if (!ConeSlashParams) { continue; }
+
+		ConeSlashParams->Initialize(Owner);
+	}
 
 	if (FloatingWeaponMap.Contains(EAutoAttackType::Front))
 	{
@@ -48,7 +55,7 @@ void UAutoAttack::Initialize(AActor* Owner)
 		floatingWeapon->Initialize();
 	}
 
-	// �����U���̃^�C�}�[��Z�b�g
+	//　自動攻撃のタイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		AutoFrontConeAttackTimerHandle,
 		this,
@@ -69,21 +76,20 @@ void UAutoAttack::Execute()
 	return;
 }
 
-void UAutoAttack::Update(float DeltaTime)
+void UAutoAttack::Update(float DeltaTime, APlayerBase* Player, UEnemyManagerSubsystem* EnemyManager)
 {
-	// �G�Ǘ��N���X�̏��擾
-	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!enemyManager) { return; }
+	if (!EnemyManager) { return; }
 
-	// �����U���̍X�V
-	for(auto& [type,coneSlashParams] : AutoAttackParamsMap)
+	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
 	{
-		if (!coneSlashParams) { continue; }
+		if (!ConeSlashParams) { continue; }
 
-		UpdateAutoAttack(DeltaTime, *coneSlashParams, enemyManager);
+		if (!ConeSlashParams->UpdateAttack(DeltaTime)) { continue; }
+
+		ConeSlashParams->AttackJudge(Player, EnemyManager);
 	}
 
-	// ���V����̍X�V
+	// 
 	for (auto& [type, floatingWeapon] : FloatingWeaponMap)
 	{
 		if (!floatingWeapon) { continue; }
@@ -106,7 +112,7 @@ void UAutoAttack::StartAutoAttack()
 	
 	
 
-	// �O����󎩓��U������̎��͍U���x���^�C�}�[��Z�b�g
+	//　前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		FrontToRingDelayTimerHandle,
 		this,
@@ -122,68 +128,4 @@ void UAutoAttack::StartAutoRingAttack()
 	{
 		FloatingWeaponMap[EAutoAttackType::Ring]->Start(OwnerActor->GetRootComponent());
 	}
-}
-
-void UAutoAttack::Execute()
-{
-	return;
-}
-
-void UAutoAttack::Update(float DeltaTime,APlayerBase* Player,UEnemyManagerSubsystem* EnemyManager)
-{
-	if (!EnemyManager) { return; }
-
-	for(auto& [type,ConeSlashParams] : AutoAttackParamsMap)
-	{
-		if (!ConeSlashParams) { continue; }
-
-		if (!ConeSlashParams->UpdateAttack(DeltaTime)) { continue; }
-
-		ConeSlashParams->AttackJudge(Player, EnemyManager);
-
-		//UpdateAutoAttack(DeltaTime, *ConeSlashParams, EnemyManager);
-	}
-}
-
-
-void UAutoAttack::UpdateAutoAttack(float DeltaTime, UFanAttackBase& RingPulseSlashAttack, UEnemyManagerSubsystem* EnemyManager)
-{
-	//if (!OwnerActor) { return; }
-	//if (!EnemyManager) { return; }
-
-	//if (!RingPulseSlashAttack.UpdateAttack(DeltaTime)) { return; }
-
-	////�@�v���C���[�̍��W�ƑO���x�N�g����擾
-	//const FVector playerLocation	= OwnerActor->GetActorLocation();
-	//const FVector forwardVector		= OwnerActor->GetActorForwardVector();
-
-	////�@�U�������x�N�g��
-	//const FVector attackDir = RingPulseSlashAttack.CalcAttackDir(forwardVector);
-
-	//{
-	//	//�@�U���͈͂�f�o�b�O���C���ŉ���
-	//	UDebugDrawLibrary::DrawDebugFan(
-	//		GetWorld(),
-	//		playerLocation,
-	//		attackDir,
-	//		RingPulseSlashAttack.Radius,
-	//		RingPulseSlashAttack.ConeAngle,
-	//		10
-	//	);
-	//}
-
-	////�@�G���X�g����[�v���āA�U���͈͓�̓G�Ƀ_���[�W��^����
-	//for (auto& enemy : EnemyManager->GetEnemyList())
-	//{
-	//	if (!enemy) { continue; }
-
-	//	//�@�G���U���͈͓�ɂ��邩����
-	//	if (RingPulseSlashAttack.IsTargetInRange(enemy, playerLocation, attackDir))
-	//	{
-	//		enemy->SetKnockBackData(playerLocation, RingPulseSlashAttack.KnockbackPower,1.0f);
-
-	//		// �_���[�W��^����()
-	//		enemy->SetTakeDamaged(10);
-	//	}
-	//}
 }

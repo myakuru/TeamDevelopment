@@ -2,8 +2,8 @@
 
 #include "FloatingWeaponStandState.h"
 
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
-#include <ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h>
 
 UFloatingWeaponStandState::UFloatingWeaponStandState()
 {

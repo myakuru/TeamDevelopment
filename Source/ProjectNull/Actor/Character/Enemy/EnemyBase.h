@@ -91,11 +91,11 @@ public:
 
 	// 経験値
 	UPROPERTY(EditAnywhere)
-	int EXP;
+	int EXP = 0;
 
 	// ギアエネルギー
 	UPROPERTY(EditAnywhere)
-	int GearEnergy;
+	int GearEnergy = 0;
 
 	// プレイヤーとの距離
 	float DistancePlayer = 0.0f;

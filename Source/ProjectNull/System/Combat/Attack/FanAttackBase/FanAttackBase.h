@@ -31,6 +31,23 @@ public:
 	bool UpdateAttack(float DeltaTime);
 
 	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	bool CanDeactivate();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	bool IsActiveFirstFrame();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	void UpdatePrevActiveFlg();
+
+	/// <summary>
 	/// 攻撃範囲内にターゲットがいるかどうかの判定
 	/// </summary>
 	/// <param name="Target			">ターゲット	</param>
@@ -95,6 +112,16 @@ public:
 	//　扇の広さ（角度）
 	UPROPERTY(EditAnywhere)
 	float ConeAngle;
+
+	// 攻撃中か
+	bool bIsActive;
+
+	// 全フレームでアクティブだったか
+	bool bPrevActive;
+
+	// 開始の角度
+	UPROPERTY(EditAnywhere)
+	float StartAngle;
 
 	//　現在の角度
 	UPROPERTY(EditAnywhere)

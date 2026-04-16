@@ -14,16 +14,19 @@ UFanAttackBase::UFanAttackBase()
 	, RotationSpeed(1000.0f)
 	, Radius(300.0f)
 	, ConeAngle(30.0f)
+	, bIsActive(false)
+	, bPrevActive(false)
 	, CurrentAngle(0.0f)
 	, KnockbackPower(2.0f)
+	, StartAngle(0.0f)
 {
 }
 
 void UFanAttackBase::Start()
 {
-	bIsActive = true;
-	CurrentAngle = 0.0f;
-	ElapsedTime = 0.0f;
+	bIsActive		= true;
+	CurrentAngle	= StartAngle;
+	ElapsedTime		= 0.0f;
 }
 
 bool UFanAttackBase::UpdateAttack(float DeltaTime)
@@ -38,15 +41,15 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
 
-	//　プレイヤーの座標と前方ベクトルを取得
-	const FVector playerLocation = OwnerActor->GetActorLocation();
-	const FVector forwardVector = OwnerActor->GetActorForwardVector();
-
-	//　攻撃方向ベクトル
-	const FVector attackDir = CalcAttackDir(forwardVector);
-
 	//　攻撃範囲をデバッグラインで可視化
 	{
+		//　プレイヤーの座標と前方ベクトルを取得
+		const FVector playerLocation = OwnerActor->GetActorLocation();
+		const FVector forwardVector = OwnerActor->GetActorForwardVector();
+
+		//　攻撃方向ベクトル
+		const FVector attackDir = CalcAttackDir(forwardVector);
+
 		UDebugDrawLibrary::DrawDebugFan(
 			GetWorld(),
 			playerLocation,
@@ -92,11 +95,6 @@ bool UFanAttackBase::IsTargetInRange(AActor* Target, const FVector& OwnerLocatio
 	return Dot > GetConeCosine();
 }
 
-FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector) const
-{
-	const float angle = bRotate ? CurrentAngle : 0.0f;
-	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
-}
 
 void UFanAttackBase::AttackJudgePlayer(APlayerBase* Player)
 {
@@ -134,4 +132,29 @@ void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
 			enemy->SetTakeDamaged(10);
 		}
 	}
+}
+
+bool UFanAttackBase::CanDeactivate()
+{
+	bool canDeactivate = (bIsActive != bPrevActive) && !bIsActive;
+	bPrevActive = bIsActive;
+	return canDeactivate;
+}
+
+bool UFanAttackBase::IsActiveFirstFrame()
+{
+	bool canDeactivate = (bIsActive != bPrevActive) && bIsActive;
+	bPrevActive = bIsActive;
+	return canDeactivate;
+}
+
+void UFanAttackBase::UpdatePrevActiveFlg()
+{
+	bPrevActive = bIsActive;
+}
+
+FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector) const
+{
+	const float angle = bRotate ? CurrentAngle : 0.0f;
+	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
 }

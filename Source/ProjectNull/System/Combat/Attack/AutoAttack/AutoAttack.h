@@ -5,17 +5,16 @@
 #include "AutoAttack.generated.h"
 
 
-// �G�Ǘ��N���X
+//　敵管理クラス
 class UEnemyManagerSubsystem;
 
-//�@�~�^�̎a���U���N���X
+//　円型の斬撃攻撃クラス
 class UFanAttackBase;
 
-// ���V����G�t�F�N�g�N���X
+// Niagaraエフェクトクラス
 class UFloatingWeaponEffect;
 
-
-// �����U�����
+//　自動攻撃種類
 UENUM(BlueprintType)
 enum class EAutoAttackType : uint8
 {
@@ -25,7 +24,7 @@ enum class EAutoAttackType : uint8
 };
 
 /// <summary>
-/// �����U���N���X
+/// 自動攻撃クラス
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UAutoAttack final : public UAttackBase
@@ -47,52 +46,42 @@ public:
 private:
 
 	/// <summary>
-	/// �����U���̊J�n
+	/// 自動攻撃の開始
 	/// </summary>
 	void StartAutoAttack();
 
 	/// <summary>
-	/// ����2�i�K�i�����O��Ɉړ��j�����a���U���̊J�n
+	/// 周囲2段階（リング状に移動）自動斬撃攻撃の開始
 	/// </summary>
 	void StartAutoRingAttack();
-
-	/// <summary>
-	/// �����U���̋��ʍX�V����
-	/// </summary>
-	/// <param name="DeltaTime">�f���^�^�C��</param>
-	/// <param name="ConeSlashParams">���a���U���̃p�����[�^</param>
-	/// <param name="EnemyManager">�G�Ǘ��N���X</param>
-	void UpdateAutoAttack(float DeltaTime, UFanAttackBase& RingPulseSlashAttack, class UEnemyManagerSubsystem* EnemyManager);
-
 	
-	// �����U���̊Ԋu����
+	//　自動攻撃の間隔時間
 	UPROPERTY(EditAnywhere)
 	float AutoAttackInterval;
 
-	// �O����󎩓��U������̎��͍U���x������
+	//　前方扇状自動攻撃からの周囲攻撃遅延時間
 	UPROPERTY(EditAnywhere)
 	float FrontToRingDelay;
 
-	// �����U���̃p�����[�^�}�b�v�z��
+	//　自動攻撃のパラメータマップ配列
 	UPROPERTY(EditAnywhere, Instanced)
 	TMap<EAutoAttackType, UFanAttackBase*> AutoAttackParamsMap;
 
 	// ================================================================
-	// �G�t�F�N�g�֘A
+	// 
 	// ================================================================
 
-	// ���V����G�t�F�N�g�N���X�̃}�b�v�z��
 	UPROPERTY(EditAnywhere, Instanced)
 	TMap<EAutoAttackType, UFloatingWeaponEffect*> FloatingWeaponMap;
 
-	// ================================================================
-	// �^�C�}�[�֘A
-	// ================================================================
+	//　================================================================
+	//　タイマー関連
+	//　================================================================
 
-	// �O����󎩓��U���^�C�}�[
+	//　前方扇状自動攻撃タイマー
 	FTimerHandle AutoFrontConeAttackTimerHandle;
 
-	// �O����󎩓��U������̎��͍U���x���^�C�}�[
+	//　前方扇状自動攻撃からの周囲攻撃遅延タイマー
 	FTimerHandle FrontToRingDelayTimerHandle;
 
 };
