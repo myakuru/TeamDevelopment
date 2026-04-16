@@ -5,12 +5,11 @@
 #include "PlayerAttackComponent.generated.h"
 
 
-//　プレイヤークラス
+// プレイヤークラス
 class APlayerBase;
 
-//　攻撃基底クラス
+// 攻撃基底クラス
 class UAttackBase;
-
 
 /// <summary>
 /// プレイヤー（ワールド内の自身が操作するキャラクター）の攻撃コンポーネントクラス
@@ -29,7 +28,7 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	//　プレイヤー（持ち主）をセットするメソッド
+	// セッター
 	inline void SetOwnerPlayer(APlayerBase* Player) { OwnerPlayer = Player; }
 
 private:
@@ -41,7 +40,7 @@ private:
 	/// <returns>作成した攻撃クラス</returns>
 	template<typename AttackType>
 	AttackType* AddAttack();
-	
+
 	/// <summary>
 	/// リストから攻撃クラスを検索して取得
 	/// </summary>
@@ -51,11 +50,11 @@ private:
 	AttackType* FindAttack();
 
 
-	//　プレイヤー（持ち主）のポインタ
+	// プレイヤー（持ち主）のポインタ
 	UPROPERTY()
 	APlayerBase* OwnerPlayer;
 
-	//　プレイヤーの攻撃クラスの配列
+	// プレイヤーの攻撃クラスの配列
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<UAttackBase*> PlayerAttacks;
 

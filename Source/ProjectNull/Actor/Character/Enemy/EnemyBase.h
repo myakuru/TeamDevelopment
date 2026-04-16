@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -20,15 +19,15 @@ struct FStatScaling
 	GENERATED_BODY()
 
 public:
-	//　基礎数値
+	// 基礎数値
 	UPROPERTY(EditAnywhere)
 	int32 Base = 100;
 
-	//　倍率
+	// 倍率
 	UPROPERTY(EditAnywhere)
 	float Scale = 1.0f;
 
-	//　倍率増加量
+	// 倍率増加量
 	UPROPERTY(EditAnywhere)
 	float ScalePerKill = 0.005f;
 
@@ -52,37 +51,37 @@ struct FEnemyStatus
 	GENERATED_BODY()
 
 public:
-	//　移動方向
+	// 移動方向
 	UPROPERTY(EditAnywhere)
 	FVector MoveDir = FVector::ZeroVector;
 
-	//　移動速度
+	// 移動速度
 	UPROPERTY(EditAnywhere)
 	float	MoveSpeed = 300.0f;
 
-	//　回転補間速度
+	// 回転補間速度
 	UPROPERTY(EditAnywhere)
 	float	RotationInterpSpeed = 5.0f;
 
-	//　最終的なヒットポイント
+	// 最終的なヒットポイント
 	UPROPERTY(EditAnywhere)
 	int32	FinalHP = 100;
 
-	//　スケーリング計算用ヒットポイント
+	// スケーリング計算用ヒットポイント
 	UPROPERTY(EditAnywhere)
 	FStatScaling HPScaling;
 
-	//　最終的な攻撃力
+	// 最終的な攻撃力
 	UPROPERTY(EditAnywhere)
 	int32	FinalAttack = 1;
 
-	//　スケーリング計算用攻撃力
+	// スケーリング計算用攻撃力
 	UPROPERTY(EditAnywhere)
 	FStatScaling AttackScaling;
 
 	// エネミーの重量
 	UPROPERTY(EditAnywhere)
-	float	KnockBackWeight = 1.0;
+	float	KnockBackWeight = 1.0f;
 
 	// ノックバック方向
 	FVector KNockBackVelocity = FVector::ZeroVector;
@@ -90,19 +89,29 @@ public:
 	// エネミーが吹き飛び中の判定フラグ
 	bool	KnockBackFlg = false;
 
-	//　経験値
+	// 経験値
 	UPROPERTY(EditAnywhere)
-	int EXP;
+	int EXP = 0;
 
-	//　ギアエネルギー
+	// ギアエネルギー
 	UPROPERTY(EditAnywhere)
-	int GearEnergy;
+	int GearEnergy = 0;
+
+	// プレイヤーとの距離
+	float DistancePlayer = 0.0f;
+
+	// 攻撃可能距離
+	UPROPERTY(EditAnywhere)
+	float AttackDistance = 20.0f;
+
+	// 攻撃可能フラグ
+	bool CanAttack = false;
 };
 
-//　敵管理クラス
+// 敵管理クラス
 class UEnemyManagerSubsystem;
 
-//　ゲームの進行管理クラス
+// ゲームの進行管理クラス
 class UGameProgressSubsystem;
 
 /// <summary>
@@ -116,7 +125,6 @@ class PROJECTNULL_API AEnemyBase : public ACharacter
 	GENERATED_BODY()
 	
 public:
-	// Sets default values for this character's properties
 	AEnemyBase();
 public:
 
@@ -125,16 +133,12 @@ public:
 	/// </summary>
 	virtual void SetKnockBackData(const FVector& playerLocation, float AttackPower, float EnemyWeight);
 
-// エビ追加
-public:
-
 	/// <summary>
 	/// 敵（自身) がダメージを受ける処理
 	/// </summary>
 	virtual void SetTakeDamaged(int32 AttackPower = 1);
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	/// <summary>
@@ -195,10 +199,8 @@ protected:
 	FVector LanchVelocity;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/// <summary>
@@ -213,6 +215,17 @@ public:
 	/// </summary>
 	virtual void OnDeath();
 
+	/// <summary>
+	/// 攻撃可能かを決める処理
+	/// </summary>
+	virtual void CheckCanAttack();
+
+public:
+
+	// 攻撃可能か
+	virtual void SetCanAttack(bool CanAttack) { EnemyStatus.CanAttack = CanAttack; }
+	virtual bool CanAttack()const { return EnemyStatus.CanAttack; }
+
 private:
 
 	/// <summary>
@@ -225,7 +238,7 @@ private:
 	FVector CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime);
 
 	/// <summary>
-	///　移動方向へ補間した回転を計算 
+	/// 移動方向へ補間した回転を計算 
 	/// </summary>
 	/// <param name="CurrentRotation">現在の回転</param>
 	/// <param name="TargetRotation">向かうべき回転</param>

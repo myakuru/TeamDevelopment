@@ -14,7 +14,7 @@ enum class ESpawnPattern : uint8
 };
 
 /// <summary>
-///  Waveごとの敵の出現パターンを管理するDataTable用の構造体
+/// Waveごとの敵の出現パターンを管理するDataTable用の構造体
 /// </summary>
 USTRUCT(BlueprintType)
 struct FEnemySpawnUnit

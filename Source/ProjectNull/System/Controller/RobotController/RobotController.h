@@ -4,13 +4,13 @@
 #include "GameFramework/PlayerController.h"
 #include "RobotController.generated.h"
 
-//　入力アクションの値を表す構造体
+// 入力アクションの値を表す構造体
 struct FInputActionValue;
 
-//　入力マッピングコンテキストクラス
+// 入力マッピングコンテキストクラス
 class UInputMappingContext;
 
-//　入力アクションクラス
+// 入力アクションクラス
 class UInputAction;
 
 
@@ -29,13 +29,16 @@ public:
 
 	ARobotController();
 
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHUD; }
+
 protected:
 
 	virtual void BeginPlay()			override;
 	virtual void SetupInputComponent()	override;
 
 	/// <summary>
-	/// ギアの実行関数　01
+	/// ギアの実行関数 01
 	/// </summary>
 	/// <param name="GearActionValue01">入力値</param>
 	virtual void GearExecute01(const FInputActionValue& GearActionValue01);
@@ -65,33 +68,37 @@ private:
 	/// <param name="LookActionValue">入力値</param>
 	void Jump(const FInputActionValue& JumpActionValue);
 
-	
-	//　入力マッピングコンテキスト
+	/// <summary>
+	/// UIの初期化関数
+	/// </summary>
+	void InitializeUI();
+
+	// 入力マッピングコンテキスト
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputContext;
 
-	//　移動入力アクション
+	// 移動入力アクション
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
 
-	//　視点入力アクション
+	// 視点入力アクション
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> LookAction;
 
-	//　ジャンプ入力アクション
+	// ジャンプ入力アクション
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> JumpAction;
 
-	//　ギア入力アクション　01
+	// ギア入力アクション 01
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> GearAction01;
 
-
-	UPROPERTY(EditAnywhere)
+	// プレイヤーHUDウィジェットクラス
+	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UPlayerHUDWidget> PlayerHUDClass;
 
+	// プレイヤーHUDウィジェットのインスタンス
 	UPROPERTY()
-	UPlayerHUDWidget* PlayerHUD;
-
+	TObjectPtr<UPlayerHUDWidget> PlayerHUD;
 
 };

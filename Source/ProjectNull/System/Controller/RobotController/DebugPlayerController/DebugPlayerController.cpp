@@ -2,13 +2,14 @@
 #include "DebugPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+
 #include "ProjectNull/Actor/Character/Player/Robot/Robot.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 
 ADebugPlayerController::ADebugPlayerController():
 	ARobotController(),
-	bIsDebugMode(false),
-	DebugMaxAcceleration(10000.0f)
+	bIsDebugMode(false)
 {
 
 }
@@ -16,11 +17,6 @@ ADebugPlayerController::ADebugPlayerController():
 void ADebugPlayerController::BeginPlay()
 {
 	ARobotController::BeginPlay();
-
-	if(bIsDebugMode)
-	{
-		SetDebugParameter();
-	}
 }
 
 void ADebugPlayerController::SetupInputComponent()
@@ -36,28 +32,31 @@ void ADebugPlayerController::SetupInputComponent()
 
 void ADebugPlayerController::ChangeDebugMode(const FInputActionValue& ActionValue)
 {
-	if(bIsDebugMode)
+	FTransform transform;
+	APawn* oldPawn = GetPawn();
+
+	if (oldPawn)
 	{
+		transform = oldPawn->GetActorTransform();
+		oldPawn->Destroy();
+	}
+
+	APawn* newPawn = nullptr;
+
+	if (bIsDebugMode)
+	{
+		newPawn = GetWorld()->SpawnActor<APawn>(GameClass, transform);
 		bIsDebugMode = false;
-		if (auto* player = Cast<APlayerBase>(GetCharacter()))
-		{
-			player->ResetMovementParameters();
-		}
 	}
 	else
 	{
+		newPawn = GetWorld()->SpawnActor<APawn>(DebugClass, transform);
 		bIsDebugMode = true;
-		SetDebugParameter();
 	}
-}
 
-void ADebugPlayerController::SetDebugParameter()
-{
-	if (auto* movement = GetCharacter()->GetCharacterMovement())
+	if (newPawn)
 	{
-		movement->SetMovementMode(MOVE_Flying);
-		movement->MaxAcceleration	= DebugMaxAcceleration;
-		movement->MaxFlySpeed		= DebugMaxAcceleration;
+		Possess(newPawn);
 	}
 }
 

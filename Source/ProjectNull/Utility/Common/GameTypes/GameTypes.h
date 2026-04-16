@@ -4,7 +4,7 @@
 
 #include "GameTypes.generated.h"
 
-//　しきい値の最大値、最小値
+// しきい値の最大値、最小値
 USTRUCT(BlueprintType)
 struct FThresholdRange
 {
@@ -18,7 +18,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float maxThreshold = 0.0f;
 
-	//　範囲内かどうか
+	// 範囲内かどうか
 	bool IsWithinRange(float Value) const
 	{
 		if (Value >= minThreshold && Value < maxThreshold)

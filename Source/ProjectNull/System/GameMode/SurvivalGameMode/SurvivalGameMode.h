@@ -18,4 +18,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+
+	void BeginPlay() override;
+
 };

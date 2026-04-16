@@ -5,13 +5,13 @@
 #include "UObject/Object.h"
 #include "GearStateBase.generated.h"
 
-//　プレイヤーのギアコンポーネントクラス
+// プレイヤーのギアコンポーネントクラス
 class UPlayerGearComponent;
 
-//　プレイヤーの中間基底クラス
+// プレイヤーの中間基底クラス
 class APlayerBase;
 
-//　ギアの基底クラス
+// ギアの基底クラス
 class UGearBase;
 
 /// <summary>
@@ -44,20 +44,20 @@ public:
 	/// <param name="DeltaTime">デルタタイム</param>
 	virtual void Update(float DeltaTime) { return; }
 
-	//　ギア状態の終了
+	// ギア状態の終了
 	virtual void End() { return; }
 
 protected:
 
-	/// 持ち主のプレイヤーのポインタ
+	// 持ち主のプレイヤーのポインタ
 	UPROPERTY()
 	APlayerBase* OwnerPlayer;
 
-	//　持ち主ギアコンポーネントのポインタ
+	// 持ち主ギアコンポーネントのポインタ
 	UPROPERTY()
 	UPlayerGearComponent* OwnerGearComponent;
 
-	//　持ち主ギアのポインタ
+	// 持ち主ギアのポインタ
 	UPROPERTY()
 	UGearBase* OwnerGear;
 
