@@ -20,8 +20,8 @@ class UNiagaraSystem;
 // Niagaraコンポーネントクラス
 class UNiagaraComponent;
 
-// リング状斬撃攻撃クラス
-class URingPulseSlashAttack;
+// 扇状斬撃攻撃クラス
+class UFanAttackBase;
 
 // 浮遊武器の状態基底クラス
 class UFloatingWeaponStateBase;
@@ -60,11 +60,11 @@ public:
 
 
 	// セッター
-	inline void SetOwnerAttack(URingPulseSlashAttack* Owner) { OwnerAttack = Owner; }
+	inline void SetOwnerAttack(UFanAttackBase* Owner) { OwnerAttack = Owner; }
 	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
 
 	// ゲッター
-	inline URingPulseSlashAttack* GetOwnerAttack() const { return OwnerAttack; }
+	inline UFanAttackBase* GetOwnerAttack() const { return OwnerAttack; }
 private:
 
 	/// <summary>
@@ -87,7 +87,7 @@ private:
 
 	// 基準とする攻撃クラス
 	UPROPERTY()
-	URingPulseSlashAttack* OwnerAttack;
+	UFanAttackBase* OwnerAttack;
 
 	// Niagaraシステム
 	UPROPERTY(EditAnywhere)
