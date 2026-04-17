@@ -96,7 +96,7 @@ bool UFanAttackBase::IsTargetInRange(AActor* Target, const FVector& OwnerLocatio
 }
 
 
-void UFanAttackBase::AttackJudgePlayer(APlayerBase* Player)
+void UFanAttackBase::AttackJudgePlayer(AActor* Player)
 {
 	if (!Player) { return; }
 
@@ -129,7 +129,7 @@ void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
 			enemy->SetKnockBackData(playerLocation, 2.0f, 1.0f);
 
 			// ƒ_ƒ[ƒW‚ð—^‚¦‚é
-			enemy->SetTakeDamaged(10);
+			enemy->SetTakeDamaged();
 		}
 	}
 }

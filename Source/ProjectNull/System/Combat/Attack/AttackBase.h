@@ -42,14 +42,14 @@ public:
 	/// <param name="DeltaTime		">デルタタイム				</param>
 	/// <param name="Player			">プレイヤークラスのアドレス	</param>
 	/// <param name="EnemyManager	">敵管理クラスのアドレス		</param>
-	virtual void Update(float DeltaTime,APlayerBase* Player = nullptr,UEnemyManagerSubsystem* EnemyManager = nullptr) { return; }
+	virtual void Update(float DeltaTime, AActor* Player = nullptr,UEnemyManagerSubsystem* EnemyManager = nullptr) { return; }
 
 	/// <summary>
 	/// 攻撃判定
 	/// </summary>
 	/// <param name="Player			">プレイヤークラスのアドレス	</param>
 	/// <param name="EnemyManager	">敵管理クラスのアドレス		</param>
-	virtual void AttackJudge(APlayerBase* Player = nullptr, UEnemyManagerSubsystem* EnemyManager = nullptr);
+	virtual void AttackJudge(AActor* Player = nullptr, UEnemyManagerSubsystem* EnemyManager = nullptr);
 
 
 	/// <summary>
@@ -77,7 +77,7 @@ protected:
 	/// プレイヤーに対する攻撃判定
 	/// </summary>
 	/// <param name="Player">プレイヤークラスのアドレス</param>
-	virtual void AttackJudgePlayer(APlayerBase* Player) { return; };
+	virtual void AttackJudgePlayer(AActor* Player) { return; };
 	
 	/// <summary>
 	/// 敵リストに対する攻撃判定

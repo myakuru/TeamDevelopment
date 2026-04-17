@@ -40,7 +40,7 @@ public:
 	void Initialize(AActor* Owner)	override;
 	void Execute()					override;
 	void Update(float DeltaTime,
-				APlayerBase* Player = nullptr,
+			AActor* Player = nullptr,
 				UEnemyManagerSubsystem* EnemyManager = nullptr)	override;
 
 private:

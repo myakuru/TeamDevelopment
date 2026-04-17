@@ -20,7 +20,8 @@ void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 		Owner->ChangeState(EFloatingWeaponState::Stand);
 		return;
 	}
-
+	//3
+	
 	// プレイヤーの座標
 	const FVector playerLocation = OwnerActor->GetActorLocation();
 	// プレイヤーが向いてる方向

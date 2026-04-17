@@ -27,7 +27,7 @@ void UFloatingWeaponEffect::Initialize()
 		if (!state) { continue; }
 		state->SetOnwer(this);
 	}
-	ChangeState(EFloatingWeaponState::Stand);
+	ChangeState(EFloatingWeaponState::Attack);
 }
 
 void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)

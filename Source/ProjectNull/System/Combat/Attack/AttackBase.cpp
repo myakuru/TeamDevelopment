@@ -16,7 +16,7 @@ void UAttackBase::Initialize(AActor* Owner)
 	OwnerActor = Owner;
 }
 
-void UAttackBase::AttackJudge(APlayerBase* Player, UEnemyManagerSubsystem* EnemyManager)
+void UAttackBase::AttackJudge(AActor* Player, UEnemyManagerSubsystem* EnemyManager)
 {
 	if (Player)
 	{

@@ -65,6 +65,7 @@ public:
 
 	// ƒQƒbƒ^[
 	inline UFanAttackBase* GetOwnerAttack() const { return OwnerAttack; }
+
 private:
 
 	/// <summary>

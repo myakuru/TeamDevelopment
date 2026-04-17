@@ -25,3 +25,8 @@ void ACombatCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 }
 
+void ACombatCharacterBase::ApplyDamage(float Damage)
+{
+	CombatStats.HP.Current -= Damage;
+}
+

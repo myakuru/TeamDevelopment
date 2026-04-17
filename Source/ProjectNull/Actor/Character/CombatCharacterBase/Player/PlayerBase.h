@@ -4,6 +4,8 @@
 #include "../CombatCharacterBase.h"
 #include "PlayerBase.generated.h"
 
+// プレイヤーHUDウィジェットへのポインタ
+class UPlayerHUDWidget;
 
 // カメラスプリングアームコンポーネント
 class USpringArmComponent;
@@ -59,6 +61,7 @@ public:
 
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void ApplyDamage(float Damage = 1.0f)										override;
 
 	/// <summary>
 	/// 移動処理
@@ -79,8 +82,17 @@ private:
 	/// <returns>移動できるならtrue,移動できないならfalse</returns>
 	bool CanMove();
 
+	/// <summary>
+	/// HPをHUDに反映させる
+	/// </summary>
+	void UpdateHUDHP();
+
 	// 経験値関連構造体
 	FExpSystem ExpSystem;
+
+	// プレイヤーHUDウィジェットへのポインタ
+	UPROPERTY()
+	UPlayerHUDWidget* HUDWidget;
 
 	// ================================================================
 	// プレイヤーのコンポーネント
