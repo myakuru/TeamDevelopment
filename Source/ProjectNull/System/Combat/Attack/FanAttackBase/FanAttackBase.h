@@ -86,7 +86,7 @@ protected:
 	/// プレイヤーに対する攻撃判定
 	/// </summary>
 	/// <param name="Player">プレイヤークラスのアドレス</param>
-	virtual void AttackJudgePlayer(APlayerBase* Player) override;
+	virtual void AttackJudgePlayer(AActor* Player) override;
 
 public:
 

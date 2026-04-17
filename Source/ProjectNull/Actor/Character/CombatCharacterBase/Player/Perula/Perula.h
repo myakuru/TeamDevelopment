@@ -13,9 +13,6 @@ class PROJECTNULL_API APerula : public APlayerBase
 public:
 	APerula();
 
-	UPROPERTY()
-	class UPlayerHUDWidget* PlayerHUDWidget;
-
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void BeginPlay() override;

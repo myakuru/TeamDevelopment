@@ -76,7 +76,7 @@ void UAutoAttack::Execute()
 	return;
 }
 
-void UAutoAttack::Update(float DeltaTime, APlayerBase* Player, UEnemyManagerSubsystem* EnemyManager)
+void UAutoAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
 {
 	if (!EnemyManager) { return; }
 
@@ -86,7 +86,7 @@ void UAutoAttack::Update(float DeltaTime, APlayerBase* Player, UEnemyManagerSubs
 
 		if (!ConeSlashParams->UpdateAttack(DeltaTime)) { continue; }
 
-		ConeSlashParams->AttackJudge(Player, EnemyManager);
+		ConeSlashParams->AttackJudge(nullptr, EnemyManager);
 	}
 
 	// 

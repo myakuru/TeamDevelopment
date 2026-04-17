@@ -20,25 +20,12 @@ void APerula::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-	if (ARobotController* RobotController = Cast<ARobotController>(GetController()))
-	{
-		PlayerHUDWidget = RobotController->GetPlayerHUD();
-	}
-
-	if (PlayerHUDWidget)
-	{
-		PlayerHUDWidget->SetPlayerHp(MaxHp, CurrentHp);
-	}
 }
 
 void APerula::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (PlayerHUDWidget)
-	{
-		PlayerHUDWidget->SetPlayerHp(MaxHp, CurrentHp);
-	}
+	
 }
 

@@ -5,6 +5,8 @@
 #include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
 #include "ProjectNull/Component/PlayerAttackComponent/PlayerAttackComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
@@ -57,19 +59,30 @@ void APlayerBase::BeginPlay()
 
 	ACombatCharacterBase::BeginPlay();
 
+	UpdateHUDHP();
 }
 
 void APlayerBase::Tick(float DeltaTime)
 {
 	ACombatCharacterBase::Tick(DeltaTime);
 
-
+	if (ARobotController* RobotController = Cast<ARobotController>(GetController()))
+	{
+		HUDWidget = RobotController->GetPlayerHUD();
+	}
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	ACombatCharacterBase::SetupPlayerInputComponent(PlayerInputComponent);
 	
+}
+
+void APlayerBase::ApplyDamage(float Damage)
+{
+	ACombatCharacterBase::ApplyDamage(Damage);
+
+	UpdateHUDHP();
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)
@@ -93,4 +106,12 @@ bool APlayerBase::CanMove()
 	}
 
 	return true;
+}
+
+void APlayerBase::UpdateHUDHP()
+{
+	if (HUDWidget)
+	{
+		HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
+	}
 }
