@@ -114,6 +114,9 @@ class UEnemyManagerSubsystem;
 // ゲームの進行管理クラス
 class UGameProgressSubsystem;
 
+// 敵攻撃コンポーネント
+class UEnemyAttackComponent;
+
 /// <summary>
 /// 敵の中間基底クラス
 /// メモ：Characterクラスを継承しているがコンポーネントが多く、
@@ -189,6 +192,12 @@ protected:
 	/// </summary>
 	UPROPERTY()
 	UGameProgressSubsystem* GameProgress;
+
+	/// <summary>
+	/// 敵の攻撃コンポーネントクラス
+	/// </summary>
+	UPROPERTY(VisibleAnywhere, Category = "EnemyAttack")
+	UEnemyAttackComponent* EnemyAttackComponent;
 
 	/// <summary>
 	/// 敵基本ステータス

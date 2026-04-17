@@ -1,8 +1,9 @@
 
 #include "EnemyBase.h"
-#include "ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h"
-#include "ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h"
 #include "Components/CapsuleComponent.h"
+#include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -12,6 +13,8 @@ AEnemyBase::AEnemyBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
+	// 敵の攻撃コンポーネントの生成
+	EnemyAttackComponent = CreateDefaultSubobject<UEnemyAttackComponent>("EnemyAttack");
 }
 
 
@@ -21,6 +24,7 @@ void AEnemyBase::BeginPlay()
 	
 	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+
 
 	// 敵が生成された際に敵管理クラス経由でリストへ登録する
 	if (EnemyManager) {
@@ -56,6 +60,11 @@ void AEnemyBase::BeginPlay()
 
 		//	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase BeginPlay ==="));
 		//}
+	}
+
+	// コンポーネントに自身の参照を渡す
+	{
+		if (EnemyAttackComponent)EnemyAttackComponent->SetOwnerEnemy(this);
 	}
 
 	// ゲームの進行に合わせて敵パラメータを設定
