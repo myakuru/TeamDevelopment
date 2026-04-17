@@ -5,16 +5,16 @@
 #include "AutoAttack.generated.h"
 
 
-//　敵管理クラス
+// 敵管理クラス
 class UEnemyManagerSubsystem;
 
-//　円型の斬撃攻撃クラス
+// 円型の斬撃攻撃クラス
 class UFanAttackBase;
 
 // Niagaraエフェクトクラス
 class UFloatingWeaponEffect;
 
-//　自動攻撃種類
+// 自動攻撃種類
 UENUM(BlueprintType)
 enum class EAutoAttackType : uint8
 {
@@ -55,15 +55,15 @@ private:
 	/// </summary>
 	void StartAutoRingAttack();
 	
-	//　自動攻撃の間隔時間
+	// 自動攻撃の間隔時間
 	UPROPERTY(EditAnywhere)
 	float AutoAttackInterval;
 
-	//　前方扇状自動攻撃からの周囲攻撃遅延時間
+	// 前方扇状自動攻撃からの周囲攻撃遅延時間
 	UPROPERTY(EditAnywhere)
 	float FrontToRingDelay;
 
-	//　自動攻撃のパラメータマップ配列
+	// 自動攻撃のパラメータマップ配列
 	UPROPERTY(EditAnywhere, Instanced)
 	TMap<EAutoAttackType, UFanAttackBase*> AutoAttackParamsMap;
 
@@ -74,14 +74,14 @@ private:
 	UPROPERTY(EditAnywhere, Instanced)
 	TMap<EAutoAttackType, UFloatingWeaponEffect*> FloatingWeaponMap;
 
-	//　================================================================
-	//　タイマー関連
-	//　================================================================
+	// ================================================================
+	// タイマー関連
+	// ================================================================
 
-	//　前方扇状自動攻撃タイマー
+	// 前方扇状自動攻撃タイマー
 	FTimerHandle AutoFrontConeAttackTimerHandle;
 
-	//　前方扇状自動攻撃からの周囲攻撃遅延タイマー
+	// 前方扇状自動攻撃からの周囲攻撃遅延タイマー
 	FTimerHandle FrontToRingDelayTimerHandle;
 
 };

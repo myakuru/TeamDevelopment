@@ -22,7 +22,7 @@ public:
 	/// 開始の際の初期化
 	/// </summary>
 	void Start();
-
+	 
 	/// <summary>
 	/// 更新処理
 	/// </summary>
@@ -97,19 +97,19 @@ public:
 	// 経過時間
 	float ElapsedTime;
 
-	//　回転するかどうか
+	// 回転するかどうか
 	UPROPERTY(EditAnywhere)
 	bool bRotate;
 
-	//　回転速度（度/秒）
+	// 回転速度（度/秒）
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
-	//　攻撃半径
+	// 攻撃半径
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
-	//　扇の広さ（角度）
+	// 扇の広さ（角度）
 	UPROPERTY(EditAnywhere)
 	float ConeAngle;
 
@@ -123,11 +123,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	float StartAngle;
 
-	//　現在の角度
+	// 現在の角度
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
 
-	//　ノックバックの強さ
+	// ノックバックの強さ
 	UPROPERTY(EditAnywhere)
 	float KnockbackPower;
 
