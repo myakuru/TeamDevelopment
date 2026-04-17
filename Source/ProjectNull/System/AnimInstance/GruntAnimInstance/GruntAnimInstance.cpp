@@ -2,7 +2,7 @@
 
 
 #include "GruntAnimInstance.h"
-#include <ProjectNull/Actor/Character/Enemy/EnemyGrunt/EnemyGruntBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyGrunt/EnemyGruntBase.h>
 
 UGruntAnimInstance::UGruntAnimInstance():
 	CanAttack(false)

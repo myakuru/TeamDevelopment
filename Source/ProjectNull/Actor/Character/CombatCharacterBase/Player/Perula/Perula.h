@@ -2,10 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-
-#include "ProjectNull/Actor/Character/Player/PlayerBase.h"
-
+#include "../PlayerBase.h"
 #include "Perula.generated.h"
 
 UCLASS()

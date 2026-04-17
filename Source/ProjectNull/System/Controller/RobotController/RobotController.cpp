@@ -3,10 +3,11 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "ProjectNull/System/Gear/GearBase.h"
-#include "ProjectNull/Actor/Character/Player/Robot/Robot.h"
-#include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
-#include "ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h"
+
+#include <ProjectNull/System/Gear/GearBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/Robot/Robot.h>
+#include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
+#include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 
 
 ARobotController::ARobotController()

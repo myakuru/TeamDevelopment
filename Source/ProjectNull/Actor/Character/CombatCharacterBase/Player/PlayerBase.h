@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "../CombatCharacterBase.h"
 #include "PlayerBase.generated.h"
 
 
@@ -44,7 +44,7 @@ public:
 /// プレイヤー（ワールド内の自身が操作するキャラクター）の中間基底クラス
 /// </summary>
 UCLASS()
-class PROJECTNULL_API APlayerBase : public ACharacter
+class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
 {
 	GENERATED_BODY()
 public:

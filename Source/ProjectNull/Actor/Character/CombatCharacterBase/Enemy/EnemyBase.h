@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "../../../System/DataTable/KnockBackData/KnockBackData.h"
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
+#include "../CombatCharacterBase.h"
 #include "EnemyBase.generated.h"
 
 // 前方宣言
@@ -120,7 +120,7 @@ class UGameProgressSubsystem;
 ///	重くなる可能性があるためActorを継承する可能性大
 /// </summary>
 UCLASS()
-class PROJECTNULL_API AEnemyBase : public ACharacter
+class PROJECTNULL_API AEnemyBase : public ACombatCharacterBase
 {
 	GENERATED_BODY()
 	

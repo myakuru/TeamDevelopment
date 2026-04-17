@@ -1,8 +1,8 @@
 #include "GearBase.h"
 
-#include "ProjectNull/System/Gear/State/GearStateBase.h"
-#include "ProjectNull/Actor/Character/Player/PlayerBase.h"
-#include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
+#include <ProjectNull/System/Gear/State/GearStateBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 
 
 UGearBase::UGearBase():

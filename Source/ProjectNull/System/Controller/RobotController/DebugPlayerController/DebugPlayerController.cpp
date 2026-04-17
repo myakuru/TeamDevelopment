@@ -3,7 +3,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
-#include "ProjectNull/Actor/Character/Player/Robot/Robot.h"
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/Robot/Robot.h>
 
 #include "GameFramework/CharacterMovementComponent.h"
 

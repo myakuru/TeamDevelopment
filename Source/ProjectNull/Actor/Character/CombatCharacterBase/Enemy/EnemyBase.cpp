@@ -17,7 +17,7 @@ AEnemyBase::AEnemyBase()
 
 void AEnemyBase::BeginPlay()
 {
-	Super::BeginPlay();
+	ACombatCharacterBase::BeginPlay();
 	
 	// “GŠÇ—ƒNƒ‰ƒX‚Ìî•ñŽæ“¾
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
@@ -191,12 +191,12 @@ void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPow
 
 void AEnemyBase::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	ACombatCharacterBase::Tick(DeltaTime);
 }
 
 void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	ACombatCharacterBase::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 

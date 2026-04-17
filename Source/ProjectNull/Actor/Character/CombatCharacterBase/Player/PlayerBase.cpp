@@ -55,20 +55,20 @@ void APlayerBase::BeginPlay()
 		GearComponent->SetOwnerPlayer(this);
 	}
 
-	Super::BeginPlay();
+	ACombatCharacterBase::BeginPlay();
 
 }
 
 void APlayerBase::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	ACombatCharacterBase::Tick(DeltaTime);
 
 
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	ACombatCharacterBase::SetupPlayerInputComponent(PlayerInputComponent);
 	
 }
 

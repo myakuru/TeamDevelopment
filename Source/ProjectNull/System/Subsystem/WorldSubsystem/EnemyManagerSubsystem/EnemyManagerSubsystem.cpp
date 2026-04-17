@@ -2,7 +2,7 @@
 #include "EnemyManagerSubsystem.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "ProjectNull/Actor/Character/Enemy/EnemyBase.h"
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
 
 void UEnemyManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)

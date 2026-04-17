@@ -2,8 +2,8 @@
 
 
 #include "FanAttackBase.h"
-#include <ProjectNull/Actor/Character/Enemy/EnemyBase.h>
-#include <ProjectNull/Actor/Character/Player/PlayerBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
