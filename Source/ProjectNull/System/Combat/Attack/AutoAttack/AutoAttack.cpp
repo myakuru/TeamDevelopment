@@ -55,7 +55,7 @@ void UAutoAttack::Initialize(AActor* Owner)
 		floatingWeapon->Initialize();
 	}
 
-	//　自動攻撃のタイマーをセット
+	// 自動攻撃のタイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		AutoFrontConeAttackTimerHandle,
 		this,
@@ -112,7 +112,7 @@ void UAutoAttack::StartAutoAttack()
 	
 	
 
-	//　前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット
+	// 前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		FrontToRingDelayTimerHandle,
 		this,

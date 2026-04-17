@@ -35,19 +35,19 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 
 	ElapsedTime += DeltaTime;
 
-	//　回転処理
+	// 回転処理
 	if (bRotate)
 	{
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
 
-	//　攻撃範囲をデバッグラインで可視化
+	// 攻撃範囲をデバッグラインで可視化
 	{
-		//　プレイヤーの座標と前方ベクトルを取得
+		// プレイヤーの座標と前方ベクトルを取得
 		const FVector playerLocation = OwnerActor->GetActorLocation();
 		const FVector forwardVector = OwnerActor->GetActorForwardVector();
 
-		//　攻撃方向ベクトル
+		// 攻撃方向ベクトル
 		const FVector attackDir = CalcAttackDir(forwardVector);
 
 		UDebugDrawLibrary::DrawDebugFan(
@@ -60,7 +60,7 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 		);
 	}
 
-	//　終了判定
+	// 終了判定
 	if (ElapsedTime >= Duration)
 	{
 		bIsActive = false;
@@ -74,22 +74,22 @@ bool UFanAttackBase::IsTargetInRange(AActor* Target, const FVector& OwnerLocatio
 	if (!OwnerActor) { return false; }
 	if (!Target) { return false; }
 
-	//　敵へのベクトル
+	// 敵へのベクトル
 	FVector ToEnemy = Target->GetActorLocation() - OwnerLocation;
 
 	// 攻撃方向ベクトル
 	const FVector AttackDir = CalcAttackDir(OwnerActor->GetActorForwardVector());
 
-	//　距離チェック
+	// 距離チェック
 	if (ToEnemy.SizeSquared() > GetRadiusSquared())
 	{
 		return false;
 	}
 
-	//　ベクトル正規化
+	// ベクトル正規化
 	ToEnemy.Normalize();
 
-	//　角度チェック
+	// 角度チェック
 	float Dot = FVector::DotProduct(AttackDir, ToEnemy);
 
 	return Dot > GetConeCosine();
@@ -100,10 +100,10 @@ void UFanAttackBase::AttackJudgePlayer(APlayerBase* Player)
 {
 	if (!Player) { return; }
 
-	//　持ち主の座標を取得
+	// 持ち主の座標を取得
 	const FVector ownerLocation = OwnerActor->GetActorLocation();
 
-	//　敵が攻撃範囲内にいるか判定
+	// 敵が攻撃範囲内にいるか判定
 	if (IsTargetInRange(Player, ownerLocation))
 	{
 		// ダメージを与える(未実装)
@@ -114,15 +114,15 @@ void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
 {
 	if (!EnemyManager) { return; }
 
-	//　プレイヤーの座標を取得
+	// プレイヤーの座標を取得
 	const FVector playerLocation = OwnerActor->GetActorLocation();
 
-	//　敵リストをループして、攻撃範囲内の敵にダメージを与える
+	// 敵リストをループして、攻撃範囲内の敵にダメージを与える
 	for (auto& enemy : EnemyManager->GetEnemyList())
 	{
 		if (!enemy) { continue; }
 
-		//　敵が攻撃範囲内にいるか判定
+		// 敵が攻撃範囲内にいるか判定
 		if (IsTargetInRange(enemy, playerLocation))
 		{
 			// 第二引数※要改善(ノックバックの強さなどは基底に置くかゲットできるようにしたい)

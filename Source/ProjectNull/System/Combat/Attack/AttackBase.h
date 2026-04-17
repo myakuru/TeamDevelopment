@@ -94,6 +94,6 @@ protected:
 	// 攻撃を実行できるかどうか
 	bool bCanExecute;
 
-	//　実行中かどうか
+	// 実行中かどうか
 	bool bIsActive;
 };
