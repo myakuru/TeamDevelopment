@@ -1,8 +1,6 @@
 #include "PlayerHUDWidget.h"
 #include <Components/Button.h>
 #include <Components/TextBlock.h>
-
-#include "Kismet/GameplayStatics.h"
 #include "Components/Image.h"
 
 // プレイヤーの経験値バーとHPバーのウィジェットクラスのヘッダーファイルをインクルード
@@ -16,7 +14,7 @@
 
 void UPlayerHUDWidget::NativeConstruct()
 {
-	GameTimer->StartTimer(3600.0f);
+	GameTimer->StartTimer(120.0f);
 
 	if (ActionButton)
 	{
