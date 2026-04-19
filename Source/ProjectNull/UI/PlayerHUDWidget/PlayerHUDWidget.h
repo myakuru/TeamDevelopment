@@ -28,11 +28,17 @@ protected:
 	UFUNCTION()
 	void OnClickedActionButton();
 
+	// プレイヤーの経験値バー
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UPlayerExpBarWidget> PlayerExpBar;
 
+	// プレイヤーのHPバー
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPlayerHpBarWidget> PlayerHpBar;
+
+	// タイマーのUI
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UGameTimerWidget> GameTimer;
 
 public:
 
