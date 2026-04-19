@@ -4,7 +4,7 @@
 #include "MiniMapActor.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Kismet/GameplayStatics.h"
-#include <ProjectNull/Actor/Character/Player/PlayerBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
 // Sets default values
 AMiniMapActor::AMiniMapActor()
