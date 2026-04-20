@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "EnemySpawnPattern/EnemyWaveDataAsset.h"
 #include "EnemySpawner.generated.h"
 
 /// <summary>
@@ -88,6 +89,12 @@ public:
 	/// </summary>
 	UFUNCTION(BlueprintCallable, Category = "EnemySpawner")
 	void SpawnEnemy();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	TObjectPtr<UEnemyWaveDataAsset> WaveData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	FTransform SpawnOrigin;
 
 private:
 

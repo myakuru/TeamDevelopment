@@ -4,6 +4,8 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "EnemySpawnPattern/EnemySpawnPatternBase.h"
+
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyGrunt/EnemyGruntBase.h>
 
 
@@ -32,6 +34,14 @@ void AEnemySpawner::SpawnEnemy()
 	// 出現対象が存在しなかったら実行しない
 	if (!EnemyClass) { return; }
 
+	UE_LOG(LogTemp, Warning, TEXT("SpawnWave called"));
+
+	if (!WaveData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("WaveData is null"));
+		return;
+	}
+
 	// プレイヤーの情報を取得する（0番:1P）
 	const APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!pPlayerPawn) { return; }
@@ -39,23 +49,72 @@ void AEnemySpawner::SpawnEnemy()
 	// プレイヤーの場所（Location）
 	const FVector playerLocation = pPlayerPawn->GetActorLocation();
 
-	// 出現座標XY
-	FVector spawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
+	for (const FEnemySpawnUnit& Unit : WaveData->Enemies)
+	{
+		if (!Unit.EnemyClass)
+		{
+			UE_LOG(LogTemp, Error, TEXT("EnemyClass is null"));
+			continue;
+		}
+		if (!Unit.SpawnPattern)
+		{
+			UE_LOG(LogTemp, Error, TEXT("SpawnPattern is null"));
+			continue;
+		}
 
-	// 当たり判定の結果
-	FHitResult hitResult;
+		// 出現座標を決める
+		TArray<FVector> spawnLocations =
+			Unit.SpawnPattern->GenerateSpawnTransforms(Unit.SpawnCount, playerLocation);
 
-	// Rayが静的なオブジェクトに衝突していて
-	// 衝突している場所が地面または坂の傾きの場合は（壁などでない場合）
-	// 敵を出現させる
-	if (IsIntersectingStaticObjects(hitResult, spawnLocation)
-		&& hitResult.Normal.Z > SpawnParams.MinGroundNormalZ) {
-		// 情報に基づいてアクターを出現させる
-		AEnemyGruntBase* enemyGrunt = GetWorld()->SpawnActor<AEnemyGruntBase>(
-			EnemyClass,
-			spawnLocation,
-			FRotator::ZeroRotator);
+		UE_LOG(LogTemp, Warning, TEXT("Transforms count: %d"), spawnLocations.Num());
+
+		// Count分エネミーを生成
+		for (FVector& spawnLocation : spawnLocations)
+		{
+			// 当たり判定の結果
+			FHitResult hitResult;
+
+			// Rayが静的なオブジェクトに衝突していて
+			// 衝突している場所が地面または坂の傾きの場合は（壁などでない場合）
+			// 敵を出現させる
+			if (IsIntersectingStaticObjects(hitResult, spawnLocation)
+				&& hitResult.Normal.Z > SpawnParams.MinGroundNormalZ) {
+				// 情報に基づいてアクターを出現させる
+				AActor* SpawnedEnemy = GetWorld()->SpawnActor<AActor>(
+					Unit.EnemyClass,
+					spawnLocation,
+					FRotator::ZeroRotator);
+
+				UE_LOG(LogTemp, Warning, TEXT("SpawnActor result: %s"),
+					SpawnedEnemy ? TEXT("SUCCESS") : TEXT("FAILED"));
+			}
+		}
 	}
+
+	//// プレイヤーの情報を取得する（0番:1P）
+	//const APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	//if (!pPlayerPawn) { return; }
+
+	//// プレイヤーの場所（Location）
+	//const FVector playerLocation = pPlayerPawn->GetActorLocation();
+
+	//// 出現座標XY
+	//FVector spawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
+
+	//// 当たり判定の結果
+	//FHitResult hitResult;
+
+	//// Rayが静的なオブジェクトに衝突していて
+	//// 衝突している場所が地面または坂の傾きの場合は（壁などでない場合）
+	//// 敵を出現させる
+	//if (IsIntersectingStaticObjects(hitResult, spawnLocation)
+	//	&& hitResult.Normal.Z > SpawnParams.MinGroundNormalZ) {
+	//	// 情報に基づいてアクターを出現させる
+	//	AEnemyGruntBase* enemyGrunt = GetWorld()->SpawnActor<AEnemyGruntBase>(
+	//		EnemyClass,
+	//		spawnLocation,
+	//		FRotator::ZeroRotator);
+	//}
 }
 
 FVector AEnemySpawner::CalculateEnemySpawnPointInRing(const FVector& Center) const
