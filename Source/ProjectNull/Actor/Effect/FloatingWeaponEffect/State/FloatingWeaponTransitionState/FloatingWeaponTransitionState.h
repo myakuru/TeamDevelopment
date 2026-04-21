@@ -3,7 +3,6 @@
 
 #include "CoreMinimal.h"
 #include "../FloatingWeaponStateBase.h"
-#include "../../../FloatingWeaponEffect/FloatingWeaponEffect.h"
 #include "FloatingWeaponTransitionState.generated.h"
 
 /// <summary>
@@ -18,16 +17,8 @@ public:
 
 public:
 
-	void Start(EFloatingWeaponState SetNextState);
+	void Start(EFloatingWeaponState SetNextState) override;
 	void Update(AActor* OwnerActor, float DeltaTime)override;
-	void UpdateTransitionTime(float DeltaTime);
 
-
-	bool IsFinishedTransitionState() const
-	{
-		return TransitionTime <= 0.0f;
-	}
-
-	float TransitionTime;
 	EFloatingWeaponState NextState;
 };

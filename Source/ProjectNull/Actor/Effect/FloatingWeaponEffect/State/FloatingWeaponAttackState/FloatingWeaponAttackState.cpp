@@ -11,7 +11,7 @@ UFloatingWeaponAttackState::UFloatingWeaponAttackState()
 void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
-
+	UE_LOG(LogTemp, Warning, TEXT("AttackState"));
 	auto* attack = Owner->GetOwnerAttack();
 
 	if (attack->CanDeactivate())

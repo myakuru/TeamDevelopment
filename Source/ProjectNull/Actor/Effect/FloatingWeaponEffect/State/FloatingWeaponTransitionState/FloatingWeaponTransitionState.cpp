@@ -7,45 +7,39 @@
 
 
 UFloatingWeaponTransitionState::UFloatingWeaponTransitionState():
-	NextState(EFloatingWeaponState::None),
-	TransitionTime(0.0f)
+	NextState(EFloatingWeaponState::Attack)
 {
 }
 
 void UFloatingWeaponTransitionState::Start(EFloatingWeaponState SetNextState)
 {
-	NextState = SetNextState;
-	if(Owner && Owner->GetOwnerAttack())
-	{
-		TransitionTime = Owner->GetOwnerAttack()->TransitionStateTime();
-	}
+	NextState		= SetNextState;
+	TransitionTime	= GetTransitionStateTime();
 }
 
 void UFloatingWeaponTransitionState::Update(AActor* OwnerActor, float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("TransitionState"));
 
 	auto* attack = Owner->GetOwnerAttack();
 
 	UpdateTransitionTime(DeltaTime);
 
 	
-	if (attack->IsAttackStateStep())
+	if (NextState == EFloatingWeaponState::Attack
+		&& attack->IsAttackStateStep())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Attack);
 		return;
 	}
 
-	if(IsFinishedTransitionState())
+	if(NextState == EFloatingWeaponState::Stand
+		&& IsFinishedTransitionState())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Stand);
 		return;
 	}
-}
 
-void UFloatingWeaponTransitionState::UpdateTransitionTime(float DeltaTime)
-{
-	if (TransitionTime <= 0.0f) { return; }
-	TransitionTime -= DeltaTime;
-	TransitionTime = std::max(TransitionTime,0.0f);
+	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
 }

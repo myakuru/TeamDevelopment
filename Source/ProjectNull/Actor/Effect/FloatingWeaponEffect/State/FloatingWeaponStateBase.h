@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "../../FloatingWeaponEffect/FloatingWeaponEffect.h"
 #include "FloatingWeaponStateBase.generated.h"
 
 // 浮遊武器クラス
@@ -21,8 +22,8 @@ public:
 	UFloatingWeaponStateBase();
 
 public:
-
 	virtual void Start() { return; }
+	virtual void Start(EFloatingWeaponState SetNextState) { return; }
 
 	/// <summary>
 	/// 更新
@@ -34,6 +35,14 @@ public:
 	inline void SetOnwer(UFloatingWeaponEffect* SetOwner) { Owner = SetOwner; }
 
 protected:
+
+	inline bool IsFinishedTransitionState() const { return TransitionTime <= 0.0f; }
+
+	float GetTransitionStateTime() const;
+
+	void UpdateTransitionTime(float DeltaTime);
+
+	float TransitionTime;
 
 	UPROPERTY()
 	UFloatingWeaponEffect* Owner;

@@ -40,7 +40,7 @@ bool UFloatingWeaponAttack::UpdateAttack(float DeltaTime)
 bool UFloatingWeaponAttack::IsAttackStateStep()
 {
 	if (!AutoAttack) { return false; }
-	return ElapsedTime <= Duration;
+	return ElapsedTime < Duration;
 }
 
 float UFloatingWeaponAttack::TransitionStateTime()

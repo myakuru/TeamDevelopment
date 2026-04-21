@@ -9,9 +9,23 @@ UFloatingWeaponStandState::UFloatingWeaponStandState()
 {
 }
 
+void UFloatingWeaponStandState::Start()
+{
+	TransitionTime = GetTransitionStateTime();
+}
+
 void UFloatingWeaponStandState::Update(AActor* OwnerActor, float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("StandState"));
+
+	UpdateTransitionTime(DeltaTime);
+
+	if (IsFinishedTransitionState())
+	{
+		Owner->ChangeState(EFloatingWeaponState::Transition, EFloatingWeaponState::Attack);
+		return;
+	}
 
 	auto* attack = Owner->GetOwnerAttack();
 

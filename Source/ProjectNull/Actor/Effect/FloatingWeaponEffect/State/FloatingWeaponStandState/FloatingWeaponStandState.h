@@ -16,7 +16,7 @@ class PROJECTNULL_API UFloatingWeaponStandState final : public UFloatingWeaponSt
 public:
 	UFloatingWeaponStandState();
 public:
-
+	void Start() override;
 	void Update(AActor* OwnerActor,float DeltaTime)override;
 private:
 

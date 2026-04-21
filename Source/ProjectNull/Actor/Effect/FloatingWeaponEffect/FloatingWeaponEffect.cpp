@@ -28,7 +28,7 @@ void UFloatingWeaponEffect::Initialize()
 		if (!state) { continue; }
 		state->SetOnwer(this);
 	}
-	ChangeState(EFloatingWeaponState::Attack);
+	ChangeState(EFloatingWeaponState::Transition);
 }
 
 void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
@@ -53,6 +53,28 @@ void UFloatingWeaponEffect::Update(AActor* OwnerActor, float DeltaTime)
 	CurrentState->Update(OwnerActor,DeltaTime);
 
 	UpdateTransform();
+}
+
+void UFloatingWeaponEffect::ChangeState(EFloatingWeaponState NextState)
+{
+	if (!States.Contains(NextState) || !States[NextState]) { return; }
+	CurrentState = States[NextState];
+
+	if (CurrentState)
+	{
+		CurrentState->Start();
+	}
+}
+
+void UFloatingWeaponEffect::ChangeState(EFloatingWeaponState NextState, EFloatingWeaponState TheStateAfterTheNext)
+{
+	if (!States.Contains(NextState) || !States[NextState]) { return; }
+	CurrentState = States[NextState];
+
+	if (CurrentState)
+	{
+		CurrentState->Start(TheStateAfterTheNext);
+	}
 }
 
 bool UFloatingWeaponEffect::IsAttackStateStep() const

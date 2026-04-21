@@ -9,7 +9,6 @@
 UENUM(BlueprintType)
 enum class EFloatingWeaponState : uint8
 {
-	None,
 	Stand,
 	Attack,
 	Transition,
@@ -25,9 +24,7 @@ class UNiagaraComponent;
 // 扇状斬撃攻撃クラス
 class UFloatingWeaponAttack;
 
-// 浮遊武器の状態基底クラス
 class UFloatingWeaponStateBase;
-
 
 /// <summary>
 /// 浮遊武器エフェクトクラス
@@ -58,17 +55,10 @@ public:
 	/// 状態の遷移
 	/// </summary>
 	/// <param name="State">ステート種類</param>
-	template<typename ...ArgType>
-	void ChangeState(EFloatingWeaponState State, ArgType&&... Args)
-	{
-		if (!States.Contains(State) || !States[State]) { return; }
-		CurrentState = States[State];
+	void ChangeState(EFloatingWeaponState NextState);
 
-		if (CurrentState)
-		{
-			CurrentState->Start(Args);
-		}
-	}
+	void ChangeState(EFloatingWeaponState NextState,EFloatingWeaponState TheStateAfterTheNext);
+	
 
 	bool IsAttackStateStep() const;
 
