@@ -96,4 +96,8 @@ protected:
 
 	// 実行中かどうか
 	bool bIsActive;
+
+	// デバッグライン描画するかどうか
+	UPROPERTY(EditAnywhere)
+	bool bIsDrawDebugLine;
 };

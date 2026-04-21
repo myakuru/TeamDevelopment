@@ -1,7 +1,7 @@
 
 #include "FloatingWeaponAttackState.h"
 
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 
 UFloatingWeaponAttackState::UFloatingWeaponAttackState()
@@ -14,13 +14,11 @@ void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 
 	auto* attack = Owner->GetOwnerAttack();
 
-	// 攻撃が消えたらエフェクト消す
 	if (attack->CanDeactivate())
 	{
-		Owner->ChangeState(EFloatingWeaponState::Stand);
+		Owner->ChangeState(EFloatingWeaponState::Transition,EFloatingWeaponState::Stand);
 		return;
 	}
-	//3
 	
 	// プレイヤーの座標
 	const FVector playerLocation = OwnerActor->GetActorLocation();

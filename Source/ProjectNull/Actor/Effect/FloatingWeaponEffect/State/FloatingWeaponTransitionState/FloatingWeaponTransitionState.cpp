@@ -3,11 +3,22 @@
 #include "FloatingWeaponTransitionState.h"
 
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
 
 
-UFloatingWeaponTransitionState::UFloatingWeaponTransitionState()
+UFloatingWeaponTransitionState::UFloatingWeaponTransitionState():
+	NextState(EFloatingWeaponState::None),
+	TransitionTime(0.0f)
 {
+}
+
+void UFloatingWeaponTransitionState::Start(EFloatingWeaponState SetNextState)
+{
+	NextState = SetNextState;
+	if(Owner && Owner->GetOwnerAttack())
+	{
+		TransitionTime = Owner->GetOwnerAttack()->TransitionStateTime();
+	}
 }
 
 void UFloatingWeaponTransitionState::Update(AActor* OwnerActor, float DeltaTime)
@@ -16,15 +27,25 @@ void UFloatingWeaponTransitionState::Update(AActor* OwnerActor, float DeltaTime)
 
 	auto* attack = Owner->GetOwnerAttack();
 
-	if (attack->IsActiveFirstFrame())
+	UpdateTransitionTime(DeltaTime);
+
+	
+	if (attack->IsAttackStateStep())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Attack);
 		return;
 	}
 
-	if (attack->CanDeactivate())
+	if(IsFinishedTransitionState())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Stand);
 		return;
 	}
+}
+
+void UFloatingWeaponTransitionState::UpdateTransitionTime(float DeltaTime)
+{
+	if (TransitionTime <= 0.0f) { return; }
+	TransitionTime -= DeltaTime;
+	TransitionTime = std::max(TransitionTime,0.0f);
 }

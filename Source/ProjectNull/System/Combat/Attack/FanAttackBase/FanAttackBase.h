@@ -28,7 +28,7 @@ public:
 	/// </summary>
 	/// <param name="DeltaTime">デルタタイム</param>
 	/// /// <returns>更新結果</returns>
-	bool UpdateAttack(float DeltaTime);
+	virtual bool UpdateAttack(float DeltaTime);
 
 	/// <summary>
 	/// 

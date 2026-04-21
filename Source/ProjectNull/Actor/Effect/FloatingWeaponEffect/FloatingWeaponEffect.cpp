@@ -5,7 +5,8 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
+#include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h>
 
 
@@ -54,10 +55,10 @@ void UFloatingWeaponEffect::Update(AActor* OwnerActor, float DeltaTime)
 	UpdateTransform();
 }
 
-void UFloatingWeaponEffect::ChangeState(EFloatingWeaponState State)
+bool UFloatingWeaponEffect::IsAttackStateStep() const
 {
-	if (!States.Contains(State) || !States[State]) { return; }
-	CurrentState = States[State];
+	if (!OwnerAttack) { return false; }
+	return OwnerAttack->IsAttackStateStep();
 }
 
 void UFloatingWeaponEffect::UpdateTransform()

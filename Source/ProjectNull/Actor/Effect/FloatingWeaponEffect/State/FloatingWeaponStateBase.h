@@ -22,6 +22,8 @@ public:
 
 public:
 
+	virtual void Start() { return; }
+
 	/// <summary>
 	/// XV
 	/// </summary>

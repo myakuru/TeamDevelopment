@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "FanAttackBase.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
@@ -50,14 +48,17 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 		// 攻撃方向ベクトル
 		const FVector attackDir = CalcAttackDir(forwardVector);
 
-		UDebugDrawLibrary::DrawDebugFan(
-			GetWorld(),
-			playerLocation,
-			attackDir,
-			Radius,
-			ConeAngle,
-			10
-		);
+		if (bIsDrawDebugLine)
+		{
+			UDebugDrawLibrary::DrawDebugFan(
+				GetWorld(),
+				playerLocation,
+				attackDir,
+				Radius,
+				ConeAngle,
+				10
+			);
+		}
 	}
 
 	// 終了判定

@@ -7,15 +7,15 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 
 
-UAutoAttack::UAutoAttack()
-	: AutoAttackInterval(5.0f)
-	, FrontToRingDelay(1.0f)
+UAutoAttack::UAutoAttack():
+	AutoAttackInterval(5.0f),
+	FrontToRingDelay(1.0f)
 {
 }
 
@@ -28,31 +28,8 @@ void UAutoAttack::Initialize(AActor* Owner)
 	{
 		if (!ConeSlashParams) { continue; }
 
+		ConeSlashParams->SetAutoAttack(this);
 		ConeSlashParams->Initialize(Owner);
-	}
-
-	if (FloatingWeaponMap.Contains(EAutoAttackType::Front))
-	{
-		if (auto* floatingWeapon = FloatingWeaponMap[EAutoAttackType::Front])
-		{
-			floatingWeapon->SetOwnerAttack(AutoAttackParamsMap[EAutoAttackType::Front]);
-			floatingWeapon->Start(OwnerActor->GetRootComponent());
-		}
-	}
-
-	if (FloatingWeaponMap.Contains(EAutoAttackType::Ring))
-	{
-		if (auto* floatingWeapon = FloatingWeaponMap[EAutoAttackType::Ring])
-		{
-			floatingWeapon->SetOwnerAttack(AutoAttackParamsMap[EAutoAttackType::Ring]);
-		}
-	}
-
-
-	for (auto& [type, floatingWeapon] : FloatingWeaponMap)
-	{
-		if (!floatingWeapon) { continue; }
-		floatingWeapon->Initialize();
 	}
 
 	// 自動攻撃のタイマーをセット
@@ -63,12 +40,6 @@ void UAutoAttack::Initialize(AActor* Owner)
 		AutoAttackInterval,
 		true);
 
-
-	/*if (FloatingWeaponMap.Contains(EAutoAttackType::Front)
-		&& FloatingWeaponMap[EAutoAttackType::Front])
-	{
-		FloatingWeaponMap[EAutoAttackType::Front]->Start(OwnerActor->GetRootComponent());
-	}*/
 }
 
 void UAutoAttack::Execute()
@@ -89,14 +60,12 @@ void UAutoAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem
 		ConeSlashParams->AttackJudge(nullptr, EnemyManager);
 	}
 
-	// 
-	for (auto& [type, floatingWeapon] : FloatingWeaponMap)
+	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
 	{
-		if (!floatingWeapon) { continue; }
-
-		floatingWeapon->Update(OwnerActor,DeltaTime);
+		if (!ConeSlashParams) { continue; }
+		ConeSlashParams->Update(DeltaTime, Player, EnemyManager);
 	}
-
+	
 }
 
 void UAutoAttack::StartAutoAttack()
@@ -110,8 +79,6 @@ void UAutoAttack::StartAutoAttack()
 	}
 
 	
-	
-
 	// 前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		FrontToRingDelayTimerHandle,
@@ -123,9 +90,5 @@ void UAutoAttack::StartAutoAttack()
 
 void UAutoAttack::StartAutoRingAttack()
 {
-	if (FloatingWeaponMap.Contains(EAutoAttackType::Ring)
-		&& FloatingWeaponMap[EAutoAttackType::Ring])
-	{
-		FloatingWeaponMap[EAutoAttackType::Ring]->Start(OwnerActor->GetRootComponent());
-	}
+	
 }

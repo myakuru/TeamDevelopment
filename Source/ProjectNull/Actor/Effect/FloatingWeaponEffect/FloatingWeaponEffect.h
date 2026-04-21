@@ -9,8 +9,10 @@
 UENUM(BlueprintType)
 enum class EFloatingWeaponState : uint8
 {
+	None,
 	Stand,
 	Attack,
+	Transition,
 	Count UMETA(Hidden)
 };
 
@@ -21,7 +23,7 @@ class UNiagaraSystem;
 class UNiagaraComponent;
 
 // 扇状斬撃攻撃クラス
-class UFanAttackBase;
+class UFloatingWeaponAttack;
 
 // 浮遊武器の状態基底クラス
 class UFloatingWeaponStateBase;
@@ -56,15 +58,26 @@ public:
 	/// 状態の遷移
 	/// </summary>
 	/// <param name="State">ステート種類</param>
-	void ChangeState(EFloatingWeaponState State);
+	template<typename ...ArgType>
+	void ChangeState(EFloatingWeaponState State, ArgType&&... Args)
+	{
+		if (!States.Contains(State) || !States[State]) { return; }
+		CurrentState = States[State];
 
+		if (CurrentState)
+		{
+			CurrentState->Start(Args);
+		}
+	}
+
+	bool IsAttackStateStep() const;
 
 	// セッター
-	inline void SetOwnerAttack(UFanAttackBase* Owner) { OwnerAttack = Owner; }
+	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner) { OwnerAttack = Owner; }
 	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
 
 	// ゲッター
-	inline UFanAttackBase* GetOwnerAttack() const { return OwnerAttack; }
+	inline UFloatingWeaponAttack* GetOwnerAttack() const { return OwnerAttack; }
 
 private:
 
@@ -88,7 +101,7 @@ private:
 
 	// 基準とする攻撃クラス
 	UPROPERTY()
-	UFanAttackBase* OwnerAttack;
+	UFloatingWeaponAttack* OwnerAttack;
 
 	// Niagaraシステム
 	UPROPERTY(EditAnywhere)
