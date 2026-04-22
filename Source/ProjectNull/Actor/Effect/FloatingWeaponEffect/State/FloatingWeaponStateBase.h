@@ -57,5 +57,5 @@ protected:
 	// エフェクトの回転オフセット
 	UPROPERTY(EditAnywhere)
 	FRotator RotatorOffset;
-
+	
 };

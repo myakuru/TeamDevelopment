@@ -22,24 +22,54 @@ void UFloatingWeaponTransitionState::Update(AActor* OwnerActor, float DeltaTime)
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("TransitionState"));
 
-	auto* attack = Owner->GetOwnerAttack();
-
 	UpdateTransitionTime(DeltaTime);
-
 	
-	if (NextState == EFloatingWeaponState::Attack
-		&& attack->IsAttackStateStep())
+	switch (NextState)
+	{
+	case EFloatingWeaponState::Stand:	UpdateStandTransition(OwnerActor, DeltaTime);	break;
+	case EFloatingWeaponState::Attack:	UpdateAttakTransition(OwnerActor,DeltaTime);	break;
+	case EFloatingWeaponState::Transition: break;
+	case EFloatingWeaponState::Count: break;
+	default: break;
+	}
+
+	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
+}
+
+void UFloatingWeaponTransitionState::UpdateAttakTransition(AActor* OwnerActor, float DeltaTime)
+{
+	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
+
+	const FTransform currentTransform = Owner->GetTransform();
+	const FTransform targetTransform = Owner->GetAttackStartTransform(OwnerActor);
+	const FVector currentLocation = currentTransform.GetLocation();
+	const FVector targetLocation = targetTransform.GetLocation();
+	const float lerpValue = TransitionTime / GetTransitionStateTime();
+	const FVector resultLocation = FMath::Lerp(currentLocation,targetLocation,lerpValue);
+	//Transform = FMath::Lerp(currentTransform, targetTransform, lerpValue);
+	Transform.SetLocation(resultLocation);
+	if (Owner->GetOwnerAttack()->IsAttackStateStep())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Attack);
 		return;
 	}
+}
 
-	if(NextState == EFloatingWeaponState::Stand
-		&& IsFinishedTransitionState())
+void UFloatingWeaponTransitionState::UpdateStandTransition(AActor* OwnerActor, float DeltaTime)
+{
+
+	const FTransform currentTransform = Owner->GetTransform();
+	const FTransform targetTransform = Owner->GetStandStartTransform(OwnerActor);
+	const FVector currentLocation = currentTransform.GetLocation();
+	const FVector targetLocation = targetTransform.GetLocation();
+	const float lerpValue = TransitionTime / GetTransitionStateTime();
+	const FVector resultLocation = FMath::Lerp(currentLocation, targetLocation, lerpValue);
+	//Transform = FMath::Lerp(currentTransform, targetTransform, lerpValue);
+	Transform.SetLocation(resultLocation);
+
+	if (IsFinishedTransitionState())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Stand);
 		return;
 	}
-
-	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
 }

@@ -20,5 +20,11 @@ public:
 	void Start(EFloatingWeaponState SetNextState) override;
 	void Update(AActor* OwnerActor, float DeltaTime)override;
 
+private:
+
+	void UpdateAttakTransition(AActor* OwnerActor, float DeltaTime);
+
+	void UpdateStandTransition(AActor* OwnerActor, float DeltaTime);
+
 	EFloatingWeaponState NextState;
 };

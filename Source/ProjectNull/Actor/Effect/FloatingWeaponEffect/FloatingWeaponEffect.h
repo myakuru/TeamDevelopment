@@ -62,13 +62,16 @@ public:
 
 	bool IsAttackStateStep() const;
 
+	FTransform GetAttackStartTransform(AActor* OwnerActor);
+	FTransform GetStandStartTransform(AActor* OwnerActor);
+
 	// セッター
 	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner) { OwnerAttack = Owner; }
 	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
 
 	// ゲッター
-	inline UFloatingWeaponAttack* GetOwnerAttack() const { return OwnerAttack; }
-
+	inline UFloatingWeaponAttack* GetOwnerAttack() const	{ return OwnerAttack; }
+	inline FTransform GetTransform() const					{ return Transform; }
 private:
 
 	/// <summary>
@@ -122,5 +125,8 @@ private:
 	UFloatingWeaponStateBase* CurrentState;
 
 	UPROPERTY(EditAnywhere)
-	FVector StandLocation;
+	FTransform StandStartTransformOffset;
+
+	UPROPERTY(EditAnywhere)
+	float LocationDistOffset;
 };

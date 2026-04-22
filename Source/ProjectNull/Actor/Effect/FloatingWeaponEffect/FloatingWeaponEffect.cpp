@@ -8,6 +8,8 @@
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
 #include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h>
+#include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponAttackState/FloatingWeaponAttackState.h>
+#include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStandState/FloatingWeaponStandState.h>
 
 
 UFloatingWeaponEffect::UFloatingWeaponEffect():
@@ -81,6 +83,43 @@ bool UFloatingWeaponEffect::IsAttackStateStep() const
 {
 	if (!OwnerAttack) { return false; }
 	return OwnerAttack->IsAttackStateStep();
+}
+
+FTransform UFloatingWeaponEffect::GetAttackStartTransform(AActor* OwnerActor)
+{
+	if (!OwnerActor || !OwnerAttack || !States.Contains(EFloatingWeaponState::Attack)
+		|| !States[EFloatingWeaponState::Attack]) { return FTransform(); }
+	auto* attakState = Cast<UFloatingWeaponAttackState>(States[EFloatingWeaponState::Attack]);
+	if (!attakState) { 
+		//UE_LOG(LogTemp, Warning, TEXT("aaaa"));
+		return FTransform();
+	}
+	return attakState->CalcAttackStateTransform(OwnerActor,OwnerAttack,OwnerAttack->StartAngle);
+}
+
+FTransform UFloatingWeaponEffect::GetStandStartTransform(AActor* OwnerActor)
+{
+	/*if (!OwnerActor || !OwnerAttack || !States.Contains(EFloatingWeaponState::Stand)
+		|| !States[EFloatingWeaponState::Stand]) {
+		return FTransform();
+	}
+	auto* standState = Cast<UFloatingWeaponStandState>(States[EFloatingWeaponState::Stand]);
+	if (!standState) {
+		return FTransform();
+	}*/
+	// プレイヤーの座標
+	const FVector playerLocation = OwnerActor->GetActorLocation();
+	// プレイヤーが向いてる方向
+	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
+	// 攻撃方向からのオフセット位置
+	const FVector offsetLocation = playerForwardVector * StandStartTransformOffset.GetLocation();
+	// 浮遊武器の最終位置
+	const FVector resultLocation = playerLocation + offsetLocation;
+	FTransform resultTransform;
+	resultTransform.SetLocation(resultLocation);
+	resultTransform.SetRotation(StandStartTransformOffset.GetRotation());
+
+	return resultTransform;
 }
 
 void UFloatingWeaponEffect::UpdateTransform()
