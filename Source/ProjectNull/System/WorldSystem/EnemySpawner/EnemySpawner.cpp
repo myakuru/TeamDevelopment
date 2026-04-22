@@ -3,7 +3,8 @@
 
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
-#include "ProjectNull/Actor/Character/Enemy/EnemyGrunt/EnemyGruntBase.h"
+
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyGrunt/EnemyGruntBase.h>
 
 
 AEnemySpawner::AEnemySpawner()

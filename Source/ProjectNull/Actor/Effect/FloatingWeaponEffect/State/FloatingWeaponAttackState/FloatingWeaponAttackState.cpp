@@ -1,8 +1,8 @@
 
 #include "FloatingWeaponAttackState.h"
 
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
-#include <ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h>
 
 UFloatingWeaponAttackState::UFloatingWeaponAttackState()
 {
@@ -20,7 +20,8 @@ void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 		Owner->ChangeState(EFloatingWeaponState::Stand);
 		return;
 	}
-
+	//3
+	
 	// プレイヤーの座標
 	const FVector playerLocation = OwnerActor->GetActorLocation();
 	// プレイヤーが向いてる方向

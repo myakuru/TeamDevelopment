@@ -1,10 +1,10 @@
 
 #include "DashGear.h"
 
-#include "ProjectNull/Actor/Character/Player/PlayerBase.h"
-#include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
-#include "ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h"
-#include "ProjectNull/System/Gear/DashGear/State/DashGearState_Lv1/DashGearState_Lv1.h"
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
+#include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
+#include <ProjectNull/System/Gear/DashGear/State/DashGearState_Lv1/DashGearState_Lv1.h>
 
 UDashGear::UDashGear()
 {

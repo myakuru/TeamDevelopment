@@ -5,7 +5,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
-#include <ProjectNull/System/Combat/Attack/RingPulseSlashAttack/RingPulseSlashAttack.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h>
 
 
@@ -27,7 +27,7 @@ void UFloatingWeaponEffect::Initialize()
 		if (!state) { continue; }
 		state->SetOnwer(this);
 	}
-	ChangeState(EFloatingWeaponState::Stand);
+	ChangeState(EFloatingWeaponState::Attack);
 }
 
 void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
