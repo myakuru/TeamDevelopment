@@ -17,6 +17,7 @@ void UFloatingWeaponAttack::Initialize(AActor* Owner)
 	if (FloatingWeaponEffect)
 	{
 		FloatingWeaponEffect->SetOwnerAttack(this);
+		FloatingWeaponEffect->SetOwnerActor(Owner);
 		FloatingWeaponEffect->Initialize();
 		FloatingWeaponEffect->Start(Owner->GetRootComponent());
 	}
@@ -28,7 +29,7 @@ void UFloatingWeaponAttack::Update(float DeltaTime, AActor* Player, UEnemyManage
 	UFanAttackBase::Update(DeltaTime, Player, EnemyManager);
 	if (FloatingWeaponEffect)
 	{
-		FloatingWeaponEffect->Update(OwnerActor, DeltaTime);
+		FloatingWeaponEffect->Update(DeltaTime);
 	}
 }
 

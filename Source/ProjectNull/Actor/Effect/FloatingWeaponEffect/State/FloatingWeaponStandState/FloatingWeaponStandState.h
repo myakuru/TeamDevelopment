@@ -17,7 +17,7 @@ public:
 	UFloatingWeaponStandState();
 public:
 	void Start() override;
-	void Update(AActor* OwnerActor,float DeltaTime)override;
+	void Update(float DeltaTime)override;
 private:
 
 	UPROPERTY(EditAnywhere)

@@ -49,7 +49,7 @@ public:
 	/// 更新
 	/// </summary>
 	/// <param name="OwnerActor">持ち主のクラス</param>
-	void Update(AActor* OwnerActor,float DeltaTime);
+	void Update(float DeltaTime);
 
 	/// <summary>
 	/// 状態の遷移
@@ -62,12 +62,13 @@ public:
 
 	bool IsAttackStateStep() const;
 
-	FTransform GetAttackStartTransform(AActor* OwnerActor);
-	FTransform GetStandStartTransform(AActor* OwnerActor);
+	FTransform GetAttackStartTransform();
+	FTransform GetStandStartTransform();
 
 	// セッター
-	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner) { OwnerAttack = Owner; }
-	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
+	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner)	{ OwnerAttack = Owner; }
+	inline void SetOwnerActor(AActor* SetOwnerActor)			{ OwnerActor = SetOwnerActor; }
+	inline void SetTransform(const FTransform& SetTransform)	{ Transform = SetTransform; }
 
 	// ゲッター
 	inline UFloatingWeaponAttack* GetOwnerAttack() const	{ return OwnerAttack; }
@@ -95,6 +96,10 @@ private:
 	// 基準とする攻撃クラス
 	UPROPERTY()
 	UFloatingWeaponAttack* OwnerAttack;
+
+	
+	UPROPERTY()
+	AActor* OwnerActor;
 
 	// Niagaraシステム
 	UPROPERTY(EditAnywhere)

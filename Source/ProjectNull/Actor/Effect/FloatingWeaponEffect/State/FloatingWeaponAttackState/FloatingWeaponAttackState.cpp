@@ -8,7 +8,7 @@ UFloatingWeaponAttackState::UFloatingWeaponAttackState()
 {
 }
 
-void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponAttackState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("AttackState"));
@@ -20,12 +20,12 @@ void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 		return;
 	}
 
-	Transform = CalcAttackStateTransform(OwnerActor,attack,attack->CurrentAngle);
+	Transform = CalcAttackStateTransform(attack,attack->CurrentAngle);
 	
-	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
+	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
-FTransform UFloatingWeaponAttackState::CalcAttackStateTransform(AActor* OwnerActor, UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
+FTransform UFloatingWeaponAttackState::CalcAttackStateTransform(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
 {
 	if (!OwnerActor || !OwnerAttack) { return FTransform(); }
 

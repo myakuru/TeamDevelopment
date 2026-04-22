@@ -9,7 +9,7 @@ UFloatingWeaponStateBase::UFloatingWeaponStateBase():
 {
 }
 
-void UFloatingWeaponStateBase::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponStateBase::Update(float DeltaTime)
 {
 	if (!Owner) { return; }
 	Owner->SetTransform(Transform);

@@ -28,7 +28,8 @@ void UFloatingWeaponEffect::Initialize()
 	for (auto& [type, state] : States)
 	{
 		if (!state) { continue; }
-		state->SetOnwer(this);
+		state->SetOwner(this);
+		state->SetOwnerActor(OwnerActor);
 	}
 	ChangeState(EFloatingWeaponState::Transition);
 }
@@ -48,11 +49,11 @@ void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 		true);
 }
 
-void UFloatingWeaponEffect::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponEffect::Update(float DeltaTime)
 {
 	if (!OwnerActor || !OwnerAttack || !CurrentState) { return; }
 
-	CurrentState->Update(OwnerActor,DeltaTime);
+	CurrentState->Update(DeltaTime);
 
 	UpdateTransform();
 }
@@ -85,7 +86,7 @@ bool UFloatingWeaponEffect::IsAttackStateStep() const
 	return OwnerAttack->IsAttackStateStep();
 }
 
-FTransform UFloatingWeaponEffect::GetAttackStartTransform(AActor* OwnerActor)
+FTransform UFloatingWeaponEffect::GetAttackStartTransform()
 {
 	if (!OwnerActor || !OwnerAttack || !States.Contains(EFloatingWeaponState::Attack)
 		|| !States[EFloatingWeaponState::Attack]) { return FTransform(); }
@@ -94,10 +95,10 @@ FTransform UFloatingWeaponEffect::GetAttackStartTransform(AActor* OwnerActor)
 		//UE_LOG(LogTemp, Warning, TEXT("aaaa"));
 		return FTransform();
 	}
-	return attakState->CalcAttackStateTransform(OwnerActor,OwnerAttack,OwnerAttack->StartAngle);
+	return attakState->CalcAttackStateTransform(OwnerAttack,OwnerAttack->StartAngle);
 }
 
-FTransform UFloatingWeaponEffect::GetStandStartTransform(AActor* OwnerActor)
+FTransform UFloatingWeaponEffect::GetStandStartTransform()
 {
 	/*if (!OwnerActor || !OwnerAttack || !States.Contains(EFloatingWeaponState::Stand)
 		|| !States[EFloatingWeaponState::Stand]) {
@@ -107,6 +108,11 @@ FTransform UFloatingWeaponEffect::GetStandStartTransform(AActor* OwnerActor)
 	if (!standState) {
 		return FTransform();
 	}*/
+
+	if (!OwnerActor) {
+		return FTransform();
+	}
+
 	// プレイヤーの座標
 	const FVector playerLocation = OwnerActor->GetActorLocation();
 	// プレイヤーが向いてる方向
@@ -117,9 +123,9 @@ FTransform UFloatingWeaponEffect::GetStandStartTransform(AActor* OwnerActor)
 	const FVector resultLocation = playerLocation + offsetLocation;
 	FTransform resultTransform;
 	resultTransform.SetLocation(resultLocation);
-	resultTransform.SetRotation(StandStartTransformOffset.GetRotation());
+	resultTransform.SetRotation(StandStartTransformOffset.GetRotation() + OwnerActor->GetActorRotation().Quaternion());
 
-	return resultTransform;
+	return StandStartTransformOffset;
 }
 
 void UFloatingWeaponEffect::UpdateTransform()

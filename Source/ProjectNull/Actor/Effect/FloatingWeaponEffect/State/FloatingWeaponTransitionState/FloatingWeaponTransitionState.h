@@ -18,13 +18,17 @@ public:
 public:
 
 	void Start(EFloatingWeaponState SetNextState) override;
-	void Update(AActor* OwnerActor, float DeltaTime)override;
+	void Update(float DeltaTime)override;
 
 private:
 
-	void UpdateAttakTransition(AActor* OwnerActor, float DeltaTime);
+	void UpdateAttakTransition(float DeltaTime);
 
-	void UpdateStandTransition(AActor* OwnerActor, float DeltaTime);
+	void UpdateStandTransition(float DeltaTime);
+
 
 	EFloatingWeaponState NextState;
+
+
+	FTransform StartTransformOffset;
 };

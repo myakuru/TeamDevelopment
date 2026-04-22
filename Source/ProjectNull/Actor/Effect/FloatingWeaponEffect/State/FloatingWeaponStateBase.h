@@ -29,10 +29,11 @@ public:
 	/// 更新
 	/// </summary>
 	/// <param name="DeltaTime">デルタタイム</param>
-	virtual void Update(AActor* OwnerActor, float DeltaTime);
+	virtual void Update(float DeltaTime);
 
 	// セッター
-	inline void SetOnwer(UFloatingWeaponEffect* SetOwner) { Owner = SetOwner; }
+	inline void SetOwner(UFloatingWeaponEffect* SetOwner) { Owner = SetOwner; }
+	inline void SetOwnerActor(AActor* SetOwnerActor) { OwnerActor = SetOwnerActor; }
 
 protected:
 
@@ -46,6 +47,9 @@ protected:
 
 	UPROPERTY()
 	UFloatingWeaponEffect* Owner;
+
+	UPROPERTY()
+	AActor* OwnerActor;
 
 	UPROPERTY(EditAnywhere)
 	FTransform Transform;

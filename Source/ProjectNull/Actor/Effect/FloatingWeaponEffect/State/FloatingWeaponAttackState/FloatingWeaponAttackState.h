@@ -19,8 +19,8 @@ public:
 	UFloatingWeaponAttackState();
 public:
 
-	void Update(AActor* OwnerActor,float DeltaTime)override;
-	FTransform CalcAttackStateTransform(AActor* OwnerActor, UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle);
+	void Update(float DeltaTime)override;
+	FTransform CalcAttackStateTransform(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle);
 private:
 	
 };

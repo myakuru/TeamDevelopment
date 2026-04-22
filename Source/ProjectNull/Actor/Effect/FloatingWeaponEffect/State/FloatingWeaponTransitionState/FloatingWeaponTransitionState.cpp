@@ -15,9 +15,13 @@ void UFloatingWeaponTransitionState::Start(EFloatingWeaponState SetNextState)
 {
 	NextState		= SetNextState;
 	TransitionTime	= GetTransitionStateTime();
+
+	if (!Owner) { return; }
+	//オフセットがほしい
+	StartTransformOffset = Owner->GetTransform();
 }
 
-void UFloatingWeaponTransitionState::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponTransitionState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("TransitionState"));
@@ -26,50 +30,72 @@ void UFloatingWeaponTransitionState::Update(AActor* OwnerActor, float DeltaTime)
 	
 	switch (NextState)
 	{
-	case EFloatingWeaponState::Stand:	UpdateStandTransition(OwnerActor, DeltaTime);	break;
-	case EFloatingWeaponState::Attack:	UpdateAttakTransition(OwnerActor,DeltaTime);	break;
+	case EFloatingWeaponState::Stand:
+		UpdateStandTransition(DeltaTime);
+
+		if (IsFinishedTransitionState())
+		{
+			Owner->ChangeState(EFloatingWeaponState::Stand);
+			return;
+		}
+		
+		break;
+	case EFloatingWeaponState::Attack:
+		UpdateAttakTransition(DeltaTime);
+		if (Owner->GetOwnerAttack()->IsAttackStateStep())
+		{
+			Owner->ChangeState(EFloatingWeaponState::Attack);
+			return;
+		}
+
+		break;
 	case EFloatingWeaponState::Transition: break;
 	case EFloatingWeaponState::Count: break;
 	default: break;
 	}
 
-	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
+	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
-void UFloatingWeaponTransitionState::UpdateAttakTransition(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponTransitionState::UpdateAttakTransition(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 
-	const FTransform currentTransform = Owner->GetTransform();
-	const FTransform targetTransform = Owner->GetAttackStartTransform(OwnerActor);
+	/*const float lerpValue = TransitionTime / GetTransitionStateTime();
+	const FTransform currentTransform = StartTransformOffset;
+	const FTransform targetTransform = Owner->GetAttackStartTransform();
+
 	const FVector currentLocation = currentTransform.GetLocation();
 	const FVector targetLocation = targetTransform.GetLocation();
-	const float lerpValue = TransitionTime / GetTransitionStateTime();
 	const FVector resultLocation = FMath::Lerp(currentLocation,targetLocation,lerpValue);
-	//Transform = FMath::Lerp(currentTransform, targetTransform, lerpValue);
+
+	const FQuat4d currentQuaternion = currentTransform.GetRotation().Rotator().Quaternion();
+	const FQuat4d targetQuaternion = targetTransform.GetRotation().Rotator().Quaternion();
+	const FQuat4d resultQuaternion = FQuat4d::Slerp(currentQuaternion, targetQuaternion, lerpValue);
+
+
 	Transform.SetLocation(resultLocation);
-	if (Owner->GetOwnerAttack()->IsAttackStateStep())
-	{
-		Owner->ChangeState(EFloatingWeaponState::Attack);
-		return;
-	}
+	Transform.SetRotation(resultQuaternion);*/
+
 }
 
-void UFloatingWeaponTransitionState::UpdateStandTransition(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponTransitionState::UpdateStandTransition(float DeltaTime)
 {
+	// オフセットの補間→最終的にプレイヤー
+	const float lerpValue = TransitionTime / GetTransitionStateTime();
 
-	const FTransform currentTransform = Owner->GetTransform();
-	const FTransform targetTransform = Owner->GetStandStartTransform(OwnerActor);
+	const FTransform currentTransform = StartTransformOffset;
+	const FTransform targetTransform = Owner->GetStandStartTransform();
+	
 	const FVector currentLocation = currentTransform.GetLocation();
 	const FVector targetLocation = targetTransform.GetLocation();
-	const float lerpValue = TransitionTime / GetTransitionStateTime();
 	const FVector resultLocation = FMath::Lerp(currentLocation, targetLocation, lerpValue);
-	//Transform = FMath::Lerp(currentTransform, targetTransform, lerpValue);
-	Transform.SetLocation(resultLocation);
 
-	if (IsFinishedTransitionState())
-	{
-		Owner->ChangeState(EFloatingWeaponState::Stand);
-		return;
-	}
+	const FQuat4d currentQuaternion = currentTransform.GetRotation().Rotator().Quaternion();
+	const FQuat4d targetQuaternion = targetTransform.GetRotation().Rotator().Quaternion();
+	const FQuat4d resultQuaternion = FQuat4d::Slerp(currentQuaternion, targetQuaternion, lerpValue);
+
+	/*Transform.SetLocation(resultLocation);
+	Transform.SetRotation(resultQuaternion);*/
+
 }

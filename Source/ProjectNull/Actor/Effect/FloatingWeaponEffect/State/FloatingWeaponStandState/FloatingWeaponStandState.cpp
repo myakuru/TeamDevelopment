@@ -14,7 +14,7 @@ void UFloatingWeaponStandState::Start()
 	TransitionTime = GetTransitionStateTime();
 }
 
-void UFloatingWeaponStandState::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponStandState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("StandState"));
@@ -27,23 +27,8 @@ void UFloatingWeaponStandState::Update(AActor* OwnerActor, float DeltaTime)
 		return;
 	}
 
-	auto* attack = Owner->GetOwnerAttack();
+	Transform = Owner->GetStandStartTransform();
 
-	// プレイヤーの座標
-	const FVector playerLocation = OwnerActor->GetActorLocation();
-	// プレイヤーが向いてる方向
-	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
-	const FVector playerRightVector = OwnerActor->GetActorRightVector();
-	// 攻撃方向からのオフセット位置
-	const FVector offsetLocation = playerRightVector * OffsetDist;
-	// 浮遊武器の最終位置
-	const FVector resultLocation = playerLocation + offsetLocation;
-
-	Transform.SetLocation(resultLocation);
-	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw;
-
-	Transform.SetRotation(RotatorOffset.Quaternion());
-
-	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
+	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
