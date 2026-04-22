@@ -11,6 +11,13 @@ void UGameProgressSubsystem::AddKillCount(int32 Value)
 	UpdatePhase();
 }
 
+void UGameProgressSubsystem::SetPhase(int NewPhase)
+{
+	if (Phase == NewPhase) { return; }
+	Phase = NewPhase;
+	OnPhaseChanged.Broadcast(Phase);
+}
+
 void UGameProgressSubsystem::UpdatePhase() 
 {
 	int32 killCount = KillCount;

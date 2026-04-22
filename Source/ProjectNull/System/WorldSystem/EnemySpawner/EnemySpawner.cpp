@@ -8,6 +8,9 @@
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyGrunt/EnemyGruntBase.h>
 
+#include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
+#include <ProjectNull/System/WorldSystem/EnemySpawner/EnemyPhaseSpawnTable.h>
+#include "Engine/GameInstance.h"
 
 AEnemySpawner::AEnemySpawner()
 {
@@ -27,6 +30,22 @@ void AEnemySpawner::BeginPlay()
 		SpawnParams.SpawnInterval,
 		true);
 
+	// フェーズ情報を取得
+	CachedSubsystem = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
+	if (CachedSubsystem)
+	{
+		CachedSubsystem->OnPhaseChanged.AddUObject(this, &AEnemySpawner::HandlePhaseChanged);
+		HandlePhaseChanged(CachedSubsystem->GetPhase());
+	}
+}
+
+void AEnemySpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (CachedSubsystem)
+	{
+		CachedSubsystem->OnPhaseChanged.RemoveAll(this);
+	}
+	Super::EndPlay(EndPlayReason);
 }
 
 void AEnemySpawner::SpawnEnemy()
@@ -36,7 +55,7 @@ void AEnemySpawner::SpawnEnemy()
 
 	UE_LOG(LogTemp, Warning, TEXT("SpawnWave called"));
 
-	if (!WaveData)
+	if (!CurrentWaveData)
 	{
 		UE_LOG(LogTemp, Error, TEXT("WaveData is null"));
 		return;
@@ -49,7 +68,7 @@ void AEnemySpawner::SpawnEnemy()
 	// プレイヤーの場所（Location）
 	const FVector playerLocation = pPlayerPawn->GetActorLocation();
 
-	for (const FEnemySpawnUnit& Unit : WaveData->Enemies)
+	for (const FEnemySpawnUnit& Unit : CurrentWaveData->Enemies)
 	{
 		if (!Unit.EnemyClass)
 		{
@@ -90,31 +109,6 @@ void AEnemySpawner::SpawnEnemy()
 			}
 		}
 	}
-
-	//// プレイヤーの情報を取得する（0番:1P）
-	//const APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	//if (!pPlayerPawn) { return; }
-
-	//// プレイヤーの場所（Location）
-	//const FVector playerLocation = pPlayerPawn->GetActorLocation();
-
-	//// 出現座標XY
-	//FVector spawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
-
-	//// 当たり判定の結果
-	//FHitResult hitResult;
-
-	//// Rayが静的なオブジェクトに衝突していて
-	//// 衝突している場所が地面または坂の傾きの場合は（壁などでない場合）
-	//// 敵を出現させる
-	//if (IsIntersectingStaticObjects(hitResult, spawnLocation)
-	//	&& hitResult.Normal.Z > SpawnParams.MinGroundNormalZ) {
-	//	// 情報に基づいてアクターを出現させる
-	//	AEnemyGruntBase* enemyGrunt = GetWorld()->SpawnActor<AEnemyGruntBase>(
-	//		EnemyClass,
-	//		spawnLocation,
-	//		FRotator::ZeroRotator);
-	//}
 }
 
 FVector AEnemySpawner::CalculateEnemySpawnPointInRing(const FVector& Center) const
@@ -152,6 +146,33 @@ bool AEnemySpawner::IsIntersectingStaticObjects(FHitResult& HitResult, FVector& 
 	}
 
 	return isIntersect;
+}
+
+void AEnemySpawner::HandlePhaseChanged(int NewPhase)
+{
+	ApplySpawnModeByPhase(NewPhase);
+}
+
+void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
+{
+	if (!PhaseSpawnTable)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PhaseSpawnTable is null"));
+		CurrentWaveData = nullptr;
+		return;
+	}
+
+	UEnemyWaveDataAsset* NewWaveData = 
+		const_cast<UEnemyWaveDataAsset*>(PhaseSpawnTable->FindWaveDataByPhase(NewPhase));
+	
+	if (!NewWaveData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("No WaveData found Phase : %d"), NewPhase);
+		CurrentWaveData = nullptr;
+		return;
+	}
+
+	CurrentWaveData = NewWaveData;
 }
 
 //

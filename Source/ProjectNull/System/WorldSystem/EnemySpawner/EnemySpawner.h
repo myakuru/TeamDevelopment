@@ -3,7 +3,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "EnemySpawnPattern/EnemyWaveDataAsset.h"
+#include "EnemyPhaseSpawnTable.h"
 #include "EnemySpawner.generated.h"
+
+class UGameProgressSubsystem;
+class UEnemyPhaseSpawnTable;
 
 /// <summary>
 /// 360度（degree）
@@ -81,6 +85,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 
@@ -90,8 +95,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemySpawner")
 	void SpawnEnemy();
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UEnemyPhaseSpawnTable> PhaseSpawnTable = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
-	TObjectPtr<UEnemyWaveDataAsset> WaveData;
+	TObjectPtr<const UEnemyWaveDataAsset> CurrentWaveData = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
 	FTransform SpawnOrigin;
@@ -112,6 +120,9 @@ private:
 	/// <returns>交差しているかどうか</returns>
 	bool IsIntersectingStaticObjects(FHitResult& HitResult,FVector& SpawnLocationXY);
 
+	void HandlePhaseChanged(int NewPhase);
+	void ApplySpawnModeByPhase(int NewPhase);
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AEnemyGruntBase> EnemyClass;
 
@@ -125,4 +136,9 @@ private:
 	/// 敵を一定時間ごとにスポーンするタイマーID
 	/// </summary>
 	FTimerHandle SpawnTimerHandle;
+
+	/// <summary>
+	/// フェーズのデータを持ったゲームシステム
+	/// </summary>
+	UGameProgressSubsystem* CachedSubsystem = nullptr;
 };
