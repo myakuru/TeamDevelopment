@@ -5,7 +5,7 @@
 #include "Robot.generated.h"
 
 /// <summary>
-///　ロボット（ワールド内の自身が操作するキャラクター）のクラス
+/// ロボット（ワールド内の自身が操作するキャラクター）のクラス
 /// </summary>
 UCLASS()
 class PROJECTNULL_API ARobot : public APlayerBase

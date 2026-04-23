@@ -4,10 +4,10 @@
 #include "Components/ActorComponent.h"
 #include "PlayerGearComponent.generated.h"
 
-//　ギアの基底クラス
+// ギアの基底クラス
 class UGearBase;
 
-//　プレイヤーの中間基底クラス
+// プレイヤーの中間基底クラス
 class APlayerBase;
 
 
@@ -36,26 +36,24 @@ public:
 
 	void ExecuteGear(int32 GearIndex);
 
-	//　セッター
-	//　プレイヤー（持ち主）をセットするメソッド
+	// セッター
 	inline void SetOwnerPlayer(APlayerBase* Player) { OwnerPlayer = Player; }
 
-	//　ゲッター
+	// ゲッター
 	inline const TArray<UGearBase*>& GetPlayerGears() const { return PlayerGears; }
 	inline int32 GetCurrentGearLevel() const { return CurrentGearLevel; }
 
 private:
 
-	//　プレイヤー（持ち主）のポインタ
+	// プレイヤー（持ち主）のポインタ
 	UPROPERTY()
 	APlayerBase* OwnerPlayer;
 
-	//　プレイヤーの装備ギアクラスの配列
+	// プレイヤーの装備ギアクラスの配列
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<UGearBase*> PlayerGears;
 
-	//　現在ギアのレベル
+	// 現在ギアのレベル
 	UPROPERTY(EditAnywhere)
-
 	int32 CurrentGearLevel;
 };

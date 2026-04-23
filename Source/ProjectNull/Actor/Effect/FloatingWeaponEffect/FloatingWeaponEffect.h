@@ -5,14 +5,26 @@
 #include "UObject/Object.h"
 #include "FloatingWeaponEffect.generated.h"
 
-//　Niagaraエフェクトクラス
+
+UENUM(BlueprintType)
+enum class EFloatingWeaponState : uint8
+{
+	Stand,
+	Attack,
+	Count UMETA(Hidden)
+};
+
+// Niagaraエフェクトクラス
 class UNiagaraSystem;
 
-//　Niagaraコンポーネントクラス
+// Niagaraコンポーネントクラス
 class UNiagaraComponent;
 
-//　リング状斬撃攻撃クラス
-class URingPulseSlashAttack;
+// 扇状斬撃攻撃クラス
+class UFanAttackBase;
+
+// 浮遊武器の状態基底クラス
+class UFloatingWeaponStateBase;
 
 
 /// <summary>
@@ -27,6 +39,8 @@ public:
 	UFloatingWeaponEffect();
 public:
 
+	void Initialize();
+
 	/// <summary>
 	/// エフェクト再生開始
 	/// </summary>
@@ -36,11 +50,21 @@ public:
 	/// 更新
 	/// </summary>
 	/// <param name="OwnerActor">持ち主のクラス</param>
-	void Update(AActor* OwnerActor);
+	void Update(AActor* OwnerActor,float DeltaTime);
 
-	//　セッター
-	inline void SetOwnerAttack(URingPulseSlashAttack* Owner) { OwnerAttack = Owner; }
+	/// <summary>
+	/// 状態の遷移
+	/// </summary>
+	/// <param name="State">ステート種類</param>
+	void ChangeState(EFloatingWeaponState State);
 
+
+	// セッター
+	inline void SetOwnerAttack(UFanAttackBase* Owner) { OwnerAttack = Owner; }
+	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
+
+	// ゲッター
+	inline UFanAttackBase* GetOwnerAttack() const { return OwnerAttack; }
 private:
 
 	/// <summary>
@@ -61,27 +85,38 @@ private:
 
 
 
-	//　基準とする攻撃クラス
+	// 基準とする攻撃クラス
 	UPROPERTY()
-	URingPulseSlashAttack* OwnerAttack;
+	UFanAttackBase* OwnerAttack;
 
-	//　Niagaraシステム
+	// Niagaraシステム
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* EffectSystem;
 
-	//　Niagaraコンポーネント
+	// Niagaraコンポーネント
 	UPROPERTY()
 	UNiagaraComponent* EffectComponent;
 
-	//　エフェクトのTransform
+	// エフェクトのTransform
 	UPROPERTY(EditAnywhere)
 	FTransform Transform;
 
-	//　エフェクトの半径オフセット
+	// エフェクトの半径オフセット
 	UPROPERTY(EditAnywhere)
 	float RadiusOffset;
 
-	//　エフェクトの回転オフセット
+	// エフェクトの回転オフセット
 	UPROPERTY(EditAnywhere)
 	FRotator RotatorOffset;
+
+	// 浮遊武器の状態の配列
+	UPROPERTY(EditAnywhere, Instanced)
+	TMap<EFloatingWeaponState,UFloatingWeaponStateBase*> States;
+
+	// 現在の浮遊武器状態
+	UPROPERTY()
+	UFloatingWeaponStateBase* CurrentState;
+
+	UPROPERTY(EditAnywhere)
+	FVector StandLocation;
 };

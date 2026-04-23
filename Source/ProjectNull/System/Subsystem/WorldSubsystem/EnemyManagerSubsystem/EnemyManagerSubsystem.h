@@ -6,7 +6,7 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "EnemyManagerSubsystem.generated.h"
 
-//　敵の中間基底クラス
+// 敵の中間基底クラス
 class AEnemyBase;
 
 /// <summary>

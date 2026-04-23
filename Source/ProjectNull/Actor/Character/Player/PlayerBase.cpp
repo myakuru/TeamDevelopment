@@ -10,30 +10,29 @@ APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
 		AttackComponent(nullptr),
-		GearComponent(nullptr),
-		MaxAcceleration(2100.0f)
+		GearComponent(nullptr)
 {
-	//　================================================================
-	//　自身の設定
-	//　================================================================
+	// ================================================================
+	// 自身の設定
+	// ================================================================
 
-	//　Tickを有効にする
+	// Tickを有効にする
 	PrimaryActorTick.bCanEverTick = true;
 
-	//　コントローラーのYaw回転をキャラクターに反映させない
+	// コントローラーのYaw回転をキャラクターに反映させない
 	bUseControllerRotationYaw = false;
 
-	//　================================================================
-	//　カメラスプリングアームコンポーネントの作成と設定
-	//　================================================================
+	// ================================================================
+	// カメラスプリングアームコンポーネントの作成と設定
+	// ================================================================
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
 	SpringArmComponent->TargetArmLength = 600.0f;
 	SpringArmComponent->bUsePawnControlRotation = true;
 
-	//　================================================================
-	//　カメラコンポーネントの作成と設定
-	//　================================================================
+	// ================================================================
+	// カメラコンポーネントの作成と設定
+	// ================================================================
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->bUsePawnControlRotation = false;
@@ -57,11 +56,7 @@ void APlayerBase::BeginPlay()
 	}
 
 	Super::BeginPlay();
-	
-	if(auto* movement = GetCharacterMovement())
-	{
-		movement->MaxAcceleration = MaxAcceleration;
-	}
+
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -88,15 +83,6 @@ void APlayerBase::Move(const FVector2d& InputVector)
 
 	AddMovementInput(forward, InputVector.Y);
 	AddMovementInput(right, InputVector.X);
-}
-
-void APlayerBase::ResetMovementParameters()
-{
-	if (auto* movement = GetCharacterMovement())
-	{
-		movement->SetMovementMode(MOVE_Walking);
-		movement->MaxAcceleration = MaxAcceleration;
-	}
 }
 
 bool APlayerBase::CanMove()

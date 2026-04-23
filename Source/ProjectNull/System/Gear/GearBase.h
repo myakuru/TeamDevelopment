@@ -5,7 +5,7 @@
 #include "GearBase.generated.h"
 
 
-//　ギアのステータス構造体
+// ギアのステータス構造体
 USTRUCT(BlueprintType)
 struct FGearStatus
 {
@@ -20,23 +20,23 @@ public:
 	}
 public:
 
-	//　ギア持続時間
+	// ギア持続時間
 	UPROPERTY(EditAnywhere)
 	float Duration;
 
-	//　ギアのクールタイム
+	// ギアのクールタイム
 	UPROPERTY(EditAnywhere)
 	float CoolTime;
 };
 
 
-//　プレイヤーのギアコンポーネントクラス
+// プレイヤーのギアコンポーネントクラス
 class UPlayerGearComponent;
 
-//　プレイヤーの中間基底クラス
+// プレイヤーの中間基底クラス
 class APlayerBase;
 
-//　ギアの状態の基底クラス
+// ギアの状態の基底クラス
 class UGearStateBase;
 
 
@@ -54,7 +54,7 @@ public:
 
 public:
 
-	//　ギアの最大レベル
+	// ギアの最大レベル
 	static constexpr int32 kMaxGearLevel = 4;
 
 	/// <summary>
@@ -73,13 +73,13 @@ public:
 	/// <param name="DeltaTime">デルタタイム</param>
 	virtual void Update(float DeltaTime);
 
-	//　ゲッター
+	// ゲッター
 	bool CanExecute()			const { return bCanExecute; }
 	bool BlocksMovement()		const { return bBlocksMovement; }
 	bool IsActive()				const { return bIsActive; }
 	bool IsMovementBlocked()	const { return bBlocksMovement; }
 
-	//　セッター
+	// セッター
 	void SetBlocksMovement(bool Flg)	{ bBlocksMovement = Flg; }
 	void SetCanExecute(bool Flg)		{ bCanExecute = Flg; }
 
@@ -89,7 +89,7 @@ protected:
 	UPROPERTY()
 	APlayerBase* OwnerPlayer;
 
-	//　持ち主ギアコンポーネントのポインタ
+	// 持ち主ギアコンポーネントのポインタ
 	UPROPERTY()
 	UPlayerGearComponent* OwnerGearComponent;
 
@@ -98,29 +98,29 @@ private:
 	virtual void ResetParams();
 
 
-	//　ギアの状態の配列
+	// ギアの状態の配列
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<UGearStateBase*> GearStates;
 
-	//　ギアのステータスの配列
+	// ギアのステータスの配列
 	UPROPERTY(EditAnywhere)
 	TArray<FGearStatus> GearStatuses;
 
-	//　実行されたギアのレベル
+	// 実行されたギアのレベル
 	int32 ExecutedGearLevel;
 
-	//　ギアを実行できるかどうか
+	// ギアを実行できるかどうか
 	bool bCanExecute;
 
-	//　経過時間
+	// 経過時間
 	float ElapsedTime;
 
-	//　ギアが実行中かどうか
+	// ギアが実行中かどうか
 	bool bIsActive;
 
-	//　ギアによって移動をブロックするかどうか
+	// ギアによって移動をブロックするかどうか
 	bool bBlocksMovement;
 
-	//　ギアの持続時間を管理するタイマーハンドル
+	// ギアの持続時間を管理するタイマーハンドル
 	FTimerHandle DurationTimerHandle;
 };

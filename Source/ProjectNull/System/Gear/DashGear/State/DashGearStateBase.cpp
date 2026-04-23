@@ -89,14 +89,14 @@ void UDashGearStateBase::UpdateDashAttack()
 {
 	if (!OwnerPlayer) { return; }
 
-	//@ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ÌŽæ“¾
+	// ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ÌŽæ“¾
 	const FVector playerLocation = OwnerPlayer->GetActorLocation();
 
-	//@“GŠÇ—ƒNƒ‰ƒX‚Ìî•ñŽæ“¾
+	// “GŠÇ—ƒNƒ‰ƒX‚Ìî•ñŽæ“¾
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!enemyManager) { return; }
 
-	//@“G‚ÌƒŠƒXƒg‚©‚ç‹——£‚ð”äŠr‚µ‚ÄUŒ‚”ÍˆÍ“à‚Ì“G‚ðUŒ‚
+	// “G‚ÌƒŠƒXƒg‚©‚ç‹——£‚ð”äŠr‚µ‚ÄUŒ‚”ÍˆÍ“à‚Ì“G‚ðUŒ‚
 	for (const auto& enemy : enemyManager->GetEnemyList())
 	{
 		if (!enemy) { continue; }
@@ -105,11 +105,12 @@ void UDashGearStateBase::UpdateDashAttack()
 
 		if (DistSq <= DashAttackRangeSquared)
 		{
-			enemy->OnDeath();
+			enemy->SetKnockBackData(playerLocation,3,1);
+			enemy->SetTakeDamaged();
 		}
 	}
 
-	//@UŒ‚”ÍˆÍ‚ÌƒfƒoƒbƒO•\Ž¦
+	// UŒ‚”ÍˆÍ‚ÌƒfƒoƒbƒO•\Ž¦
 	DrawDebugSphere(
 		GetWorld(),
 		OwnerPlayer->GetActorLocation(),
