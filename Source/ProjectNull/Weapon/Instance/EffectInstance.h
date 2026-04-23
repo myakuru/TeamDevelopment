@@ -19,7 +19,7 @@ struct FEffectInstance
 
 public:
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	UEffectData* Data;
 
 	UPROPERTY()
