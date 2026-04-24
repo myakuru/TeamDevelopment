@@ -39,45 +39,61 @@ void UFloatingWeaponTransitionState::Start(EFloatingWeaponState SetNextState)
 void UFloatingWeaponTransitionState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
+
 	UE_LOG(LogTemp, Warning, TEXT("TransitionState"));
 
 	UpdateTransitionTime(DeltaTime);
 	
-	UpdateTransformLerp(DeltaTime);
+	UpdateTransformOffsetLerp(DeltaTime);
 	
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
-void UFloatingWeaponTransitionState::UpdateTransformLerp(float DeltaTime)
+void UFloatingWeaponTransitionState::UpdateTransformOffsetLerp(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 
-	// オフセットの補間→最終的にプレイヤー
+	// オフセットの補間→最終的にプレイヤー座標も考慮して計算
 	float lerpValue = 1.0f - (TransitionTime / GetTransitionStateTime());
 	lerpValue = std::clamp(lerpValue, 0.0f, 1.0f);
-	//UE_LOG(LogTemp, Warning, TEXT("lerpValue %.2f"), lerpValue);
 
+	// 補間処理
 	const FVector resultLocation	= FMath::Lerp(StartLocationOffset, TargetTransform.GetLocation(), lerpValue);
 	const FQuat4d resultQuaternion	= FQuat4d::Slerp(StartRotationOffset, TargetTransform.GetRotation(), lerpValue);
 
+	// オフセットTransform更新
 	LocationOffset = resultLocation;
-	Owner->SetRotation(resultQuaternion.Rotator());
+	//Owner->SetRotation(resultQuaternion.Rotator());
 
-	// 遷移後の状態に応じて、補間先のTransform情報を変更
-	if (NextState == EFloatingWeaponState::Attack)
+	// 状態遷移処理
+	switch (NextState)
 	{
-		if (Owner->GetOwnerAttack()->IsAttackStateStep())
-		{
-			Owner->ChangeState(EFloatingWeaponState::Attack);
-			return;
-		}
+	case EFloatingWeaponState::Stand:	TryChangeToStandState();	break;
+	case EFloatingWeaponState::Attack:	TryChangeToAttackState();	break;
+	case EFloatingWeaponState::Transition:	return;
+	case EFloatingWeaponState::Count:		return;
+	default: return;
 	}
-	else if (NextState == EFloatingWeaponState::Stand)
+}
+
+void UFloatingWeaponTransitionState::TryChangeToStandState()
+{
+	if (!Owner) { return; }
+
+	if (IsFinishedTransitionState())
 	{
-		if (IsFinishedTransitionState())
-		{
-			Owner->ChangeState(EFloatingWeaponState::Stand);
-			return;
-		}
+		Owner->ChangeState(EFloatingWeaponState::Stand);
+		return;
 	}
+}
+
+void UFloatingWeaponTransitionState::TryChangeToAttackState()
+{
+	if (!Owner || !Owner->GetOwnerAttack()) { return; }
+
+	if (Owner->GetOwnerAttack()->IsAttackStateStep())
+	{
+		Owner->ChangeState(EFloatingWeaponState::Attack);
+		return;
+	}	
 }

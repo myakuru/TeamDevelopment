@@ -55,7 +55,6 @@ void UFloatingWeaponEffect::Update(float DeltaTime)
 
 	CurrentState->Update(DeltaTime);
 
-	CalcTransformOffset();
 	UpdateTransform();
 }
 
@@ -93,11 +92,7 @@ FTransform UFloatingWeaponEffect::GetAttackStartTransformOffset()
 		|| !States[EFloatingWeaponState::Attack]) { return FTransform(); }
 	auto* attakState = Cast<UFloatingWeaponAttackState>(States[EFloatingWeaponState::Attack]);
 	FTransform resultTransform;
-	if (!attakState) { 
-		//UE_LOG(LogTemp, Warning, TEXT("aaaa"));
-		return resultTransform;
-	}
-	//UE_LOG(LogTemp, Warning, TEXT("llllllllllllll %.2f %.2f %.2f"), pos.X, pos.Y, pos.Z);
+	if (!attakState) { return resultTransform; }
 
 	resultTransform = attakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle);
 	return resultTransform;
@@ -105,14 +100,17 @@ FTransform UFloatingWeaponEffect::GetAttackStartTransformOffset()
 
 FTransform UFloatingWeaponEffect::GetStandStartTransformOffset()
 {
-	if (!OwnerActor) { return FTransform(); }
-
-	
-	return StandStartTransformOffset;
+	if(!States.Contains(EFloatingWeaponState::Stand)
+		|| !States[EFloatingWeaponState::Stand]) { return FTransform(); }
+	const auto* standState = Cast<UFloatingWeaponStandState>(States[EFloatingWeaponState::Stand]);
+	if (!standState) { return FTransform(); }
+	return standState->GetStartTransformOffset();
 }
 
 void UFloatingWeaponEffect::UpdateTransform()
 {
+	CalcTransformOffset();
+
 	if (!EffectComponent) { return; }
 	EffectComponent->SetWorldTransform(Transform);
 }
@@ -121,14 +119,17 @@ void UFloatingWeaponEffect::CalcTransformOffset()
 {
 	if (!OwnerActor) { return; }
 
+	// プレイヤーの座標
 	const FVector playerLocation	= OwnerActor->GetActorLocation();
-	const FRotator playerRotation	= OwnerActor->GetActorRotation();
+	// プレイヤーの回転
+	FRotator playerRotation	= OwnerActor->GetActorRotation();
+	// ワールドオフセット座標
+	const FVector worldOffsetLocation	= playerRotation.RotateVector(LocationOffset);
+	const FVector resultLocation		= playerLocation + worldOffsetLocation;
 
-	const FVector worldOffsetLocation = playerRotation.RotateVector(LocationOffset);
-	const FVector resultLocation = playerLocation + worldOffsetLocation;
-
-	//const FVector resultLocation = playerLocation + LocationOffset;
-
+	// メモ:座標と同じように回転オフセット計算後プレイヤーの回転を考慮
+	RotatorOffset.Yaw = playerRotation.Yaw + RotatorYawOffset;
+	Transform.SetRotation(RotatorOffset.Quaternion());
 	Transform.SetLocation(resultLocation);	
 }
 

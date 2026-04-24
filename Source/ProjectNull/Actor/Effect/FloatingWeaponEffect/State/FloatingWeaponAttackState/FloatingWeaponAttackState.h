@@ -5,6 +5,7 @@
 #include "../FloatingWeaponStateBase.h"
 #include "FloatingWeaponAttackState.generated.h"
 
+// 浮遊武器攻撃
 class UFloatingWeaponAttack;
 
 /// <summary>
@@ -18,10 +19,13 @@ class PROJECTNULL_API UFloatingWeaponAttackState final : public UFloatingWeaponS
 public:
 	UFloatingWeaponAttackState();
 public:
-
 	void Update(float DeltaTime)override;
 
+	/// <summary>
+	/// 攻撃状態のTransformオフセットの計算
+	/// </summary>
+	/// <param name="OwnerAttack"></param>
+	/// <param name="RotatorOffsetAngle"></param>
+	/// <returns></returns>
 	FTransform CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle);
-private:
-	
 };

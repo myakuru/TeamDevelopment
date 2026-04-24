@@ -42,7 +42,9 @@ class PROJECTNULL_API UFloatingWeaponEffect : public UObject
 public:
 	UFloatingWeaponEffect();
 public:
-
+	/// <summary>
+	/// 初期化
+	/// </summary>
 	void Initialize();
 
 	/// <summary>
@@ -70,12 +72,11 @@ public:
 	FTransform GetStandStartTransformOffset();
 
 	// セッター
-	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner)	{ OwnerAttack = Owner; }
-	inline void SetOwnerActor(AActor* SetOwnerActor)			{ OwnerActor = SetOwnerActor; }
-	inline void SetRotation(const FRotator& SetRotation)		{ Transform.SetRotation(SetRotation.Quaternion()); }
+	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner)		{ OwnerAttack = Owner; }
+	inline void SetOwnerActor(AActor* SetOwnerActor)				{ OwnerActor = SetOwnerActor; }
 	inline void SetLocationOffset(const FVector& SetLocationOffset)	{ LocationOffset = SetLocationOffset; }
+	inline void SetRotatorYawOffset(float SetRotatorYawOffset)		{ RotatorYawOffset = SetRotatorYawOffset; }
 	
-
 	// ゲッター
 	inline UFloatingWeaponAttack* GetOwnerAttack() const	{ return OwnerAttack; }
 	inline FTransform GetTransform() const					{ return Transform; }
@@ -84,11 +85,15 @@ public:
 private:
 
 	/// <summary>
+	/// Transformオフセット計算
+	/// </summary>
+	void CalcTransformOffset();
+
+	/// <summary>
 	/// Transformの更新
 	/// </summary>
 	void UpdateTransform();
 
-	void CalcTransformOffset();
 
 	/// <summary>
 	/// エフェクト無効にする
@@ -101,13 +106,11 @@ private:
 	/// <returns>可能ならtrue 可能じゃないならfalse</returns>
 	inline bool CanSpawn() const { return EffectSystem && !EffectComponent; }
 
-
-
 	// 基準とする攻撃クラス
 	UPROPERTY()
 	UFloatingWeaponAttack* OwnerAttack;
 
-	
+	// 持ち主のクラス
 	UPROPERTY()
 	AActor* OwnerActor;
 
@@ -123,12 +126,17 @@ private:
 	UPROPERTY()
 	FTransform Transform;
 
+	// エフェクトの座標オフセット
 	UPROPERTY(EditAnywhere)
 	FVector LocationOffset;
 
 	// エフェクトの半径オフセット
 	UPROPERTY(EditAnywhere)
 	float RadiusOffset;
+
+	// エフェクトの回転オフセット
+	UPROPERTY(EditAnywhere)
+	float RotatorYawOffset;
 
 	// エフェクトの回転オフセット
 	UPROPERTY(EditAnywhere)
@@ -141,7 +149,4 @@ private:
 	// 現在の浮遊武器状態
 	UPROPERTY()
 	UFloatingWeaponStateBase* CurrentState;
-
-	UPROPERTY(EditAnywhere)
-	FTransform StandStartTransformOffset;
 };

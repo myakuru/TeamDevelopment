@@ -16,6 +16,7 @@ void UFloatingWeaponStandState::Start()
 void UFloatingWeaponStandState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
+
 	UE_LOG(LogTemp, Warning, TEXT("StandState"));
 
 	UpdateTransitionTime(DeltaTime);
@@ -26,7 +27,9 @@ void UFloatingWeaponStandState::Update(float DeltaTime)
 		return;
 	}
 
+	
 	LocationOffset = Owner->GetStandStartTransformOffset().GetLocation();
+
 
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }

@@ -12,6 +12,7 @@ void UFloatingWeaponAttackState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("AttackState"));
+
 	auto* attack = Owner->GetOwnerAttack();
 
 	if (attack->CanDeactivate())
@@ -21,9 +22,11 @@ void UFloatingWeaponAttackState::Update(float DeltaTime)
 	}
 
 	FTransform TransformOffset = CalcAttackStateTransformOffset(attack,attack->CurrentAngle);
-	Owner->SetRotation(RotatorOffset);
+
+	Owner->SetRotatorYawOffset(RotatorOffset.Yaw);
 
 	LocationOffset = TransformOffset.GetLocation();
+
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
@@ -36,17 +39,13 @@ FTransform UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingW
 	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
 
 	// 攻撃方向からのオフセット位置
-	//const FVector offsetLocation = OwnerAttack->CalcAttackDir(playerForwardVector) * RadiusOffset;
 	const FVector offsetLocation = OwnerAttack->CalcAttackDir(FVector::ForwardVector, RotatorOffsetAngle) * RadiusOffset;
 
 	// 回転オフセット考慮して計算
-	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + RotatorOffsetAngle;
+	//RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + RotatorOffsetAngle;
+	RotatorOffset.Yaw = RotatorOffsetAngle;
 
 	resultTransformOffset.SetLocation(offsetLocation);
-
-	UE_LOG(LogTemp, Warning, TEXT("iiiiiiiiiiiiii %.2f"), RotatorOffsetAngle);
-	UE_LOG(LogTemp, Warning, TEXT("llllllllllllll %.2f %.2f %.2f"), offsetLocation.X, offsetLocation.Y, offsetLocation.Z);
-
 	resultTransformOffset.SetRotation(RotatorOffset.Quaternion());
 	
 	return resultTransformOffset;
