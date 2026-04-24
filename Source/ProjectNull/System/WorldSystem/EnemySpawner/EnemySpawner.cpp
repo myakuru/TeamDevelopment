@@ -41,6 +41,7 @@ void AEnemySpawner::BeginPlay()
 
 void AEnemySpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	// 登録していたフェーズ情報を解除
 	if (CachedSubsystem)
 	{
 		CachedSubsystem->OnPhaseChanged.RemoveAll(this);
@@ -51,7 +52,7 @@ void AEnemySpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AEnemySpawner::SpawnEnemy()
 {
 	// 出現対象が存在しなかったら実行しない
-	if (!EnemyClass) { return; }
+	//if (!EnemyClass) { return; }
 
 	UE_LOG(LogTemp, Warning, TEXT("SpawnWave called"));
 
@@ -68,65 +69,53 @@ void AEnemySpawner::SpawnEnemy()
 	// プレイヤーの場所（Location）
 	const FVector playerLocation = pPlayerPawn->GetActorLocation();
 
-	for (const FEnemySpawnUnit& Unit : CurrentWaveData->Enemies)
+	// フェーズに対応した生成数を取得
+	const int32 spawnNum = PhaseSpawnTable->FindEnemyNumByPhase(NowPhase);
+
+	// 各データテーブルの持つフェーズの敵生成数に応じて敵を生成
+	for (int i = 0; i < spawnNum; i++)
 	{
-		if (!Unit.EnemyClass)
+		// 確率の合計を計算
+		int TotalWeight = 0;
+		for (const FEnemySpawnUnit& Unit : CurrentWaveData->Enemies)
 		{
-			UE_LOG(LogTemp, Error, TEXT("EnemyClass is null"));
-			continue;
-		}
-		if (!Unit.SpawnPattern)
-		{
-			UE_LOG(LogTemp, Error, TEXT("SpawnPattern is null"));
-			continue;
+			TotalWeight += Unit.CreateProbability;
 		}
 
-		// 出現座標を決める
-		TArray<FVector> spawnLocations =
-			Unit.SpawnPattern->GenerateSpawnTransforms(Unit.SpawnCount, playerLocation);
+		// 合計値の範囲でランダムを取得
+		const int Roll = FMath::RandRange(0, TotalWeight - 1);
+		int Accumulated = 0;
 
-		UE_LOG(LogTemp, Warning, TEXT("Transforms count: %d"), spawnLocations.Num());
-
-		// Count分エネミーを生成
-		for (FVector& spawnLocation : spawnLocations)
+		for (const FEnemySpawnUnit Unit : CurrentWaveData->Enemies)
 		{
-			// 当たり判定の結果
-			FHitResult hitResult;
+			Accumulated += Unit.CreateProbability;
 
-			// Rayが静的なオブジェクトに衝突していて
-			// 衝突している場所が地面または坂の傾きの場合は（壁などでない場合）
-			// 敵を出現させる
-			if (IsIntersectingStaticObjects(hitResult, spawnLocation)
-				&& hitResult.Normal.Z > SpawnParams.MinGroundNormalZ) {
-				// 情報に基づいてアクターを出現させる
-				AActor* SpawnedEnemy = GetWorld()->SpawnActor<AActor>(
-					Unit.EnemyClass,
-					spawnLocation,
-					FRotator::ZeroRotator);
+			// 累積確率を超えたらこの敵を選択
+			// 乱数よりも敵生成確率が低ければ次の敵に移って再生成
+			// 累積確率を超えたらこの敵を選択
+			if (Roll < Accumulated)
+			{
+				if (!Unit.EnemyClass || !Unit.SpawnPattern) { break; }
 
-				UE_LOG(LogTemp, Warning, TEXT("SpawnActor result: %s"),
-					SpawnedEnemy ? TEXT("SUCCESS") : TEXT("FAILED"));
+				// 座標を出現パターンの派生先から取得
+				TArray<FVector> SpawnLocations =
+					Unit.SpawnPattern->GenerateSpawnTransforms(1, playerLocation);
+
+				for (FVector& SpawnLocation : SpawnLocations)
+				{
+					FHitResult HitResult;
+					if (IsIntersectingStaticObjects(HitResult, SpawnLocation)
+						&& HitResult.Normal.Z > SpawnParams.MinGroundNormalZ)
+						// 情報に基づいてアクターを出現させる
+					{
+						GetWorld()->SpawnActor<AActor>(
+							Unit.EnemyClass, SpawnLocation, FRotator::ZeroRotator);
+					}
+				}
+				break;
 			}
 		}
 	}
-}
-
-FVector AEnemySpawner::CalculateEnemySpawnPointInRing(const FVector& Center) const
-{
-	// ランダム角度
-	float angle = FMath::RandRange(0.0f, kFullCircleDeg);
-
-	// ランダム半径
-	const float distance = FMath::FRandRange(SpawnParams.SpawnMinRadius, SpawnParams.SpawnMaxRadius);
-
-	// XYオフセット
-	FVector offset = {
-		FMath::Cos(FMath::DegreesToRadians(angle)) * distance,
-		FMath::Sin(FMath::DegreesToRadians(angle)) * distance,
-		0.0f
-	};
-
-	return Center + offset;
 }
 
 bool AEnemySpawner::IsIntersectingStaticObjects(FHitResult& HitResult, FVector& SpawnLocationXY)
@@ -162,6 +151,7 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 		return;
 	}
 
+	// 新しいウェーブデータを取得
 	UEnemyWaveDataAsset* NewWaveData = 
 		const_cast<UEnemyWaveDataAsset*>(PhaseSpawnTable->FindWaveDataByPhase(NewPhase));
 	
@@ -173,27 +163,5 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 	}
 
 	CurrentWaveData = NewWaveData;
+	NowPhase = NewPhase;
 }
-
-//
-//void AEnemySpawner::Tick(float DeltaTime)
-//{
-//	// プレイヤーの情報を取得する（0番:1P）
-//	const APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-//	if (!pPlayerPawn) { return; }
-//
-//	// プレイヤーの場所（Location）
-//	const FVector playerLocation = pPlayerPawn->GetActorLocation();
-//
-//	// 出現座標XY
-//	FVector spawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
-//
-//	// Rayの座標を求める
-//	FVector rayStart = spawnLocation + FVector(0.0f, 0.0f, SpawnParams.RayStartHeight);
-//	FVector rayEnd = spawnLocation - FVector(0.0f, 0.0f, SpawnParams.RayEndDepth);
-//
-//	Super::Tick(DeltaTime);
-//	DrawDebugLine(GetWorld(), rayStart, rayEnd, FColor::Green, false, 0.1f, 0, 2);
-//
-//}
-

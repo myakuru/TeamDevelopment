@@ -110,7 +110,7 @@ private:
 	/// プレイヤー周囲のリング状スポーン座標を計算
 	/// <param name="Center">中心座標</param>
 	/// <returns>ランダム座標結果</returns>
-	FVector CalculateEnemySpawnPointInRing(const FVector& Center) const;
+	//FVector CalculateEnemySpawnPointInRing(const FVector& Center) const;
 
 	/// <summary>
 	/// 静的オブジェクトと交差しているか
@@ -122,9 +122,6 @@ private:
 
 	void HandlePhaseChanged(int NewPhase);
 	void ApplySpawnModeByPhase(int NewPhase);
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AEnemyGruntBase> EnemyClass;
 
 	/// <summary>
 	/// 出現パラメータ
@@ -141,4 +138,9 @@ private:
 	/// フェーズのデータを持ったゲームシステム
 	/// </summary>
 	UGameProgressSubsystem* CachedSubsystem = nullptr;
+
+	/// <summary>
+	/// 現在のフェーズデータ
+	/// </sumamry>
+	int NowPhase = 0;
 };

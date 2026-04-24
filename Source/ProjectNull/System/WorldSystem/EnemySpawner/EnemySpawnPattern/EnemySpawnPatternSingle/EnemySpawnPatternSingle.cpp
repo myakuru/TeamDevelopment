@@ -7,6 +7,8 @@ TArray<FVector> UEnemySpawnPatternSingle::GenerateSpawnTransforms_Implementation
 {
 	TArray<FVector> Results;
 	// OriginTransform‚ð‚»‚Ì‚Ü‚Ü‚P‚Â‚¾‚¯’Ç‰Á‚µ‚Ä•Ô‚·
-	Results.Add(OriginVector);
+	FVector SpawnVector = CalculateEnemySpawnPointInRing(OriginVector);
+
+	Results.Add(SpawnVector);
 	return Results;
 }
