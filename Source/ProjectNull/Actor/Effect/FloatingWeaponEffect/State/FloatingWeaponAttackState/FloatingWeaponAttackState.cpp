@@ -20,33 +20,34 @@ void UFloatingWeaponAttackState::Update(float DeltaTime)
 		return;
 	}
 
-	Transform = CalcAttackStateTransform(attack,attack->CurrentAngle);
-	
+	FTransform TransformOffset = CalcAttackStateTransformOffset(attack,attack->CurrentAngle);
+	Owner->SetRotation(RotatorOffset);
+
+	LocationOffset = TransformOffset.GetLocation();
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
-FTransform UFloatingWeaponAttackState::CalcAttackStateTransform(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
+FTransform UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
 {
-	if (!OwnerActor || !OwnerAttack) { return FTransform(); }
-
-	FTransform resultTransform;
-
-	// プレイヤーの座標
-	const FVector playerLocation = OwnerActor->GetActorLocation();
+	if (!Owner || !OwnerActor || !OwnerAttack) { return FTransform(); }
+	FTransform resultTransformOffset;
 
 	// プレイヤーが向いてる方向
 	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
 
 	// 攻撃方向からのオフセット位置
-	const FVector offsetLocation = OwnerAttack->CalcAttackDir(playerForwardVector) * RadiusOffset;
+	//const FVector offsetLocation = OwnerAttack->CalcAttackDir(playerForwardVector) * RadiusOffset;
+	const FVector offsetLocation = OwnerAttack->CalcAttackDir(FVector::ForwardVector, RotatorOffsetAngle) * RadiusOffset;
 
-	// 浮遊武器の最終位置
-	const FVector resultLocation = playerLocation + offsetLocation;
-
+	// 回転オフセット考慮して計算
 	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + RotatorOffsetAngle;
 
-	resultTransform.SetLocation(resultLocation);
-	resultTransform.SetRotation(RotatorOffset.Quaternion());
+	resultTransformOffset.SetLocation(offsetLocation);
 
-	return resultTransform;
+	UE_LOG(LogTemp, Warning, TEXT("iiiiiiiiiiiiii %.2f"), RotatorOffsetAngle);
+	UE_LOG(LogTemp, Warning, TEXT("llllllllllllll %.2f %.2f %.2f"), offsetLocation.X, offsetLocation.Y, offsetLocation.Z);
+
+	resultTransformOffset.SetRotation(RotatorOffset.Quaternion());
+	
+	return resultTransformOffset;
 }

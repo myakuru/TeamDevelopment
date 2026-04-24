@@ -38,6 +38,7 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 	{
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
+	//UE_LOG(LogTemp, Warning, TEXT("StartAngle %.2f"), StartAngle);
 
 	// 攻撃範囲をデバッグラインで可視化
 	{
@@ -157,5 +158,11 @@ void UFanAttackBase::UpdatePrevActiveFlg()
 FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector) const
 {
 	const float angle = bRotate ? CurrentAngle : 0.0f;
+	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
+}
+
+FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector, float Angle) const
+{
+	const float angle = bRotate ? Angle : 0.0f;
 	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
 }

@@ -6,6 +6,9 @@
 #include "FloatingWeaponEffect.generated.h"
 
 
+/// <summary>
+/// 浮遊武器状態種類 
+/// </summary>
 UENUM(BlueprintType)
 enum class EFloatingWeaponState : uint8
 {
@@ -24,7 +27,9 @@ class UNiagaraComponent;
 // 扇状斬撃攻撃クラス
 class UFloatingWeaponAttack;
 
+// 浮遊武器状態の中間基底クラス
 class UFloatingWeaponStateBase;
+
 
 /// <summary>
 /// 浮遊武器エフェクトクラス
@@ -56,29 +61,34 @@ public:
 	/// </summary>
 	/// <param name="State">ステート種類</param>
 	void ChangeState(EFloatingWeaponState NextState);
-
 	void ChangeState(EFloatingWeaponState NextState,EFloatingWeaponState TheStateAfterTheNext);
 	
 
 	bool IsAttackStateStep() const;
 
-	FTransform GetAttackStartTransform();
-	FTransform GetStandStartTransform();
+	FTransform GetAttackStartTransformOffset();
+	FTransform GetStandStartTransformOffset();
 
 	// セッター
 	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner)	{ OwnerAttack = Owner; }
 	inline void SetOwnerActor(AActor* SetOwnerActor)			{ OwnerActor = SetOwnerActor; }
-	inline void SetTransform(const FTransform& SetTransform)	{ Transform = SetTransform; }
+	inline void SetRotation(const FRotator& SetRotation)		{ Transform.SetRotation(SetRotation.Quaternion()); }
+	inline void SetLocationOffset(const FVector& SetLocationOffset)	{ LocationOffset = SetLocationOffset; }
+	
 
 	// ゲッター
 	inline UFloatingWeaponAttack* GetOwnerAttack() const	{ return OwnerAttack; }
 	inline FTransform GetTransform() const					{ return Transform; }
+	inline FVector GetLocationOffset() const				{ return LocationOffset; }
+
 private:
 
 	/// <summary>
 	/// Transformの更新
 	/// </summary>
 	void UpdateTransform();
+
+	void CalcTransformOffset();
 
 	/// <summary>
 	/// エフェクト無効にする
@@ -110,8 +120,11 @@ private:
 	UNiagaraComponent* EffectComponent;
 
 	// エフェクトのTransform
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	FTransform Transform;
+
+	UPROPERTY(EditAnywhere)
+	FVector LocationOffset;
 
 	// エフェクトの半径オフセット
 	UPROPERTY(EditAnywhere)
@@ -131,7 +144,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	FTransform StandStartTransformOffset;
-
-	UPROPERTY(EditAnywhere)
-	float LocationDistOffset;
 };

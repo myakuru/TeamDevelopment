@@ -12,7 +12,7 @@ UFloatingWeaponStateBase::UFloatingWeaponStateBase():
 void UFloatingWeaponStateBase::Update(float DeltaTime)
 {
 	if (!Owner) { return; }
-	Owner->SetTransform(Transform);
+	Owner->SetLocationOffset(LocationOffset);
 }
 
 float UFloatingWeaponStateBase::GetTransitionStateTime() const

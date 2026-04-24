@@ -55,6 +55,7 @@ void UFloatingWeaponEffect::Update(float DeltaTime)
 
 	CurrentState->Update(DeltaTime);
 
+	CalcTransformOffset();
 	UpdateTransform();
 }
 
@@ -86,45 +87,27 @@ bool UFloatingWeaponEffect::IsAttackStateStep() const
 	return OwnerAttack->IsAttackStateStep();
 }
 
-FTransform UFloatingWeaponEffect::GetAttackStartTransform()
+FTransform UFloatingWeaponEffect::GetAttackStartTransformOffset()
 {
 	if (!OwnerActor || !OwnerAttack || !States.Contains(EFloatingWeaponState::Attack)
 		|| !States[EFloatingWeaponState::Attack]) { return FTransform(); }
 	auto* attakState = Cast<UFloatingWeaponAttackState>(States[EFloatingWeaponState::Attack]);
+	FTransform resultTransform;
 	if (!attakState) { 
 		//UE_LOG(LogTemp, Warning, TEXT("aaaa"));
-		return FTransform();
+		return resultTransform;
 	}
-	return attakState->CalcAttackStateTransform(OwnerAttack,OwnerAttack->StartAngle);
+	//UE_LOG(LogTemp, Warning, TEXT("llllllllllllll %.2f %.2f %.2f"), pos.X, pos.Y, pos.Z);
+
+	resultTransform = attakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle);
+	return resultTransform;
 }
 
-FTransform UFloatingWeaponEffect::GetStandStartTransform()
+FTransform UFloatingWeaponEffect::GetStandStartTransformOffset()
 {
-	/*if (!OwnerActor || !OwnerAttack || !States.Contains(EFloatingWeaponState::Stand)
-		|| !States[EFloatingWeaponState::Stand]) {
-		return FTransform();
-	}
-	auto* standState = Cast<UFloatingWeaponStandState>(States[EFloatingWeaponState::Stand]);
-	if (!standState) {
-		return FTransform();
-	}*/
+	if (!OwnerActor) { return FTransform(); }
 
-	if (!OwnerActor) {
-		return FTransform();
-	}
-
-	// プレイヤーの座標
-	const FVector playerLocation = OwnerActor->GetActorLocation();
-	// プレイヤーが向いてる方向
-	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
-	// 攻撃方向からのオフセット位置
-	const FVector offsetLocation = playerForwardVector * StandStartTransformOffset.GetLocation();
-	// 浮遊武器の最終位置
-	const FVector resultLocation = playerLocation + offsetLocation;
-	FTransform resultTransform;
-	resultTransform.SetLocation(resultLocation);
-	resultTransform.SetRotation(StandStartTransformOffset.GetRotation() + OwnerActor->GetActorRotation().Quaternion());
-
+	
 	return StandStartTransformOffset;
 }
 
@@ -132,6 +115,21 @@ void UFloatingWeaponEffect::UpdateTransform()
 {
 	if (!EffectComponent) { return; }
 	EffectComponent->SetWorldTransform(Transform);
+}
+
+void UFloatingWeaponEffect::CalcTransformOffset()
+{
+	if (!OwnerActor) { return; }
+
+	const FVector playerLocation	= OwnerActor->GetActorLocation();
+	const FRotator playerRotation	= OwnerActor->GetActorRotation();
+
+	const FVector worldOffsetLocation = playerRotation.RotateVector(LocationOffset);
+	const FVector resultLocation = playerLocation + worldOffsetLocation;
+
+	//const FVector resultLocation = playerLocation + LocationOffset;
+
+	Transform.SetLocation(resultLocation);	
 }
 
 void UFloatingWeaponEffect::Deactivate()

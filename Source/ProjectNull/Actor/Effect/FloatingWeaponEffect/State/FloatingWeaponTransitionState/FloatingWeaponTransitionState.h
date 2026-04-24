@@ -14,21 +14,25 @@ class PROJECTNULL_API UFloatingWeaponTransitionState final : public UFloatingWea
 	GENERATED_BODY()
 public:
 	UFloatingWeaponTransitionState();
-
 public:
-
-	void Start(EFloatingWeaponState SetNextState) override;
-	void Update(float DeltaTime)override;
-
+	void Start(EFloatingWeaponState SetNextState)	override;
+	void Update(float DeltaTime)					override;
 private:
 
-	void UpdateAttakTransition(float DeltaTime);
+	
+	void UpdateTransformLerp(float DeltaTime);
 
-	void UpdateStandTransition(float DeltaTime);
 
 
+	// 遷移先浮遊武器状態
 	EFloatingWeaponState NextState;
 
+	// 現在の状態開始座標オフセット
+	FVector StartLocationOffset;
 
-	FTransform StartTransformOffset;
+	// 現在の状態開始回転オフセット
+	FQuat StartRotationOffset;
+
+	// 遷移先の目指すべきTransform情報
+	FTransform TargetTransform;
 };

@@ -61,6 +61,7 @@ public:
 	/// <param name="forwardVector">‘O•û•ûŒü</param>
 	/// <returns>ŒvZŒ‹‰Ê</returns>
 	virtual FVector CalcAttackDir(const FVector& forwardVector) const override;
+	FVector CalcAttackDir(const FVector& forwardVector,float Angle) const;
 
 	/// <summary>
 	/// ”¼Œa‚Ì“ñæ‚ğæ“¾

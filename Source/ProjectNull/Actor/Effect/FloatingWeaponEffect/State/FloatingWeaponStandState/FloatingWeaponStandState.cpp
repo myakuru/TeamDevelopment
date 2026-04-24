@@ -1,5 +1,4 @@
 
-
 #include "FloatingWeaponStandState.h"
 
 #include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
@@ -27,7 +26,7 @@ void UFloatingWeaponStandState::Update(float DeltaTime)
 		return;
 	}
 
-	Transform = Owner->GetStandStartTransform();
+	LocationOffset = Owner->GetStandStartTransformOffset().GetLocation();
 
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }

@@ -20,6 +20,4 @@ public:
 	void Update(float DeltaTime)override;
 private:
 
-	UPROPERTY(EditAnywhere)
-	float OffsetDist;
 };

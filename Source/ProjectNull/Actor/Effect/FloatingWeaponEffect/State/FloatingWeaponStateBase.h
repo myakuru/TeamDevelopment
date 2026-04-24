@@ -52,7 +52,7 @@ protected:
 	AActor* OwnerActor;
 
 	UPROPERTY(EditAnywhere)
-	FTransform Transform;
+	FVector LocationOffset;
 
 	// エフェクトの半径オフセット
 	UPROPERTY(EditAnywhere)
