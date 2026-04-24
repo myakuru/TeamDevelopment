@@ -1,4 +1,4 @@
-
+ï»¿
 #pragma once
 
 #include "CoreMinimal.h"
@@ -22,25 +22,25 @@ private:
 	virtual void SetupInputComponent()	override;
 	virtual void GearExecute01(const FInputActionValue& GearActionValue01) override;
 
-	// ƒfƒoƒbƒOƒ‚[ƒh‚ÌØ‚è‘Ö‚¦ŠÖ”
+	// ï¿½fï¿½oï¿½bï¿½Oï¿½ï¿½ï¿½[ï¿½hï¿½ÌØ‚ï¿½Ö‚ï¿½ï¿½Öï¿½
 	void ChangeDebugMode(const FInputActionValue& ActionValue);
 
 	/// <summary>
-	/// ã•ûŒü‚Ö‚ÌˆÚ“®“ü—Íˆ—ŠÖ”
+	/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚ÌˆÚ“ï¿½ï¿½ï¿½ï¿½Íï¿½ï¿½ï¿½ï¿½Öï¿½
 	/// </summary>
-	/// <param name="ActionValue">“ü—Í’l</param>
+	/// <param name="ActionValue">ï¿½ï¿½ï¿½Í’l</param>
 	void MoveUp(const FInputActionValue& ActionValue);
 
 
-	// ã•ûŒü‚Ö‚ÌˆÚ“®“ü—ÍƒAƒNƒVƒ‡ƒ“
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö‚ÌˆÚ“ï¿½ï¿½ï¿½ï¿½ÍƒAï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, Category = "DebugInput")
 	TObjectPtr<UInputAction> MoveUpAction;
 
-	// ƒfƒoƒbƒOƒ‚[ƒhØ‚è‘Ö‚¦“ü—ÍƒAƒNƒVƒ‡ƒ“
+	// ï¿½fï¿½oï¿½bï¿½Oï¿½ï¿½ï¿½[ï¿½hï¿½Ø‚ï¿½Ö‚ï¿½ï¿½ï¿½ï¿½ÍƒAï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, Category = "DebugInput")
 	TObjectPtr<UInputAction> ChangeDebugModeAction;
 
-	// ƒfƒoƒbƒOƒ‚[ƒh‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+	// ï¿½fï¿½oï¿½bï¿½Oï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½Ìƒtï¿½ï¿½ï¿½O
 	bool bIsDebugMode;
 
 	UPROPERTY(EditAnywhere)

@@ -1,4 +1,4 @@
-
+ï»¿
 #include "RobotController.h"
 
 #include "EnhancedInputComponent.h"
@@ -24,10 +24,10 @@ void ARobotController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// “ü—Íƒ}ƒbƒsƒ“ƒOƒRƒ“ƒeƒLƒXƒgŠÖ˜A‚Ì‰Šú‰»
+	// ï¿½ï¿½ï¿½Íƒ}ï¿½bï¿½sï¿½ï¿½ï¿½Oï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½Ö˜Aï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	InitializeInputContext();
 
-	// UI‚Ì‰Šú‰»
+	// UIï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	InitializeUI();
 }
 
@@ -71,7 +71,7 @@ void ARobotController::Look(const FInputActionValue& LookActionValue)
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
-	// ƒWƒƒƒ“ƒv‚ÌÀs
+	// ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Ìï¿½ï¿½s
 	if (ACharacter* controlledCharacter = GetCharacter())
 	{
 		controlledCharacter->Jump();
@@ -90,7 +90,7 @@ void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 	}
 }
 
-// UI‚Ì‰Šú‰»ŠÖ”
+// UIï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
 void ARobotController::InitializeUI()
 {
 
@@ -98,7 +98,7 @@ void ARobotController::InitializeUI()
 	{
 		PlayerHUD		= CreateWidget<UPlayerHUDWidget>	(this, PlayerHUDClass);
 
-		// HUD‚Ì•\¦
+		// HUDï¿½Ì•\ï¿½ï¿½
 		if (PlayerHUD)
 		{
 			PlayerHUD->AddToViewport();

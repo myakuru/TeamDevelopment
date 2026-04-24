@@ -1,4 +1,4 @@
-
+ï»¿
 #include "FloatingWeaponEffect.h"
 
 #include "NiagaraSystem.h"
@@ -34,7 +34,7 @@ void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 {
 	if (!CanSpawn()) { return; }
 
-	// ƒGƒtƒFƒNƒg‚ÌÄ¶ŠJn
+	// ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½ÌÄï¿½ï¿½Jï¿½n
 	EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		EffectSystem,
 		RootComponent,

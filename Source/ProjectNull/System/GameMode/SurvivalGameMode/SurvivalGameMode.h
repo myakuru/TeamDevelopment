@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "SurvivalGameMode.generated.h"
 
 /// <summary>
-/// ¶‚«c‚èƒQ[ƒ€ƒ‚[ƒhƒNƒ‰ƒX
+/// ï¿½ï¿½ï¿½ï¿½ï¿½cï¿½ï¿½Qï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½Nï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS()
 class PROJECTNULL_API ASurvivalGameMode : public AGameModeBase

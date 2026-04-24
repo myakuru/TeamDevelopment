@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
@@ -13,14 +13,14 @@ class PROJECTNULL_API UDebugDrawLibrary : public UBlueprintFunctionLibrary
 public:
 
 	/// <summary>
-	/// îó‚ğƒfƒoƒbƒOƒ‰ƒCƒ“‰Â‹‰»
+	/// æ‰‡çŠ¶ã‚’ãƒ‡ãƒãƒƒã‚°ãƒ©ã‚¤ãƒ³å¯è¦–åŒ–
 	/// </summary>
-	/// <param name="World">ƒ[ƒ‹ƒh</param>
-	/// <param name="Center">’†SÀ•W</param>
-	/// <param name="Forward">‘O•û•ûŒü</param>
-	/// <param name="Radius">”¼Œa</param>
-	/// <param name="AngleDeg">Šp“x</param>
-	/// <param name="Segments">‹æŠÔ</param>
+	/// <param name="World">ãƒ¯ãƒ¼ãƒ«ãƒ‰</param>
+	/// <param name="Center">ä¸­å¿ƒåº§æ¨™</param>
+	/// <param name="Forward">å‰æ–¹æ–¹å‘</param>
+	/// <param name="Radius">åŠå¾„</param>
+	/// <param name="AngleDeg">è§’åº¦</param>
+	/// <param name="Segments">åŒºé–“</param>
 	static void DrawDebugFan(UWorld* World,FVector Center,FVector Forward,float Radius,float AngleDeg,int32 Segments);
 	
 

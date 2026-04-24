@@ -1,4 +1,4 @@
-
+﻿
 #include "CombatCharacterBase.h"
 
 ACombatCharacterBase::ACombatCharacterBase()

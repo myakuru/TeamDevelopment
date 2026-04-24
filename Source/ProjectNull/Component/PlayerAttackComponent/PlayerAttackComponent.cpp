@@ -1,4 +1,4 @@
-#include "PlayerAttackComponent.h"
+ï»¿#include "PlayerAttackComponent.h"
 
 #include <ProjectNull/System/Combat/Attack/AttackBase.h>
 #include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
@@ -16,7 +16,7 @@ void UPlayerAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// UŒ‚ƒNƒ‰ƒX‚Ì‰Šú‰»
+	// ï¿½Uï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	for(auto& attack : PlayerAttacks)
 	{
 		if (!attack) { continue; }
@@ -26,13 +26,13 @@ void UPlayerAttackComponent::BeginPlay()
 
 void UPlayerAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	// “GŠÇ—ƒNƒ‰ƒX‚Ìî•ñæ“¾
+	// ï¿½Gï¿½Ç—ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½Ìï¿½ï¿½æ“¾
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!enemyManager) { return; }
 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// UŒ‚ƒNƒ‰ƒX‚ÌXV
+	// ï¿½Uï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½ÌXï¿½V
 	for(auto& attack : PlayerAttacks)
 	{
 		if (!attack) { continue; }

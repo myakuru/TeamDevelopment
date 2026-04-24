@@ -1,4 +1,4 @@
-
+ï»¿
 
 #include "FloatingWeaponStandState.h"
 
@@ -21,14 +21,14 @@ void UFloatingWeaponStandState::Update(AActor* OwnerActor, float DeltaTime)
 		return;
 	}
 
-	// ƒvƒŒƒCƒ„[‚ÌÀ•W
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½W
 	const FVector playerLocation = OwnerActor->GetActorLocation();
-	// ƒvƒŒƒCƒ„[‚ªŒü‚¢‚Ä‚é•ûŒü
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½
 	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
 	const FVector playerRightVector = OwnerActor->GetActorRightVector();
-	// UŒ‚•ûŒü‚©‚ç‚ÌƒIƒtƒZƒbƒgˆÊ’u
+	// ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌƒIï¿½tï¿½Zï¿½bï¿½gï¿½Ê’u
 	const FVector offsetLocation = playerRightVector * OffsetDist;
-	// •‚—V•Ší‚ÌÅIˆÊ’u
+	// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½ÌÅIï¿½Ê’u
 	const FVector resultLocation = playerLocation + offsetLocation;
 
 	Transform.SetLocation(resultLocation);
