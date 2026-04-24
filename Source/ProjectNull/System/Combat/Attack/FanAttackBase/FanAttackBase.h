@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "../AttackBase.h"
 #include "FanAttackBase.generated.h"
 
 /**
- * îóUŒ‚ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÌŠî’êƒNƒ‰ƒX
+ * ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½gï¿½ÌŠï¿½ï¿½Nï¿½ï¿½ï¿½X
  */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFanAttackBase : public UAttackBase
@@ -19,15 +19,15 @@ public:
 public:
 
 	/// <summary>
-	/// ŠJn‚ÌÛ‚Ì‰Šú‰»
+	/// ï¿½Jï¿½nï¿½ÌÛ‚Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
 	void Start();
 	 
 	/// <summary>
-	/// XVˆ—
+	/// ï¿½Xï¿½Vï¿½ï¿½ï¿½ï¿½
 	/// </summary>
-	/// <param name="DeltaTime">ƒfƒ‹ƒ^ƒ^ƒCƒ€</param>
-	/// /// <returns>XVŒ‹‰Ê</returns>
+	/// <param name="DeltaTime">ï¿½fï¿½ï¿½ï¿½^ï¿½^ï¿½Cï¿½ï¿½</param>
+	/// /// <returns>ï¿½Xï¿½Vï¿½ï¿½ï¿½ï¿½</returns>
 	bool UpdateAttack(float DeltaTime);
 
 	/// <summary>
@@ -48,86 +48,86 @@ public:
 	void UpdatePrevActiveFlg();
 
 	/// <summary>
-	/// UŒ‚”ÍˆÍ“à‚Éƒ^[ƒQƒbƒg‚ª‚¢‚é‚©‚Ç‚¤‚©‚Ì”»’è
+	/// ï¿½Uï¿½ï¿½ï¿½ÍˆÍ“ï¿½Éƒ^ï¿½[ï¿½Qï¿½bï¿½gï¿½ï¿½ï¿½ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½Ì”ï¿½ï¿½ï¿½
 	/// </summary>
-	/// <param name="Target			">ƒ^[ƒQƒbƒg	</param>
-	/// <param name="OwnerLocation	">UŒ‚Ò‚ÌˆÊ’u	</param>
-	/// <returns>ƒ^[ƒQƒbƒg‚ªUŒ‚”ÍˆÍ“à‚©‚Ç‚¤‚©</returns>
+	/// <param name="Target			">ï¿½^ï¿½[ï¿½Qï¿½bï¿½g	</param>
+	/// <param name="OwnerLocation	">ï¿½Uï¿½ï¿½ï¿½Ò‚ÌˆÊ’u	</param>
+	/// <returns>ï¿½^ï¿½[ï¿½Qï¿½bï¿½gï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ÍˆÍ“ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½</returns>
 	virtual bool IsTargetInRange(AActor* Target, const FVector& OwnerLocation) override;
 
 	/// <summary>
-	/// UŒ‚•ûŒü‚ÌŒvZ
+	/// ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌŒvï¿½Z
 	/// </summary>
-	/// <param name="forwardVector">‘O•û•ûŒü</param>
-	/// <returns>ŒvZŒ‹‰Ê</returns>
+	/// <param name="forwardVector">ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+	/// <returns>ï¿½vï¿½Zï¿½ï¿½ï¿½ï¿½</returns>
 	virtual FVector CalcAttackDir(const FVector& forwardVector) const override;
 
 	/// <summary>
-	/// ”¼Œa‚Ì“ñæ‚ğæ“¾
+	/// ï¿½ï¿½ï¿½aï¿½Ì“ï¿½ï¿½ï¿½æ“¾
 	/// </summary>
-	/// <returns>”¼Œa‚Ì“ñæ</returns>
+	/// <returns>ï¿½ï¿½ï¿½aï¿½Ì“ï¿½ï¿½</returns>
 	inline float GetRadiusSquared() const { return Radius * Radius; }
 
 	/// <summary>
-	/// îŠp‚Ìcos’l
+	/// ï¿½ï¿½pï¿½ï¿½cosï¿½l
 	/// </summary>
-	/// <returns>îŠp‚Ìcos’l</returns>
+	/// <returns>ï¿½ï¿½pï¿½ï¿½cosï¿½l</returns>
 	inline float GetConeCosine() const { return FMath::Cos(FMath::DegreesToRadians(ConeAngle)); }
 
 protected:
 
 	/// <summary>
-	/// “GƒŠƒXƒg‚É‘Î‚·‚éUŒ‚”»’è
+	/// ï¿½Gï¿½ï¿½ï¿½Xï¿½gï¿½É‘Î‚ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
-	/// <param name="EnemyManager">“GŠÇ—ƒNƒ‰ƒX‚ÌƒAƒhƒŒƒX</param>
+	/// <param name="EnemyManager">ï¿½Gï¿½Ç—ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½ÌƒAï¿½hï¿½ï¿½ï¿½X</param>
 	virtual void AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager) override;
 
 	/// <summary>
-	/// ƒvƒŒƒCƒ„[‚É‘Î‚·‚éUŒ‚”»’è
+	/// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½É‘Î‚ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
-	/// <param name="Player">ƒvƒŒƒCƒ„[ƒNƒ‰ƒX‚ÌƒAƒhƒŒƒX</param>
+	/// <param name="Player">ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Nï¿½ï¿½ï¿½Xï¿½ÌƒAï¿½hï¿½ï¿½ï¿½X</param>
 	virtual void AttackJudgePlayer(AActor* Player) override;
 
 public:
 
-	// UŒ‚‚Ì‘±ŠÔi•bj
+	// ï¿½Uï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôiï¿½bï¿½j
 	UPROPERTY(EditAnywhere)
 	float Duration;
 
-	// Œo‰ßŠÔ
+	// ï¿½oï¿½ßï¿½ï¿½ï¿½
 	float ElapsedTime;
 
-	// ‰ñ“]‚·‚é‚©‚Ç‚¤‚©
+	// ï¿½ï¿½]ï¿½ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere)
 	bool bRotate;
 
-	// ‰ñ“]‘¬“xi“x/•bj
+	// ï¿½ï¿½]ï¿½ï¿½ï¿½xï¿½iï¿½x/ï¿½bï¿½j
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
-	// UŒ‚”¼Œa
+	// ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½a
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
-	// î‚ÌL‚³iŠp“xj
+	// ï¿½ï¿½ÌLï¿½ï¿½ï¿½iï¿½pï¿½xï¿½j
 	UPROPERTY(EditAnywhere)
 	float ConeAngle;
 
-	// UŒ‚’†‚©
+	// ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	bool bIsActive;
 
-	// ‘SƒtƒŒ[ƒ€‚ÅƒAƒNƒeƒBƒu‚¾‚Á‚½‚©
+	// ï¿½Sï¿½tï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÅƒAï¿½Nï¿½eï¿½Bï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	bool bPrevActive;
 
-	// ŠJn‚ÌŠp“x
+	// ï¿½Jï¿½nï¿½ÌŠpï¿½x
 	UPROPERTY(EditAnywhere)
 	float StartAngle;
 
-	// Œ»İ‚ÌŠp“x
+	// ï¿½ï¿½ï¿½İ‚ÌŠpï¿½x
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
 
-	// ƒmƒbƒNƒoƒbƒN‚Ì‹­‚³
+	// ï¿½mï¿½bï¿½Nï¿½oï¿½bï¿½Nï¿½Ì‹ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere)
 	float KnockbackPower;
 

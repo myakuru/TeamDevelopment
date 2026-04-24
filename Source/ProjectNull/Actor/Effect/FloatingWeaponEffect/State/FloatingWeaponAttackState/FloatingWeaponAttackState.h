@@ -1,4 +1,4 @@
-
+ï»¿
 #pragma once
 
 #include "CoreMinimal.h"
@@ -6,7 +6,7 @@
 #include "FloatingWeaponAttackState.generated.h"
 
 /// <summary>
-// •‚—V•Ší‚ÌUŒ‚ó‘ÔƒNƒ‰ƒX
+// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½ÌUï¿½ï¿½ï¿½ï¿½ÔƒNï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponAttackState final : public UFloatingWeaponStateBase

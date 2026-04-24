@@ -1,4 +1,4 @@
-#include "AttackBase.h"
+ï»¿#include "AttackBase.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
@@ -20,12 +20,12 @@ void UAttackBase::AttackJudge(AActor* Player, UEnemyManagerSubsystem* EnemyManag
 {
 	if (Player)
 	{
-		// ƒvƒŒƒCƒ„[‚É‘Î‚·‚éUŒ‚”»’èˆ—
+		// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½É‘Î‚ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½èˆï¿½ï¿½
 		AttackJudgePlayer(Player);
 	}
 	else if (EnemyManager)
 	{
-		// “GƒŠƒXƒg‚É‘Î‚·‚éUŒ‚”»’èˆ—
+		// ï¿½Gï¿½ï¿½ï¿½Xï¿½gï¿½É‘Î‚ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½èˆï¿½ï¿½
 		AttackJudgeEnemys(EnemyManager);
 	}
 }

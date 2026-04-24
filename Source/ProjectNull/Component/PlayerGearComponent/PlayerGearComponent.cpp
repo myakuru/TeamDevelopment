@@ -1,4 +1,4 @@
-#include "PlayerGearComponent.h"
+ï»¿#include "PlayerGearComponent.h"
 
 #include "ProjectNull\System\Gear\GearBase.h"
 
@@ -16,7 +16,7 @@ void UPlayerGearComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ƒMƒA‚Ì‰Šú‰»
+	// ï¿½Mï¿½Aï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	for (auto& gear : PlayerGears)
 	{
 		if (!gear) { continue; }
@@ -28,7 +28,7 @@ void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ƒMƒA‚ÌXV
+	// ï¿½Mï¿½Aï¿½ÌXï¿½V
 	for(auto& gear : PlayerGears)
 	{
 		if (!gear) { continue; }
@@ -39,7 +39,7 @@ void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 bool UPlayerGearComponent::IsMovementBlockedByGear() const
 {
-	// ƒMƒA‚Ì’†‚ÉˆÚ“®‚ğƒuƒƒbƒN‚·‚é‚à‚Ì‚ª‚ ‚é‚©‚Ç‚¤‚©‚ğ”»’è
+	// ï¿½Mï¿½Aï¿½Ì’ï¿½ï¿½ÉˆÚ“ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ğ”»’ï¿½
 	for (auto& gear : PlayerGears)
 	{
 		if (!gear) { continue; }

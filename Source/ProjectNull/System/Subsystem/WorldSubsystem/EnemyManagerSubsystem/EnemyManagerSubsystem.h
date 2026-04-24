@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,11 +6,11 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "EnemyManagerSubsystem.generated.h"
 
-// “G‚Ì’†ŠÔŠî’êƒNƒ‰ƒX
+// ï¿½Gï¿½Ì’ï¿½ï¿½ÔŠï¿½ï¿½Nï¿½ï¿½ï¿½X
 class AEnemyBase;
 
 /// <summary>
-/// “GŠÇ—ƒNƒ‰ƒX
+/// ï¿½Gï¿½Ç—ï¿½ï¿½Nï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS()
 class PROJECTNULL_API UEnemyManagerSubsystem : public UWorldSubsystem
@@ -21,38 +21,38 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 	/// <summary>
-	/// “G‚ÌXVˆ—
+	/// ï¿½Gï¿½ÌXï¿½Vï¿½ï¿½ï¿½ï¿½
 	/// </summary>
-	/// <param name="deltaTime">ƒfƒ‹ƒ^ƒ^ƒCƒ€</param>
+	/// <param name="deltaTime">ï¿½fï¿½ï¿½ï¿½^ï¿½^ï¿½Cï¿½ï¿½</param>
 	void UpdateEnemies(float DeltaTime);
 
 	/// <summary>
-	/// “G‚ÌƒŠƒXƒg‚Ö‘ÎÛ‚ğ“o˜^
+	/// ï¿½Gï¿½Ìƒï¿½ï¿½Xï¿½gï¿½Ö‘ÎÛ‚ï¿½oï¿½^
 	/// </summary>
-	/// <param name="enemy">“G‚Ìƒ|ƒCƒ“ƒ^</param>
+	/// <param name="enemy">ï¿½Gï¿½Ìƒ|ï¿½Cï¿½ï¿½ï¿½^</param>
 	void RegisterEnemy(AEnemyBase* Enemy);
 
 	/// <summary>
-	/// “G‚ÌƒŠƒXƒg‚©‚ç‘ÎÛ‚ğíœ
+	/// ï¿½Gï¿½Ìƒï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ÎÛ‚ï¿½íœ
 	/// </summary>
-	/// <param name="enemy">“G‚Ìƒ|ƒCƒ“ƒ^</param>
+	/// <param name="enemy">ï¿½Gï¿½Ìƒ|ï¿½Cï¿½ï¿½ï¿½^</param>
 	void RemoveEnemy(AEnemyBase* Enemy);
 
 	/// <summary>
-	/// ƒŠƒXƒg“à‚Ì“G”
+	/// ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½Ì“Gï¿½ï¿½
 	/// </summary>
-	/// <returns>“G”</returns>
+	/// <returns>ï¿½Gï¿½ï¿½</returns>
 	int32 GetEnemyNum() const { return EnemyGruntList.Num(); }
 
 	/// <summary>
-	/// “G‚ğ‚Ü‚Æ‚ß‚éƒŠƒXƒg
+	/// ï¿½Gï¿½ï¿½Ü‚Æ‚ß‚éƒŠï¿½Xï¿½g
 	/// </summary>
 	TArray<AEnemyBase*> GetEnemyList() const { return EnemyGruntList; }	
 
 private:
 
 	/// <summary>
-	/// “G‚ğ‚Ü‚Æ‚ß‚éƒŠƒXƒg
+	/// ï¿½Gï¿½ï¿½Ü‚Æ‚ß‚éƒŠï¿½Xï¿½g
 	/// </summary>
 	UPROPERTY()
 	TArray<AEnemyBase*> EnemyGruntList;

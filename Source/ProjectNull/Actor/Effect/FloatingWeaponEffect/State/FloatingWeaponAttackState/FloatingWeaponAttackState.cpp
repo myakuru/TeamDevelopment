@@ -1,4 +1,4 @@
-
+ï»¿
 #include "FloatingWeaponAttackState.h"
 
 #include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
@@ -14,7 +14,7 @@ void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 
 	auto* attack = Owner->GetOwnerAttack();
 
-	// UŒ‚‚ªÁ‚¦‚½‚çƒGƒtƒFƒNƒgÁ‚·
+	// ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½
 	if (attack->CanDeactivate())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Stand);
@@ -22,13 +22,13 @@ void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
 	}
 	//3
 	
-	// ƒvƒŒƒCƒ„[‚ÌÀ•W
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½W
 	const FVector playerLocation = OwnerActor->GetActorLocation();
-	// ƒvƒŒƒCƒ„[‚ªŒü‚¢‚Ä‚é•ûŒü
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½
 	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
-	// UŒ‚•ûŒü‚©‚ç‚ÌƒIƒtƒZƒbƒgˆÊ’u
+	// ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÌƒIï¿½tï¿½Zï¿½bï¿½gï¿½Ê’u
 	const FVector offsetLocation = attack->CalcAttackDir(playerForwardVector) * RadiusOffset;
-	// •‚—V•Ší‚ÌÅIˆÊ’u
+	// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½ÌÅIï¿½Ê’u
 	const FVector resultLocation = playerLocation + offsetLocation;
 
 	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + attack->CurrentAngle;

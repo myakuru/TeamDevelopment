@@ -1,4 +1,4 @@
-
+ï»¿
 #include "EnemyManagerSubsystem.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -26,11 +26,11 @@ void UEnemyManagerSubsystem::RemoveEnemy(AEnemyBase* Enemy)
 
 void UEnemyManagerSubsystem::UpdateEnemies(float DeltaTime)
 {
-	// ƒvƒŒƒCƒ„[‚Ìî•ñ‚ğæ“¾‚·‚éi0”Ô:1Pj
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½i0ï¿½ï¿½:1Pï¿½j
 	APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!pPlayerPawn) { return; }
 	
-	// ‚·‚×‚Ä“G‚ÌXVƒƒ\ƒbƒh‚ğŒÄ‚Ô
+	// ï¿½ï¿½ï¿½×‚Ä“Gï¿½ÌXï¿½Vï¿½ï¿½ï¿½\ï¿½bï¿½hï¿½ï¿½Ä‚ï¿½
 	for (AEnemyBase* enemy : EnemyGruntList) 
 	{
 		if (enemy) 
