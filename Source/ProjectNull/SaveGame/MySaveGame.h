@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../Weapon/Instance/WeaponInstance.h"
+#include "../Weapon/SaveData/WeaponSaveData.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
@@ -18,7 +18,12 @@ class PROJECTNULL_API UMySaveGame : public USaveGame
 
 public:
 
+	static const FString& GetSaveSlotName()
+	{
+		static const FString Name = TEXT("MainSave");
+		return Name;
+	}
+
 	UPROPERTY()
-	TArray<FWeaponInstance> m_Weapons;
-	
+	FWeaponSaveData m_WeaponData;
 };

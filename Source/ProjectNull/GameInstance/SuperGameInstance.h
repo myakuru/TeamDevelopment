@@ -27,11 +27,16 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UDataTable* m_WeaponDataTable;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	UWeaponManager* m_WeaponManager;
 
-private:
+	UFUNCTION(BlueprintCallable)
 	void LoadGameData();
-	void ApplySaveData();
+
+	UFUNCTION(BlueprintCallable)
+	void SaveGameData();
+
+private:
+	
 
 };

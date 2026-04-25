@@ -10,16 +10,16 @@ void USuperGameInstance::Init()
 	Super::Init();
 
 	m_WeaponManager = NewObject<UWeaponManager>(this);
+	if (m_WeaponManager) m_WeaponManager->Initialize(m_WeaponDataTable);
 
+	LoadGameData();
 
-	// •Šíƒ[ƒh‚µ‚½‚ç“n‚·
-	//if (m_WeaponManager) m_WeaponManager->Initialize();
 }
 
 void USuperGameInstance::LoadGameData()
 {
-	FString SlotName = "WeaponSave";
-	int32 UserIndex = 0;
+	const FString SlotName = UMySaveGame::GetSaveSlotName();
+	const int32 UserIndex = 0;
 
 	if (UGameplayStatics::DoesSaveGameExist(SlotName, UserIndex))
 	{
@@ -33,12 +33,24 @@ void USuperGameInstance::LoadGameData()
 			UGameplayStatics::CreateSaveGameObject(UMySaveGame::StaticClass())
 		);
 	}
+
+	if (m_WeaponManager) {
+		m_WeaponManager->LoadFromSaveData(m_CurrentSaveData);
+	}
+
 }
 
-void USuperGameInstance::ApplySaveData()
+void USuperGameInstance::SaveGameData()
 {
-	if (!m_CurrentSaveData || !m_WeaponManager)return;
+	if (!m_CurrentSaveData)return;
 
-	m_WeaponManager->Initialize(m_CurrentSaveData->m_Weapons, m_WeaponDataTable);
+	if (m_WeaponManager) {
+		m_WeaponManager->SaveToData(m_CurrentSaveData);
+	}
+
+	const FString SlotName = UMySaveGame::GetSaveSlotName();
+	const int32 UserIndex = 0;
+
+	UGameplayStatics::SaveGameToSlot(m_CurrentSaveData, SlotName, UserIndex);
 
 }

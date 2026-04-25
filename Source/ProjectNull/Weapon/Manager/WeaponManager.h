@@ -8,6 +8,8 @@
 #include"../Data/WeaponData.h"
 #include "WeaponManager.generated.h"
 
+class UMySaveGame;
+
 /**
  * 
  */
@@ -19,7 +21,11 @@ class PROJECTNULL_API UWeaponManager : public UObject
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void Initialize(const TArray<FWeaponInstance>& InWeapons, UDataTable* InDataTable);
+	void Initialize(UDataTable* InDataTable);
+
+	void SaveToData(UMySaveGame* a_SaveGame);
+
+	void LoadFromSaveData(UMySaveGame* a_SaveGame);
 
 	UFUNCTION(BlueprintCallable)
 	const TArray<FWeaponInstance>& GetWeapons() const;
