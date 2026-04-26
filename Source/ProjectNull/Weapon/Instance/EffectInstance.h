@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "EffectInstance.generated.h"
 
+class UEffectData;
+class UUEffectBase;
+
 /**
  * 
  */
@@ -16,10 +19,15 @@ struct FEffectInstance
 
 public:
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	FName EffectId;
+	UPROPERTY(BlueprintReadWrite)
+	UEffectData* Data;
+
+	UPROPERTY()
+	UUEffectBase* RuntimeEffect;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int32 Level = 0;
+
+	void Initialize(UObject* a_Outer);
 
 };

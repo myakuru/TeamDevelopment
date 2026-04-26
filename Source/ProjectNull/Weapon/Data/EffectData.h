@@ -6,17 +6,20 @@
 #include "Engine/DataAsset.h"
 #include "EffectData.generated.h"
 
+class UUEffectBase;
+
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class PROJECTNULL_API UEffectData : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName EffectId;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUEffectBase> EffectClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Name;
