@@ -7,13 +7,14 @@
 
 void UGearChangeWidget::NativeConstruct()
 {
-	// �M�A�`�F���W�p��UI�}�e���A����쐬
+	Super::NativeConstruct();
+
+	// ギアチェンジエネルギーのマテリアルを取得
 	if (GearChangeImage)
 	{
 		GearChangeMaterial = GearChangeImage->GetDynamicMaterial();
 	}
 
-	// NativeTick��L����
 	SetIsFocusable(false);
 }
 
@@ -23,7 +24,7 @@ void UGearChangeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 
 	static float ChargeAmount = 0.0f;
 
-	ChargeAmount += InDeltaTime * 5.0f; // �`���[�W�ʂ���ԂƂƂ�ɑ���������
+	ChargeAmount += InDeltaTime * 5.0f;
 
 	SetGearChangeEnergy(ChargeAmount);
 
@@ -33,15 +34,14 @@ void UGearChangeWidget::SetGearChangeEnergy(float ChargeAmount)
 {
 	if (GearChangeMaterial)
 	{
-		// �}�e���A���̃p�����[�^��X�V���ă`���[�W�ʂ𔽉f������
 		GearChangeMaterial->SetScalarParameterValue(TEXT("ChargeAmount"), ChargeAmount);
 	}
 	if (GearChangeText)
 	{
-		// �`���[�W�ʂ�0����1000�͈̔͂ɐ���
-		ChargeAmount = std::clamp(ChargeAmount, 0.0f, 1000.0f);
+		// 表示する値を0から1000の範囲に制限
+		ChargeAmount = std::clamp(ChargeAmount, MinChargeAmount, MaxChargeAmount);
 
-		// �`���[�W�ʂ�e�L�X�g�ɕ\��
+		// ~%と表示される
 		FString ChargeText = FString::Printf(TEXT("%.0f"), ChargeAmount);
 
 		GearChangeText->SetText(FText::FromString(ChargeText));

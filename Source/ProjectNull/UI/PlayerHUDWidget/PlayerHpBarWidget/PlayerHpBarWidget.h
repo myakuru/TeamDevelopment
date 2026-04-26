@@ -15,12 +15,11 @@ class PROJECTNULL_API UPlayerHpBarWidget : public UUserWidget
 
 protected:
 
-	// �摜�E�B�W�F�b�g�ւ̃|�C���^
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> ExpImage;
 
 public:
-
+	/** プレイヤーのHPバーを更新する関数 */
 	void SetHp(int32 CurrentHp, int32 MaxHp);
 	
 };

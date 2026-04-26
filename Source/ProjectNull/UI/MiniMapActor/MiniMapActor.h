@@ -19,19 +19,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// ��ʂ�L���v�`�����邽�߂̃R���|�[�l���g
+	/** 上から見た視点のを映すカメラ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Minimap")
 	class USceneCaptureComponent2D* SceneCaptureComponent;
 
-	// �L�����N�^�[�̒ǐ�
 	UPROPERTY()
 	class ACharacter* TargetCharacter;
 
-	// �J�����̍���
+	/** カメラの高さ */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Minimap")
 	float CameraHeight = 0.0f;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

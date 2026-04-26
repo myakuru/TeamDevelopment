@@ -23,7 +23,6 @@ void UPlayerHUDWidget::NativeConstruct()
 		ActionButton->OnClicked.AddDynamic(this, &UPlayerHUDWidget::OnClickedActionButton);
 	}
 
-	// NativeTick��L����
 	SetIsFocusable(false);
 
 	SetPlayerSkillCooldown(SkillCooldownTime);

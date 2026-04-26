@@ -10,7 +10,7 @@ class UImage;
 class UTextBlock;
 
 /**
- * ���̃N���X�́A�M�A�`�F���W��UI��Ǘ����邽�߂̃E�B�W�F�b�g�N���X�ł��B�M�A�`�F���W�̍ۂɕ\�������UI�v�f�𐧌䂵�A�K�v�ɉ����ă}�e���A����C���[�W��X�V��������S���܂��B
+ * ギアチェンジのUIを表示するウィジェットクラス
  */
 UCLASS()
 class PROJECTNULL_API UGearChangeWidget : public UUserWidget
@@ -19,15 +19,15 @@ class PROJECTNULL_API UGearChangeWidget : public UUserWidget
 
 protected:
 
-	// �M�A�`�F���W�p��UI�}�e���A��
+	/** ギアチェンジのUIを表示するためのマテリアルインスタンス */
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> GearChangeMaterial;
 
-	// �M�A�`�F���W�p��UI�C���[�W
+	/** ギアチェンジのUIを表示するための画像 */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UImage> GearChangeImage;
 
-	// �M�A�`�F���W�̃`���[�W�ʂ̃e�L�X�g
+	/** ギアチェンジのUIを表示するためのテキスト */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> GearChangeText;
 
@@ -39,5 +39,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetGearChangeEnergy(float Charge);
+
+private:
+
+	/** ギアチェンジの最大チャージ量 */
+	static constexpr float MaxChargeAmount = 1000.0f;
+
+	/** ギアチェンジの最小のチャージ量 */
+	static constexpr float MinChargeAmount = 0.0f;
 	
 };

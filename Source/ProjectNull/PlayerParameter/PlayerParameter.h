@@ -7,7 +7,7 @@
 #include "PlayerParameter.generated.h"
 
 /**
- * �v���C���[�̃p�����[�^�iHP�E�M�A�G�l���M�[�j��Ǘ�����N���X
+ * プレイヤーのパラメータを管理するクラス (HP、ギアエネルギーなど)
  */
 UCLASS()
 class PROJECTNULL_API UPlayerParameter : public UObject
@@ -15,23 +15,22 @@ class PROJECTNULL_API UPlayerParameter : public UObject
 	GENERATED_BODY()
 
 public:
-
 	UPlayerParameter();
 
 protected:
-	/** ���݂�HP */
+	/** 現在のHP */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerParameter")
 	float Health;
 
-	/** �ő�HP */
+	/** 最大HP */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerParameter")
 	float MaxHealth;
 
-	/** �M�A�G�l���M�[�̌��ݒl */
+	/** 現在のギアエネルギー */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerParameter")
 	float GearEnergy;
 
-	/** �M�A�G�l���M�[�̍ő�l */
+	/** 最大ギアエネルギー */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerParameter")
 	float MaxGearEnergy;
 
@@ -39,19 +38,19 @@ protected:
 public:
 	//~ Begin Getter
 
-	/** ���݂�HP��Ԃ� */
+	/** 現在のHPを取得 */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
 	float GetHealth() const { return Health; }
 
-	/** ���݂̃M�A�G�l���M�[��Ԃ� */
+	/** 現在のギアエネルギーを取得 */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
 	float GetGearEnergy() const { return GearEnergy; }
 
-	/** HP�̊�����Ԃ� (0~100) */
+	/** HPの割合を取得 (0~100) */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
 	float GetHealthRate() const;
 
-	/** �M�A�G�l���M�[�̊�����Ԃ� (0~100) */
+	/** ギアエネルギーの割合を取得 (0~100) */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
 	float GetGearEnergyRate() const;
 
@@ -59,18 +58,18 @@ public:
 
 	//~ Begin Setter
 
-	/** HP��ݒ肷��i0~MaxHealth �ɃN�����v�j */
+	/** HPを設定 (0~MaxHealth の範囲) */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
 	void SetHealth(float NewHealth);
 
-	/** �M�A�G�l���M�[��ݒ肷��i0~MaxGearEnergy �ɃN�����v�j */
+	/** ギアエネルギーを設定 (0~MaxGearEnergy の範囲) */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
 	void SetGearEnergy(float NewGearEnergy);
 
 	//~ End Setter
 
 private:
-	/** �p�[�Z���g�ϊ��p�萔 */
+	/** 割合計算の基準値 */
 	static constexpr float PercentageBase = 100.0f;
 
 };

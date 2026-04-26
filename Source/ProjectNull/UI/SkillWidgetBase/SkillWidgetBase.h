@@ -21,7 +21,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UImage> SkillImage;
 
-	// �N�[���_�E���p�̃}�e���A��
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> CooldownMaterial;
 
@@ -29,7 +28,7 @@ protected:
 
 public:
 
-	// 0����1�͈̔͂ŃX�L���A�C�R�����]������֐�
+	/** スキルのクールダウンを更新 */
 	UFUNCTION(BlueprintCallable)
 	void UpdateRotationImage(float angle);
 };

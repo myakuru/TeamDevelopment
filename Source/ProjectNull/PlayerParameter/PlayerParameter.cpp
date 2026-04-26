@@ -12,19 +12,19 @@ UPlayerParameter::UPlayerParameter()
 
 float UPlayerParameter::GetHealthRate() const
 {
-	// 0 ���Z��h��
+	// 0演算を防止
 	if (MaxHealth <= 0.0f) return 0.0f;
 
-	// �l���͈͊O�ɂȂ�\�������邽�߃N�����v���Ă���p�[�Z���g�ϊ�
+	//  %表記にする
 	return FMath::Clamp(Health / MaxHealth, 0.0f, 1.0f) * PercentageBase;
 }
 
 float UPlayerParameter::GetGearEnergyRate() const
 {
-	// 0 ���Z��h��
+	// 0演算を防止
 	if (MaxGearEnergy <= 0.0f) return 0.0f;
 
-	// �l���͈͊O�ɂȂ�\�������邽�߃N�����v���Ă���p�[�Z���g�ϊ�
+	//  %表記にする
 	return FMath::Clamp(GearEnergy / MaxGearEnergy, 0.0f, 1.0f) * PercentageBase;
 }
 
