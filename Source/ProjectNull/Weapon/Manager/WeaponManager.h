@@ -20,7 +20,6 @@ class PROJECTNULL_API UWeaponManager : public UObject
 	
 public:
 
-	UFUNCTION(BlueprintCallable)
 	void Initialize(UDataTable* InDataTable);
 
 	void SaveToData(UMySaveGame* a_SaveGame);
@@ -31,17 +30,27 @@ public:
 	const TArray<FWeaponInstance>& GetWeapons() const;
 
 	UFUNCTION(BlueprintCallable)
-	void AddWeapon(const FWeaponInstance& NewWeapon);
+	void AddWeapon(const FWeaponInstance& a_NewWeapon);
 
 	UFUNCTION(BlueprintCallable)
 	bool GetWeaponMaster(FName WeaponId,FWeaponData& OutData)const;
 
-	
+	UFUNCTION(BlueprintCallable)
+	void SetEquippedWeapon(int32 a_Index, const FWeaponInstance& a_Weapon);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetEquippedWeapon(FWeaponInstance& a_EquippedWeapon, int32 a_Index);
 
 private:
 
 	UPROPERTY()
 	TArray<FWeaponInstance> m_Weapons;
+
+	UPROPERTY()
+	int64 m_NextWeaponID = 0;
+
+	UPROPERTY()
+	TArray<int64> m_EquippedWeaponIDs;
 
 	UPROPERTY(EditAnywhere, Category = "Data")
 	UDataTable* WeaponDataTable;
