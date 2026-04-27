@@ -67,8 +67,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float RadiusOffset;
 
-	// エフェクトの回転オフセット
+	// エフェクトの回転
 	UPROPERTY(EditAnywhere)
-	FRotator RotatorOffset;
+	FRotator Rotation;
 	
 };

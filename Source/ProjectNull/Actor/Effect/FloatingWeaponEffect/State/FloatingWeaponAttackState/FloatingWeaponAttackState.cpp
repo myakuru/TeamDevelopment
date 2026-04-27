@@ -21,19 +21,21 @@ void UFloatingWeaponAttackState::Update(float DeltaTime)
 		return;
 	}
 
-	FTransform TransformOffset = CalcAttackStateTransformOffset(attack,attack->CurrentAngle);
+	FCalcResultOffset resultOffset = CalcAttackStateTransformOffset(attack,attack->CurrentAngle);
 
-	Owner->SetRotatorYawOffset(RotatorOffset.Yaw);
+	// 回転オフセット考慮して計算
+	Owner->SetRotatorYawOffset(resultOffset.YawOffset);
 
-	LocationOffset = TransformOffset.GetLocation();
+	LocationOffset = resultOffset.Transform.GetLocation();
 
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
-FTransform UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
+FCalcResultOffset UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
 {
-	if (!Owner || !OwnerActor || !OwnerAttack) { return FTransform(); }
-	FTransform resultTransformOffset;
+	FCalcResultOffset resultOffset;
+
+	if (!Owner || !OwnerActor || !OwnerAttack) { return resultOffset; }
 
 	// プレイヤーが向いてる方向
 	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
@@ -41,12 +43,9 @@ FTransform UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingW
 	// 攻撃方向からのオフセット位置
 	const FVector offsetLocation = OwnerAttack->CalcAttackDir(FVector::ForwardVector, RotatorOffsetAngle) * RadiusOffset;
 
-	// 回転オフセット考慮して計算
-	//RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + RotatorOffsetAngle;
-	RotatorOffset.Yaw = RotatorOffsetAngle;
+	resultOffset.Transform.SetLocation(offsetLocation);
+	resultOffset.Transform.SetRotation(Rotation.Quaternion());
+	resultOffset.YawOffset = RotatorOffsetAngle;
 
-	resultTransformOffset.SetLocation(offsetLocation);
-	resultTransformOffset.SetRotation(RotatorOffset.Quaternion());
-	
-	return resultTransformOffset;
+	return resultOffset;
 }

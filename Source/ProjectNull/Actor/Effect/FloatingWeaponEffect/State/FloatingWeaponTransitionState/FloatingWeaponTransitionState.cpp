@@ -1,5 +1,4 @@
 
-
 #include "FloatingWeaponTransitionState.h"
 
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
@@ -22,7 +21,12 @@ void UFloatingWeaponTransitionState::Start(EFloatingWeaponState SetNextState)
 	if (!Owner) { return; }
 	//オフセットがほしい
 	StartLocationOffset = Owner->GetLocationOffset();
+
+
 	StartRotationOffset = Owner->GetTransform().GetRotation();
+	FRotator result = StartRotationOffset.Rotator();
+	result.Yaw = Owner->GetRotatorYawOffset();
+	StartRotationOffset = result.Quaternion();
 
 	// 遷移後の状態に応じて、補間先のTransform情報を変更
 	if (NextState == EFloatingWeaponState::Attack)
@@ -45,7 +49,9 @@ void UFloatingWeaponTransitionState::Update(float DeltaTime)
 	UpdateTransitionTime(DeltaTime);
 	
 	UpdateTransformOffsetLerp(DeltaTime);
-	
+
+	Owner->SetRotatorYawOffset(0);
+
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
@@ -60,10 +66,10 @@ void UFloatingWeaponTransitionState::UpdateTransformOffsetLerp(float DeltaTime)
 	// 補間処理
 	const FVector resultLocation	= FMath::Lerp(StartLocationOffset, TargetTransform.GetLocation(), lerpValue);
 	const FQuat4d resultQuaternion	= FQuat4d::Slerp(StartRotationOffset, TargetTransform.GetRotation(), lerpValue);
-
+	
 	// オフセットTransform更新
 	LocationOffset = resultLocation;
-	//Owner->SetRotation(resultQuaternion.Rotator());
+	Rotation = resultQuaternion.Rotator();
 
 	// 状態遷移処理
 	switch (NextState)

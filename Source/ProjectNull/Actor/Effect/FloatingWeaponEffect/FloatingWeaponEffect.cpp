@@ -18,7 +18,7 @@ UFloatingWeaponEffect::UFloatingWeaponEffect():
 	EffectComponent(nullptr),
 	Transform(FTransform()),
 	RadiusOffset(200.0f),
-	RotatorOffset(FRotator())
+	Rotation(FRotator())
 {
 	
 }
@@ -94,7 +94,7 @@ FTransform UFloatingWeaponEffect::GetAttackStartTransformOffset()
 	FTransform resultTransform;
 	if (!attakState) { return resultTransform; }
 
-	resultTransform = attakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle);
+	resultTransform = attakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle).Transform;
 	return resultTransform;
 }
 
@@ -122,14 +122,16 @@ void UFloatingWeaponEffect::CalcTransformOffset()
 	// プレイヤーの座標
 	const FVector playerLocation	= OwnerActor->GetActorLocation();
 	// プレイヤーの回転
-	FRotator playerRotation	= OwnerActor->GetActorRotation();
+	FRotator playerRotation			= OwnerActor->GetActorRotation();
+
 	// ワールドオフセット座標
 	const FVector worldOffsetLocation	= playerRotation.RotateVector(LocationOffset);
 	const FVector resultLocation		= playerLocation + worldOffsetLocation;
 
 	// メモ:座標と同じように回転オフセット計算後プレイヤーの回転を考慮
-	RotatorOffset.Yaw = playerRotation.Yaw + RotatorYawOffset;
-	Transform.SetRotation(RotatorOffset.Quaternion());
+	Rotation.Yaw = playerRotation.Yaw + RotatorYawOffset;
+
+	Transform.SetRotation(Rotation.Quaternion());
 	Transform.SetLocation(resultLocation);	
 }
 

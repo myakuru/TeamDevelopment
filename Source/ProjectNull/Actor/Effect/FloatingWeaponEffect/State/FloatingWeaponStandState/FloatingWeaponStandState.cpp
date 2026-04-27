@@ -30,6 +30,7 @@ void UFloatingWeaponStandState::Update(float DeltaTime)
 	
 	LocationOffset = Owner->GetStandStartTransformOffset().GetLocation();
 
+	Owner->SetRotatorYawOffset(0);
 
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }

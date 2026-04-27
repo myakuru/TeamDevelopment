@@ -12,6 +12,7 @@ UFloatingWeaponStateBase::UFloatingWeaponStateBase():
 void UFloatingWeaponStateBase::Update(float DeltaTime)
 {
 	if (!Owner) { return; }
+	Owner->SetRotation(Rotation);
 	Owner->SetLocationOffset(LocationOffset);
 }
 

@@ -75,12 +75,14 @@ public:
 	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner)		{ OwnerAttack = Owner; }
 	inline void SetOwnerActor(AActor* SetOwnerActor)				{ OwnerActor = SetOwnerActor; }
 	inline void SetLocationOffset(const FVector& SetLocationOffset)	{ LocationOffset = SetLocationOffset; }
+	inline void SetRotation(const FRotator& SetRotation)			{ Rotation = SetRotation; }
 	inline void SetRotatorYawOffset(float SetRotatorYawOffset)		{ RotatorYawOffset = SetRotatorYawOffset; }
 	
 	// ゲッター
 	inline UFloatingWeaponAttack* GetOwnerAttack() const	{ return OwnerAttack; }
 	inline FTransform GetTransform() const					{ return Transform; }
 	inline FVector GetLocationOffset() const				{ return LocationOffset; }
+	inline float GetRotatorYawOffset() const				{ return RotatorYawOffset; }
 
 private:
 
@@ -134,13 +136,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	float RadiusOffset;
 
-	// エフェクトの回転オフセット
+	// エフェクトの回転
 	UPROPERTY(EditAnywhere)
-	float RotatorYawOffset;
+	FRotator Rotation;
 
 	// エフェクトの回転オフセット
 	UPROPERTY(EditAnywhere)
-	FRotator RotatorOffset;
+	float RotatorYawOffset;
 
 	// 浮遊武器の状態の配列
 	UPROPERTY(EditAnywhere, Instanced)
