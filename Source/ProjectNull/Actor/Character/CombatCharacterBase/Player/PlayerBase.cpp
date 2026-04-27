@@ -3,15 +3,16 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
-#include "ProjectNull/Component/PlayerAttackComponent/PlayerAttackComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
-		AttackComponent(nullptr),
+		AutoAttack(nullptr),
 		GearComponent(nullptr)
 {
 	// ================================================================
@@ -39,35 +40,37 @@ APlayerBase::APlayerBase()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->bUsePawnControlRotation = false;
 
+	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
 
-	AttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>("Attack");
-	GearComponent	= CreateDefaultSubobject<UPlayerGearComponent>("Gear");
 }
 
 void APlayerBase::BeginPlay()
 {
+	ACombatCharacterBase::BeginPlay();
 
-	if (AttackComponent)
-	{
-		AttackComponent->SetOwnerPlayer(this);
-	}
-
-	if (GearComponent)
-	{
+	if (GearComponent) {
 		GearComponent->SetOwnerPlayer(this);
 	}
 
-	ACombatCharacterBase::BeginPlay();
+	if (AutoAttack) {
+		AutoAttack->Initialize(this);
+	}
 
 	UpdateHUDHP();
 }
 
 void APlayerBase::Tick(float DeltaTime)
 {
+	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+	if (!enemyManager) { return; }
+
 	ACombatCharacterBase::Tick(DeltaTime);
 
-	if (ARobotController* RobotController = Cast<ARobotController>(GetController()))
-	{
+	if (AutoAttack) {
+		AutoAttack->Update(DeltaTime,nullptr,enemyManager);
+	}
+
+	if (ARobotController* RobotController = Cast<ARobotController>(GetController())) {
 		HUDWidget = RobotController->GetPlayerHUD();
 	}
 }
@@ -100,8 +103,7 @@ void APlayerBase::Move(const FVector2d& InputVector)
 
 bool APlayerBase::CanMove()
 {
-	if(GearComponent && GearComponent->IsMovementBlockedByGear())
-	{
+	if(GearComponent && GearComponent->IsMovementBlockedByGear()) {
 		return false;
 	}
 
@@ -110,8 +112,7 @@ bool APlayerBase::CanMove()
 
 void APlayerBase::UpdateHUDHP()
 {
-	if (HUDWidget)
-	{
+	if (HUDWidget) {
 		HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
 	}
 }

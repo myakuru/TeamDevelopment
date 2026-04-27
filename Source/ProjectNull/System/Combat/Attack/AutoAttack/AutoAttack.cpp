@@ -42,11 +42,6 @@ void UAutoAttack::Initialize(AActor* Owner)
 
 }
 
-void UAutoAttack::Execute()
-{
-	return;
-}
-
 void UAutoAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
 {
 	if (!EnemyManager) { return; }

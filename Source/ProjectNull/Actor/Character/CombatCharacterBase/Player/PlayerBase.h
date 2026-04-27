@@ -19,6 +19,10 @@ class UPlayerAttackComponent;
 // �M�A�R���|�[�l���g
 class UPlayerGearComponent;
 
+class UAttackBase;
+
+class UAutoAttack;
+
 USTRUCT(BlueprintType)
 struct FExpSystem
 {
@@ -106,10 +110,9 @@ private:
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	UCameraComponent* CameraComponent;
 
-	// �U���R���|�[�l���g
-	UPROPERTY(VisibleAnywhere,Category = "Attack")
-	UPlayerAttackComponent* AttackComponent;
-
+	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
+	TObjectPtr<UAutoAttack> AutoAttack;
+	
 	// �M�A�R���|�[�l���g
 	UPROPERTY(VisibleAnywhere,Category = "Gear")
 	UPlayerGearComponent* GearComponent;

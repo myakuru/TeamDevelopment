@@ -19,11 +19,11 @@ public:
 	void Start()					override;
 	void Update(float DeltaTime)	override;
 
-	// ƒQƒbƒ^[
+	// ï¿½Qï¿½bï¿½^ï¿½[
 	inline FTransform GetStartTransformOffset() const { return StartTransformOffset; }
 
 private:
-	// ‘Ò‹@ó‘Ô‚ÌŠJnTranform
+	// ï¿½Ò‹@ï¿½ï¿½Ô‚ÌŠJï¿½nTranform
 	UPROPERTY(EditAnywhere)
 	FTransform StartTransformOffset;
 
