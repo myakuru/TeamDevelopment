@@ -43,7 +43,7 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			attack->Execute();
 		}
 
-		attack->Update(DeltaTime, pPlayerPawn, nullptr);
+		attack->Update(DeltaTime, pPlayerPawn);
 	}
 }
 

@@ -22,7 +22,12 @@ public:
 	/// 開始の際の初期化
 	/// </summary>
 	void Start();
-	 
+
+	/// <summary>
+	/// 攻撃の実行
+	/// </summary>
+	virtual void Execute()override;
+	
 	/// <summary>
 	/// 更新処理
 	/// </summary>
