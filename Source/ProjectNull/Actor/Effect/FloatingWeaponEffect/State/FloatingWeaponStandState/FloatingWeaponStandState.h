@@ -16,10 +16,16 @@ class PROJECTNULL_API UFloatingWeaponStandState final : public UFloatingWeaponSt
 public:
 	UFloatingWeaponStandState();
 public:
+	void Start()					override;
+	void Update(float DeltaTime)	override;
 
-	void Update(AActor* OwnerActor,float DeltaTime)override;
+	// ゲッター
+	inline FTransform GetStartTransformOffset() const { return StartTransformOffset; }
+
 private:
-
+	// 待機状態の開始Tranform
 	UPROPERTY(EditAnywhere)
-	float OffsetDist;
+	FTransform StartTransformOffset;
+
+	float Angle;
 };

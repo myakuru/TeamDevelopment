@@ -96,4 +96,8 @@ protected:
 
 	// ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½
 	bool bIsActive;
+
+	// ƒfƒoƒbƒOƒ‰ƒCƒ“•`‰æ‚·‚é‚©‚Ç‚¤‚©
+	UPROPERTY(EditAnywhere)
+	bool bIsDrawDebugLine;
 };

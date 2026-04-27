@@ -1,15 +1,16 @@
-ï»¿
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "../../FloatingWeaponEffect/FloatingWeaponEffect.h"
 #include "FloatingWeaponStateBase.generated.h"
 
-// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½X
+// •‚—V•ŠíƒNƒ‰ƒX
 class UFloatingWeaponEffect;
 
 /// <summary>
-// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½Ìï¿½ÔŠï¿½ï¿½Nï¿½ï¿½ï¿½X
+// •‚—V•Ší‚Ìó‘ÔŠî’êƒNƒ‰ƒX
 /// </summary>
 UCLASS()
 class PROJECTNULL_API UFloatingWeaponStateBase : public UObject
@@ -21,30 +22,53 @@ public:
 	UFloatingWeaponStateBase();
 
 public:
+	/// <summary>
+	/// ŠJnˆ—
+	/// </summary>
+	virtual void Start() { return; }
+	virtual void Start(EFloatingWeaponState SetNextState) { return; }
 
 	/// <summary>
-	/// ï¿½Xï¿½V
+	/// XVˆ—
 	/// </summary>
-	/// <param name="DeltaTime">ï¿½fï¿½ï¿½ï¿½^ï¿½^ï¿½Cï¿½ï¿½</param>
-	virtual void Update(AActor* OwnerActor, float DeltaTime);
+	/// <param name="DeltaTime">ƒfƒ‹ƒ^ƒ^ƒCƒ€</param>
+	virtual void Update(float DeltaTime);
 
-	// ï¿½Zï¿½bï¿½^ï¿½[
-	inline void SetOnwer(UFloatingWeaponEffect* SetOwner) { Owner = SetOwner; }
+	// ƒZƒbƒ^[
+	inline void SetOwner(UFloatingWeaponEffect* SetOwner)	{ Owner = SetOwner; }
+	inline void SetOwnerActor(AActor* SetOwnerActor)		{ OwnerActor = SetOwnerActor; }
 
 protected:
 
+	inline bool IsFinishedTransitionState() const { return TransitionTime <= 0.0f; }
+
+
+	float GetTransitionStateTime() const;
+
+
+	void UpdateTransitionTime(float DeltaTime);
+
+	// ó‘Ô‚Ì‘JˆÚŠÔŠÇ——p
+	float TransitionTime;
+
+	// ‚¿å‚Ì•‚—V•ŠíƒNƒ‰ƒX
 	UPROPERTY()
 	UFloatingWeaponEffect* Owner;
 
-	UPROPERTY(EditAnywhere)
-	FTransform Transform;
+	// ‚¿å‚ÌƒAƒNƒ^[ƒNƒ‰ƒX
+	UPROPERTY()
+	AActor* OwnerActor;
 
-	// ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½Ì”ï¿½ï¿½aï¿½Iï¿½tï¿½Zï¿½bï¿½g
+	// ƒGƒtƒFƒNƒg‚ÌƒIƒtƒZƒbƒgÀ•W
+	UPROPERTY(EditAnywhere)
+	FVector LocationOffset;
+
+	// ƒGƒtƒFƒNƒg‚Ì”¼ŒaƒIƒtƒZƒbƒg
 	UPROPERTY(EditAnywhere)
 	float RadiusOffset;
 
-	// ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½Ì‰ï¿½]ï¿½Iï¿½tï¿½Zï¿½bï¿½g
+	// ƒGƒtƒFƒNƒg‚Ì‰ñ“]
 	UPROPERTY(EditAnywhere)
-	FRotator RotatorOffset;
-
+	FRotator Rotation;
+	
 };

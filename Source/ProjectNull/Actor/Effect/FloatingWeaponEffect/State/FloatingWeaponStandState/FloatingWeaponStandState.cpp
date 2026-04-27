@@ -1,4 +1,3 @@
-﻿
 
 #include "FloatingWeaponStandState.h"
 
@@ -9,33 +8,30 @@ UFloatingWeaponStandState::UFloatingWeaponStandState()
 {
 }
 
-void UFloatingWeaponStandState::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponStandState::Start()
+{
+	TransitionTime = GetTransitionStateTime();
+}
+
+void UFloatingWeaponStandState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 
-	auto* attack = Owner->GetOwnerAttack();
+	UE_LOG(LogTemp, Warning, TEXT("StandState"));
 
-	if (attack->IsActiveFirstFrame())
+	UpdateTransitionTime(DeltaTime);
+
+	if (IsFinishedTransitionState())
 	{
-		Owner->ChangeState(EFloatingWeaponState::Attack);
+		Owner->ChangeState(EFloatingWeaponState::Transition, EFloatingWeaponState::Attack);
 		return;
 	}
 
-	// �v���C���[�̍��W
-	const FVector playerLocation = OwnerActor->GetActorLocation();
-	// �v���C���[�������Ă����
-	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
-	const FVector playerRightVector = OwnerActor->GetActorRightVector();
-	// �U����������̃I�t�Z�b�g�ʒu
-	const FVector offsetLocation = playerRightVector * OffsetDist;
-	// ���V����̍ŏI�ʒu
-	const FVector resultLocation = playerLocation + offsetLocation;
+	
+	LocationOffset = Owner->GetStandStartTransformOffset().GetLocation();
 
-	Transform.SetLocation(resultLocation);
-	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw;
+	Owner->SetRotatorYawOffset(0);
 
-	Transform.SetRotation(RotatorOffset.Quaternion());
-
-	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
+	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 

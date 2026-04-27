@@ -4,10 +4,11 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
-UAttackBase::UAttackBase()
-	:	OwnerActor(nullptr)
-	,	bCanExecute(true)
-	,	bIsActive(false)
+UAttackBase::UAttackBase():
+	OwnerActor(nullptr),
+	bCanExecute(true),
+	bIsActive(false),
+	bIsDrawDebugLine(false)
 {
 }
 
