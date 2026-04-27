@@ -1,4 +1,4 @@
-
+ï»¿
 #pragma once
 
 #include "CoreMinimal.h"
@@ -6,7 +6,7 @@
 #include "FloatingWeaponStandState.generated.h"
 
 /// <summary>
-// •‚—V•Ší‚Ì‘Ò‹@ó‘ÔƒNƒ‰ƒX
+// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½Ì‘Ò‹@ï¿½ï¿½ÔƒNï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponStandState final : public UFloatingWeaponStateBase
@@ -16,10 +16,16 @@ class PROJECTNULL_API UFloatingWeaponStandState final : public UFloatingWeaponSt
 public:
 	UFloatingWeaponStandState();
 public:
+	void Start()					override;
+	void Update(float DeltaTime)	override;
 
-	void Update(AActor* OwnerActor,float DeltaTime)override;
+	// ƒQƒbƒ^[
+	inline FTransform GetStartTransformOffset() const { return StartTransformOffset; }
+
 private:
-
+	// ‘Ò‹@ó‘Ô‚ÌŠJnTranform
 	UPROPERTY(EditAnywhere)
-	float OffsetDist;
+	FTransform StartTransformOffset;
+
+	float Angle;
 };

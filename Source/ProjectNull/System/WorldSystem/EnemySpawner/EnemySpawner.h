@@ -1,8 +1,13 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "EnemySpawnPattern/EnemyWaveDataAsset.h"
+#include "EnemyPhaseSpawnTable.h"
 #include "EnemySpawner.generated.h"
+
+class UGameProgressSubsystem;
+class UEnemyPhaseSpawnTable;
 
 /// <summary>
 /// 360度（degree）
@@ -80,6 +85,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 
@@ -89,13 +95,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemySpawner")
 	void SpawnEnemy();
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UEnemyPhaseSpawnTable> PhaseSpawnTable = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	TObjectPtr<const UEnemyWaveDataAsset> CurrentWaveData = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	FTransform SpawnOrigin;
+
 private:
 
 	/// <summary>
 	/// プレイヤー周囲のリング状スポーン座標を計算
 	/// <param name="Center">中心座標</param>
 	/// <returns>ランダム座標結果</returns>
-	FVector CalculateEnemySpawnPointInRing(const FVector& Center) const;
+	//FVector CalculateEnemySpawnPointInRing(const FVector& Center) const;
 
 	/// <summary>
 	/// 静的オブジェクトと交差しているか
@@ -105,8 +120,8 @@ private:
 	/// <returns>交差しているかどうか</returns>
 	bool IsIntersectingStaticObjects(FHitResult& HitResult,FVector& SpawnLocationXY);
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AEnemyGruntBase> EnemyClass;
+	void HandlePhaseChanged(int NewPhase);
+	void ApplySpawnModeByPhase(int NewPhase);
 
 	/// <summary>
 	/// 出現パラメータ
@@ -118,4 +133,14 @@ private:
 	/// 敵を一定時間ごとにスポーンするタイマーID
 	/// </summary>
 	FTimerHandle SpawnTimerHandle;
+
+	/// <summary>
+	/// フェーズのデータを持ったゲームシステム
+	/// </summary>
+	UGameProgressSubsystem* CachedSubsystem = nullptr;
+
+	/// <summary>
+	/// 現在のフェーズデータ
+	/// </sumamry>
+	int NowPhase = 0;
 };

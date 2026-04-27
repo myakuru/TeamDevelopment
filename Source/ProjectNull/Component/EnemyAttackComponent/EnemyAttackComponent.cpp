@@ -1,4 +1,4 @@
-#include "EnemyAttackComponent.h"
+ï»¿#include "EnemyAttackComponent.h"
 
 #include <ProjectNull/System/Combat/Attack/AttackBase.h>
 #include <Kismet/GameplayStatics.h>
@@ -15,7 +15,7 @@ void UEnemyAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// ”z—ñ“à‚ÌUŒ‚ƒNƒ‰ƒX‚Ì‰Šú‰»
+	// ï¿½zï¿½ï¿½ï¿½ÌUï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	for (auto& attack : EnemyAttacks)
 	{
 		if (!attack) { continue; }
@@ -28,12 +28,12 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ƒvƒŒƒCƒ„[‚Ìî•ñæ“¾
-	// ƒvƒŒƒCƒ„[‚Ìî•ñ‚ğæ“¾‚·‚éi0”Ô:1Pj
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½æ“¾
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½i0ï¿½ï¿½:1Pï¿½j
 	APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!pPlayerPawn) { return; }
 
-	// ”z—ñ“à‚ÌUŒ‚ƒNƒ‰ƒX‚ÌXV
+	// ï¿½zï¿½ï¿½ï¿½ÌUï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½ÌXï¿½V
 	for (auto& attack : EnemyAttacks)
 	{
 		if (!attack) { continue; }

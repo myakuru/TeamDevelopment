@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 #include "GameTimerWidget.h"
 #include "TimerManager.h"
 
@@ -6,7 +6,7 @@ void UGameTimerWidget::StartTimer(float Duration)
 {
 	RemainingTime = Duration;
 
-	// ƒ[ƒ‹ƒh‚©‚çƒ^ƒCƒ}[‚ğæ“¾‚µ‚ÄACountDownTimerŠÖ”‚ğˆê’èŠÔŠu‚ÅŒÄ‚Ño‚·
+	// ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½^ï¿½Cï¿½}ï¿½[ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ÄACountDownTimerï¿½Öï¿½ï¿½ï¿½ï¿½ï¿½ÔŠuï¿½ÅŒÄ‚Ñoï¿½ï¿½
 	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &UGameTimerWidget::CountDownTimer, 1.0f, true);
 
 }
@@ -15,18 +15,18 @@ void UGameTimerWidget::CountDownTimer()
 {
 	if (RemainingTime <= 0)
 	{
-		// ƒ^ƒCƒ}[‚ªI—¹‚µ‚½ê‡‚Ìˆ—
+		// ï¿½^ï¿½Cï¿½}ï¿½[ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Ìï¿½ï¿½ï¿½
 		GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
 		TimerText = TEXT("Time's Up!");
 	}
 	else
 	{
-		// ƒ^ƒCƒ}[‚ª‚Ü‚¾c‚Á‚Ä‚¢‚éê‡‚Ìˆ—
+		// ï¿½^ï¿½Cï¿½}ï¿½[ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½cï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ê‡ï¿½Ìï¿½ï¿½ï¿½
 		int32 Hours = FMath::FloorToInt(RemainingTime / 3600);
 		int32 Minutes = FMath::FloorToInt(RemainingTime / 60);
 		int32 Seconds = FMath::FloorToInt(RemainingTime) % 60;
 		TimerText = FString::Printf(TEXT("%02d:%02d:%02d"), Hours, Minutes, Seconds);
-		RemainingTime -= 1.0f; // 1•bŒ¸‚ç‚·
+		RemainingTime -= 1.0f; // 1ï¿½bï¿½ï¿½ï¿½ç‚·
 	}
 }
 

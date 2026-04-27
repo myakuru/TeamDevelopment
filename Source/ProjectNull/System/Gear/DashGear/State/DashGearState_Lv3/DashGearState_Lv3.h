@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "../DashGearStateBase.h"
 #include "DashGearState_Lv3.generated.h"
 
 /// <summary>
-/// ƒ_ƒbƒVƒ…ƒMƒAó‘ÔƒŒƒxƒ‹3ƒNƒ‰ƒX
+/// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½Mï¿½Aï¿½ï¿½Ôƒï¿½ï¿½xï¿½ï¿½3ï¿½Nï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UDashGearState_Lv3 final : public UDashGearStateBase

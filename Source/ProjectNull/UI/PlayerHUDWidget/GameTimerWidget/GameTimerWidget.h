@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -30,7 +30,7 @@ private:
 
 	void CountDownTimer();
 
-	float RemainingTime = 0.0f;	// ƒ^ƒCƒ}[ƒnƒ“ƒhƒ‹
+	float RemainingTime = 0.0f;	// ï¿½^ï¿½Cï¿½}ï¿½[ï¿½nï¿½ï¿½ï¿½hï¿½ï¿½
 	FTimerHandle CountdownTimerHandle;
 	
 };

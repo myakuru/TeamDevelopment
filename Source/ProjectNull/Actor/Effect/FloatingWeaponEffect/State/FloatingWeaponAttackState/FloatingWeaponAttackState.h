@@ -1,12 +1,36 @@
-
+ï»¿
 #pragma once
 
 #include "CoreMinimal.h"
 #include "../FloatingWeaponStateBase.h"
 #include "FloatingWeaponAttackState.generated.h"
 
+/** ƒIƒtƒZƒbƒgŒvZŒ‹‰Ê•Ô‚è’l—p\‘¢‘Ì */
+USTRUCT(BlueprintType)
+struct FCalcResultOffset
+{
+	GENERATED_BODY()
+
+public:
+
+	FCalcResultOffset() :
+		Transform(FTransform()),
+		YawOffset(0.0f)
+	{
+	}
+
+	/** TransformƒIƒtƒZƒbƒg */
+	FTransform Transform;
+
+	/** YawƒIƒtƒZƒbƒg */
+	float YawOffset;
+};
+
+// •‚—V•ŠíUŒ‚
+class UFloatingWeaponAttack;
+
 /// <summary>
-// •‚—V•Ší‚ÌUŒ‚ó‘ÔƒNƒ‰ƒX
+// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½ÌUï¿½ï¿½ï¿½ï¿½ÔƒNï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponAttackState final : public UFloatingWeaponStateBase
@@ -16,7 +40,14 @@ class PROJECTNULL_API UFloatingWeaponAttackState final : public UFloatingWeaponS
 public:
 	UFloatingWeaponAttackState();
 public:
-	void Update(AActor* OwnerActor,float DeltaTime)override;
-private:
-	
+
+	void Update(float DeltaTime)override;
+
+	/// <summary>
+	/// UŒ‚ó‘Ô‚ÌTransformƒIƒtƒZƒbƒg‚ÌŒvZ
+	/// </summary>
+	/// <param name="OwnerAttack"></param>
+	/// <param name="RotatorOffsetAngle"></param>
+	/// <returns></returns>
+	FCalcResultOffset CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle);
 };

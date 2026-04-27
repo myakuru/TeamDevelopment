@@ -4,49 +4,31 @@
 #include "Engine/DataTable.h"
 #include "EnemySpawnData.generated.h"
 
-UENUM(BlueprintType)
-enum class ESpawnPattern : uint8
-{
-	Single		UMETA(DisplayName = "Single"),			// 単体で出現
-	Circle		UMETA(DisplayName = "Circle"),			// 円形に出現
-	Line		UMETA(DisplayName = "Line"),			// 線状に出現
-	RandomMulti UMETA(DisplayName = "RandomMulti"),		// ランダムに複数体出現
-};
+class UEnemySpawnPatternBase;
 
-/// <summary>
-/// Waveごとの敵の出現パターンを管理するDataTable用の構造体
-/// </summary>
 USTRUCT(BlueprintType)
 struct FEnemySpawnUnit
 {
 	GENERATED_BODY()
 
-	// 出現する敵クラス
+	// 出現させる敵のID
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int EnemyID = 0;
+
+	// 出現させる敵のクラス（BPクラスをエディタから指定）
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> EnemyClass = nullptr;
 
-	// 出現数
+	// 何体出すか（現在はPatternMultiでのみ仕様）
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 SpawnCount = 1;
 
-	// 個別パターンを使うかどうか
+	// 出現する確率
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bOverridePattern = false;
+	int32 CreateProbability = 1;
 
-	// 個別パターン
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESpawnPattern SpawnPattern = ESpawnPattern::Single;
-};
-
-/// <summary>
-/// Waveごとの敵出現情報を管理する DataTable 用構造体
-/// </summary>
-USTRUCT(BlueprintType)
-struct PROJECTNULL_API FEnemySpawnData : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	// 出現する敵一覧
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FEnemySpawnUnit> Enemies;
+	// どのパターンで出すか（SingleやMultiをエディタで選択）
+	// Instanced : エディタ上でオブジェクトを直接作成してプロパティを編集できる
+	UPROPERTY(EditAnywhere, Instanced, BlueprintReadWrite)
+	TObjectPtr<UEnemySpawnPatternBase> SpawnPattern = nullptr;
 };

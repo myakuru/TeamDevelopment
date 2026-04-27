@@ -6,11 +6,15 @@
 #include "FloatingWeaponEffect.generated.h"
 
 
+/// <summary>
+/// 浮遊武器状態種類 
+/// </summary>
 UENUM(BlueprintType)
 enum class EFloatingWeaponState : uint8
 {
 	Stand,
 	Attack,
+	Transition,
 	Count UMETA(Hidden)
 };
 
@@ -21,9 +25,9 @@ class UNiagaraSystem;
 class UNiagaraComponent;
 
 // 扇状斬撃攻撃クラス
-class UFanAttackBase;
+class UFloatingWeaponAttack;
 
-// 浮遊武器の状態基底クラス
+// 浮遊武器状態の中間基底クラス
 class UFloatingWeaponStateBase;
 
 
@@ -38,7 +42,9 @@ class PROJECTNULL_API UFloatingWeaponEffect : public UObject
 public:
 	UFloatingWeaponEffect();
 public:
-
+	/// <summary>
+	/// 初期化
+	/// </summary>
 	void Initialize();
 
 	/// <summary>
@@ -50,28 +56,46 @@ public:
 	/// 更新
 	/// </summary>
 	/// <param name="OwnerActor">持ち主のクラス</param>
-	void Update(AActor* OwnerActor,float DeltaTime);
+	void Update(float DeltaTime);
 
 	/// <summary>
 	/// 状態の遷移
 	/// </summary>
 	/// <param name="State">ステート種類</param>
-	void ChangeState(EFloatingWeaponState State);
+	void ChangeState(EFloatingWeaponState NextState);
+	void ChangeState(EFloatingWeaponState NextState,EFloatingWeaponState TheStateAfterTheNext);
+	
 
+	bool IsAttackStateStep() const;
+
+	FTransform GetAttackStartTransformOffset();
+	FTransform GetStandStartTransformOffset();
 
 	// セッター
-	inline void SetOwnerAttack(UFanAttackBase* Owner) { OwnerAttack = Owner; }
-	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
-
+	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner)		{ OwnerAttack = Owner; }
+	inline void SetOwnerActor(AActor* SetOwnerActor)				{ OwnerActor = SetOwnerActor; }
+	inline void SetLocationOffset(const FVector& SetLocationOffset)	{ LocationOffset = SetLocationOffset; }
+	inline void SetRotation(const FRotator& SetRotation)			{ Rotation = SetRotation; }
+	inline void SetRotatorYawOffset(float SetRotatorYawOffset)		{ RotatorYawOffset = SetRotatorYawOffset; }
+	
 	// ゲッター
-	inline UFanAttackBase* GetOwnerAttack() const { return OwnerAttack; }
+	inline UFloatingWeaponAttack* GetOwnerAttack() const	{ return OwnerAttack; }
+	inline FTransform GetTransform() const					{ return Transform; }
+	inline FVector GetLocationOffset() const				{ return LocationOffset; }
+	inline float GetRotatorYawOffset() const				{ return RotatorYawOffset; }
 
 private:
+
+	/// <summary>
+	/// Transformオフセット計算
+	/// </summary>
+	void CalcTransformOffset();
 
 	/// <summary>
 	/// Transformの更新
 	/// </summary>
 	void UpdateTransform();
+
 
 	/// <summary>
 	/// エフェクト無効にする
@@ -84,11 +108,13 @@ private:
 	/// <returns>可能ならtrue 可能じゃないならfalse</returns>
 	inline bool CanSpawn() const { return EffectSystem && !EffectComponent; }
 
-
-
 	// 基準とする攻撃クラス
 	UPROPERTY()
-	UFanAttackBase* OwnerAttack;
+	UFloatingWeaponAttack* OwnerAttack;
+
+	// 持ち主のクラス
+	UPROPERTY()
+	AActor* OwnerActor;
 
 	// Niagaraシステム
 	UPROPERTY(EditAnywhere)
@@ -99,16 +125,24 @@ private:
 	UNiagaraComponent* EffectComponent;
 
 	// エフェクトのTransform
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	FTransform Transform;
+
+	// エフェクトの座標オフセット
+	UPROPERTY(EditAnywhere)
+	FVector LocationOffset;
 
 	// エフェクトの半径オフセット
 	UPROPERTY(EditAnywhere)
 	float RadiusOffset;
 
+	// エフェクトの回転
+	UPROPERTY(EditAnywhere)
+	FRotator Rotation;
+
 	// エフェクトの回転オフセット
 	UPROPERTY(EditAnywhere)
-	FRotator RotatorOffset;
+	float RotatorYawOffset;
 
 	// 浮遊武器の状態の配列
 	UPROPERTY(EditAnywhere, Instanced)
@@ -117,7 +151,4 @@ private:
 	// 現在の浮遊武器状態
 	UPROPERTY()
 	UFloatingWeaponStateBase* CurrentState;
-
-	UPROPERTY(EditAnywhere)
-	FVector StandLocation;
 };

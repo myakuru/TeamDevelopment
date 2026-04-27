@@ -32,8 +32,8 @@ public:
 	/// 更新処理
 	/// </summary>
 	/// <param name="DeltaTime">デルタタイム</param>
-	/// /// <returns>更新結果</returns>
-	bool UpdateAttack(float DeltaTime);
+	/// <returns>更新結果</returns>
+	virtual bool UpdateAttack(float DeltaTime);
 
 	/// <summary>
 	/// 
@@ -66,6 +66,7 @@ public:
 	/// <param name="forwardVector">前方方向</param>
 	/// <returns>計算結果</returns>
 	virtual FVector CalcAttackDir(const FVector& forwardVector) const override;
+	FVector CalcAttackDir(const FVector& forwardVector,float Angle) const;
 
 	/// <summary>
 	/// 半径の二乗を取得

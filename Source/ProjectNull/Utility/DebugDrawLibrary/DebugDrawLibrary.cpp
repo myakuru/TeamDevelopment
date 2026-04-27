@@ -1,4 +1,4 @@
-
+ï»¿
 #include "DebugDrawLibrary.h"
 
 
@@ -6,14 +6,14 @@ void UDebugDrawLibrary::DrawDebugFan(UWorld* World, FVector Center, FVector Forw
 {
 	float HalfAngle = AngleDeg * 0.5f;
 
-	// ¶’[‚Æ‰E’[
+	// å·¦ç«¯ã¨å³ç«¯
 	FVector LeftDir = Forward.RotateAngleAxis(-HalfAngle, FVector::UpVector);
 	FVector RightDir = Forward.RotateAngleAxis(HalfAngle, FVector::UpVector);
 
 	DrawDebugLine(World, Center, Center + LeftDir * Radius, FColor::Green, false, 0.1f, 0, 2);
 	DrawDebugLine(World, Center, Center + RightDir * Radius, FColor::Green, false, 0.1f, 0, 2);
 
-	// î‚ÌƒJ[ƒu•”•ª
+	// æ‰‡ã®ã‚«ãƒ¼ãƒ–éƒ¨åˆ†
 	float Step = AngleDeg / Segments;
 
 	FVector PrevPoint = Center + LeftDir * Radius;

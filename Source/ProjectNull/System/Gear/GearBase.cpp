@@ -1,4 +1,4 @@
-#include "GearBase.h"
+ï»¿#include "GearBase.h"
 
 #include <ProjectNull/System/Gear/State/GearStateBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
@@ -41,7 +41,7 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 		coolTime = GearStatuses[stateIndex].CoolTime;
 	}
 
-	// ƒN[ƒ‹ƒ^ƒCƒ€‚ÌŠJŽn
+	// ï¿½Nï¿½[ï¿½ï¿½ï¿½^ï¿½Cï¿½ï¿½ï¿½ÌŠJï¿½n
 	GetWorld()->GetTimerManager().SetTimer(
 		DurationTimerHandle,
 		this,

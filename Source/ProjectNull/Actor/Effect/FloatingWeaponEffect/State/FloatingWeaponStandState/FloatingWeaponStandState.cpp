@@ -1,5 +1,4 @@
 
-
 #include "FloatingWeaponStandState.h"
 
 #include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
@@ -9,33 +8,30 @@ UFloatingWeaponStandState::UFloatingWeaponStandState()
 {
 }
 
-void UFloatingWeaponStandState::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponStandState::Start()
+{
+	TransitionTime = GetTransitionStateTime();
+}
+
+void UFloatingWeaponStandState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 
-	auto* attack = Owner->GetOwnerAttack();
+	UE_LOG(LogTemp, Warning, TEXT("StandState"));
 
-	if (attack->IsActiveFirstFrame())
+	UpdateTransitionTime(DeltaTime);
+
+	if (IsFinishedTransitionState())
 	{
-		Owner->ChangeState(EFloatingWeaponState::Attack);
+		Owner->ChangeState(EFloatingWeaponState::Transition, EFloatingWeaponState::Attack);
 		return;
 	}
 
-	// プレイヤーの座標
-	const FVector playerLocation = OwnerActor->GetActorLocation();
-	// プレイヤーが向いてる方向
-	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
-	const FVector playerRightVector = OwnerActor->GetActorRightVector();
-	// 攻撃方向からのオフセット位置
-	const FVector offsetLocation = playerRightVector * OffsetDist;
-	// 浮遊武器の最終位置
-	const FVector resultLocation = playerLocation + offsetLocation;
+	
+	LocationOffset = Owner->GetStandStartTransformOffset().GetLocation();
 
-	Transform.SetLocation(resultLocation);
-	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw;
+	Owner->SetRotatorYawOffset(0);
 
-	Transform.SetRotation(RotatorOffset.Quaternion());
-
-	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
+	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 

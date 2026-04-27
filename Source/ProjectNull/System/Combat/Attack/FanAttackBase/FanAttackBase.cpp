@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "FanAttackBase.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
@@ -44,6 +42,7 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 	{
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
+	//UE_LOG(LogTemp, Warning, TEXT("StartAngle %.2f"), StartAngle);
 
 	// 攻撃範囲をデバッグラインで可視化
 	{
@@ -54,14 +53,17 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 		// 攻撃方向ベクトル
 		const FVector attackDir = CalcAttackDir(forwardVector);
 
-		UDebugDrawLibrary::DrawDebugFan(
-			GetWorld(),
-			playerLocation,
-			attackDir,
-			Radius,
-			ConeAngle,
-			10
-		);
+		if (bIsDrawDebugLine)
+		{
+			UDebugDrawLibrary::DrawDebugFan(
+				GetWorld(),
+				playerLocation,
+				attackDir,
+				Radius,
+				ConeAngle,
+				10
+			);
+		}
 	}
 
 	// 終了判定
@@ -160,5 +162,11 @@ void UFanAttackBase::UpdatePrevActiveFlg()
 FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector) const
 {
 	const float angle = bRotate ? CurrentAngle : 0.0f;
+	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
+}
+
+FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector, float Angle) const
+{
+	const float angle = bRotate ? Angle : 0.0f;
 	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
 }

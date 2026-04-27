@@ -4,6 +4,8 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "GameProgressSubsystem.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPhaseChanged, int);
+
 /// <summary>
 /// ゲームの進行管理クラス
 /// </summary>
@@ -23,6 +25,13 @@ public:
 	int32 GetKillCount() const { return KillCount; }
 
 	int32 GetPhase() const { return Phase; }
+
+	/// <summary>
+	/// フェーズを通知する
+	/// </summary>
+	FOnPhaseChanged OnPhaseChanged;
+
+	void SetPhase(int NewPhase);
 
 	/// <summary>
 	/// フェーズの境界を定義する倒した敵数閾値
