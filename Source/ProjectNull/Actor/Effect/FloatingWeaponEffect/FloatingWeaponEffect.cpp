@@ -119,16 +119,16 @@ void UFloatingWeaponEffect::CalcTransformOffset()
 {
 	if (!OwnerActor) { return; }
 
-	// ƒvƒŒƒCƒ„[‚ÌÀ•W
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½W
 	const FVector playerLocation	= OwnerActor->GetActorLocation();
-	// ƒvƒŒƒCƒ„[‚Ì‰ñ“]
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ì‰ï¿½]
 	FRotator playerRotation			= OwnerActor->GetActorRotation();
 
-	// ƒ[ƒ‹ƒhƒIƒtƒZƒbƒgÀ•W
+	// ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½ï¿½ï¿½W
 	const FVector worldOffsetLocation	= playerRotation.RotateVector(LocationOffset);
 	const FVector resultLocation		= playerLocation + worldOffsetLocation;
 
-	// ƒƒ‚:À•W‚Æ“¯‚¶‚æ‚¤‚É‰ñ“]ƒIƒtƒZƒbƒgŒvZŒãƒvƒŒƒCƒ„[‚Ì‰ñ“]‚ğl—¶
+	// ï¿½ï¿½ï¿½ï¿½:ï¿½ï¿½ï¿½Wï¿½Æ“ï¿½ï¿½ï¿½ï¿½æ‚¤ï¿½É‰ï¿½]ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½vï¿½Zï¿½ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ì‰ï¿½]ï¿½ï¿½lï¿½ï¿½
 	Rotation.Yaw = playerRotation.Yaw + RotatorYawOffset;
 
 	Transform.SetRotation(Rotation.Quaternion());
