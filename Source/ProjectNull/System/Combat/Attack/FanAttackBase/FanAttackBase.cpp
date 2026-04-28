@@ -43,7 +43,7 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 	// 攻撃範囲をデバッグラインで可視化
 	{
 		// プレイヤーの座標と前方ベクトルを取得
-		const FVector playerLocation = OwnerActor->GetActorLocation();
+		const FVector location = RootComponent->GetComponentLocation();
 		const FVector forwardVector = RootComponent->GetForwardVector();
 
 		// 攻撃方向ベクトル
@@ -53,7 +53,7 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 		{
 			UDebugDrawLibrary::DrawDebugFan(
 				GetWorld(),
-				playerLocation,
+				location,
 				attackDir,
 				Radius,
 				ConeAngle,
@@ -115,7 +115,7 @@ void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
 	if (!EnemyManager) { return; }
 
 	// プレイヤーの座標を取得
-	const FVector playerLocation = OwnerActor->GetActorLocation();
+	const FVector location = OwnerActor->GetActorLocation();
 
 	// 敵リストをループして、攻撃範囲内の敵にダメージを与える
 	for (auto& enemy : EnemyManager->GetEnemyList())
@@ -126,7 +126,7 @@ void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
 		if (IsTargetInRange(enemy))
 		{
 			// 第二引数※要改善(ノックバックの強さなどは基底に置くかゲットできるようにしたい)
-			enemy->SetKnockBackData(playerLocation, 2.0f, 1.0f);
+			enemy->SetKnockBackData(location, 2.0f, 1.0f);
 
 			// ダメージを与える
 			enemy->SetTakeDamaged();

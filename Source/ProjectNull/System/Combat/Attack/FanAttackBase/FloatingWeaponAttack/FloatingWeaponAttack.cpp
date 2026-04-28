@@ -1,4 +1,4 @@
-
+﻿
 #include "FloatingWeaponAttack.h"
 
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
@@ -14,14 +14,13 @@ void UFloatingWeaponAttack::Initialize(AActor* Owner)
 {
 	UFanAttackBase::Initialize(Owner);
 
-	if (FloatingWeaponEffect)
-	{
-		FloatingWeaponEffect->SetOwnerAttack(this);
-		FloatingWeaponEffect->SetOwnerActor(Owner);
-		FloatingWeaponEffect->Initialize();
-		FloatingWeaponEffect->Start(Owner->GetRootComponent());
-	}
-
+	if (!FloatingWeaponEffect) { return; }
+	
+	FloatingWeaponEffect->SetOwnerAttack(this);
+	FloatingWeaponEffect->SetOwnerActor(Owner);
+	FloatingWeaponEffect->Initialize();
+	FloatingWeaponEffect->Start(Owner->GetRootComponent());
+	
 }
 
 void UFloatingWeaponAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)

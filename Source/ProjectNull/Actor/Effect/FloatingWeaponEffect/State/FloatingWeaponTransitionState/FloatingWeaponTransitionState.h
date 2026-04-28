@@ -6,7 +6,7 @@
 #include "FloatingWeaponTransitionState.generated.h"
 
 /// <summary>
-/// •‚—V•Ší‚Ì‘JˆÚó‘ÔƒNƒ‰ƒX
+/// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½Ì‘Jï¿½Úï¿½ÔƒNï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponTransitionState final : public UFloatingWeaponStateBase
@@ -19,31 +19,17 @@ public:
 	void Update(float DeltaTime)					override;
 private:
 
-	/// <summary>
-	/// ó‘Ô‘JˆÚ‚ÌTransformƒIƒtƒZƒbƒg‚Ì•âŠÔˆ—
-	/// </summary>
-	/// <param name="DeltaTime">ƒfƒ‹ƒ^ƒ^ƒCƒ€</param>
+	
 	void UpdateTransformOffsetLerp(float DeltaTime);
 
-	/// <summary>
-	/// Stand‚Ö‚Ì‘JˆÚ‚ğ‚İ‚é
-	/// </summary>
 	void TryChangeToStandState();
 
-	/// <summary>
-	/// UŒ‚ó‘Ô‚É‘JˆÚ‚ğ‚İ‚éƒƒ\ƒbƒh
-	/// </summary>
 	void TryChangeToAttackState();
 
-	// ‘JˆÚæ•‚—V•Šíó‘Ô
 	EFloatingWeaponState NextState;
 
-	// Œ»İ‚Ìó‘ÔŠJnÀ•WƒIƒtƒZƒbƒg
-	FVector StartLocationOffset;
+	
 
-	// Œ»İ‚Ìó‘ÔŠJn‰ñ“]ƒIƒtƒZƒbƒg
-	FQuat StartRotationOffset;
-
-	// ‘JˆÚæ‚Ì–Úw‚·‚×‚«Transformî•ñ
+	FTransform StartTransform;
 	FTransform TargetTransform;
 };

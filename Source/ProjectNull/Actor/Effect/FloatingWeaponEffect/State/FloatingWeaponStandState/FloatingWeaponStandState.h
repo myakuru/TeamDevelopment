@@ -16,12 +16,12 @@ class PROJECTNULL_API UFloatingWeaponStandState final : public UFloatingWeaponSt
 public:
 	UFloatingWeaponStandState();
 public:
+	void Initialize() override;
 	void Start()					override;
 	void Update(float DeltaTime)	override;
 
-	// �Q�b�^�[
-	inline FTransform GetStartTransformOffset() const { return StartTransformOffset; }
-
+	FTransform GetStartTransformOffset();
+	
 private:
 	// �ҋ@��Ԃ̊J�nTranform
 	UPROPERTY(EditAnywhere)

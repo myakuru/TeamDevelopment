@@ -1,4 +1,4 @@
-
+﻿
 #include "FloatingWeaponStandState.h"
 
 #include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
@@ -6,6 +6,12 @@
 
 UFloatingWeaponStandState::UFloatingWeaponStandState()
 {
+}
+
+void UFloatingWeaponStandState::Initialize()
+{
+	StartTransformOffset.SetRotation(RelativeRotation.Quaternion());
+
 }
 
 void UFloatingWeaponStandState::Start()
@@ -26,12 +32,16 @@ void UFloatingWeaponStandState::Update(float DeltaTime)
 		Owner->ChangeState(EFloatingWeaponState::Transition, EFloatingWeaponState::Attack);
 		return;
 	}
-
-	
-	LocationOffset = Owner->GetStandStartTransformOffset().GetLocation();
-
-	Owner->SetRotatorYawOffset(0);
+	StartTransformOffset.SetRotation(RelativeRotation.Quaternion());
+	RelativeTransform = StartTransformOffset;
 
 	UFloatingWeaponStateBase::Update(DeltaTime);
+}
+
+FTransform UFloatingWeaponStandState::GetStartTransformOffset()
+{
+	FTransform result = StartTransformOffset;
+	result.SetRotation(RelativeRotation.Quaternion());
+	return result;
 }
 

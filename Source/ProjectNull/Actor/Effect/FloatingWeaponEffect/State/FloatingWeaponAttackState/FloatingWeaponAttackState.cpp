@@ -1,4 +1,4 @@
-
+ï»¿
 #include "FloatingWeaponAttackState.h"
 
 #include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
@@ -21,31 +21,26 @@ void UFloatingWeaponAttackState::Update(float DeltaTime)
 		return;
 	}
 
-	FCalcResultOffset resultOffset = CalcAttackStateTransformOffset(attack,attack->CurrentAngle);
+	const float currentAngle = attack->CurrentAngle;
 
-	// ‰ñ“]ƒIƒtƒZƒbƒgl—¶‚µ‚ÄŒvŽZ
-	Owner->SetRotatorYawOffset(resultOffset.YawOffset);
-
-	LocationOffset = resultOffset.Transform.GetLocation();
-
+	RelativeTransform = CalcAttackStateTransformOffset(attack, currentAngle);
+	
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
-FCalcResultOffset UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
+FTransform UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
 {
-	FCalcResultOffset resultOffset;
+	FTransform resultOffset;
 
 	if (!Owner || !OwnerActor || !OwnerAttack) { return resultOffset; }
 
-	// ƒvƒŒƒCƒ„[‚ªŒü‚¢‚Ä‚é•ûŒü
-	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
+	// æ”»æ’ƒæ–¹å‘ã‹ã‚‰ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆä½ç½®
+	const FVector location = OwnerAttack->CalcAttackDir(FVector::ForwardVector, RotatorOffsetAngle) * RadiusOffset;
 
-	// UŒ‚•ûŒü‚©‚ç‚ÌƒIƒtƒZƒbƒgˆÊ’u
-	const FVector offsetLocation = OwnerAttack->CalcAttackDir(FVector::ForwardVector, RotatorOffsetAngle) * RadiusOffset;
+	RelativeRotation.Yaw = RotatorOffsetAngle;
 
-	resultOffset.Transform.SetLocation(offsetLocation);
-	resultOffset.Transform.SetRotation(Rotation.Quaternion());
-	resultOffset.YawOffset = RotatorOffsetAngle;
+	resultOffset.SetLocation(location);
+	resultOffset.SetRotation(RelativeRotation.Quaternion());
 
 	return resultOffset;
 }
