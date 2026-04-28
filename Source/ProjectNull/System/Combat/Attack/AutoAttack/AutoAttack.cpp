@@ -84,5 +84,9 @@ void UAutoAttack::StartAutoAttack()
 
 void UAutoAttack::StartAutoRingAttack()
 {
-	
+	if (AutoAttackParamsMap.Contains(EAutoAttackType::Ring)
+		&& AutoAttackParamsMap[EAutoAttackType::Ring])
+	{
+		AutoAttackParamsMap[EAutoAttackType::Ring]->Start();
+	}
 }
