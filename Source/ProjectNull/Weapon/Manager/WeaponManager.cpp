@@ -7,7 +7,9 @@
 void UWeaponManager::Initialize(UDataTable* InDataTable)
 {
     WeaponDataTable = InDataTable;
-	m_EquippedWeaponIDs.SetNum(3);
+	m_EquippedWeaponIDs.Add(-1);
+	m_EquippedWeaponIDs.Add(-1);
+	m_EquippedWeaponIDs.Add(-1);
 }
 
 void UWeaponManager::SaveToData(UMySaveGame* a_SaveGame)
@@ -55,8 +57,8 @@ bool UWeaponManager::GetWeaponMaster(FName WeaponId, FWeaponData& OutData) const
     if (!WeaponDataTable)return false;
     FWeaponData* FoundData = WeaponDataTable->FindRow<FWeaponData>(WeaponId, TEXT(""));
 
-    //if (!FoundData)return false;
-    //OutData = *FoundData;
+    if (!FoundData)return false;
+    OutData = *FoundData;
     return true;
 }
 
