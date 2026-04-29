@@ -23,6 +23,8 @@ void UWeaponManager::SaveToData(UMySaveGame* a_SaveGame)
         a_SaveGame->m_WeaponData.Weapons.Add(Weapon);
     }
 
+	a_SaveGame->m_WeaponData.EquippedWeaponIDs = m_EquippedWeaponIDs;
+
 }
 
 void UWeaponManager::LoadFromSaveData(UMySaveGame* a_SaveGame)
