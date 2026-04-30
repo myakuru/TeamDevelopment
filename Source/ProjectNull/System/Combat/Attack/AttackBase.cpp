@@ -29,12 +29,10 @@ void UAttackBase::AttackJudge(AActor* Player, UEnemyManagerSubsystem* EnemyManag
 {
 	if (Player)
 	{
-		// �v���C���[�ɑ΂���U�����菈��
 		AttackJudgePlayer(Player);
 	}
 	else if (EnemyManager)
 	{
-		// �G���X�g�ɑ΂���U�����菈��
 		AttackJudgeEnemys(EnemyManager);
 	}
 }
