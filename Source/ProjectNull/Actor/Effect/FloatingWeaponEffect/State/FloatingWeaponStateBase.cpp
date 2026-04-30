@@ -12,14 +12,19 @@ UFloatingWeaponStateBase::UFloatingWeaponStateBase():
 void UFloatingWeaponStateBase::Update(float DeltaTime)
 {
 	if (!Owner) { return; }
-	Owner->SetRotation(Rotation);
-	Owner->SetLocationOffset(LocationOffset);
+	Owner->SetRelativeTransform(RelativeTransform);
 }
 
 float UFloatingWeaponStateBase::GetTransitionStateTime() const
 {
 	if (!Owner || !Owner->GetOwnerAttack()) { return 0.0f; }
-	return Owner->GetOwnerAttack()->TransitionStateTime();
+	return Owner->GetOwnerAttack()->TotalTransitionStateTime() * 0.5f;
+}
+
+float UFloatingWeaponStateBase::GetStandStateTime() const
+{
+	if (!Owner || !Owner->GetOwnerAttack()) { return 0.0f; }
+	return Owner->GetOwnerAttack()->StandStateTime();
 }
 
 void UFloatingWeaponStateBase::UpdateTransitionTime(float DeltaTime)

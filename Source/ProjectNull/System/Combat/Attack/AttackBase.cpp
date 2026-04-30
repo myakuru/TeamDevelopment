@@ -7,26 +7,32 @@
 UAttackBase::UAttackBase():
 	OwnerActor(nullptr),
 	bCanExecute(true),
-	bIsActive(false),
-	bIsDrawDebugLine(false)
+	bIsActive(false)
 {
 }
 
 void UAttackBase::Initialize(AActor* Owner)
 {
 	OwnerActor = Owner;
+
+	RootComponent = NewObject<USceneComponent>(Owner);
+
+	if (!RootComponent) { return; }
+
+	RootComponent->RegisterComponent();
+	RootComponent->AttachToComponent(
+		Owner->GetRootComponent(),
+		FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 void UAttackBase::AttackJudge(AActor* Player, UEnemyManagerSubsystem* EnemyManager)
 {
 	if (Player)
 	{
-		// �v���C���[�ɑ΂���U�����菈��
 		AttackJudgePlayer(Player);
 	}
 	else if (EnemyManager)
 	{
-		// �G���X�g�ɑ΂���U�����菈��
 		AttackJudgeEnemys(EnemyManager);
 	}
 }

@@ -5,28 +5,7 @@
 #include "../FloatingWeaponStateBase.h"
 #include "FloatingWeaponAttackState.generated.h"
 
-/** ƒIƒtƒZƒbƒgŒvZŒ‹‰Ê•Ô‚è’l—p\‘¢‘Ì */
-USTRUCT(BlueprintType)
-struct FCalcResultOffset
-{
-	GENERATED_BODY()
-
-public:
-
-	FCalcResultOffset() :
-		Transform(FTransform()),
-		YawOffset(0.0f)
-	{
-	}
-
-	/** TransformƒIƒtƒZƒbƒg */
-	FTransform Transform;
-
-	/** YawƒIƒtƒZƒbƒg */
-	float YawOffset;
-};
-
-// •‚—V•ŠíUŒ‚
+// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½
 class UFloatingWeaponAttack;
 
 /// <summary>
@@ -43,11 +22,5 @@ public:
 
 	void Update(float DeltaTime)override;
 
-	/// <summary>
-	/// UŒ‚ó‘Ô‚ÌTransformƒIƒtƒZƒbƒg‚ÌŒvZ
-	/// </summary>
-	/// <param name="OwnerAttack"></param>
-	/// <param name="RotatorOffsetAngle"></param>
-	/// <returns></returns>
-	FCalcResultOffset CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle);
+	FTransform CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle);
 };

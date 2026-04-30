@@ -16,9 +16,7 @@ UFloatingWeaponEffect::UFloatingWeaponEffect():
 	OwnerAttack(nullptr),
 	EffectSystem(nullptr),
 	EffectComponent(nullptr),
-	Transform(FTransform()),
-	RadiusOffset(200.0f),
-	Rotation(FRotator())
+	RelativeTransform(FTransform())
 {
 	
 }
@@ -30,6 +28,7 @@ void UFloatingWeaponEffect::Initialize()
 		if (!state) { continue; }
 		state->SetOwner(this);
 		state->SetOwnerActor(OwnerActor);
+		state->Initialize();
 	}
 	ChangeState(EFloatingWeaponState::Transition);
 }
@@ -38,7 +37,6 @@ void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 {
 	if (!CanSpawn()) { return; }
 
-	// �G�t�F�N�g�̍Đ��J�n
 	EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		EffectSystem,
 		RootComponent,
@@ -94,7 +92,7 @@ FTransform UFloatingWeaponEffect::GetAttackStartTransformOffset()
 	FTransform resultTransform;
 	if (!attakState) { return resultTransform; }
 
-	resultTransform = attakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle).Transform;
+	resultTransform = attakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle);
 	return resultTransform;
 }
 
@@ -102,37 +100,15 @@ FTransform UFloatingWeaponEffect::GetStandStartTransformOffset()
 {
 	if(!States.Contains(EFloatingWeaponState::Stand)
 		|| !States[EFloatingWeaponState::Stand]) { return FTransform(); }
-	const auto* standState = Cast<UFloatingWeaponStandState>(States[EFloatingWeaponState::Stand]);
+	auto* standState = Cast<UFloatingWeaponStandState>(States[EFloatingWeaponState::Stand]);
 	if (!standState) { return FTransform(); }
 	return standState->GetStartTransformOffset();
 }
 
 void UFloatingWeaponEffect::UpdateTransform()
 {
-	CalcTransformOffset();
-
 	if (!EffectComponent) { return; }
-	EffectComponent->SetWorldTransform(Transform);
-}
-
-void UFloatingWeaponEffect::CalcTransformOffset()
-{
-	if (!OwnerActor) { return; }
-
-	// �v���C���[�̍��W
-	const FVector playerLocation	= OwnerActor->GetActorLocation();
-	// �v���C���[�̉�]
-	FRotator playerRotation			= OwnerActor->GetActorRotation();
-
-	// ���[���h�I�t�Z�b�g���W
-	const FVector worldOffsetLocation	= playerRotation.RotateVector(LocationOffset);
-	const FVector resultLocation		= playerLocation + worldOffsetLocation;
-
-	// ����:���W�Ɠ����悤�ɉ�]�I�t�Z�b�g�v�Z��v���C���[�̉�]��l��
-	Rotation.Yaw = playerRotation.Yaw + RotatorYawOffset;
-
-	Transform.SetRotation(Rotation.Quaternion());
-	Transform.SetLocation(resultLocation);	
+	EffectComponent->SetRelativeTransform(RelativeTransform);
 }
 
 void UFloatingWeaponEffect::Deactivate()

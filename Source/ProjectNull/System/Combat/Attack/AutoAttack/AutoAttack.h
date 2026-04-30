@@ -38,10 +38,10 @@ public:
 public:
 
 	void Initialize(AActor* Owner)	override;
-	void Execute()					override;
 	void Update(float DeltaTime,
 			AActor* Player = nullptr,
 			UEnemyManagerSubsystem* EnemyManager = nullptr)	override;
+	void Execute()					override { return; }
 
 	// ゲッター
 	inline float GetAutoAttackInterval() const	{ return AutoAttackInterval; }
