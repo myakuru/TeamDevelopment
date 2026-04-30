@@ -2,8 +2,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NiagaraFunctionLibrary.h"
-#include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
 #include "../CombatCharacterBase.h"
 #include "EnemyBase.generated.h"
@@ -11,15 +9,6 @@
 // 前方宣言
 class UCapsuleComponent;
 class UPrimitiveComponent;
-class UEnemyDataAsset;
-
-template<typename T>
-class TStateMachine;
-
-struct FStateMachineDeleter
-{
-	void operator()(TStateMachine<AEnemyBase>* Ptr) const;
-};
 
 /// <summary>
 /// 敵ステータスのスケーリング情報
@@ -76,7 +65,7 @@ public:
 
 	// 最終的なヒットポイント
 	UPROPERTY(EditAnywhere)
-	float	FinalHP = 100;
+	int32	FinalHP = 100;
 
 	// スケーリング計算用ヒットポイント
 	UPROPERTY(EditAnywhere)
@@ -102,11 +91,11 @@ public:
 
 	// 経験値
 	UPROPERTY(EditAnywhere)
-	float EXP = 0;
+	int EXP = 0;
 
 	// ギアエネルギー
 	UPROPERTY(EditAnywhere)
-	float GearEnergy = 0;
+	int GearEnergy = 0;
 
 	// プレイヤーとの距離
 	float DistancePlayer = 0.0f;
@@ -119,20 +108,6 @@ public:
 	bool CanAttack = false;
 };
 
-/**
- * @brief パーティクル用構造体
- */
-USTRUCT(BlueprintType)
-struct FEnemyParticle
-{
-	GENERATED_BODY()
-
-public:
-	// 移動方向
-	UPROPERTY(EditAnywhere, Category = "VFX")
-	TObjectPtr<UNiagaraSystem> DeathEffect;
-};
-
 // 敵管理クラス
 class UEnemyManagerSubsystem;
 
@@ -141,11 +116,6 @@ class UGameProgressSubsystem;
 
 // 敵攻撃コンポーネント
 class UEnemyAttackComponent;
-
-/** アイテム管理クラス*/
-//class UItemManagerSubsystem;
-/** 落とすアイテム*/
-class AExperiencePickup;
 
 /// <summary>
 /// 敵の中間基底クラス
@@ -159,15 +129,7 @@ class PROJECTNULL_API AEnemyBase : public ACombatCharacterBase
 	
 public:
 	AEnemyBase();
-	~AEnemyBase() override;
-
 public:
-
-	/** Poolから取り出されるときに呼ぶ*/
-	virtual void Activate(const FVector& LocalPos, UEnemyDataAsset*	InData);
-
-	/** Poolに返却するときに呼ぶ*/
-	virtual void Deactivate();
 
 	/// <summary>
 	/// 敵（自身）が吹き飛ばされる処理
@@ -178,9 +140,6 @@ public:
 	/// 敵（自身) がダメージを受ける処理
 	/// </summary>
 	virtual void SetTakeDamaged(int32 AttackPower = 1);
-
-	/** StateMachineへのアクセス、Stateの追加・変更に使う*/
-	TStateMachine<AEnemyBase>& GetStateMachine();
 
 protected:
 	virtual void BeginPlay() override;
@@ -240,31 +199,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "EnemyAttack")
 	UEnemyAttackComponent* EnemyAttackComponent;
 
-	///** アイテム管理クラスのポインタ*/
-	//UPROPERTY()
-	//TWeakObjectPtr<UItemManagerSubsystem> ItemManagerSubsystem;
-
-	/** アイテムの設定*/
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	TSubclassOf<AExperiencePickup> ExperiencePickupClass;
-
 	/// <summary>
 	/// 敵基本ステータス
 	/// </summary>
 	UPROPERTY(EditAnywhere)
 	FEnemyStatus EnemyStatus;
 
-	/** 死んだ時のエフェクト（パーティクル）*/
-	UPROPERTY(EditAnywhere)
-	FEnemyParticle EnemyParticle;
-
 	FVector LanchVelocity;
-
-	/** エネミー固有のデータ*/
-	const UEnemyDataAsset* GetEnemyData() const { return EnemyDataAsset; }
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UEnemyDataAsset> EnemyDataAsset;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -314,6 +255,4 @@ private:
 	/// <param name="DeltaTime">デルタタイム</param>
 	/// <returns>補間した回転結果</returns>
 	FRotator CalculateRotationToMoveDirection(const FRotator& CurrentRotation, const FRotator& TargetRotation,float RotationInterpSpeed, float DeltaTime);
-
-	TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter> StateMachine;
 };

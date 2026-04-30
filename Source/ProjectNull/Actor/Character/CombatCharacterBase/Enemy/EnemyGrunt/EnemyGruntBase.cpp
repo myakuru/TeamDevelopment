@@ -32,15 +32,6 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	//UE_LOG(LogTemp, Warning, TEXT("EnemyGruntUpdate"));
-
-	//// 全部まとめて出す場合
-	//UE_LOG(LogTemp, Warning, TEXT("[Debug] Label=%s, Class=%s, Name=%s, Loc=%s"),
-	//	*GetActorLabel(),
-	//	*GetClass()->GetName(),
-	//	*GetName(),
-	//	*GetActorLocation().ToString());
-
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
 

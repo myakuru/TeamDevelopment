@@ -2,7 +2,7 @@
 #include "SurvivalGameMode.h"
 
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
-#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
+
 // HpWidgetクラスのインクルード
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 
@@ -28,14 +28,5 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 	if (enemyManager) {
 		UE_LOG(LogTemp, Warning, TEXT("num %d"), enemyManager->GetEnemyNum());
 		enemyManager->UpdateEnemies(DeltaTime);
-	}
-
-	/** アイテム管理クラスの情報取得*/
-	UItemManagerSubsystem* itemManager = GetWorld()->GetSubsystem<UItemManagerSubsystem>();
-
-	/** 更新*/
-	if (itemManager)
-	{
-		itemManager->UpdateItemManagers(DeltaTime);
 	}
 }
