@@ -18,12 +18,11 @@ class PROJECTNULL_API UPlayerExpBarWidget : public UUserWidget
 
 protected:
 
-	// �摜�E�B�W�F�b�g�ւ̃|�C���^
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> ExpImage;
 
 public:
-
+	/** 経験値を設定する関数 */
 	void SetExp(int32 CurrentExp, int32 NextLevelExp);
 	
 };

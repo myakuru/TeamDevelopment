@@ -9,7 +9,7 @@
 class UImage;
 
 /**
- * 
+ * プレイヤーの向きを表示するためのウィジェットクラス
  */
 UCLASS()
 class PROJECTNULL_API UPlayerDirection_MiniMap : public UUserWidget
@@ -18,19 +18,17 @@ class PROJECTNULL_API UPlayerDirection_MiniMap : public UUserWidget
 
 protected:
 
-	// �~�j�}�b�v�̃v���C���[���������Image
+	/** プレイヤーの向きを表示するための画像 */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UImage> PlayerDirection;
 
-	// �������֐�
 	virtual void NativeConstruct() override;
 
-	// Tick������L���ɂ��邽�߂̃I�[�o�[���C�h
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
 
-	// �v���C���[�̕�����X�V����֐�
+	/** プレイヤーのUIの進行方向を変更 */
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlayerDirection(float PlayerYaw);
 	
