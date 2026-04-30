@@ -27,6 +27,10 @@ private:
 	// 位相（時間）
 	float Phase;
 
+	// 開始位相（時間）
+	UPROPERTY(EditAnywhere)
+	float StartPhase;
+
 	// 周波数（速さ）
 	UPROPERTY(EditAnywhere)
 	float Frequency;

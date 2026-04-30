@@ -48,6 +48,8 @@ protected:
 
 	float GetTransitionStateTime() const;
 
+	float GetStandStateTime() const;
+
 
 	void UpdateTransitionTime(float DeltaTime);
 

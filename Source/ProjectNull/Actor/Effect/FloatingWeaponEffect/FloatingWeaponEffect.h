@@ -126,4 +126,5 @@ private:
 	// 現在の浮遊武器状態
 	UPROPERTY()
 	UFloatingWeaponStateBase* CurrentState;
+
 };

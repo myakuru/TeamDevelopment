@@ -6,20 +6,22 @@
 
 UFloatingWeaponStandState::UFloatingWeaponStandState():
 	Phase(0.0f),
-	Frequency(0.0f),
-	Amplitude(0.0f)
+	StartPhase(0.0f),
+	Frequency(3.0f),
+	Amplitude(1.0f)
 {
 }
 
 void UFloatingWeaponStandState::Initialize()
 {
 	StartTransformOffset.SetRotation(RelativeRotation.Quaternion());
-
+	
 }
 
 void UFloatingWeaponStandState::Start()
 {
-	TransitionTime = GetTransitionStateTime();
+	TransitionTime = GetStandStateTime();
+	Phase = StartPhase;
 }
 
 void UFloatingWeaponStandState::Update(float DeltaTime)
@@ -30,6 +32,7 @@ void UFloatingWeaponStandState::Update(float DeltaTime)
 
 	UpdateTransitionTime(DeltaTime);
 
+	RelativeTransform = StartTransformOffset;
 	Phase += Frequency * DeltaTime;
 	const float resultOffsetZ = FMath::Sin(Phase) * Amplitude;
 
@@ -46,8 +49,6 @@ void UFloatingWeaponStandState::Update(float DeltaTime)
 		Owner->ChangeState(EFloatingWeaponState::Transition, EFloatingWeaponState::Attack);
 		return;
 	}
-	//RelativeTransform.SetRotation(RelativeRotation.Quaternion());
-	//RelativeTransform = StartTransformOffset;
 
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }

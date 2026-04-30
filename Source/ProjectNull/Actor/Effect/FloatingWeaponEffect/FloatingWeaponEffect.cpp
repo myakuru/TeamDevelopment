@@ -107,7 +107,6 @@ FTransform UFloatingWeaponEffect::GetStandStartTransformOffset()
 
 void UFloatingWeaponEffect::UpdateTransform()
 {
-
 	if (!EffectComponent) { return; }
 	EffectComponent->SetRelativeTransform(RelativeTransform);
 }

@@ -43,12 +43,22 @@ bool UFloatingWeaponAttack::IsAttackStateStep()
 	return ElapsedTime < Duration;
 }
 
-float UFloatingWeaponAttack::TransitionStateTime()
+float UFloatingWeaponAttack::TotalTransitionStateTime()
 {
 	float resultTime = 0.0f;
 	if (!AutoAttack) { return resultTime; }
 	const float interval = AutoAttack->GetAutoAttackInterval();
-	resultTime = (interval - Duration) / 3.0f;
+	const float TotalTransitionTimeRatio = 1.0f - StandTimeRatio;
+	resultTime = (interval - Duration) * TotalTransitionTimeRatio;
+	return resultTime;
+}
+
+float UFloatingWeaponAttack::StandStateTime()
+{
+	float resultTime = 0.0f;
+	if (!AutoAttack) { return resultTime; }
+	const float interval = AutoAttack->GetAutoAttackInterval();
+	resultTime = (interval - Duration) * StandTimeRatio;
 
 	return resultTime;
 }
