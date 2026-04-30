@@ -16,7 +16,7 @@ class PROJECTNULL_API UPlayerHpBarWidget : public UUserWidget
 protected:
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UImage> ExpImage;
+	TObjectPtr<UImage> HpImage;
 
 public:
 	/** プレイヤーのHPバーを更新する関数 */

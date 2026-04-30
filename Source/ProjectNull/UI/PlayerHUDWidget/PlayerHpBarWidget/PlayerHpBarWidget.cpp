@@ -5,12 +5,12 @@
 
 void UPlayerHpBarWidget::SetHp(int32 CurrentHp, int32 MaxHp)
 {
-	if (ExpImage)
+	if (HpImage)
 	{
 		float HpRatio = static_cast<float>(CurrentHp) / static_cast<float>(MaxHp);
 
-		ExpImage->SetRenderTransformPivot(FVector2D(0.0f, 0.5f));
+		HpImage->SetRenderTransformPivot(FVector2D(0.0f, 0.5f));
 
-		ExpImage->SetRenderScale(FVector2D(HpRatio, 1.0f));
+		HpImage->SetRenderScale(FVector2D(HpRatio, 1.0f));
 	}
 }

@@ -5,6 +5,9 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
+
 void UGearChangeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -14,20 +17,6 @@ void UGearChangeWidget::NativeConstruct()
 	{
 		GearChangeMaterial = GearChangeImage->GetDynamicMaterial();
 	}
-
-	SetIsFocusable(false);
-}
-
-void UGearChangeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-
-	static float ChargeAmount = 0.0f;
-
-	ChargeAmount += InDeltaTime * 5.0f;
-
-	SetGearChangeEnergy(ChargeAmount);
-
 }
 
 void UGearChangeWidget::SetGearChangeEnergy(float ChargeAmount)
@@ -36,11 +25,9 @@ void UGearChangeWidget::SetGearChangeEnergy(float ChargeAmount)
 	{
 		GearChangeMaterial->SetScalarParameterValue(TEXT("ChargeAmount"), ChargeAmount);
 	}
+
 	if (GearChangeText)
 	{
-		// 表示する値を0から1000の範囲に制限
-		ChargeAmount = std::clamp(ChargeAmount, MinChargeAmount, MaxChargeAmount);
-
 		// ~%と表示される
 		FString ChargeText = FString::Printf(TEXT("%.0f"), ChargeAmount);
 

@@ -8,6 +8,7 @@
 
 class UImage;
 class UTextBlock;
+class USuperGameInstance;
 
 /**
  * ギアチェンジのUIを表示するウィジェットクラス
@@ -33,19 +34,16 @@ protected:
 
 	virtual void NativeConstruct() override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
 public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetGearChangeEnergy(float Charge);
 
 private:
-
 	/** ギアチェンジの最大チャージ量 */
 	static constexpr float MaxChargeAmount = 1000.0f;
 
 	/** ギアチェンジの最小のチャージ量 */
 	static constexpr float MinChargeAmount = 0.0f;
-	
+
 };
