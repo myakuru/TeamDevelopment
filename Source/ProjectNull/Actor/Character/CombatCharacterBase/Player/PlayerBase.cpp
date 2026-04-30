@@ -8,6 +8,8 @@
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
@@ -41,7 +43,6 @@ APlayerBase::APlayerBase()
 	CameraComponent->bUsePawnControlRotation = false;
 
 	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
-
 }
 
 void APlayerBase::BeginPlay()
@@ -64,6 +65,7 @@ void APlayerBase::Tick(float DeltaTime)
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!enemyManager) { return; }
 
+	
 	ACombatCharacterBase::Tick(DeltaTime);
 
 	if (AutoAttack) {
@@ -86,6 +88,20 @@ void APlayerBase::ApplyDamage(float Damage)
 	ACombatCharacterBase::ApplyDamage(Damage);
 
 	UpdateHUDHP();
+}
+
+void APlayerBase::AddGearEnergy(float Amount)
+{
+	if (!Instance || !Instance->GetCharacterParameterData()) { return; }
+	
+	Instance->GetCharacterParameterData()->AddGearEnergy(Amount);
+}
+
+void APlayerBase::AddExperience(float Amount)
+{
+	if (!Instance || !Instance->GetCharacterParameterData()) { return; }
+
+	Instance->GetCharacterParameterData()->AddExperience(Amount);
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)
