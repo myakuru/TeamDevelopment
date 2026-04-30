@@ -5,7 +5,7 @@
 #include "FanAttackBase.generated.h"
 
 /**
- * ���U���R���|�[�l���g�̊��N���X
+ * 扇状攻撃コンポーネントの基底クラス
  */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFanAttackBase : public UAttackBase
@@ -19,16 +19,16 @@ public:
 public:
 
 	/// <summary>
-	/// �J�n�̍ۂ̏�����
+	/// 開始の際の初期化
 	/// </summary>
 	void Start();
 	 
 	/// <summary>
-	/// �X�V����
+	/// 更新処理
 	/// </summary>
-	/// <param name="DeltaTime">�f���^�^�C��</param>
-	/// /// <returns>�X�V����</returns>
-	bool UpdateAttack(float DeltaTime);
+	/// <param name="DeltaTime">デルタタイム</param>
+	/// <returns>更新結果</returns>
+	virtual bool UpdateAttack(float DeltaTime);
 
 	/// <summary>
 	/// 
@@ -48,87 +48,89 @@ public:
 	void UpdatePrevActiveFlg();
 
 	/// <summary>
-	/// �U���͈͓�Ƀ^�[�Q�b�g�����邩�ǂ����̔���
+	/// 攻撃範囲内にターゲットがいるかどうかの判定
 	/// </summary>
-	/// <param name="Target			">�^�[�Q�b�g	</param>
-	/// <param name="OwnerLocation	">�U���҂̈ʒu	</param>
-	/// <returns>�^�[�Q�b�g���U���͈͓���ǂ���</returns>
-	virtual bool IsTargetInRange(AActor* Target, const FVector& OwnerLocation) override;
+	/// <param name="Target			">ターゲット	</param>
+	/// <returns>ターゲットが攻撃範囲内かどうか</returns>
+	virtual bool IsTargetInRange(AActor* Target) override;
 
 	/// <summary>
-	/// �U�������̌v�Z
+	/// 攻撃方向の計算
 	/// </summary>
-	/// <param name="forwardVector">�O������</param>
-	/// <returns>�v�Z����</returns>
+	/// <param name="forwardVector">前方方向</param>
+	/// <returns>計算結果</returns>
 	virtual FVector CalcAttackDir(const FVector& forwardVector) const override;
+	FVector CalcAttackDir(const FVector& forwardVector,float Angle) const;
 
 	/// <summary>
-	/// ���a�̓���擾
+	/// 半径の二乗を取得
 	/// </summary>
-	/// <returns>���a�̓��</returns>
+	/// <returns>半径の二乗</returns>
 	inline float GetRadiusSquared() const { return Radius * Radius; }
 
 	/// <summary>
-	/// ��p��cos�l
+	/// 扇角のcos値
 	/// </summary>
-	/// <returns>��p��cos�l</returns>
+	/// <returns>扇角のcos値</returns>
 	inline float GetConeCosine() const { return FMath::Cos(FMath::DegreesToRadians(ConeAngle)); }
 
 protected:
 
 	/// <summary>
-	/// �G���X�g�ɑ΂���U������
+	/// 敵リストに対する攻撃判定
 	/// </summary>
-	/// <param name="EnemyManager">�G�Ǘ��N���X�̃A�h���X</param>
+	/// <param name="EnemyManager">敵管理クラスのアドレス</param>
 	virtual void AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager) override;
 
 	/// <summary>
-	/// �v���C���[�ɑ΂���U������
+	/// プレイヤーに対する攻撃判定
 	/// </summary>
-	/// <param name="Player">�v���C���[�N���X�̃A�h���X</param>
+	/// <param name="Player">プレイヤークラスのアドレス</param>
 	virtual void AttackJudgePlayer(AActor* Player) override;
 
 public:
 
-	// �U���̎������ԁi�b�j
+	// 攻撃の持続時間（秒）
 	UPROPERTY(EditAnywhere)
 	float Duration;
 
-	// �o�ߎ���
+	// 経過時間
 	float ElapsedTime;
 
-	// ��]���邩�ǂ���
+	// 回転するかどうか
 	UPROPERTY(EditAnywhere)
 	bool bRotate;
 
-	// ��]���x�i�x/�b�j
+	// 回転速度（度/秒）
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
-	// �U�����a
+	// 攻撃半径
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
-	// ��̍L���i�p�x�j
+	// 扇の広さ（角度）
 	UPROPERTY(EditAnywhere)
 	float ConeAngle;
 
-	// �U������
+	// 攻撃中か
 	bool bIsActive;
 
-	// �S�t���[���ŃA�N�e�B�u��������
+	// 全フレームでアクティブだったか
 	bool bPrevActive;
 
-	// �J�n�̊p�x
+	// 開始の角度
 	UPROPERTY(EditAnywhere)
 	float StartAngle;
 
-	// ���݂̊p�x
+	// 現在の角度
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
 
-	// �m�b�N�o�b�N�̋���
+	// ノックバックの強さ
 	UPROPERTY(EditAnywhere)
 	float KnockbackPower;
 
+	UPROPERTY(EditAnywhere)
+	bool bIsDrawDebugLine;
 };

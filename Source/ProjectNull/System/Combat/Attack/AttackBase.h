@@ -10,6 +10,8 @@ class UEnemyManagerSubsystem;
 // �v���C���[���N���X
 class APlayerBase;
 
+class USceneComponent;
+
 /// <summary>
 /// �U���̊��N���X
 /// �v���C���[��G�̍U���R���|�[�l���g�N���X�Ŏg�p�����U���N���X�̊��N���X
@@ -59,7 +61,7 @@ public:
 	/// <param name="OwnerLocation	">�U���҂̈ʒu	</param>
 	/// <param name="AttackDir		">�U������	</param>
 	/// <returns>�^�[�Q�b�g���U���͈͓���ǂ���</returns>
-	virtual bool IsTargetInRange(AActor* Target, const FVector& OwnerLocation) { return false; }
+	virtual bool IsTargetInRange(AActor* Target) { return false; }
 
 	/// <summary>
 	/// ������̑O���x�N�g������U��������v�Z����
@@ -91,9 +93,13 @@ protected:
 	UPROPERTY()
 	AActor* OwnerActor;
 	
-	// �U������s�ł��邩�ǂ���
+	/** アタッチ用のルート（位置・回転管理） */
+	UPROPERTY()
+	USceneComponent* RootComponent;
+
 	bool bCanExecute;
 
-	// ���s�����ǂ���
 	bool bIsActive;
+
+	FTransform Transform;
 };

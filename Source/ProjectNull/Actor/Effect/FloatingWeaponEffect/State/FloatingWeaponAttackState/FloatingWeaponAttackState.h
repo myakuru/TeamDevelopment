@@ -5,6 +5,9 @@
 #include "../FloatingWeaponStateBase.h"
 #include "FloatingWeaponAttackState.generated.h"
 
+// ���V����U��
+class UFloatingWeaponAttack;
+
 /// <summary>
 // ���V����̍U����ԃN���X
 /// </summary>
@@ -16,7 +19,8 @@ class PROJECTNULL_API UFloatingWeaponAttackState final : public UFloatingWeaponS
 public:
 	UFloatingWeaponAttackState();
 public:
-	void Update(AActor* OwnerActor,float DeltaTime)override;
-private:
-	
+
+	void Update(float DeltaTime)override;
+
+	FTransform CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle);
 };

@@ -4,9 +4,9 @@
 #include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
-UPlayerAttackComponent::UPlayerAttackComponent()
-	:	OwnerPlayer(nullptr)
-	,	PlayerAttacks(TArray<UAttackBase*>())
+UPlayerAttackComponent::UPlayerAttackComponent():
+	OwnerPlayer(nullptr),
+	PlayerAttacks(TArray<UAttackBase*>())
 {
 	PrimaryComponentTick.bCanEverTick = true;
 

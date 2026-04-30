@@ -6,29 +6,33 @@
 #include "FloatingWeaponEffect.generated.h"
 
 
+/// <summary>
+/// 浮遊武器状態種類 
+/// </summary>
 UENUM(BlueprintType)
 enum class EFloatingWeaponState : uint8
 {
 	Stand,
 	Attack,
+	Transition,
 	Count UMETA(Hidden)
 };
 
-// Niagara�G�t�F�N�g�N���X
+// Niagaraエフェクトクラス
 class UNiagaraSystem;
 
-// Niagara�R���|�[�l���g�N���X
+// Niagaraコンポーネントクラス
 class UNiagaraComponent;
 
-// ���a���U���N���X
-class UFanAttackBase;
+// 扇状斬撃攻撃クラス
+class UFloatingWeaponAttack;
 
-// ���V����̏�Ԋ��N���X
+// 浮遊武器状態の中間基底クラス
 class UFloatingWeaponStateBase;
 
 
 /// <summary>
-/// ���V����G�t�F�N�g�N���X
+/// 浮遊武器エフェクトクラス
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponEffect : public UObject
@@ -38,86 +42,89 @@ class PROJECTNULL_API UFloatingWeaponEffect : public UObject
 public:
 	UFloatingWeaponEffect();
 public:
-
+	/// <summary>
+	/// 初期化
+	/// </summary>
 	void Initialize();
 
 	/// <summary>
-	/// �G�t�F�N�g�Đ��J�n
+	/// エフェクト再生開始
 	/// </summary>
 	void Start(USceneComponent* RootComponent);
 
 	/// <summary>
-	/// �X�V
+	/// 更新
 	/// </summary>
-	/// <param name="OwnerActor">������̃N���X</param>
-	void Update(AActor* OwnerActor,float DeltaTime);
+	/// <param name="OwnerActor">持ち主のクラス</param>
+	void Update(float DeltaTime);
 
 	/// <summary>
-	/// ��Ԃ̑J��
+	/// 状態の遷移
 	/// </summary>
-	/// <param name="State">�X�e�[�g���</param>
-	void ChangeState(EFloatingWeaponState State);
+	/// <param name="State">ステート種類</param>
+	void ChangeState(EFloatingWeaponState NextState);
+	void ChangeState(EFloatingWeaponState NextState,EFloatingWeaponState TheStateAfterTheNext);
+	
 
+	bool IsAttackStateStep() const;
 
-	// �Z�b�^�[
-	inline void SetOwnerAttack(UFanAttackBase* Owner) { OwnerAttack = Owner; }
-	inline void SetTransform(const FTransform& SetTransform) { Transform = SetTransform; }
+	FTransform GetAttackStartTransformOffset();
+	FTransform GetStandStartTransformOffset();
 
-	// �Q�b�^�[
-	inline UFanAttackBase* GetOwnerAttack() const { return OwnerAttack; }
+	// セッター
+	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner)		{ OwnerAttack = Owner; }
+	inline void SetOwnerActor(AActor* SetOwnerActor)				{ OwnerActor = SetOwnerActor; }
+	inline void SetRelativeTransform(const FTransform& a_RelativeTransform)	{ RelativeTransform = a_RelativeTransform; }
+	
+	// ゲッター
+	inline UFloatingWeaponAttack* GetOwnerAttack() const	{ return OwnerAttack; }
+	inline FTransform GetRelativeTransform() const			{ return RelativeTransform; }
 
 private:
 
 	/// <summary>
-	/// Transform�̍X�V
+	/// Transformの更新
 	/// </summary>
 	void UpdateTransform();
 
+
 	/// <summary>
-	/// �G�t�F�N�g�����ɂ���
+	/// エフェクト無効にする
 	/// </summary>
 	void Deactivate();
 
 	/// <summary>
-	/// �o���\���ǂ���
+	/// 出現可能かどうか
 	/// </summary>
-	/// <returns>�\�Ȃ�true �\����Ȃ��Ȃ�false</returns>
+	/// <returns>可能ならtrue 可能じゃないならfalse</returns>
 	inline bool CanSpawn() const { return EffectSystem && !EffectComponent; }
 
-
-
-	// ��Ƃ���U���N���X
+	// 基準とする攻撃クラス
 	UPROPERTY()
-	UFanAttackBase* OwnerAttack;
+	UFloatingWeaponAttack* OwnerAttack;
 
-	// Niagara�V�X�e��
+	// 持ち主のクラス
+	UPROPERTY()
+	AActor* OwnerActor;
+
+	// Niagaraシステム
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* EffectSystem;
 
-	// Niagara�R���|�[�l���g
+	// Niagaraコンポーネント
 	UPROPERTY()
 	UNiagaraComponent* EffectComponent;
 
-	// �G�t�F�N�g��Transform
-	UPROPERTY(EditAnywhere)
-	FTransform Transform;
+	// エフェクトのRelativeTransform
+	UPROPERTY()
+	FTransform RelativeTransform;
 
-	// �G�t�F�N�g�̔��a�I�t�Z�b�g
-	UPROPERTY(EditAnywhere)
-	float RadiusOffset;
-
-	// �G�t�F�N�g�̉�]�I�t�Z�b�g
-	UPROPERTY(EditAnywhere)
-	FRotator RotatorOffset;
-
-	// ���V����̏�Ԃ̔z��
+	// 浮遊武器の状態の配列
 	UPROPERTY(EditAnywhere, Instanced)
 	TMap<EFloatingWeaponState,UFloatingWeaponStateBase*> States;
 
-	// ���݂̕��V������
+	// 現在の浮遊武器状態
 	UPROPERTY()
 	UFloatingWeaponStateBase* CurrentState;
 
-	UPROPERTY(EditAnywhere)
-	FVector StandLocation;
 };

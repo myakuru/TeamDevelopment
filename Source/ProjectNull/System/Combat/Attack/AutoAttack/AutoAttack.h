@@ -9,7 +9,7 @@
 class UEnemyManagerSubsystem;
 
 // 円型の斬撃攻撃クラス
-class UFanAttackBase;
+class UFloatingWeaponAttack;
 
 // Niagaraエフェクトクラス
 class UFloatingWeaponEffect;
@@ -38,10 +38,14 @@ public:
 public:
 
 	void Initialize(AActor* Owner)	override;
-	void Execute()					override;
 	void Update(float DeltaTime,
 			AActor* Player = nullptr,
-				UEnemyManagerSubsystem* EnemyManager = nullptr)	override;
+			UEnemyManagerSubsystem* EnemyManager = nullptr)	override;
+	void Execute()					override { return; }
+
+	// ゲッター
+	inline float GetAutoAttackInterval() const	{ return AutoAttackInterval; }
+	inline float GetFrontToRingDelay() const	{ return FrontToRingDelay; }
 
 private:
 
@@ -65,14 +69,7 @@ private:
 
 	// 自動攻撃のパラメータマップ配列
 	UPROPERTY(EditAnywhere, Instanced)
-	TMap<EAutoAttackType, UFanAttackBase*> AutoAttackParamsMap;
-
-	// ================================================================
-	// 
-	// ================================================================
-
-	UPROPERTY(EditAnywhere, Instanced)
-	TMap<EAutoAttackType, UFloatingWeaponEffect*> FloatingWeaponMap;
+	TMap<EAutoAttackType, UFloatingWeaponAttack*> AutoAttackParamsMap;
 
 	// ================================================================
 	// タイマー関連

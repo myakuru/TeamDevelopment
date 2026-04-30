@@ -1,10 +1,8 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿#include "FanAttackBase.h"
 
-
-#include "FanAttackBase.h"
+#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
-#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 UFanAttackBase::UFanAttackBase()
@@ -18,7 +16,8 @@ UFanAttackBase::UFanAttackBase()
 	, bPrevActive(false)
 	, CurrentAngle(0.0f)
 	, KnockbackPower(2.0f)
-	, StartAngle(0.0f)
+	, StartAngle(0.0f),
+	bIsDrawDebugLine(false)
 {
 }
 
@@ -31,68 +30,69 @@ void UFanAttackBase::Start()
 
 bool UFanAttackBase::UpdateAttack(float DeltaTime)
 {
-	if (!bIsActive) { return false; }
+	if (!bIsActive || !RootComponent || !RootComponent->GetAttachParent()) { return false; }
 
 	ElapsedTime += DeltaTime;
 
-	// ��]����
-	if (bRotate)
-	{
+	// 回転処理
+	if (bRotate) {
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
+	//UE_LOG(LogTemp, Warning, TEXT("StartAngle %.2f"), StartAngle);
 
-	// �U���͈͂�f�o�b�O���C���ŉ���
+	// 攻撃範囲をデバッグラインで可視化
 	{
-		// �v���C���[�̍��W�ƑO���x�N�g����擾
-		const FVector playerLocation = OwnerActor->GetActorLocation();
-		const FVector forwardVector = OwnerActor->GetActorForwardVector();
+		// プレイヤーの座標と前方ベクトルを取得
+		const FVector location = RootComponent->GetComponentLocation();
+		const FVector forwardVector = RootComponent->GetForwardVector();
 
-		// �U�������x�N�g��
+		// 攻撃方向ベクトル
 		const FVector attackDir = CalcAttackDir(forwardVector);
 
-		UDebugDrawLibrary::DrawDebugFan(
-			GetWorld(),
-			playerLocation,
-			attackDir,
-			Radius,
-			ConeAngle,
-			10
-		);
+		if (bIsDrawDebugLine)
+		{
+			UDebugDrawLibrary::DrawDebugFan(
+				GetWorld(),
+				location,
+				attackDir,
+				Radius,
+				ConeAngle,
+				10
+			);
+		}
 	}
 
-	// �I������
-	if (ElapsedTime >= Duration)
-	{
+	// 終了判定
+	if (ElapsedTime >= Duration) {
 		bIsActive = false;
 	}
 
 	return true;
 }
 
-bool UFanAttackBase::IsTargetInRange(AActor* Target, const FVector& OwnerLocation)
+bool UFanAttackBase::IsTargetInRange(AActor* Target)
 {
-	if (!OwnerActor) { return false; }
-	if (!Target) { return false; }
+	if (!OwnerActor || !Target || !RootComponent || !RootComponent->GetAttachParent())	{ return false; }
+	const auto* parent = RootComponent->GetAttachParent();
 
-	// �G�ւ̃x�N�g��
-	FVector ToEnemy = Target->GetActorLocation() - OwnerLocation;
+	// 敵へのベクトル
+	FVector toEnemy = Target->GetActorLocation() - parent->GetComponentLocation();
 
-	// �U�������x�N�g��
-	const FVector AttackDir = CalcAttackDir(OwnerActor->GetActorForwardVector());
+	// 攻撃方向ベクトル
+	const FVector attackDir = CalcAttackDir(parent->GetForwardVector());
 
-	// �����`�F�b�N
-	if (ToEnemy.SizeSquared() > GetRadiusSquared())
-	{
+	// 距離チェック
+	if (toEnemy.SizeSquared() > GetRadiusSquared()) {
 		return false;
 	}
 
-	// �x�N�g�����K��
-	ToEnemy.Normalize();
+	// ベクトル正規化
+	toEnemy.Normalize();
 
-	// �p�x�`�F�b�N
-	float Dot = FVector::DotProduct(AttackDir, ToEnemy);
+	// 角度チェック
+	float dot = FVector::DotProduct(attackDir, toEnemy);
 
-	return Dot > GetConeCosine();
+	return dot > GetConeCosine();
 }
 
 
@@ -100,13 +100,13 @@ void UFanAttackBase::AttackJudgePlayer(AActor* Player)
 {
 	if (!Player) { return; }
 
-	// ������̍��W��擾
+	// 持ち主の座標を取得
 	const FVector ownerLocation = OwnerActor->GetActorLocation();
 
-	// �G���U���͈͓�ɂ��邩����
-	if (IsTargetInRange(Player, ownerLocation))
+	// 敵が攻撃範囲内にいるか判定
+	if (IsTargetInRange(Player))
 	{
-		// �_���[�W��^����(������)
+		// ダメージを与える(未実装)
 	}
 }
 
@@ -114,21 +114,21 @@ void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
 {
 	if (!EnemyManager) { return; }
 
-	// �v���C���[�̍��W��擾
-	const FVector playerLocation = OwnerActor->GetActorLocation();
+	// プレイヤーの座標を取得
+	const FVector location = OwnerActor->GetActorLocation();
 
-	// �G���X�g����[�v���āA�U���͈͓�̓G�Ƀ_���[�W��^����
+	// 敵リストをループして、攻撃範囲内の敵にダメージを与える
 	for (auto& enemy : EnemyManager->GetEnemyList())
 	{
 		if (!enemy) { continue; }
 
-		// �G���U���͈͓�ɂ��邩����
-		if (IsTargetInRange(enemy, playerLocation))
+		// 敵が攻撃範囲内にいるか判定
+		if (IsTargetInRange(enemy))
 		{
-			// ���������v���P(�m�b�N�o�b�N�̋����Ȃǂ͊��ɒu�����Q�b�g�ł���悤�ɂ�����)
-			enemy->SetKnockBackData(playerLocation, 2.0f, 1.0f);
+			// 第二引数※要改善(ノックバックの強さなどは基底に置くかゲットできるようにしたい)
+			enemy->SetKnockBackData(location, 2.0f, 1.0f);
 
-			// �_���[�W��^����
+			// ダメージを与える
 			enemy->SetTakeDamaged();
 		}
 	}
@@ -156,5 +156,11 @@ void UFanAttackBase::UpdatePrevActiveFlg()
 FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector) const
 {
 	const float angle = bRotate ? CurrentAngle : 0.0f;
+	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
+}
+
+FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector, float Angle) const
+{
+	const float angle = bRotate ? Angle : 0.0f;
 	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
 }
