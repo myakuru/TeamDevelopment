@@ -16,6 +16,11 @@ class PROJECTNULL_API UEnemyWaveDataAsset : public UDataAsset
 
 public:
 
+	/**
+	* このウェーブで出現しうる敵のリスト
+	* 毎スポーン時にCreateProbabilityを重みとして
+	* ランダムに1種類が選ばれる
+	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FEnemySpawnUnit> Enemies;
 

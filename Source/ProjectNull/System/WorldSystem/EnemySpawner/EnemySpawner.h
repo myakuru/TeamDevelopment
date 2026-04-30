@@ -95,12 +95,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemySpawner")
 	void SpawnEnemy();
 
+	/** フェーズとWaveDataの対応表、エディタでセットする*/
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UEnemyPhaseSpawnTable> PhaseSpawnTable = nullptr;
 
+	/** 現在使用中のWaveData*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
 	TObjectPtr<const UEnemyWaveDataAsset> CurrentWaveData = nullptr;
 
+	/** スポーン基準の座標*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
 	FTransform SpawnOrigin;
 
@@ -120,7 +123,9 @@ private:
 	/// <returns>交差しているかどうか</returns>
 	bool IsIntersectingStaticObjects(FHitResult& HitResult,FVector& SpawnLocationXY);
 
+	/** フェーズ変更通知を受け取る*/
 	void HandlePhaseChanged(int NewPhase);
+	/** フェーズに対応したWaveDataを適用する*/
 	void ApplySpawnModeByPhase(int NewPhase);
 
 	/// <summary>

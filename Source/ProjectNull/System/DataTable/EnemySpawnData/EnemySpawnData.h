@@ -1,10 +1,11 @@
 #pragma once
 
+class UEnemySpawnPatternBase;
+
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolConfig.h>
 #include "EnemySpawnData.generated.h"
-
-class UEnemySpawnPatternBase;
 
 USTRUCT(BlueprintType)
 struct FEnemySpawnUnit
@@ -31,4 +32,8 @@ struct FEnemySpawnUnit
 	// Instanced : エディタ上でオブジェクトを直接作成してプロパティを編集できる
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadWrite)
 	TObjectPtr<UEnemySpawnPatternBase> SpawnPattern = nullptr;
+
+	// プール情報
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UEnemyPoolConfig> PoolConfig = nullptr;
 };

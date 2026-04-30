@@ -1,9 +1,15 @@
 
 #include "EnemyBase.h"
+#include <ProjectNull/Utility/StateMachine/StateMachine.h>
 #include "Components/CapsuleComponent.h"
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
+#include <ProjectNull/Actor/Item/Pickup/ExperiencePickup/ExperiencePickup.h>
+#include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
+#include "EnemyDataAsset.h"
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -17,6 +23,7 @@ AEnemyBase::AEnemyBase()
 	EnemyAttackComponent = CreateDefaultSubobject<UEnemyAttackComponent>("EnemyAttack");
 }
 
+AEnemyBase::~AEnemyBase() = default;
 
 void AEnemyBase::BeginPlay()
 {
@@ -42,6 +49,12 @@ void AEnemyBase::BeginPlay()
 		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		CapsuleCollision->SetGenerateOverlapEvents(true);
 	}
+
+	//StateMachine = MakeUnique<TStateMachine<AEnemyBase>>();
+
+	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
+		new TStateMachine<AEnemyBase>()
+	);
 
 	// 当たり判定の設定
 	{
@@ -69,6 +82,10 @@ void AEnemyBase::BeginPlay()
 
 	// ゲームの進行に合わせて敵パラメータを設定
 	UpdateParams();
+
+	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
+		new TStateMachine<AEnemyBase>()
+	);
 }
 
 void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
@@ -221,6 +238,59 @@ void AEnemyBase::OnDeath()
 		GameProgress->AddKillCount();
 	}
 
+	// 敵が死んだ際にパーティクルを出す
+	if (EnemyParticle.DeathEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			EnemyParticle.DeathEffect,
+			GetActorLocation(),
+			GetActorRotation(),
+			FVector(1.0f),
+			true,   // bAutoDestroy
+			true,   // bAutoActivate
+			ENCPoolMethod::None,
+			true    // bPreCullCheck
+		);
+	}
+
+	/** 敵が死んだ際に経験値を落とす*/
+	if (ExperiencePickupClass)
+	{
+		/** Actorのパラメータ設定*/
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+
+		/** 経験値クラスにパラメータをセット*/
+		AExperiencePickup* ExpPickup = GetWorld()->SpawnActor<AExperiencePickup>(
+			ExperiencePickupClass,
+			GetActorLocation(),
+			FRotator::ZeroRotator,
+			SpawnParams
+		);
+
+		if (ExpPickup)
+		{
+			ExpPickup->SetExpValue(EnemyStatus.EXP);
+
+			if (UItemManagerSubsystem* ItemSubsystem = 
+				GetWorld()->GetSubsystem<UItemManagerSubsystem>())
+			{
+				ItemSubsystem->RegisterPickupItem(ExpPickup);
+				UE_LOG(LogTemp, Warning, TEXT("Register ExpPickup"));
+			}
+		}
+	}
+
+	// PoolSubSystemに返却する
+	// Return()の中でDeactivate()が呼ばれて非表示・Tick停止でPool待機に戻る
+	if (UEnemyPoolSubSystem* PoolSubSystem =
+		GetWorld()->GetSubsystem<UEnemyPoolSubSystem>())
+	{
+		PoolSubSystem->Return(this);
+		return;
+	}
+
 	// 自身をレベルから消す
 	Destroy();
 }
@@ -254,3 +324,72 @@ FRotator AEnemyBase::CalculateRotationToMoveDirection(const FRotator& CurrentRot
 							RotationInterpSpeed);
 }
 
+void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
+{
+	// ヌルチェック
+	check(InData != nullptr);
+	EnemyDataAsset = InData;
+	// Stateを初期化してChaseから開始
+	StateMachine->Start(this);
+
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	//SetActorTickEnabled(true);
+
+	// 敵管理クラスの情報取得
+	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+
+
+	// 敵が生成された際に敵管理クラス経由でリストへ登録する
+	if (EnemyManager) {
+		EnemyManager->RegisterEnemy(this);
+	}
+
+	CapsuleCollision = GetCapsuleComponent();
+
+	// コリジョンプリセット設定
+	if (CapsuleCollision)
+	{
+		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CapsuleCollision->SetCollisionObjectType(ECC_Pawn);
+		CapsuleCollision->SetCollisionResponseToAllChannels(ECR_Block);
+		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CapsuleCollision->SetGenerateOverlapEvents(true);
+	}
+
+	//StateMachine = MakeUnique<TStateMachine<AEnemyBase>>();
+
+	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
+		new TStateMachine<AEnemyBase>()
+	);
+
+	// コンポーネントに自身の参照を渡す
+	{
+		if (EnemyAttackComponent)EnemyAttackComponent->SetOwnerEnemy(this);
+	}
+
+	// ゲームの進行に合わせて敵パラメータを設定
+	UpdateParams();
+
+	SetActorLocation(LocalPos);
+
+	UE_LOG(LogTemp, Warning, TEXT("EnemyBase Activate"));
+}
+
+void AEnemyBase::Deactivate()
+{
+	StateMachine->ClearState();
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+}
+
+TStateMachine<AEnemyBase>& AEnemyBase::GetStateMachine()
+{
+	return *StateMachine;
+}
+
+void FStateMachineDeleter::operator()(TStateMachine<AEnemyBase>* Ptr) const
+{
+	delete Ptr;
+}

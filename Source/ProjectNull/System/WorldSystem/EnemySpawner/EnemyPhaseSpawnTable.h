@@ -19,7 +19,7 @@ struct FPhaseSpawnWave
     UPROPERTY(EditAnywhere)
     int32 PhaseCreateEnemyNum = 1;
 
-    // そのフェーズで使うフェーズデータ
+    //// そのフェーズで使うフェーズデータ
     UPROPERTY(EditAnywhere)
     TObjectPtr<UEnemyWaveDataAsset> WaveData = nullptr;
 };
