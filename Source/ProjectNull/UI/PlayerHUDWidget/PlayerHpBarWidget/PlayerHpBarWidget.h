@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,12 +15,11 @@ class PROJECTNULL_API UPlayerHpBarWidget : public UUserWidget
 
 protected:
 
-	// ‰æ‘œƒEƒBƒWƒFƒbƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UImage> ExpImage;
+	TObjectPtr<UImage> HpImage;
 
 public:
-
+	/** ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®HPãƒãƒ¼ã‚’æ›´æ–°ã™ã‚‹é–¢æ•° */
 	void SetHp(int32 CurrentHp, int32 MaxHp);
 	
 };

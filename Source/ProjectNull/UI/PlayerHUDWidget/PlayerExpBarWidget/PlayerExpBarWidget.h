@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -18,12 +18,11 @@ class PROJECTNULL_API UPlayerExpBarWidget : public UUserWidget
 
 protected:
 
-	// ‰æ‘œƒEƒBƒWƒFƒbƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> ExpImage;
 
 public:
-
+	/** çµŒé¨“å€¤ã‚’è¨­å®šã™ã‚‹é–¢æ•° */
 	void SetExp(int32 CurrentExp, int32 NextLevelExp);
 	
 };

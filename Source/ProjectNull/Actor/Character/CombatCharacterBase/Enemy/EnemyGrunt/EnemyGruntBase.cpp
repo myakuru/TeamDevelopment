@@ -1,4 +1,4 @@
-
+ï»¿
 #include "EnemyGruntBase.h"
 
 // Sets default values
@@ -32,7 +32,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	// ƒvƒŒƒCƒ„[‚ÌÀ•W‚ğæ“¾
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ìï¿½ï¿½Wï¿½ï¿½æ“¾
 	const FVector playerLocation = Player->GetActorLocation();
 
 	if (EnemyStatus.KnockBackFlg)
@@ -41,10 +41,10 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 		return;
 	}
 
-	// ƒvƒŒƒCƒ„[‚ÖŒü‚©‚¤ˆ—‚ğXV
+	// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ÖŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½V
 	MoveToPlayer(playerLocation,DeltaTime);
 
-	// UŒ‚‰Â”\‚©”»’f
+	// ï¿½Uï¿½ï¿½ï¿½Â”\ï¿½ï¿½ï¿½ï¿½ï¿½f
 	CheckCanAttack();
 }
 
@@ -54,7 +54,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 //	{
 //		//float KnockBackPower = 10.0f;
 //		//const FVector ActorLocation = OtherActor->GetActorLocation();
-//		//// ƒvƒŒƒCƒ„[‚ÆÚG‚µ‚½‚ç‚«”ò‚Î‚³‚ê‚é
+//		//// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ÆÚGï¿½ï¿½ï¿½ï¿½ï¿½çï¿½ï¿½ï¿½ï¿½Î‚ï¿½ï¿½ï¿½ï¿½
 //		//const float distanceToPlayer = FVector::Distance(ActorLocation, GetActorLocation());
 //		//const FVector knockBackDir = GetActorLocation() - ActorLocation;
 //		//KnockBack(knockBackDir, KnockBackPower, 1.0f);

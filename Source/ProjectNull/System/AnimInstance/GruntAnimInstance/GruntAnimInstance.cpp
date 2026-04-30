@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GruntAnimInstance.h"
@@ -13,12 +13,12 @@ void UGruntAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	// ABPƒI[ƒi[‚ğæ“¾
+	// ABPï¿½Iï¿½[ï¿½iï¿½[ï¿½ï¿½æ“¾
 	AEnemyGruntBase* OwnerCharacter 
 		= Cast<AEnemyGruntBase>(GetOwningActor());
 	if (!OwnerCharacter) { return; }
 	
-	// OwnerChacter‚É‚Ü‚Â‚í‚éˆ—
-	// UŒ‚‰Â”\ƒtƒ‰ƒO‚ğæ“¾‚·‚é
+	// OwnerChacterï¿½É‚Ü‚Â‚ï¿½éˆï¿½ï¿½
+	// ï¿½Uï¿½ï¿½ï¿½Â”\ï¿½tï¿½ï¿½ï¿½Oï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½
 	CanAttack = OwnerCharacter->CanAttack();
 }

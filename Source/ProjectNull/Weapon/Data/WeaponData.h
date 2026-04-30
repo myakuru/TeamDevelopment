@@ -1,24 +1,32 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataAsset.h"
+#include "Engine/DataTable.h"
 #include "WeaponData.generated.h"
+
+class UGearBase;
 
 /**
  * 
  */
-UCLASS()
-class PROJECTNULL_API UWeaponData : public UDataAsset
+
+USTRUCT(BlueprintType)
+struct FWeaponData : public FTableRowBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName WeaponId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName WeaponID;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-	FText Name;
-	
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FText DisplayName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UTexture2D* Icon;
+
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    TSubclassOf <UGearBase> Gear;
+
 };

@@ -1,12 +1,15 @@
-
+ï»¿
 #pragma once
 
 #include "CoreMinimal.h"
 #include "../FloatingWeaponStateBase.h"
 #include "FloatingWeaponAttackState.generated.h"
 
+// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½
+class UFloatingWeaponAttack;
+
 /// <summary>
-// •‚—V•Ší‚ÌUŒ‚ó‘ÔƒNƒ‰ƒX
+// ï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½ÌUï¿½ï¿½ï¿½ï¿½ÔƒNï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponAttackState final : public UFloatingWeaponStateBase
@@ -16,7 +19,8 @@ class PROJECTNULL_API UFloatingWeaponAttackState final : public UFloatingWeaponS
 public:
 	UFloatingWeaponAttackState();
 public:
-	void Update(AActor* OwnerActor,float DeltaTime)override;
-private:
-	
+
+	void Update(float DeltaTime)override;
+
+	FTransform CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle);
 };

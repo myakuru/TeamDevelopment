@@ -1,15 +1,15 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "../../State/GearStateBase.h"
 #include "DashGearStateBase.generated.h"
 
-// NiagaraƒGƒtƒFƒNƒgƒNƒ‰ƒX
+// Niagaraï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½Nï¿½ï¿½ï¿½X
 class UNiagaraSystem;
 
 
 /// <summary>
-/// ƒ_ƒbƒVƒ…ƒMƒA‚Ìó‘Ô‚Ì’†ŠÔŠî’êƒNƒ‰ƒX
+/// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½Mï¿½Aï¿½Ìï¿½Ô‚Ì’ï¿½ï¿½ÔŠï¿½ï¿½Nï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS()
 class PROJECTNULL_API UDashGearStateBase : public UGearStateBase
@@ -28,35 +28,35 @@ public:
 protected:
 	
 	/// <summary>
-	/// ƒ_ƒbƒVƒ…ˆ—
+	/// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
 	void Dash();
 
 	/// <summary>
-	/// ƒ_ƒbƒVƒ…UŒ‚ƒGƒtƒFƒNƒg‚ÌÄ¶
+	/// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½ÌÄï¿½
 	/// </summary>
 	void PlayDashEffect();
 
-	// îói‘O•ûj©“®aŒ‚UŒ‚‚ÌƒGƒtƒFƒNƒg
+	// ï¿½ï¿½ï¿½iï¿½Oï¿½ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½aï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ÌƒGï¿½tï¿½Fï¿½Nï¿½g
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	UNiagaraSystem* DashEffect;
 
 private:
 
 	/// <summary>
-	/// ƒ_ƒbƒVƒ…UŒ‚‚ÌXV
+	/// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ÌXï¿½V
 	/// </summary>
 	void UpdateDashAttack();
 
-	// ƒ_ƒbƒVƒ…UŒ‚‚Ì‹——£‚Ì“ñæi”äŠr—pj
+	// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½Ì‹ï¿½ï¿½ï¿½ï¿½Ì“ï¿½ï¿½iï¿½ï¿½rï¿½pï¿½j
 	UPROPERTY(EditAnywhere)
 	float DashAttackRangeSquared;
 
-	// ƒ_ƒbƒVƒ…‚Ì‘¬“x
+	// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½Ì‘ï¿½ï¿½x
 	UPROPERTY(EditAnywhere)
 	float DashSpeed;
 
-	// ƒ_ƒbƒVƒ…ƒGƒtƒFƒNƒg‚Ì‘±ŠÔ
+	// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½Gï¿½tï¿½Fï¿½Nï¿½gï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere)
 	float DashEffectDuration;
 };

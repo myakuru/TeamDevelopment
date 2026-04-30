@@ -1,41 +1,46 @@
-
+ï»¿
 #include "FloatingWeaponAttackState.h"
 
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FanAttackBase.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 
 UFloatingWeaponAttackState::UFloatingWeaponAttackState()
 {
 }
 
-void UFloatingWeaponAttackState::Update(AActor* OwnerActor, float DeltaTime)
+void UFloatingWeaponAttackState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("AttackState"));
 
 	auto* attack = Owner->GetOwnerAttack();
 
-	// UŒ‚‚ªÁ‚¦‚½‚çƒGƒtƒFƒNƒgÁ‚·
 	if (attack->CanDeactivate())
 	{
-		Owner->ChangeState(EFloatingWeaponState::Stand);
+		Owner->ChangeState(EFloatingWeaponState::Transition,EFloatingWeaponState::Stand);
 		return;
 	}
-	//3
+
+	const float currentAngle = attack->CurrentAngle;
+
+	RelativeTransform = CalcAttackStateTransformOffset(attack, currentAngle);
 	
-	// ƒvƒŒƒCƒ„[‚ÌÀ•W
-	const FVector playerLocation = OwnerActor->GetActorLocation();
-	// ƒvƒŒƒCƒ„[‚ªŒü‚¢‚Ä‚é•ûŒü
-	const FVector playerForwardVector = OwnerActor->GetActorForwardVector();
-	// UŒ‚•ûŒü‚©‚ç‚ÌƒIƒtƒZƒbƒgˆÊ’u
-	const FVector offsetLocation = attack->CalcAttackDir(playerForwardVector) * RadiusOffset;
-	// •‚—V•Ší‚ÌÅIˆÊ’u
-	const FVector resultLocation = playerLocation + offsetLocation;
-
-	RotatorOffset.Yaw = OwnerActor->GetActorRotation().Yaw + attack->CurrentAngle;
-
-	Transform.SetLocation(resultLocation);
-	Transform.SetRotation(RotatorOffset.Quaternion());
-
-	UFloatingWeaponStateBase::Update(OwnerActor, DeltaTime);
+	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
+FTransform UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
+{
+	FTransform resultOffset;
+
+	if (!Owner || !OwnerActor || !OwnerAttack) { return resultOffset; }
+
+	// æ”»æ’ƒæ–¹å‘ã‹ã‚‰ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆä½ç½®
+	const FVector location = OwnerAttack->CalcAttackDir(FVector::ForwardVector, RotatorOffsetAngle) * RadiusOffset;
+
+	RelativeRotation.Yaw = RotatorOffsetAngle;
+
+	resultOffset.SetLocation(location);
+	resultOffset.SetRotation(RelativeRotation.Quaternion());
+
+	return resultOffset;
+}

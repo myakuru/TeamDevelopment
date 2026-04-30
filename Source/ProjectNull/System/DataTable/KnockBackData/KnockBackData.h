@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "KnockBackData.generated.h"
 
 /// <summary>
-/// DataTable—p‚Ì\‘¢‘Ì‚ğC++‚Åì¬‚·‚éê‡‚ÍeƒNƒ‰ƒX‚ÉFTableRowBase‚ğw’è
+/// DataTableï¿½pï¿½Ì\ï¿½ï¿½ï¿½Ì‚ï¿½C++ï¿½Åì¬ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Íeï¿½Nï¿½ï¿½ï¿½Xï¿½ï¿½FTableRowBaseï¿½ï¿½wï¿½ï¿½
 /// </summary>
 USTRUCT(Blueprintable)
 struct PROJECTNULL_API FKnockBackData : public FTableRowBase

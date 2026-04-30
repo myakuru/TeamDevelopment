@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "../GearBase.h"
@@ -6,7 +6,7 @@
 
 
 /// <summary>
-/// ƒ_ƒbƒVƒ…ƒMƒAƒNƒ‰ƒX
+/// ï¿½_ï¿½bï¿½Vï¿½ï¿½ï¿½Mï¿½Aï¿½Nï¿½ï¿½ï¿½X
 /// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UDashGear final : public UGearBase

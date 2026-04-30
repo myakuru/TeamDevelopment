@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -19,19 +19,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// ‰æ–Ê‚ğƒLƒƒƒvƒ`ƒƒ‚·‚é‚½‚ß‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg
+	/** ä¸Šã‹ã‚‰è¦‹ãŸè¦–ç‚¹ã®ã‚’æ˜ ã™ã‚«ãƒ¡ãƒ© */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Minimap")
 	class USceneCaptureComponent2D* SceneCaptureComponent;
 
-	// ƒLƒƒƒ‰ƒNƒ^[‚Ì’ÇÕ
 	UPROPERTY()
 	class ACharacter* TargetCharacter;
 
-	// ƒJƒƒ‰‚Ì‚‚³
+	/** ã‚«ãƒ¡ãƒ©ã®é«˜ã• */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Minimap")
 	float CameraHeight = 0.0f;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
