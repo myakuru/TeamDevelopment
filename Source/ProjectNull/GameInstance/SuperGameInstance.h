@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,9 +8,10 @@
 
 class UWeaponManager;
 class UMySaveGame;
+class UCharacterParameterData;
 
 /**
- * 
+ * ゲーム全体で共有されるデータや機能を管理するクラス
  */
 UCLASS()
 class PROJECTNULL_API USuperGameInstance : public UGameInstance
@@ -21,22 +22,27 @@ public:
 
 	virtual void Init()override;
 
-	UPROPERTY()
-	UMySaveGame* m_CurrentSaveData;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	UDataTable* m_WeaponDataTable;
-	
-	UPROPERTY(BlueprintReadOnly)
-	UWeaponManager* m_WeaponManager;
-
 	UFUNCTION(BlueprintCallable)
 	void LoadGameData();
 
 	UFUNCTION(BlueprintCallable)
 	void SaveGameData();
 
-private:
-	
+	/** パラメーターを取得する */
+	TObjectPtr<UCharacterParameterData> GetCharacterParameterData() const { return CharacterParameterData; }
+
+protected:
+
+	UPROPERTY()
+	UMySaveGame* m_CurrentSaveData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UDataTable* m_WeaponDataTable;
+
+	UPROPERTY(BlueprintReadOnly)
+	UWeaponManager* m_WeaponManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCharacterParameterData> CharacterParameterData;
 
 };
