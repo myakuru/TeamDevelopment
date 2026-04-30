@@ -1,10 +1,10 @@
-#include "StateTreeTaskPrintBase.h"
+ï»¿#include "StateTreeTaskPrintBase.h"
 
 EStateTreeRunStatus UStateTreeTaskPrintBase::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
 	Super::Tick(Context, DeltaTime);
 
-	// eæ“¾(‘€ì‚³‚ê‚éPawn)
+	// è¦ªå–å¾—(æ“ä½œã•ã‚Œã‚‹Pawn)
 	UE_LOG(LogTemp, Warning, TEXT("Tick2!!"));
 
 	Timer += DeltaTime;
@@ -21,7 +21,7 @@ EStateTreeRunStatus UStateTreeTaskPrintBase::EnterState(FStateTreeExecutionConte
 {
 	Super::EnterState(Context, Transition);
 
-	// eæ“¾(‘€ì‚³‚ê‚éPawn)
+	// è¦ªå–å¾—(æ“ä½œã•ã‚Œã‚‹Pawn)
 	UE_LOG(LogTemp, Warning, TEXT("EnterStart!!"));
 	
 	return EStateTreeRunStatus::Running;
@@ -29,6 +29,6 @@ EStateTreeRunStatus UStateTreeTaskPrintBase::EnterState(FStateTreeExecutionConte
 
 void UStateTreeTaskPrintBase::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
-	// eæ“¾(‘€ì‚³‚ê‚éPawn)
+	// è¦ªå–å¾—(æ“ä½œã•ã‚Œã‚‹Pawn)
 	UE_LOG(LogTemp, Warning, TEXT("Exit!!"));
 }

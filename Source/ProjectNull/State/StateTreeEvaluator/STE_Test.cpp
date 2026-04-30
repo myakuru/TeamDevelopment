@@ -1,4 +1,4 @@
-#include "STE_Test.h"
+ï»¿#include "STE_Test.h"
 #include "StateTreeExecutionContext.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
@@ -6,7 +6,9 @@ void USTE_Test::TreeStart(FStateTreeExecutionContext& Context)
 {
 	Super::TreeStart(Context);
 
-	// eæ“¾(‘€ì‚³‚ê‚éPawn)
+	Context.GetOwner();
+
+	// è¦ªå–å¾—(æ“ä½œã•ã‚Œã‚‹Pawn)
 	UE_LOG(LogTemp, Warning, TEXT("Start!!"));
 }
 
@@ -14,7 +16,7 @@ void USTE_Test::TreeStop(FStateTreeExecutionContext& Context)
 {
 	Super::TreeStop(Context);
 
-	// eæ“¾(‘€ì‚³‚ê‚éPawn)
+	// è¦ªå–å¾—(æ“ä½œã•ã‚Œã‚‹Pawn)
 	UE_LOG(LogTemp, Warning, TEXT("Stop!!"));
 }
 
@@ -24,6 +26,6 @@ void USTE_Test::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 	
 	Timer += DeltaTime;
 
-	// eæ“¾(‘€ì‚³‚ê‚éPawn)
+	// è¦ªå–å¾—(æ“ä½œã•ã‚Œã‚‹Pawn)
 	UE_LOG(LogTemp, Warning, TEXT("Tick!!"));
 }
