@@ -86,8 +86,10 @@ public:
 	/// <param name="InputVector">���͒l�Ɋ�Â��Ẵx�N�g��XY</param>
 	void Move(const FVector2d& InputVector);
 
-	// �Q�b�^�[
+	int32 GetCurrentGearLevel() const;
+
 	inline UPlayerGearComponent*	GetGearComponent() const { return GearComponent; }
+	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const { return Instance; }
 	inline FExpSystem				GetEXPSystem() const { return ExpSystem; }
 
 

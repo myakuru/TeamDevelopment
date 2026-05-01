@@ -125,6 +125,12 @@ void APlayerBase::Move(const FVector2d& InputVector)
 	AddMovementInput(right, InputVector.X);
 }
 
+int32 APlayerBase::GetCurrentGearLevel() const
+{
+	if (!GearComponent) { return 0; }
+	return GearComponent->GetCurrentGearLevel();
+}
+
 bool APlayerBase::CanMove()
 {
 	if(GearComponent && GearComponent->IsMovementBlockedByGear()) {
