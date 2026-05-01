@@ -10,9 +10,16 @@ UCharacterParameterData::UCharacterParameterData()
 	, MaxGearEnergy		(0.0f)
 	, Experience		(0.0f)
 	, MaxExperience		(0.0f)
+	, Level				(1)
+	, FinalSpeed		(0.0f)
+	, BaseSpeed			(0.0f)
+	, ScalePerLevelSpeed(0.1f)
+	, GearLevelSpeedMultiplierArray(TArray<float>())
 	, SkillCooldownTime({0.0f, 0.0f, 0.0f})
 	, SkillCooldownElapsed({ 0.0f, 0.0f, 0.0f })
 {
+	CalculateExperience();
+
 }
 
 void UCharacterParameterData::DecreaseHealth(float Amount)
@@ -35,11 +42,31 @@ void UCharacterParameterData::AddGearEnergy(float Amount)
 
 void UCharacterParameterData::AddExperience(float Amount)
 {
+	TotalExperience += Amount;
+
+	CurrentExperience += Amount;
+
+	// 経験値によるレベルアップ
+	while (CurrentExperience >= ExperienceToNextLevel)
+	{
+		CurrentExperience -= ExperienceToNextLevel;
+
+		LevelUp();
+	}
+
 	// Maxはエディターで変更される
-	Experience = FMath::Clamp(Experience + Amount, 0.0f, MaxExperience);
+	CurrentExperience = FMath::Clamp(CurrentExperience + Amount, 0.0f, ExperienceToNextLevel);
 
 	// 変更があれば、経験値のバーが伸びていく
-	OnExperienceChanged.Broadcast(Experience, MaxExperience);
+	OnExperienceChanged.Broadcast(CurrentExperience, ExperienceToNextLevel);
+}
+
+float UCharacterParameterData::CalculateFinalSpeed()
+{
+	if (!GearLevelSpeedMultiplierArray.IsValidIndex(CurrentGearLevel)) { return FinalSpeed; }
+	const float gearLevelSpeedMultiplier = GearLevelSpeedMultiplierArray[CurrentGearLevel];
+	FinalSpeed = (BaseSpeed + Level * ScalePerLevelSpeed) * gearLevelSpeedMultiplier;
+	return FinalSpeed;
 }
 
 void UCharacterParameterData::UpdateSkillCooldown(int32 SkillIndex, float DeltaTime)
@@ -72,5 +99,18 @@ void UCharacterParameterData::ResetSkillCooldown(int32 SkillIndex)
 
 	// 0.0（開始）→ 1.0（完了）に変換してBroadcast
 	OnSkillCooldownChanged.Broadcast(SkillIndex, 0.0f, 0.0f);
+}
+
+void UCharacterParameterData::LevelUp()
+{
+	Level++;
+
+	CalculateExperience();
+	CalculateFinalSpeed();
+}
+
+void UCharacterParameterData::CalculateExperience()
+{
+	ExperienceToNextLevel = BaseExperienceToNextLevel + ExperienceToNextLevelIncreasePerLevel * Level;
 }
 

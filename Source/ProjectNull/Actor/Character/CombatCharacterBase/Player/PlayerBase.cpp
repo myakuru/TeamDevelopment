@@ -58,6 +58,14 @@ void APlayerBase::BeginPlay()
 	}
 
 	UpdateHUDHP();
+
+	if (!Instance
+		|| !Instance->GetCharacterParameterData()
+		|| !GetCharacterMovement()
+		|| !GearComponent) { return; }
+
+	const int32 gearLevel = GearComponent->GetCurrentGearLevel();
+	GetCharacterMovement()->MaxWalkSpeed = Instance->GetCharacterParameterData()->CalculateFinalSpeed();
 }
 
 void APlayerBase::Tick(float DeltaTime)
