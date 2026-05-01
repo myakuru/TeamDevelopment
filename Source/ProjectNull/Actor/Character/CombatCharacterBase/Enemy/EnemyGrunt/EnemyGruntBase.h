@@ -6,7 +6,7 @@
 #include "EnemyGruntBase.generated.h"
 
 /// <summary>
-/// �G�i��ʕ�/�G���j�̒��Ԋ��N���X
+/// 敵（一般兵/雑魚）の中間基底クラス
 /// </summary>
 UCLASS()
 class PROJECTNULL_API AEnemyGruntBase : public AEnemyBase
@@ -25,22 +25,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/// <summary>
-	/// �G�X�V���\�b�h
+	/// 敵更新メソッド
 	/// </summary>
-	/// <param name="Player">�v���C���[</param>
-	/// <param name="DeltaTime">�f���^�^�C��</param>
+	/// <param name="Player">プレイヤー</param>
+	/// <param name="DeltaTime">デルタタイム</param>
 	virtual void OnUpdate(APawn* Player, float DeltaTime) override;
-
-private:
-
-	//// ����Actor�Əd�Ȃ����ۂɌĂ΂��֐�
-	//virtual void OnOverlap(
-	//	UPrimitiveComponent* OverlappedComponent,	// �������̃R���W����
-	//	AActor* OtherActor,							// �G��Ă����A�N�^
-	//	UPrimitiveComponent* OtherComp,				// �G��Ă������̃R���|�[�l���g
-	//	int32 OtherBodyIndex,						// �{�f�B�ԍ��i��{�g��Ȃ��j
-	//	bool bFromSweep,							// Sweep���ǂ���
-	//	const FHitResult& SweepResult				// ������̏ڍה���
-	//) override;
-
 };

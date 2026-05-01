@@ -32,7 +32,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	// �v���C���[�̍��W��擾
+	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
 
 	if (EnemyStatus.KnockBackFlg)
@@ -41,9 +41,9 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 		return;
 	}
 
-	// �v���C���[�֌�����������X�V
+	// プレイヤーへ向かう処理を更新
 	MoveToPlayer(playerLocation,DeltaTime);
 
-	// �U���\�����f
+	// 攻撃可能か判断
 	CheckCanAttack();
 }
