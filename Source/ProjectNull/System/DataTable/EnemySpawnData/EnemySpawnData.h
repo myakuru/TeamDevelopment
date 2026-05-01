@@ -1,7 +1,8 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolConfig.h>
 #include "EnemySpawnData.generated.h"
 
 class UEnemySpawnPatternBase;
@@ -11,24 +12,28 @@ struct FEnemySpawnUnit
 {
 	GENERATED_BODY()
 
-	// oŒ»‚³‚¹‚é“G‚ÌID
+	// å‡ºç¾ã•ã›ã‚‹æ•µã®ID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int EnemyID = 0;
 
-	// oŒ»‚³‚¹‚é“G‚ÌƒNƒ‰ƒXiBPƒNƒ‰ƒX‚ğƒGƒfƒBƒ^‚©‚çw’èj
+	// å‡ºç¾ã•ã›ã‚‹æ•µã®ã‚¯ãƒ©ã‚¹ï¼ˆBPã‚¯ãƒ©ã‚¹ã‚’ã‚¨ãƒ‡ã‚£ã‚¿ã‹ã‚‰æŒ‡å®šï¼‰
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> EnemyClass = nullptr;
 
-	// ‰½‘Ìo‚·‚©iŒ»İ‚ÍPatternMulti‚Å‚Ì‚İd—lj
+	// ä½•ä½“å‡ºã™ã‹ï¼ˆç¾åœ¨ã¯PatternMultiã§ã®ã¿ä»•æ§˜ï¼‰
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 SpawnCount = 1;
 
-	// oŒ»‚·‚éŠm—¦
+	// å‡ºç¾ã™ã‚‹ç¢ºç‡
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CreateProbability = 1;
 
-	// ‚Ç‚Ìƒpƒ^[ƒ“‚Åo‚·‚©iSingle‚âMulti‚ğƒGƒfƒBƒ^‚Å‘I‘ğj
-	// Instanced : ƒGƒfƒBƒ^ã‚ÅƒIƒuƒWƒFƒNƒg‚ğ’¼Úì¬‚µ‚ÄƒvƒƒpƒeƒB‚ğ•ÒW‚Å‚«‚é
+	// ã©ã®ãƒ‘ã‚¿ãƒ¼ãƒ³ã§å‡ºã™ã‹ï¼ˆSingleã‚„Multiã‚’ã‚¨ãƒ‡ã‚£ã‚¿ã§é¸æŠï¼‰
+	// Instanced : ã‚¨ãƒ‡ã‚£ã‚¿ä¸Šã§ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç›´æ¥ä½œæˆã—ã¦ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’ç·¨é›†ã§ãã‚‹
 	UPROPERTY(EditAnywhere, Instanced, BlueprintReadWrite)
 	TObjectPtr<UEnemySpawnPatternBase> SpawnPattern = nullptr;
+
+	// ãƒ—ãƒ¼ãƒ«æƒ…å ±
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UEnemyPoolConfig> PoolConfig = nullptr;
 };

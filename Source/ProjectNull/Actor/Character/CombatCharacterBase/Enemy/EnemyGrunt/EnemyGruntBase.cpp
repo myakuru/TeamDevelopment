@@ -32,7 +32,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	// �v���C���[�̍��W��擾
+	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
 
 	if (EnemyStatus.KnockBackFlg)
@@ -41,25 +41,9 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 		return;
 	}
 
-	// �v���C���[�֌�����������X�V
+	// プレイヤーへ向かう処理を更新
 	MoveToPlayer(playerLocation,DeltaTime);
 
-	// �U���\�����f
+	// 攻撃可能か判断
 	CheckCanAttack();
 }
-
-//void AEnemyGruntBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	if (Cast<ACharacter>(OtherActor))
-//	{
-//		//float KnockBackPower = 10.0f;
-//		//const FVector ActorLocation = OtherActor->GetActorLocation();
-//		//// �v���C���[�ƐڐG�����琁����΂����
-//		//const float distanceToPlayer = FVector::Distance(ActorLocation, GetActorLocation());
-//		//const FVector knockBackDir = GetActorLocation() - ActorLocation;
-//		//KnockBack(knockBackDir, KnockBackPower, 1.0f);
-//		UE_LOG(LogTemp, Warning, TEXT("=== AEnemyGruntBase Overlap ==="));
-//		SetKnockBackData(OtherActor->GetActorLocation(), 2, 1);
-//	}
-//}
-//
