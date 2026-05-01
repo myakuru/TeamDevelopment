@@ -1,7 +1,7 @@
 ﻿#include "EnemyAttackComponent.h"
 
-#include <ProjectNull/System/Combat/Attack/AttackBase.h>
 #include <Kismet/GameplayStatics.h>
+#include <ProjectNull/System/Combat/Attack/AttackBase.h>
 
 UEnemyAttackComponent::UEnemyAttackComponent():
 	OwnerEnemy(nullptr),

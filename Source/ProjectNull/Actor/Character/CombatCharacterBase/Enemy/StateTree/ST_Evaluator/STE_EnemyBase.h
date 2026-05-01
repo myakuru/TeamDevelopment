@@ -38,19 +38,32 @@ public:
 	 */
 	virtual void TreeStop(FStateTreeExecutionContext& a_Context)						override;
 
+private:
 
-protected:
+	/**
+	 * @brief プレイヤーとの距離計算
+	 */
+	void CalculateDistanceToPlayer(const TObjectPtr<AActor> a_Player);
 
+private:
+	
 	/**
 	 * @brief 持ち主
 	 */
 	UPROPERTY()
-	TObjectPtr<AEnemyBase> OwnerEnemy = nullptr;
+	TObjectPtr<AEnemyBase>	OwnerEnemy = nullptr;
 
 	/**
 	 * @brief プレイヤーへの移動ベクトル
 	 */
-	UPROPERTY(VisibleAnywhere, Category = "Output")
+	UPROPERTY(VisibleAnywhere, Category = "Output",meta = (AllowPrivateAccess = "true"))
 	FVector MoveDir = FVector::ZeroVector;
+
+	/**
+	 * @brief プレイヤーとの距離(二乗比較!!)
+	 */
+	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
+	float PlayerDistanceSqr = 0.0f;
+
 
 };
