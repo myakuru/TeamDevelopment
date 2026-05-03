@@ -37,6 +37,7 @@ void UWeaponManager::LoadFromSaveData(UMySaveGame* a_SaveGame)
 	m_Weapons = a_SaveGame->m_WeaponData.Weapons;
 
 	if (!a_SaveGame->m_WeaponData.EquippedWeaponIDs.IsEmpty()) {
+		m_EquippedWeaponIDs.Empty();
 		m_EquippedWeaponIDs = a_SaveGame->m_WeaponData.EquippedWeaponIDs;
 	}
 
