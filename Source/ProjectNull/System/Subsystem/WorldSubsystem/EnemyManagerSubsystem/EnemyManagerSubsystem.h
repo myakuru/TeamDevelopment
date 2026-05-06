@@ -6,11 +6,11 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "EnemyManagerSubsystem.generated.h"
 
-// �G�̒��Ԋ��N���X
+// 敵の中間基底クラス
 class AEnemyBase;
 
 /// <summary>
-/// �G�Ǘ��N���X
+/// 敵管理クラス
 /// </summary>
 UCLASS()
 class PROJECTNULL_API UEnemyManagerSubsystem : public UWorldSubsystem
@@ -21,38 +21,38 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 	/// <summary>
-	/// �G�̍X�V����
+	/// 敵の更新処理
 	/// </summary>
-	/// <param name="deltaTime">�f���^�^�C��</param>
+	/// <param name="deltaTime">デルタタイム</param>
 	void UpdateEnemies(float DeltaTime);
 
 	/// <summary>
-	/// �G�̃��X�g�֑Ώۂ�o�^
+	/// 敵のリストへ対象を登録
 	/// </summary>
-	/// <param name="enemy">�G�̃|�C���^</param>
+	/// <param name="enemy">敵のポインタ</param>
 	void RegisterEnemy(AEnemyBase* Enemy);
 
 	/// <summary>
-	/// �G�̃��X�g����Ώۂ�폜
+	/// 敵のリストから対象を削除
 	/// </summary>
-	/// <param name="enemy">�G�̃|�C���^</param>
+	/// <param name="enemy">敵のポインタ</param>
 	void RemoveEnemy(AEnemyBase* Enemy);
 
 	/// <summary>
-	/// ���X�g��̓G��
+	/// リスト内の敵数
 	/// </summary>
-	/// <returns>�G��</returns>
+	/// <returns>敵数</returns>
 	int32 GetEnemyNum() const { return EnemyGruntList.Num(); }
 
 	/// <summary>
-	/// �G��܂Ƃ߂郊�X�g
+	/// 敵をまとめるリスト
 	/// </summary>
 	TArray<AEnemyBase*> GetEnemyList() const { return EnemyGruntList; }	
 
 private:
 
 	/// <summary>
-	/// �G��܂Ƃ߂郊�X�g
+	/// 敵をまとめるリスト
 	/// </summary>
 	UPROPERTY()
 	TArray<AEnemyBase*> EnemyGruntList;
