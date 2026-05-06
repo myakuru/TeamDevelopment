@@ -20,6 +20,9 @@ struct FWeaponData : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FName WeaponID;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FName DecomposeMaterialID;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FText DisplayName;
 

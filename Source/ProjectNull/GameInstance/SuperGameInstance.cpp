@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SuperGameInstance.h"
 #include "../Weapon/Manager/WeaponManager.h"
@@ -10,7 +10,7 @@ void USuperGameInstance::Init()
 	Super::Init();
 
 	m_WeaponManager = NewObject<UWeaponManager>(this);
-	if (m_WeaponManager) m_WeaponManager->Initialize(m_WeaponDataTable);
+	if (m_WeaponManager) m_WeaponManager->Initialize(m_WeaponDataTable,m_WeaponMaterialDataTable);
 
 	LoadGameData();
 

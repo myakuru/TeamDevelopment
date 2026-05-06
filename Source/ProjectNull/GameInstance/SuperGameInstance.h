@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -26,6 +26,9 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UDataTable* m_WeaponDataTable;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UDataTable* m_WeaponMaterialDataTable;
 	
 	UPROPERTY(BlueprintReadOnly)
 	UWeaponManager* m_WeaponManager;

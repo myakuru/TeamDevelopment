@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include"../Instance/WeaponInstance.h"
-#include"../Data/WeaponData.h"
+#include "../Instance/WeaponInstance.h"
+#include "../Instance/WeaponMaterialInstance.h"
+#include "../Data/WeaponData.h"
 #include "WeaponManager.generated.h"
 
+struct FWeaponMaterialData;
 class UMySaveGame;
 
 /**
@@ -20,7 +22,7 @@ class PROJECTNULL_API UWeaponManager : public UObject
 	
 public:
 
-	void Initialize(UDataTable* InDataTable);
+	void Initialize(UDataTable* a_DTWeapon,UDataTable* a_DTMaterial);
 
 	void SaveToData(UMySaveGame* a_SaveGame);
 
@@ -33,7 +35,13 @@ public:
 	void AddWeapon(const FWeaponInstance& a_NewWeapon);
 
 	UFUNCTION(BlueprintCallable)
-	bool GetWeaponMaster(FName WeaponId,FWeaponData& OutData)const;
+	void AddWeaponMaterial(const FWeaponMaterialInstance& a_NewMaterial);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetWeaponMaster(FName a_WeaponId,FWeaponData& a_OutData)const;
+
+	UFUNCTION(BlueprintCallable)
+	bool GetMaterialMaster(FName a_MaterialID, FWeaponMaterialData& a_OutData)const;
 
 	UFUNCTION(BlueprintCallable)
 	void SetEquippedWeapon(int32 a_Index, const FWeaponInstance& a_Weapon);
@@ -50,8 +58,18 @@ private:
 	int64 m_NextWeaponID = 0;
 
 	UPROPERTY()
+	TArray<FWeaponMaterialInstance> m_Materials;
+
+	UPROPERTY()
+	int64 m_NextMaterialID = 0;
+
+	UPROPERTY()
 	TArray<int64> m_EquippedWeaponIDs;
 
 	UPROPERTY(EditAnywhere, Category = "Data")
-	UDataTable* WeaponDataTable;
+	UDataTable* m_WeaponDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Data")
+	UDataTable* m_MaterialDataTable;
+
 };

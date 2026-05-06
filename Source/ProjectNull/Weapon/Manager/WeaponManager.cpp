@@ -3,10 +3,12 @@
 
 #include "WeaponManager.h"
 #include"../../SaveGame/MySaveGame.h"
+#include"../Data/WeaponMaterialData.h"
 
-void UWeaponManager::Initialize(UDataTable* InDataTable)
+void UWeaponManager::Initialize(UDataTable* a_DTWeapon, UDataTable* a_DTMaterial)
 {
-    WeaponDataTable = InDataTable;
+    m_WeaponDataTable = a_DTWeapon;
+	m_MaterialDataTable = a_DTMaterial;
 	m_EquippedWeaponIDs.Add(-1);
 	m_EquippedWeaponIDs.Add(-1);
 	m_EquippedWeaponIDs.Add(-1);
@@ -55,14 +57,31 @@ void UWeaponManager::AddWeapon(const FWeaponInstance& a_NewWeapon)
 	m_NextWeaponID++;
 }
 
-bool UWeaponManager::GetWeaponMaster(FName WeaponId, FWeaponData& OutData) const
+void UWeaponManager::AddWeaponMaterial(const FWeaponMaterialInstance& a_NewMaterial)
 {
-    if (!WeaponDataTable)return false;
-    FWeaponData* FoundData = WeaponDataTable->FindRow<FWeaponData>(WeaponId, TEXT(""));
+	m_Materials.Add(a_NewMaterial);
+	m_Materials.Last().UniqueId = m_NextMaterialID;
+	m_NextMaterialID++;
+}
+
+bool UWeaponManager::GetWeaponMaster(FName a_WeaponId, FWeaponData& a_OutData) const
+{
+    if (!m_WeaponDataTable)return false;
+    FWeaponData* FoundData = m_WeaponDataTable->FindRow<FWeaponData>(a_WeaponId, TEXT(""));
 
     if (!FoundData)return false;
-    OutData = *FoundData;
+    a_OutData = *FoundData;
     return true;
+}
+
+bool UWeaponManager::GetMaterialMaster(FName a_MaterialID, FWeaponMaterialData& a_OutData) const
+{
+	if (!m_MaterialDataTable)return false;
+	FWeaponMaterialData* FoundData = m_MaterialDataTable->FindRow<FWeaponMaterialData>(a_MaterialID, TEXT(""));
+
+	if (!FoundData)return false;
+	a_OutData = *FoundData;
+	return true;
 }
 
 void UWeaponManager::SetEquippedWeapon(int32 a_Index, const FWeaponInstance& a_Weapon)
