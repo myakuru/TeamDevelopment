@@ -3,13 +3,15 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
@@ -63,9 +65,6 @@ void APlayerBase::BeginPlay()
 		|| !Instance->GetCharacterParameterData()
 		|| !GetCharacterMovement()
 		|| !GearComponent) { return; }
-
-	const int32 gearLevel = GearComponent->GetCurrentGearLevel();
-	GetCharacterMovement()->MaxWalkSpeed = Instance->GetCharacterParameterData()->CalculateFinalSpeed();
 }
 
 void APlayerBase::Tick(float DeltaTime)

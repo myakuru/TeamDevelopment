@@ -20,6 +20,10 @@ public:
 	{
 	}
 
+	/**
+	 * @brief 経験値加算処理
+	 * @param Amount 加算量
+	 */
 	inline void Add(float Amount)
 	{
 		Current += Amount;
@@ -32,9 +36,15 @@ public:
 	 */
 	inline bool CanLevelUp() const
 	{
-		Current >= ExperienceToNextLevel;
+		return Current >= ExperienceToNextLevel;
 	}
 
+	/**
+	 * @brief 次レベルまでの必要経験値の計算処理
+	 * @param BaseValue 次レベルに必要な基礎経験値
+	 * @param ToNextLevelIncreasePerLevelValue 次レベル必要経験値のレベルごとの増加量
+	 * @param Level キャラクターのレベル
+	 */
 	inline void CalculateExperienceToNextLevel(
 		float BaseValue,
 		float ToNextLevelIncreasePerLevelValue,
@@ -78,13 +88,17 @@ public:
 /** プレイヤー中間基底クラス */
 class APlayerBase;
 
+/** 速度パラメータ構造体 */
 struct FSpeedParameterData;
+
+/** 経験値パラメータ構造体 */
 struct FExperienceParameterData;
+
 
 /**
  プレイヤーのRuntimeデータクラス
  */
-UCLASS()
+UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UPlayerRuntimeData final : public UCharacterRuntimeData
 {
 	GENERATED_BODY()
@@ -95,8 +109,13 @@ public:
 public:
 	void Initialize() override;
 
-	void SetOwner(const TObjectPtr<APlayerBase>& SetOwner) { Owner = SetOwner; }
+	/** セッター */
+	inline void SetOwner(APlayerBase* SetOwner) { Owner = SetOwner; }
 	
+	/**
+	 * @brief プレイヤーの経験値加算処理
+	 * @param Amount 加算される経験値
+	 */
 	void AddExperience(float Amount);
 
 private:
@@ -111,13 +130,22 @@ private:
 	 */
 	void CalculateExperience(const FExperienceParameterData& Data);
 
-
 	/**
 	 * @brief 最終的な速度計算処理
 	 */
 	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
 
+	/**
+	 * @brief 計算済みの速度をCharacterMovementに適用する
+	 */
+	void ApplyMovementSpeed();
 
+	/**
+	 * @brief レベルアップ時のプレイヤーステータスを更新（計算、適用）
+	 */
+	void UpdateStatus();
+	
+	/** 持ち主のクラス */
 	UPROPERTY()
 	TObjectPtr<APlayerBase> Owner;
 
@@ -131,5 +159,4 @@ private:
 
 	/** レベル */
 	int32 Level;
-
 };

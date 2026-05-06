@@ -4,25 +4,15 @@
 #include "../CombatCharacterBase.h"
 #include "PlayerBase.generated.h"
 
-// �v���C���[HUD�E�B�W�F�b�g�ւ̃|�C���^
 class UPlayerHUDWidget;
-
-// �J�����X�v�����O�A�[���R���|�[�l���g
 class USpringArmComponent;
-
-// �J�����R���|�[�l���g
 class UCameraComponent;
-
-// �U���R���|�[�l���g
 class UPlayerAttackComponent;
-
-// �M�A�R���|�[�l���g
 class UPlayerGearComponent;
-
 class UAttackBase;
-
 class UAutoAttack;
 class USuperGameInstance;
+class UPlayerRuntimeData;
 
 USTRUCT(BlueprintType)
 struct FExpSystem
@@ -88,9 +78,9 @@ public:
 
 	int32 GetCurrentGearLevel() const;
 
-	inline UPlayerGearComponent*	GetGearComponent() const { return GearComponent; }
-	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const { return Instance; }
-	inline FExpSystem				GetEXPSystem() const { return ExpSystem; }
+	inline UPlayerGearComponent*			GetGearComponent() const		{ return GearComponent; }
+	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const	{ return Instance; }
+	inline FExpSystem						GetEXPSystem() const			{ return ExpSystem; }
 
 
 private:
@@ -113,9 +103,6 @@ private:
 	UPROPERTY()
 	UPlayerHUDWidget* HUDWidget;
 
-	// ================================================================
-	// �v���C���[�̃R���|�[�l���g
-	// ================================================================
 	
 	// �J�����X�v�����O�A�[���R���|�[�l���g
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
@@ -134,4 +121,7 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> Instance;
+
+	UPROPERTY(EditAnywhere, Instanced, Category = "RuntimeData")
+	TObjectPtr<UPlayerRuntimeData> RuntimeData;
 };

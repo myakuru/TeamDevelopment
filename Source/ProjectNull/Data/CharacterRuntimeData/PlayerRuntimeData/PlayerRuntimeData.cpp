@@ -1,6 +1,7 @@
 ﻿
 #include "PlayerRuntimeData.h"
 
+#include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
@@ -13,8 +14,7 @@ UPlayerRuntimeData::UPlayerRuntimeData():
 
 void UPlayerRuntimeData::Initialize()
 {
-	CalculateExperience();
-
+	UpdateStatus();
 }
 
 void UPlayerRuntimeData::AddExperience(float Amount)
@@ -30,18 +30,17 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 	}
 }
 
+void UPlayerRuntimeData::ApplyMovementSpeed()
+{
+	if (!Owner->GetCharacterMovement()) { return; }
+	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed.Final;
+}
+
 void UPlayerRuntimeData::LevelUp()
 {
 	Level++;
 
-	if (!Owner || !Owner->GetSuperGameInstance()
-		|| !Owner->GetSuperGameInstance()->GetCharacterParameterData()) {
-		return;
-	}
-	const TObjectPtr<UCharacterParameterData> parameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
-
-	CalculateExperience(parameterData->GetExperienceData());
-	CalculateFinalSpeed(parameterData->GetSpeedData(),Owner->GetCurrentGearLevel());
+	UpdateStatus();
 }
 
 void UPlayerRuntimeData::CalculateExperience(const FExperienceParameterData& Data)
@@ -54,5 +53,18 @@ void UPlayerRuntimeData::CalculateFinalSpeed(const FSpeedParameterData& Data, in
 	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(CurrentGearLevel)) { return; }
 	const float gearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * gearLevelSpeedMultiplier;
+}
+
+void UPlayerRuntimeData::UpdateStatus()
+{
+	if (!Owner || !Owner->GetSuperGameInstance() || !Owner->GetSuperGameInstance()->GetCharacterParameterData()) {
+		return;
+	}
+	/* プレイヤーのパラメータデータ取得 */
+	const TObjectPtr<UCharacterParameterData> parameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+
+	CalculateExperience(parameterData->GetExperienceData());
+	CalculateFinalSpeed(parameterData->GetSpeedData(), Owner->GetCurrentGearLevel());
+	ApplyMovementSpeed();
 }
 
