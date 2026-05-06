@@ -4,7 +4,24 @@
 
 AMapActorBase::AMapActorBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+
+	Trigger = CreateDefaultSubobject<USphereComponent>(TEXT("Trigger"));
+	RootComponent = Trigger;
+
+	Trigger->InitSphereRadius(ActorParams.HitDistance);
+
+	// 衝突設定
+	Trigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Trigger->SetCollisionObjectType(ECC_WorldDynamic);
+	Trigger->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Trigger->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+	//// イベント登録
+	//Trigger->OnComponentBeginOverlap.AddDynamic(
+	//	this,
+	//	&AMapActorBase::HitReaction
+	//);
 }
 
 void AMapActorBase::BeginPlay()
@@ -17,16 +34,26 @@ void AMapActorBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-bool AMapActorBase::OnHitDistancePlayer()
+void AMapActorBase::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
+
+	if (Trigger)
+	{
+		Trigger->SetSphereRadius(ActorParams.HitDistance);
+	}
+}
+
+float AMapActorBase::DistanceFromPlayer()
+{
+	//プレイヤー取得
 	APawn* playerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (playerPawn == nullptr) { return false; }
 
-	float distance = FVector::Dist(
-		GetActorLocation(),
-		playerPawn->GetActorLocation()
-	);
+	FVector distLocation = playerPawn->GetActorLocation() - GetActorLocation();
 
-	return distance < ActorParams.HitDistance;
+	//距離の二乗
+	float distance = distLocation.X * distLocation.X + distLocation.Y * distLocation.Y + distLocation.Z * distLocation.Z;
+
+	return distance < ActorParams.HitDistance * ActorParams.HitDistance;
 }
-
