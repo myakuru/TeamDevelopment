@@ -69,8 +69,14 @@ void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 void UPlayerHUDWidget::OnClickedActionButton()
 {
-	const FString Message = TEXT("ActionButtonI");
-	HPText->SetText(FText::FromString(Message));
+	UPlayerParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
+	if (CharacterParameterData)
+	{
+		for (int32 i = 0; i < SkillWidgets.Num(); ++i)
+		{
+			CharacterParameterData->ResetSkillCooldown(i);
+		}
+	}
 }
 
 void UPlayerHUDWidget::SetPlayerHp(float CurrentHp, float MaxHp)
