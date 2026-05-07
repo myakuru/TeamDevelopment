@@ -1,5 +1,6 @@
-#include "ItemManagerSubsystem.h"
+ï»¿#include "ItemManagerSubsystem.h"
 #include "PickupItemManager/PickupItemManager.h"
+#include "ExperiencePickupManager/ExperiencePickupManager.h"
 #include "Kismet/GameplayStatics.h"
 #include <ProjectNull/Actor/Item/ItemBase.h>
 
@@ -7,25 +8,45 @@ void UItemManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	/** PickupŠÇ—ƒNƒ‰ƒX¶¬*/
+	/** Pickupç®¡ç†ã‚¯ãƒ©ã‚¹ç”Ÿæˆ*/
 	//PickupItemManager = MakeUnique<FPickupItemManager>();
 
 	PickupItemManager = TUniquePtr<FPickupItemManager, FPickupItemManagerDeleter>(
 		new FPickupItemManager()
 	);
+
+	ExperiencePickupManager = TUniquePtr<FExperiencePickupManager, FExperiencePickupManagerDeleter>(
+		new FExperiencePickupManager()
+	);
+
+	// Worldã‚’æ¸¡ã™
+	ExperiencePickupManager->Initialize(GetWorld());
 }
 
 void UItemManagerSubsystem::UpdateItemManagers(float DeltaTime)
 {
 
-	// ƒvƒŒƒCƒ„[‚Ìî•ñ‚ğæ“¾‚·‚éi0”Ô:1Pj
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æƒ…å ±ã‚’å–å¾—ã™ã‚‹ï¼ˆ0ç•ª:1Pï¼‰
 	APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!pPlayerPawn) { return; }
 
-	/** PickupŒnXV*/
+	/** Pickupç³»æ›´æ–°*/
 	if (!PickupItemManager) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("ItemManager PickupManager Update"));
 	PickupItemManager->Update(pPlayerPawn, DeltaTime);
+
+	if (ExperiencePickupManager)
+	{
+		ExperiencePickupManager->Update(pPlayerPawn, DeltaTime);
+
+		const float GainedExp = ExperiencePickupManager->ConsumeCollectedExp();
+		if (GainedExp > 0.0f)
+		{
+			// TODO: Player ã® AddExp(GainedExp) ã‚’å‘¼ã¶
+		}
+	}
+
+	/** */
 }
 
 void UItemManagerSubsystem::RegisterPickupItem(AItemBase* Item)
@@ -52,7 +73,26 @@ int32 UItemManagerSubsystem::GetItemNum()const
 	}
 }
 
+void UItemManagerSubsystem::Deinitialize()
+{
+	if (ExperiencePickupManager) { ExperiencePickupManager->Clear(); }
+	ExperiencePickupManager.Reset();
+	PickupItemManager.Reset();
+	Super::Deinitialize();
+}
+
+FExperiencePickupManager& UItemManagerSubsystem::GetExperiencePickupManager()
+{
+	check(ExperiencePickupManager.IsValid());
+	return *ExperiencePickupManager;
+}
+
 void FPickupItemManagerDeleter::operator()(FPickupItemManager* Ptr) const
+{
+	delete Ptr;
+}
+
+void FExperiencePickupManagerDeleter::operator()(FExperiencePickupManager* Ptr) const
 {
 	delete Ptr;
 }

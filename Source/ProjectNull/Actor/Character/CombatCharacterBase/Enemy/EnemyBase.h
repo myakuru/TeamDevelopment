@@ -117,6 +117,14 @@ public:
 
 	// 攻撃可能フラグ
 	bool CanAttack = false;
+
+	// 死んだときのパーティクルの色
+	UPROPERTY(EditAnywhere,Category = "Experience")
+	FLinearColor ExpColor = FLinearColor::Blue;
+
+	// パーティクルのサイズ
+	UPROPERTY(EditAnywhere, Category = "Experience")
+	float ExpSize = 1.0f;
 };
 
 /**
@@ -229,8 +237,10 @@ protected:
 	UEnemyAttackComponent* EnemyAttackComponent;
 
 	/** アイテムの設定*/
-	UPROPERTY(EditAnywhere, Category = "Drop")
-	TSubclassOf<AExperiencePickup> ExperiencePickupClass;
+	//UPROPERTY(EditAnywhere, Category = "Drop")
+	//TSubclassOf<AExperiencePickup> ExperiencePickupClass;
+
+
 
 	/// <summary>
 	/// 敵基本ステータス

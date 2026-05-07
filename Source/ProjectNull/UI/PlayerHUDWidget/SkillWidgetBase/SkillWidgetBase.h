@@ -33,7 +33,20 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> CooldownText;
 
+	/** アイコンの拡大率 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	float UIScale = 1.0f;
+
+	/** アイコンの拡大率の減少速度 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	float UIScaleDecreaseRate = 10.0f;
+
+	void SetUIScale(float CooldownTime);
+
 	virtual void NativeConstruct() override;
+
+	void ShowUI(bool bShow);
+
 
 public:
 	/** 表示位置を更新、PlayerHUDWidgetで変更されてる*/
