@@ -21,7 +21,7 @@ void UPlayerRuntimeData::Initialize()
 	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
 	// プレイヤーのHPを更新
-	Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
+	//Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
 }
 
 void UPlayerRuntimeData::AddExperience(float Amount)
@@ -55,6 +55,8 @@ void UPlayerRuntimeData::LevelUp()
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
 	UE_LOG(LogTemp, Warning, TEXT("hi ExperienceToNextLevel %.0f"), Experience.ExperienceToNextLevel);
 	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);*/
+	UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
+	
 }
 
 void UPlayerRuntimeData::CalculateExperience(const FExperienceParameterData& Data)

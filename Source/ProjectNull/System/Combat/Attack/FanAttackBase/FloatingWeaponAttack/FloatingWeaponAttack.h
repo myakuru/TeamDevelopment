@@ -45,14 +45,15 @@ public:
 	
 private:
 
-	// 自動攻撃のポインタ
+	/** 自動攻撃のポインタ */
 	UPROPERTY()
 	UAutoAttack* AutoAttack;
 
+	/** 浮遊武器エフェクトクラス */
 	UPROPERTY(EditAnywhere, Instanced)
 	UFloatingWeaponEffect* FloatingWeaponEffect;
 
-	/*待機状態の割合（0.0～1.0）**/
+	/** 待機状態の割合（0.0～1.0）*/
 	UPROPERTY(EditAnywhere)
 	float StandTimeRatio;
 };
