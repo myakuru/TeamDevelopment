@@ -101,14 +101,14 @@ void APlayerBase::AddGearEnergy(float Amount)
 {
 	if (!Instance || !Instance->GetCharacterParameterData()) { return; }
 	
-	Instance->GetCharacterParameterData()->AddGearEnergy(Amount);
+	//Instance->GetCharacterParameterData()->AddGearEnergy(Amount);
 }
 
 void APlayerBase::AddExperience(float Amount)
 {
 	if (!Instance || !Instance->GetCharacterParameterData()) { return; }
 
-	Instance->GetCharacterParameterData()->AddExperience(Amount);
+	//Instance->GetCharacterParameterData()->AddExperience(Amount);
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)

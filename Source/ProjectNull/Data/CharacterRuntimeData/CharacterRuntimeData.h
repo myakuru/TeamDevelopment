@@ -32,15 +32,10 @@ struct FHealthRuntimeData
 
 public:
 
-	FHealthRuntimeData() :
-		Max(100.0f),
-		Current(100.0f)
+	FHealthRuntimeData()
+		: Current(0.0f)
 	{
 	}
-
-	/** 最大体力 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float Max;
 
 	/** 現在の体力 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")

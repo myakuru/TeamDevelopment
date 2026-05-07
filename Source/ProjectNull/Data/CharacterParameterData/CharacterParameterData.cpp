@@ -4,41 +4,10 @@
 #include "CharacterParameterData.h"
 
 UCharacterParameterData::UCharacterParameterData()
-	: Health			(0.0f)
-	, MaxHealth			(0.0f)
-	, GearEnergy		(0.0f)
-	, MaxGearEnergy		(0.0f)
-	, SkillCooldownTime({0.0f, 0.0f, 0.0f})
+	: SkillCooldownTime({0.0f, 0.0f, 0.0f})
 	, SkillCooldownElapsed({ 0.0f, 0.0f, 0.0f })
 {
 	
-}
-
-void UCharacterParameterData::DecreaseHealth(float Amount)
-{
-	// Maxはエディターで変更される
-	Health = FMath::Clamp(Health - Amount, 0.0f, MaxHealth);
-
-	// 変更があれば、HPのバーが短くなる
-	OnHealthChanged.Broadcast(Health, MaxHealth);
-}
-
-void UCharacterParameterData::AddGearEnergy(float Amount)
-{
-	// Maxはエディターで変更される
-	GearEnergy = FMath::Clamp(GearEnergy + Amount, 0.0f, MaxGearEnergy);
-
-	// 変更があれば、ギアのテキストが更新される
-	OnGearEnergyChanged.Broadcast(GearEnergy);
-}
-
-void UCharacterParameterData::AddExperience(float Amount)
-{
-	// Maxはエディターで変更される
-	NewExperience = FMath::Clamp(NewExperience + Amount, 0.0f, MaxExperience);
-
-	// 変更があれば、経験値のバーが伸びていく
-	OnExperienceChanged.Broadcast(NewExperience, MaxExperience);
 }
 
 void UCharacterParameterData::UpdateSkillCooldown(int32 SkillIndex, float DeltaTime)
