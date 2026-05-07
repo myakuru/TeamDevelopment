@@ -5,7 +5,7 @@
 
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 #include <ProjectNull/SaveGame/MySaveGame.h>
-#include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData.h>
 
 void USuperGameInstance::Init()
 {

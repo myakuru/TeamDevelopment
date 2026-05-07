@@ -166,6 +166,13 @@ private:
 	void LevelUp();
 
 	/**
+	 * @brief HPの更新処理
+	 * @param NewHealth 初期値はPlayerParameterDataから受け取る。
+	 * @param MaxHealth DataAssetのMaxHealthを渡すことで、UIのHPバーの割合を正しく表示できるようにする。
+	 */
+	void UpdateHealth(float NewHealth);
+
+	/**
 	 * @brief 最終的な経験値計算処理
 	 */
 	void CalculateExperience(const FExperienceParameterData& Data);

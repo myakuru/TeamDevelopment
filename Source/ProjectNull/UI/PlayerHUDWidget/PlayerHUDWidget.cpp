@@ -18,7 +18,7 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 
 // キャラクターパラメーターデータへの参照
-#include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 // ギアチェンジのUI
@@ -58,7 +58,7 @@ void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	// デバック用
 	if (GameInstance && GameInstance->GetCharacterParameterData())
 	{
-		UCharacterParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
+		UPlayerParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
 
 		for(int32 i = 0; i < SkillWidgets.Num(); ++i)
 		{
@@ -69,8 +69,14 @@ void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 void UPlayerHUDWidget::OnClickedActionButton()
 {
-	const FString Message = TEXT("ActionButtonI");
-	HPText->SetText(FText::FromString(Message));
+	UPlayerParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
+	if (CharacterParameterData)
+	{
+		for (int32 i = 0; i < SkillWidgets.Num(); ++i)
+		{
+			CharacterParameterData->ResetSkillCooldown(i);
+		}
+	}
 }
 
 void UPlayerHUDWidget::SetPlayerHp(float CurrentHp, float MaxHp)
@@ -119,7 +125,7 @@ void UPlayerHUDWidget::RegisterDelegates()
 
 	if (GameInstance && GameInstance->GetCharacterParameterData())
 	{
-		UCharacterParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
+		UPlayerParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
 
 		// HPのデリゲートを登録
 		PlayerRuntimeData->OnHealthChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerHp);

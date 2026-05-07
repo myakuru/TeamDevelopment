@@ -6,7 +6,7 @@
 
 class UWeaponManager;
 class UMySaveGame;
-class UCharacterParameterData;
+class UPlayerParameterData;
 
 /**
  * ゲーム全体で共有されるデータや機能を管理するクラス
@@ -27,7 +27,7 @@ public:
 	void SaveGameData();
 
 	/** パラメーターを取得する */
-	TObjectPtr<UCharacterParameterData> GetCharacterParameterData() const { return CharacterParameterData; }
+	TObjectPtr<UPlayerParameterData> GetCharacterParameterData() const { return CharacterParameterData; }
 
 protected:
 
@@ -41,6 +41,6 @@ protected:
 	UWeaponManager* m_WeaponManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UCharacterParameterData> CharacterParameterData;
+	TObjectPtr<UPlayerParameterData> CharacterParameterData;
 
 };
