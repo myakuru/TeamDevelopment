@@ -5,7 +5,7 @@
 #include "EnemyRuntimeData.generated.h"
 
 /** 進行ベクトルが変更された時に呼び出された時に呼び出される */
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoveDirChanged,			const FVector& /*MoveDir*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoveDirChanged,		const FVector& /*MoveDir*/);
 
 /** ターゲットとの距離が変更された時に呼び出された時に呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetDistChanged,	float /*DistSqr*/);
@@ -46,7 +46,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRunTime")
 	FVector MoveDir = FVector::ZeroVector;
 
-	/** ターゲットとの距離(Sqr) */
+	/** ターゲットとの距離の二乗値 */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRunTime")
 	float TargetDistanceSqr = 0.0f;
 };

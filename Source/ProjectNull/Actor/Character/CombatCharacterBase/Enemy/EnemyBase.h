@@ -108,8 +108,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	int GearEnergy = 0;
 
-	// プレイヤーとの距離
-	float DistancePlayer = 0.0f;
+	// ターゲットとの簡易距離
+	float TargetDistanceSqr = 0.0f;
 
 	// 攻撃可能距離
 	UPROPERTY(EditAnywhere)
@@ -153,6 +153,9 @@ class UEnemyAttackComponent;
 /** 落とすアイテム*/
 class AExperiencePickup;
 
+/** 敵のランタイムパラメータ管理クラス */
+class UEnemyRuntimeData;
+
 /// <summary>
 /// 敵の中間基底クラス
 /// メモ：Characterクラスを継承しているがコンポーネントが多く、
@@ -175,22 +178,58 @@ public:
 
 	/** Poolに返却するときに呼ぶ*/
 	virtual void Deactivate();
+	
+	//~ Begin Setter
 
-	/// <summary>
-	/// 敵（自身）が吹き飛ばされる処理
-	/// </summary>
-	virtual void SetKnockBackData(const FVector& playerLocation, float AttackPower, float EnemyWeight);
-
-	/// <summary>
-	/// 敵（自身) がダメージを受ける処理
-	/// </summary>
+	/**
+	 * @brief 敵（自身）が吹き飛ばされる処理
+	 * @param playerLocation プレイヤーの座標
+	 * @param AttackPower 攻撃力
+	 * @param EnemyWeight 敵の重さ
+	 */
+	virtual void SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight);
+	
+	/**
+	 * @brief 敵（自身) がダメージを受ける処理
+	 * @param AttackPower 攻撃力
+	 */
 	virtual void SetTakeDamaged(int32 AttackPower = 1);
 
-	/** StateMachineへのアクセス、Stateの追加・変更に使う*/
+	/**
+	 * @brief 移動方向のセット
+	 * @param MoveDir 移動方向
+	 */
+	virtual void SetMoveDir(const FVector& a_MoveDir)	{ EnemyStatus.MoveDir = a_MoveDir; }
+
+	/**
+	 * @brief ターゲットとの距離の二乗値セット
+	 * @param DistSqr 距離の二乗値
+	 */
+	virtual void SetTargetDistanceSqr(float a_DistSqr)	{ EnemyStatus.TargetDistanceSqr = a_DistSqr; }
+
+	//~ End Setter
+	
+	//~ Begin Getter
+
+	/** StateMachineへのアクセス、Stateの追加・変更に使う */
 	TStateMachine<AEnemyBase>& GetStateMachine();
 
+	/** EnemyRuntimeへのアクセス、デリゲートへの登録を行う */
+	inline UEnemyRuntimeData* GetEnemyRuntimeData() const
+	{
+		return EnemyRuntimeData; 
+	}
+	
+	//~ End Getter
+
 protected:
+	
 	virtual void BeginPlay() override;
+
+	/**
+	 * @brief デリゲートへの登録関数
+	 */
+	virtual void RegisterDelegates();
 
 	/// <summary>
 	/// 敵（自身）がプレイヤーへ向かう処理
@@ -202,6 +241,7 @@ protected:
 	/// 敵（自身）のパラメータを更新する
 	/// </summary>
 	virtual void UpdateParams();
+
 
 	/// <summary>
 	/// SphereCollisionを取得して使うための関数
@@ -240,7 +280,9 @@ protected:
 	//UPROPERTY(EditAnywhere, Category = "Drop")
 	//TSubclassOf<AExperiencePickup> ExperiencePickupClass;
 
-
+	/** 敵のランタイムパラメータ管理クラス */
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntimeData")
+	TObjectPtr<UEnemyRuntimeData> EnemyRuntimeData;
 
 	/// <summary>
 	/// 敵基本ステータス

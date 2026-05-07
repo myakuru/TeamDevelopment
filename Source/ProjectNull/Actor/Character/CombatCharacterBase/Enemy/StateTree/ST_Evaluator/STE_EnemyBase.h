@@ -38,12 +38,31 @@ public:
 	 */
 	virtual void TreeStop(FStateTreeExecutionContext& a_Context)						override;
 
-private:
+	/**
+	 * @brief デリゲートへの関数登録
+	 */
+	virtual void RegisterDelegate();
 
+public:
 
-
-private:
+	//~ Begin Setter
 	
+	/**
+	 * @brief 移動方向のセット
+	 * @param a_MoveDir 移動方向
+	 */
+	virtual void SetMoveDir(const FVector& a_MoveDir) { MoveDir = a_MoveDir; }
+
+	/**
+	 * @brief ターゲットとの距離の二乗値セット
+	 * @param a_DistSqr 距離の二乗値
+	 */
+	virtual void SetTargetDistanceSqr(float a_DistSqr) { TargetDistanceSqr = a_DistSqr; }
+
+	//~ End Setter
+
+private:
+
 	/**
 	 * @brief 持ち主
 	 */
@@ -51,14 +70,14 @@ private:
 	TObjectPtr<AEnemyBase>	OwnerEnemy = nullptr;
 
 	/**
-	 * @brief プレイヤーへの移動ベクトル
+	 * @brief 移動ベクトル
 	 */
 	UPROPERTY(VisibleAnywhere, Category = "Output",meta = (AllowPrivateAccess = "true"))
 	FVector MoveDir = FVector::ZeroVector;
 
 	/**
-	 * @brief プレイヤーとの距離(二乗比較!!)
+	 * @brief ターゲットとの距離の二乗値
 	 */
 	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
-	float PlayerDistanceSqr = 0.0f;
+	float TargetDistanceSqr = 0.0f;
 };
