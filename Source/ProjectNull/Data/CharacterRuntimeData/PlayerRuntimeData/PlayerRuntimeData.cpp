@@ -42,6 +42,10 @@ void UPlayerRuntimeData::LevelUp()
 	Level++;
 
 	UpdateStatus();
+	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
+	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
+	UE_LOG(LogTemp, Warning, TEXT("hi ExperienceToNextLevel %.0f"), Experience.ExperienceToNextLevel);
+	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);*/
 }
 
 void UPlayerRuntimeData::CalculateExperience(const FExperienceParameterData& Data)
@@ -61,11 +65,12 @@ void UPlayerRuntimeData::UpdateStatus()
 	if (!Owner || !Owner->GetSuperGameInstance() || !Owner->GetSuperGameInstance()->GetCharacterParameterData()) {
 		return;
 	}
-	/* プレイヤーのパラメータデータ取得 */
-	const TObjectPtr<UCharacterParameterData> parameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
-	CalculateExperience(parameterData->GetExperienceData());
-	CalculateFinalSpeed(parameterData->GetSpeedData(), Owner->GetCurrentGearLevel());
+	/* プレイヤーのパラメータデータ取得 */
+	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+
+	CalculateExperience(ParameterData->GetExperienceData());
+	CalculateFinalSpeed(ParameterData->GetSpeedData(), Owner->GetCurrentGearLevel());
 	ApplyMovementSpeed();
 }
 

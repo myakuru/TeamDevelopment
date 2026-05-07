@@ -15,7 +15,7 @@ public:
 
 	FExperienceRuntimeData() :
 		Current(0.0f),
-		ExperienceToNextLevel(0.0f),
+		ExperienceToNextLevel(10.0f),
 		Total(0.0f)
 	{
 	}
@@ -147,7 +147,7 @@ private:
 	
 	/** 持ち主のクラス */
 	UPROPERTY()
-	TObjectPtr<APlayerBase> Owner;
+	APlayerBase* Owner;
 
 	/** 経験値関連Runtimeデータ構造体 */
 	UPROPERTY(EditAnywhere, Category = "Experience")

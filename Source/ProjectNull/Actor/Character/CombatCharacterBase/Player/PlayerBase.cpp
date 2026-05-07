@@ -51,6 +51,8 @@ void APlayerBase::BeginPlay()
 {
 	ACombatCharacterBase::BeginPlay();
 
+	Instance = GetWorld()->GetGameInstance<USuperGameInstance>();
+
 	if (GearComponent) {
 		GearComponent->SetOwnerPlayer(this);
 	}
@@ -59,12 +61,12 @@ void APlayerBase::BeginPlay()
 		AutoAttack->Initialize(this);
 	}
 
-	UpdateHUDHP();
+	if (RuntimeData) {
+		RuntimeData->SetOwner(this);
+		RuntimeData->Initialize();
+	}
 
-	if (!Instance
-		|| !Instance->GetCharacterParameterData()
-		|| !GetCharacterMovement()
-		|| !GearComponent) { return; }
+	UpdateHUDHP();
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -99,16 +101,16 @@ void APlayerBase::ApplyDamage(float Damage)
 
 void APlayerBase::AddGearEnergy(float Amount)
 {
-	if (!Instance || !Instance->GetCharacterParameterData()) { return; }
+	/*if (!Instance || !Instance->GetCharacterParameterData()) { return; }
 	
-	Instance->GetCharacterParameterData()->AddGearEnergy(Amount);
+	Instance->GetCharacterParameterData()->AddGearEnergy(Amount);*/
 }
 
 void APlayerBase::AddExperience(float Amount)
 {
-	if (!Instance || !Instance->GetCharacterParameterData()) { return; }
+	if (!RuntimeData) { return; }
 
-	Instance->GetCharacterParameterData()->AddExperience(Amount);
+	RuntimeData->AddExperience(Amount);
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)
