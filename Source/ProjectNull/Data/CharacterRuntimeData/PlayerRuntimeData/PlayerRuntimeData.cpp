@@ -5,30 +5,39 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData():
 	Owner(nullptr),
 	Level(1)
 {
-
 }
 
 void UPlayerRuntimeData::Initialize()
 {
 	UpdateStatus();
+
+	// プレイヤーのパラメータデータ取得
+	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+
+	// プレイヤーのHPを更新
+	Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
 }
 
 void UPlayerRuntimeData::AddExperience(float Amount)
 {
 	Experience.Add(Amount);
 	
-	/* 経験値によるレベルアップ */
+	// 経験値によるレベルアップ
 	while (Experience.CanLevelUp())
 	{
 		Experience.Current -= Experience.ExperienceToNextLevel;
 
 		LevelUp();
 	}
+
+	// 変更があれば、経験値のバーのUIが更新される
+	OnExperienceChanged.Broadcast(Experience.Current, Experience.ExperienceToNextLevel);
 }
 
 void UPlayerRuntimeData::ApplyMovementSpeed()
@@ -56,8 +65,8 @@ void UPlayerRuntimeData::CalculateExperience(const FExperienceParameterData& Dat
 void UPlayerRuntimeData::CalculateFinalSpeed(const FSpeedParameterData& Data, int32 CurrentGearLevel)
 {
 	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(CurrentGearLevel)) { return; }
-	const float gearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
-	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * gearLevelSpeedMultiplier;
+	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
+	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
 }
 
 void UPlayerRuntimeData::UpdateStatus()
@@ -66,7 +75,7 @@ void UPlayerRuntimeData::UpdateStatus()
 		return;
 	}
 
-	/* プレイヤーのパラメータデータ取得 */
+	// プレイヤーのパラメータデータ取得
 	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
 	CalculateExperience(ParameterData->GetExperienceData());

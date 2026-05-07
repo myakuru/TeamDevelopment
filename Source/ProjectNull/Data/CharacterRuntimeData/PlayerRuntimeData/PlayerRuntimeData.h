@@ -5,6 +5,15 @@
 #include "../CharacterRuntimeData.h"
 #include "PlayerRuntimeData.generated.h"
 
+/** 経験値が変更されたときに呼び出されるデリゲート */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExperienceChanged, int32, NewExperience, int32, MaxExperience);
+
+/** HPが変更されたときに呼び出されるデリゲート */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, NewHealth, float, MaxHealth);
+
+/** ギアエネルギーが変更されたときに呼び出されるデリゲート */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGearEnergyChanged, float, GearEnergy);
+
 /** 経験値関連Runtimeデータ構造体 */
 USTRUCT(BlueprintType)
 struct FExperienceRuntimeData
@@ -85,6 +94,25 @@ public:
 	float Final;
 };
 
+/** ギア関連Runtimeデータ構造体 */
+USTRUCT(BlueprintType)
+struct FGearRuntimeData
+{
+	GENERATED_BODY()
+
+public:
+
+	FGearRuntimeData()
+		: GearEnergy(0.0f)
+	{
+	}
+
+public:
+	/** 現在のギアエネルギー */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gear")
+	float GearEnergy;
+};
+
 /** プレイヤー中間基底クラス */
 class APlayerBase;
 
@@ -108,6 +136,18 @@ public:
 
 public:
 	void Initialize() override;
+
+	/** 経験値が変更されたときに呼び出されるデリゲート */
+	UPROPERTY(BlueprintAssignable)
+	FOnExperienceChanged OnExperienceChanged;
+
+	/** HPが変更されたときに呼び出されるデリゲート */
+	UPROPERTY(BlueprintAssignable)
+	FOnHealthChanged OnHealthChanged;
+
+	/** ギアエネルギーが変更されたときに呼び出されるデリゲート */
+	UPROPERTY(BlueprintAssignable)
+	FOnGearEnergyChanged OnGearEnergyChanged;
 
 	/** セッター */
 	inline void SetOwner(APlayerBase* SetOwner) { Owner = SetOwner; }
@@ -156,6 +196,10 @@ private:
 	/** 速度関連Runtimeデータ構造体 */
 	UPROPERTY(EditAnywhere, Category = "Speed")
 	FSpeedRuntimeData Speed;
+
+	/** ギア関連Runtimeデータ構造体 */
+	UPROPERTY(EditAnywhere, Category = "Gear")
+	FGearRuntimeData Gear;
 
 	/** レベル */
 	int32 Level;
