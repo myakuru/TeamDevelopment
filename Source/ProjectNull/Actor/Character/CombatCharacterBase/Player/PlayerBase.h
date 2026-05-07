@@ -22,6 +22,7 @@ class UPlayerGearComponent;
 class UAttackBase;
 
 class UAutoAttack;
+class USuperGameInstance;
 
 USTRUCT(BlueprintType)
 struct FExpSystem
@@ -66,6 +67,18 @@ public:
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void ApplyDamage(float Damage = 1.0f)										override;
+
+	/**
+	 * @brief ギアエネルギーを加算する処理
+	 * @param Amount 加算量
+	 */
+	void AddGearEnergy(float Amount);
+
+	/**
+	 * @brief 経験値を加算する処理
+	 * @param Amount 加算量
+	 */
+	void AddExperience(float Amount);
 
 	/// <summary>
 	/// �ړ�����
@@ -116,4 +129,7 @@ private:
 	// �M�A�R���|�[�l���g
 	UPROPERTY(VisibleAnywhere,Category = "Gear")
 	UPlayerGearComponent* GearComponent;
+
+	UPROPERTY()
+	TObjectPtr<USuperGameInstance> Instance;
 };
