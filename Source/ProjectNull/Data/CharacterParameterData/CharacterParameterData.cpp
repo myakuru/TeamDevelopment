@@ -39,8 +39,7 @@ void UCharacterParameterData::AddExperience(float Amount)
 	Experience = FMath::Clamp(Experience + Amount, 0.0f, MaxExperience);
 
 	// 変更があれば、経験値のバーが伸びていく
-	OnExperienceChanged.Broadcast(Experience, MaxExperience);
-}
+	OnExperienceChanged.Broadcast(Experience, MaxExperience);}
 
 void UCharacterParameterData::UpdateSkillCooldown(int32 SkillIndex, float DeltaTime)
 {

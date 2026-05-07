@@ -20,15 +20,4 @@ void USTE_EnemyBase::Tick(FStateTreeExecutionContext& a_Context, const float a_D
 	if (!OwnerEnemy) { return; }
 
 	Super::Tick(a_Context, a_DeltaTime);
-
-	CalculateDistanceToPlayer(UGameplayStatics::GetPlayerPawn(this, 0));
-}
-
-void USTE_EnemyBase::CalculateDistanceToPlayer(const TObjectPtr<AActor> a_Player)
-{
-	if (!OwnerEnemy || !a_Player) { return; }
-
-	MoveDir = a_Player->GetActorLocation() - OwnerEnemy->GetActorLocation();
-	PlayerDistanceSqr = MoveDir.SquaredLength();
-	MoveDir.Normalize();
 }

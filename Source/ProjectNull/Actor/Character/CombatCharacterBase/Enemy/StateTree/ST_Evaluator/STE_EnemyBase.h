@@ -40,10 +40,7 @@ public:
 
 private:
 
-	/**
-	 * @brief プレイヤーとの距離計算
-	 */
-	void CalculateDistanceToPlayer(const TObjectPtr<AActor> a_Player);
+
 
 private:
 	
@@ -64,6 +61,4 @@ private:
 	 */
 	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
 	float PlayerDistanceSqr = 0.0f;
-
-
 };
