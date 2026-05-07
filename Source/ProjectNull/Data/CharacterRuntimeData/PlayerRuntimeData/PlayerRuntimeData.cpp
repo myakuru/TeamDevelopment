@@ -4,8 +4,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
-#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData():
 	Owner(nullptr),
@@ -16,12 +15,6 @@ UPlayerRuntimeData::UPlayerRuntimeData():
 void UPlayerRuntimeData::Initialize()
 {
 	UpdateStatus();
-
-	// プレイヤーのパラメータデータ取得
-	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
-
-	// プレイヤーのHPを更新
-	Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
 }
 
 void UPlayerRuntimeData::AddExperience(float Amount)
@@ -57,6 +50,13 @@ void UPlayerRuntimeData::LevelUp()
 	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);*/
 }
 
+void UPlayerRuntimeData::UpdateHealth(float NewHealth)
+{
+	Health.Current = FMath::Clamp(NewHealth, 0.0f, Health.Max);
+
+	OnHealthChanged.Broadcast(Health.Current, Health.Max);
+}
+
 void UPlayerRuntimeData::CalculateExperience(const FExperienceParameterData& Data)
 {
 	Experience.CalculateExperienceToNextLevel(Data.BaseExperienceToNextLevel, Data.ExperienceToNextLevelIncreasePerLevel, Level);
@@ -76,7 +76,7 @@ void UPlayerRuntimeData::UpdateStatus()
 	}
 
 	/* プレイヤーのパラメータデータ取得 */
-	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+	const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
 	CalculateExperience(ParameterData->GetExperienceData());
 	CalculateFinalSpeed(ParameterData->GetSpeedData(), Owner->GetCurrentGearLevel());

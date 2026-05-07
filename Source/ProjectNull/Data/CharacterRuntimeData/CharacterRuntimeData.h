@@ -33,13 +33,18 @@ struct FHealthRuntimeData
 public:
 
 	FHealthRuntimeData()
-		: Current(0.0f)
+		: Current	(0.0f)
+		, Max		(0.0f)
 	{
 	}
 
 	/** 現在の体力 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float Current;
+
+	/** 最大体力 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	float Max;
 };
 
 /**

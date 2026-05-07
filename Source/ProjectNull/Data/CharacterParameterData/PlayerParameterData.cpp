@@ -1,16 +1,16 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CharacterParameterData.h"
+#include "PlayerParameterData.h"
 
-UCharacterParameterData::UCharacterParameterData()
+UPlayerParameterData::UPlayerParameterData()
 	: SkillCooldownTime({0.0f, 0.0f, 0.0f})
 	, SkillCooldownElapsed({ 0.0f, 0.0f, 0.0f })
 {
 	
 }
 
-void UCharacterParameterData::UpdateSkillCooldown(int32 SkillIndex, float DeltaTime)
+void UPlayerParameterData::UpdateSkillCooldown(int32 SkillIndex, float DeltaTime)
 {
 	if (!SkillCooldownElapsed.IsValidIndex(SkillIndex)) return;
 	if (!SkillCooldownTime.IsValidIndex(SkillIndex)) return;
@@ -31,7 +31,7 @@ void UCharacterParameterData::UpdateSkillCooldown(int32 SkillIndex, float DeltaT
 	OnSkillCooldownChanged.Broadcast(SkillIndex, Rate, CooldownRunTime);
 }
 
-void UCharacterParameterData::ResetSkillCooldown(int32 SkillIndex)
+void UPlayerParameterData::ResetSkillCooldown(int32 SkillIndex)
 {
 	if (!SkillCooldownElapsed.IsValidIndex(SkillIndex)) return;
 
