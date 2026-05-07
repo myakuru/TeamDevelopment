@@ -137,6 +137,12 @@ public:
 public:
 	void Initialize() override;
 
+	/**
+	 * @brief プレイヤーの経験値加算処理
+	 * @param Amount 加算される経験値
+	 */
+	void AddExperience(float Amount);
+
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
 	FOnExperienceChanged OnExperienceChanged;
@@ -148,15 +154,6 @@ public:
 	/** ギアエネルギーが変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
 	FOnGearEnergyChanged OnGearEnergyChanged;
-
-	/** セッター */
-	inline void SetOwner(APlayerBase* SetOwner) { Owner = SetOwner; }
-	
-	/**
-	 * @brief プレイヤーの経験値加算処理
-	 * @param Amount 加算される経験値
-	 */
-	void AddExperience(float Amount);
 
 private:
 

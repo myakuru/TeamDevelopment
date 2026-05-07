@@ -12,7 +12,6 @@ class UPlayerGearComponent;
 class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
-class UPlayerRuntimeData;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
@@ -38,11 +37,6 @@ public:
 	 */
 	void AddGearEnergy(float Amount);
 
-	/**
-	 * @brief 経験値を加算する処理
-	 * @param Amount 加算量
-	 */
-	void AddExperience(float Amount);
 
 	void Move(const FVector2d& InputVector);
 
@@ -78,7 +72,4 @@ private:
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> Instance;
 
-	/** Runtimeデータ 実行時に変更されるデータを計算、適用するクラス */
-	UPROPERTY(EditAnywhere, Instanced, Category = "RuntimeData")
-	TObjectPtr<UPlayerRuntimeData> RuntimeData;
 };
