@@ -28,6 +28,10 @@ void UFanAttackBase::Start()
 	ElapsedTime		= 0.0f;
 }
 
+void UFanAttackBase::Execute()
+{
+}
+
 bool UFanAttackBase::UpdateAttack(float DeltaTime)
 {
 	if (!bIsActive || !RootComponent || !RootComponent->GetAttachParent()) { return false; }
