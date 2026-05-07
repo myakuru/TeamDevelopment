@@ -61,11 +61,6 @@ void APlayerBase::BeginPlay()
 		AutoAttack->Initialize(this);
 	}
 
-	if (RuntimeData) {
-		RuntimeData->SetOwner(this);
-		RuntimeData->Initialize();
-	}
-
 	UpdateHUDHP();
 }
 
@@ -104,13 +99,6 @@ void APlayerBase::AddGearEnergy(float Amount)
 	/*if (!Instance || !Instance->GetCharacterParameterData()) { return; }
 	
 	Instance->GetCharacterParameterData()->AddGearEnergy(Amount);*/
-}
-
-void APlayerBase::AddExperience(float Amount)
-{
-	if (!RuntimeData) { return; }
-
-	RuntimeData->AddExperience(Amount);
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)

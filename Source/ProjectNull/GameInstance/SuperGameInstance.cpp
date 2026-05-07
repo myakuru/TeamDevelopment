@@ -6,6 +6,7 @@
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 #include <ProjectNull/SaveGame/MySaveGame.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 void USuperGameInstance::Init()
 {
@@ -13,6 +14,10 @@ void USuperGameInstance::Init()
 
 	m_WeaponManager = NewObject<UWeaponManager>(this);
 	if (m_WeaponManager) m_WeaponManager->Initialize(m_WeaponDataTable);
+
+	if (PlayerRuntimeData) {
+		PlayerRuntimeData->Initialize();
+	}
 
 	LoadGameData();
 

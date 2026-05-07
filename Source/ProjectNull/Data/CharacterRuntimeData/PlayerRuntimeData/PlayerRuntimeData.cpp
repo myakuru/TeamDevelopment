@@ -1,6 +1,7 @@
 ﻿
 #include "PlayerRuntimeData.h"
 
+#include <Kismet/GameplayStatics.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
@@ -16,8 +17,16 @@ void UPlayerRuntimeData::Initialize()
 {
 	UpdateStatus();
 
+	// プレイヤーの情報を取得する（0番:1P）
+	auto* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (!PlayerPawn) { return; }
+
+	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn)) {
+		Owner = PlayerBase;
+	}
+
 	// プレイヤーのパラメータデータ取得
-	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+	//const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
 	// プレイヤーのHPを更新
 	//Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
