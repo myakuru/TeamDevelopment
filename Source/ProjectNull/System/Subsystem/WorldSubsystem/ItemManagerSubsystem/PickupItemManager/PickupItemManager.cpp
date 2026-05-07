@@ -1,17 +1,17 @@
-#include "PickupItemManager.h"
+ï»¿#include "PickupItemManager.h"
 #include <ProjectNull/Actor/Item/ItemBase.h>
 
 void FPickupItemManager::Update(APawn* Player, float DeltaTime)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Pickup Count: %d"), PickupItemList.Num());
 
-	/** Œã‚ë‚©‚ç‰ñ‚·‚±‚Æ‚Åíœ‚ÌIndex‚¸‚ê‚ğ–h‚®*/
+	/** å¾Œã‚ã‹ã‚‰å›ã™ã“ã¨ã§å‰Šé™¤æ™‚ã®Indexãšã‚Œã‚’é˜²ã*/
 	for (int32 i = PickupItemList.Num() - 1; i >= 0; --i)
 	{
-		/** WeakPtr‚©‚çÀ‘Ìæ“¾*/
+		/** WeakPtrã‹ã‚‰å®Ÿä½“å–å¾—*/
 		AItemBase* Item = PickupItemList[i].Get();
 
-		/** DestroyÏ‚İ‚È‚Ç–³Œø‚È‚ç”z—ñ‚©‚çíœ*/
+		/** Destroyæ¸ˆã¿ãªã©ç„¡åŠ¹ãªã‚‰é…åˆ—ã‹ã‚‰å‰Šé™¤*/
 		if (!IsValid(Item))
 		{
 			/** */
@@ -20,14 +20,14 @@ void FPickupItemManager::Update(APawn* Player, float DeltaTime)
 		}
 
 		UE_LOG(LogTemp, Warning, TEXT("PickupItem Update"));
-		/** ŠeƒAƒCƒeƒ€‚ÌXVˆ—*/
+		/** å„ã‚¢ã‚¤ãƒ†ãƒ ã®æ›´æ–°å‡¦ç†*/
 		Item->OnUpdate(Player, DeltaTime);
 	}
 }
 
 void FPickupItemManager::Register(AItemBase* Item)
 {
-	/** –³Œø‚È‚ç“o˜^‚µ‚È‚¢*/
+	/** ç„¡åŠ¹ãªã‚‰ç™»éŒ²ã—ãªã„*/
 	if (!Item) { return; }
 
 	PickupItemList.Add(Item);
@@ -39,12 +39,12 @@ void FPickupItemManager::Remove(AItemBase* Item)
 
 	UE_LOG(LogTemp, Warning, TEXT("PickuPIem"));
 
-	/** w’èƒAƒCƒeƒ€‚ğŠÇ—‘ÎÛ‚©‚çŠO‚·*/
+	/** æŒ‡å®šã‚¢ã‚¤ãƒ†ãƒ ã‚’ç®¡ç†å¯¾è±¡ã‹ã‚‰å¤–ã™*/
 	PickupItemList.Remove(Item);
 }
 
 void FPickupItemManager::Clear()
 {
-	/** ƒŠƒXƒg‘SÁ‹*/
+	/** ãƒªã‚¹ãƒˆå…¨æ¶ˆå»*/
 	PickupItemList.Empty();
 }

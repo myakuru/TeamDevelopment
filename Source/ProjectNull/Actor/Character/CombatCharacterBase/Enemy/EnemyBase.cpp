@@ -11,6 +11,9 @@
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 #include "EnemyDataAsset.h"
 
+#include <Kismet/GameplayStatics.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
 	,	GameProgress(nullptr)
@@ -114,7 +117,7 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 		KnockBackDataTable->FindRow<FKnockBackData>(RowName, TEXT("KnockBack"));
 	if (!KnockBackData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("KnockBack row not found: %s"), *RowName.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("KnockBack row not found: %s"), *RowName.ToString());
 		return;
 	}
 
@@ -204,6 +207,16 @@ void AEnemyBase::OnDeath()
 		GameProgress->AddKillCount();
 	}
 
+	// プレイヤーの情報を取得する（0番:1P）
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (PlayerPawn) {
+		if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn))
+		{
+			PlayerBase->AddExperience(100.0f);
+		}
+	}
+
+
 	// 敵が死んだ際にパーティクルを出す
 	if (EnemyParticle.DeathEffect)
 	{
@@ -243,7 +256,7 @@ void AEnemyBase::OnDeath()
 				GetWorld()->GetSubsystem<UItemManagerSubsystem>())
 			{
 				ItemSubsystem->RegisterPickupItem(ExpPickup);
-				UE_LOG(LogTemp, Warning, TEXT("Register ExpPickup"));
+				//UE_LOG(LogTemp, Warning, TEXT("Register ExpPickup"));
 			}
 		}
 	}
@@ -339,7 +352,7 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 
 	SetActorLocation(LocalPos);
 
-	UE_LOG(LogTemp, Warning, TEXT("EnemyBase Activate"));
+	//UE_LOG(LogTemp, Warning, TEXT("EnemyBase Activate"));
 }
 
 void AEnemyBase::Deactivate()
