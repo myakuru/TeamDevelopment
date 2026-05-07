@@ -3,13 +3,15 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
@@ -58,6 +60,11 @@ void APlayerBase::BeginPlay()
 	}
 
 	UpdateHUDHP();
+
+	if (!Instance
+		|| !Instance->GetCharacterParameterData()
+		|| !GetCharacterMovement()
+		|| !GearComponent) { return; }
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -115,6 +122,12 @@ void APlayerBase::Move(const FVector2d& InputVector)
 
 	AddMovementInput(forward, InputVector.Y);
 	AddMovementInput(right, InputVector.X);
+}
+
+int32 APlayerBase::GetCurrentGearLevel() const
+{
+	if (!GearComponent) { return 0; }
+	return GearComponent->GetCurrentGearLevel();
 }
 
 bool APlayerBase::CanMove()

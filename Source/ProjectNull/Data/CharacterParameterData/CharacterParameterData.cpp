@@ -8,11 +8,10 @@ UCharacterParameterData::UCharacterParameterData()
 	, MaxHealth			(0.0f)
 	, GearEnergy		(0.0f)
 	, MaxGearEnergy		(0.0f)
-	, Experience		(0.0f)
-	, MaxExperience		(0.0f)
 	, SkillCooldownTime({0.0f, 0.0f, 0.0f})
 	, SkillCooldownElapsed({ 0.0f, 0.0f, 0.0f })
 {
+	
 }
 
 void UCharacterParameterData::DecreaseHealth(float Amount)
@@ -36,10 +35,11 @@ void UCharacterParameterData::AddGearEnergy(float Amount)
 void UCharacterParameterData::AddExperience(float Amount)
 {
 	// Maxはエディターで変更される
-	Experience = FMath::Clamp(Experience + Amount, 0.0f, MaxExperience);
+	NewExperience = FMath::Clamp(NewExperience + Amount, 0.0f, MaxExperience);
 
 	// 変更があれば、経験値のバーが伸びていく
-	OnExperienceChanged.Broadcast(Experience, MaxExperience);}
+	OnExperienceChanged.Broadcast(NewExperience, MaxExperience);
+}
 
 void UCharacterParameterData::UpdateSkillCooldown(int32 SkillIndex, float DeltaTime)
 {
@@ -72,4 +72,5 @@ void UCharacterParameterData::ResetSkillCooldown(int32 SkillIndex)
 	// 0.0（開始）→ 1.0（完了）に変換してBroadcast
 	OnSkillCooldownChanged.Broadcast(SkillIndex, 0.0f, 0.0f);
 }
+
 
