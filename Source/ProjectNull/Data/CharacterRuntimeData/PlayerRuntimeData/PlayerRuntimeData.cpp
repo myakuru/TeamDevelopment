@@ -75,7 +75,7 @@ void UPlayerRuntimeData::UpdateStatus()
 		return;
 	}
 
-	// プレイヤーのパラメータデータ取得
+	/* プレイヤーのパラメータデータ取得 */
 	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
 	CalculateExperience(ParameterData->GetExperienceData());

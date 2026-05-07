@@ -124,7 +124,7 @@ struct FExperienceParameterData;
 
 
 /**
- プレイヤーのRuntimeデータクラス
+ * プレイヤーのRuntimeデータクラス
  */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UPlayerRuntimeData final : public UCharacterRuntimeData
