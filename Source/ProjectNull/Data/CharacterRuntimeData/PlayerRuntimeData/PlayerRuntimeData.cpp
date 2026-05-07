@@ -7,6 +7,7 @@
 #include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData():
+	Owner(nullptr),
 	Level(1)
 {
 
