@@ -17,7 +17,7 @@ void UPlayerRuntimeData::Initialize()
 	UpdateStatus();
 
 	// プレイヤーのパラメータデータ取得
-	const TObjectPtr<UCharacterParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+	const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
 	// プレイヤーのHPを更新
 	//Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
