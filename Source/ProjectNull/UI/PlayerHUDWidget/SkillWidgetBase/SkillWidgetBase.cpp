@@ -15,6 +15,41 @@ void USkillWidgetBase::NativeConstruct()
 	}
 }
 
+void USkillWidgetBase::SetUIScale(float CooldownTime)
+{
+	if (CooldownTime <= 0.0f)
+	{
+		UIScale -= UIScaleDecreaseRate * GetWorld()->GetDeltaSeconds();
+	}
+
+	if (SkillImage && CooldownText)
+	{
+		if (UIScale >= 0.0f)
+		{
+			SkillImage->SetRenderScale(FVector2D(UIScale, UIScale));
+			CooldownText->SetRenderScale(FVector2D(UIScale, UIScale));
+		}
+		else
+		{
+			UIScale = 0.0f;
+		}
+	}
+}
+
+void USkillWidgetBase::ShowUI(bool bShow)
+{
+	if (!bShow)
+	{
+		SkillImage->SetVisibility(ESlateVisibility::Hidden);
+		CooldownText->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		SkillImage->SetVisibility(ESlateVisibility::Visible);
+		CooldownText->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 void USkillWidgetBase::UpdateRotationImage(float CooldownTime)
 {
 	if(CooldownMaterial)
@@ -35,5 +70,11 @@ void USkillWidgetBase::UpdateCooldownText(float CooldownTime)
 		FString CooldownString = FString::Printf(TEXT("%.1f"), CooldownTime);
 
 		CooldownText->SetText(FText::FromString(CooldownString));
+
+		// クールダウン時間に応じてUIの拡大率を変更する
+		SetUIScale(CooldownTime);
+
+		// クールダウン時間が0以下ならテキストを非表示にする
+		UIScale <= 0.0f ? ShowUI(false) : ShowUI(true);
 	}
 }
