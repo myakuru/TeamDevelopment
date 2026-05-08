@@ -59,7 +59,12 @@ void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 
 void UPlayerGearComponent::ChangeGear()
 {
+	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance() || !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()) {
+		return;
+	}
 	if (!CanChangeGear()) { return; }
+	const TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
+	PlayerRuntimeData->ResetDataOnGearChange(CurrentGearLevel);
 	CurrentGearLevel = ++CurrentGearLevel % 4;
 }
 
