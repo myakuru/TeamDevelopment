@@ -16,6 +16,8 @@ ARobotController::ARobotController():
 		MoveAction(nullptr),
 		LookAction(nullptr),
 		JumpAction(nullptr),
+		ChangeGearAction(nullptr),
+		GearAction01(nullptr),
 		PlayerHUD(nullptr)
 {
 	bReplicates = true;
@@ -36,31 +38,31 @@ void ARobotController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* enhacedInput = Cast<UEnhancedInputComponent>(InputComponent)) 
-	{
-		enhacedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
-		enhacedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
-		enhacedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ARobotController::Jump);
-		enhacedInput->BindAction(GearAction01, ETriggerEvent::Started, this, &ARobotController::GearExecute01);
-	}
+	if (!Cast<UEnhancedInputComponent>(InputComponent)) { return; }
+	auto* EnhacedInput = Cast<UEnhancedInputComponent>(InputComponent);
+	
+	EnhacedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
+	EnhacedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
+	EnhacedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ARobotController::Jump);
+	EnhacedInput->BindAction(ChangeGearAction, ETriggerEvent::Started, this, &ARobotController::ChangeGear);
+	EnhacedInput->BindAction(GearAction01, ETriggerEvent::Started, this, &ARobotController::GearExecute01);
 }
 
 void ARobotController::InitializeInputContext()
 {
 	if (!InputContext) { return; }
 
-	if (UEnhancedInputLocalPlayerSubsystem* subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer())) 
-	{
-		subSystem->AddMappingContext(InputContext, 0);
+	if (auto* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer())) {
+		SubSystem->AddMappingContext(InputContext, 0);
 	}
 }
 
 void ARobotController::Move(const FInputActionValue& MoveActionValue)
 {
-	APlayerBase* controlledPlayer = Cast<APlayerBase>(GetCharacter());
-	if (!controlledPlayer) { return; }
+	if (!Cast<APlayerBase>(GetCharacter())) { return; }
+	auto* ControlledPlayer = Cast<APlayerBase>(GetCharacter());
 
-	controlledPlayer->Move(MoveActionValue.Get<FVector2D>());
+	ControlledPlayer->Move(MoveActionValue.Get<FVector2D>());
 }
 
 void ARobotController::Look(const FInputActionValue& LookActionValue)
@@ -72,10 +74,8 @@ void ARobotController::Look(const FInputActionValue& LookActionValue)
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
-	if (ACharacter* controlledCharacter = GetCharacter())
-	{
-		controlledCharacter->Jump();
-	}
+	if (!GetCharacter()) { return; }
+	GetCharacter()->Jump();
 }
 
 void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
@@ -86,12 +86,8 @@ void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
 
 void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 {
-	if (!PlayerBase) { return; }
-	
-	if (UPlayerGearComponent* gearComponent = PlayerBase->GetGearComponent())
-	{
-		gearComponent->ExecuteGear(0);
-	}
+	if (!PlayerBase || !PlayerBase->GetGearComponent()) { return; }
+	PlayerBase->GetGearComponent()->ExecuteGear(0);
 }
 
 void ARobotController::InitializeUI()
