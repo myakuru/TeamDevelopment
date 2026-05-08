@@ -129,9 +129,10 @@ public:
 		if (!GearChangeEnergyCost.IsValidIndex(Index)) { return; }
 		const float EnergyCost = GearChangeEnergyCost[Index];
 		UE_LOG(LogTemp, Warning, TEXT("hi EnergyCost %.0f"), EnergyCost);
-		ExcessRatio = (GearEnergy / EnergyCost) / 100;
-		
-		GearEnergy = 0.0f;
+		ExcessRatio = (GearEnergy / EnergyCost) - 1.0f;
+		UE_LOG(LogTemp, Warning, TEXT("hi ExcessRatio %.2f"), ExcessRatio);
+
+		GearEnergy -= EnergyCost;
 
 	}
 	
@@ -206,7 +207,7 @@ public:
 	inline void SetIsInvincible(bool SetFlg) { bIsInvincible = SetFlg; }
 
 	inline bool IsInvincible() const { return bIsInvincible; }
-	inline FGearRuntimeData& GetGearData() { return FGearRuntimeData; }
+	inline FGearRuntimeData& GetGearData() { return Gear; }
 
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)

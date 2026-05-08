@@ -52,7 +52,6 @@ void UPlayerRuntimeData::AddGearEnergy(float Amount)
 {
 	Gear.GearEnergy += Amount;
 	UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
-	UE_LOG(LogTemp, Warning, TEXT("hi GearChangeEnergyExcess %.0f"), Gear.GearChangeEnergyExcess);
 }
 
 bool UPlayerRuntimeData::CanChangeGear(int32 CurrentGearLevel)
@@ -105,7 +104,7 @@ void UPlayerRuntimeData::CalculateFinalSpeed(const FSpeedParameterData& Data, in
 
 void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Data)
 {	
-	Gear.CalculateInvincibilityTime(Data.BaseInvincibilityTime,Data.InvincibilityCollisionRadiusSquared);
+	Gear.CalculateInvincibilityTime(Data.BaseInvincibilityTime,Data.ExtraInvincibilityTimePerExcessRatio);
 }
 
 void UPlayerRuntimeData::UpdateStatus()
