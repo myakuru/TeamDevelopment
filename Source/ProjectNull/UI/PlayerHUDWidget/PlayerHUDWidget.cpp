@@ -18,7 +18,7 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 
 // キャラクターパラメーターデータへの参照
-#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 // ギアチェンジのUI
@@ -120,21 +120,20 @@ void UPlayerHUDWidget::RegisterDelegates()
 	// ワールドからインスタンス所得
 	GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
 
-	// PlayerRuntimeDataのインスタンス化
-	PlayerRuntimeData = NewObject<UPlayerRuntimeData>(this);
-
 	if (GameInstance && GameInstance->GetCharacterParameterData())
 	{
 		UPlayerParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
 
+		UPlayerRuntimeData* PlayerRuntimeDataInstance = GameInstance->GetPlayerRuntimeData();
+
 		// HPのデリゲートを登録
-		PlayerRuntimeData->OnHealthChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerHp);
+		PlayerRuntimeDataInstance->OnHealthChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerHp);
 
 		// 経験値のデリゲートを登録
-		PlayerRuntimeData->OnExperienceChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerExp);
+		PlayerRuntimeDataInstance->OnExperienceChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerExp);
 
 		// ギアエネルギーのデリゲートを登録
-		PlayerRuntimeData->OnGearEnergyChanged.AddDynamic(this, &UPlayerHUDWidget::SetGearChangeEnergy);
+		PlayerRuntimeDataInstance->OnGearEnergyChanged.AddDynamic(this, &UPlayerHUDWidget::SetGearChangeEnergy);
 
 		// スキルのクールダウンのデリゲートを登録
 		CharacterParameterData->OnSkillCooldownChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerSkillCooldown);

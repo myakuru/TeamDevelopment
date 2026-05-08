@@ -32,7 +32,7 @@ void UItemManagerSubsystem::UpdateItemManagers(float DeltaTime)
 
 	/** Pickup系更新*/
 	if (!PickupItemManager) { return; }
-	UE_LOG(LogTemp, Warning, TEXT("ItemManager PickupManager Update"));
+	//UE_LOG(LogTemp, Warning, TEXT("ItemManager PickupManager Update"));
 	PickupItemManager->Update(pPlayerPawn, DeltaTime);
 
 	if (ExperiencePickupManager)

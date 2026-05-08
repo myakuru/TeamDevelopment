@@ -35,4 +35,8 @@ public:
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	)override;
+
+	/** 開くアニメーション */
+	UPROPERTY(EditAnywhere)
+	UAnimationAsset* OpenAnimation;
 };

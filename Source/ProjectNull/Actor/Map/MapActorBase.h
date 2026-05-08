@@ -56,8 +56,17 @@ public:
 	){ }
 
 	UPROPERTY(VisibleAnywhere)
+	USceneComponent* Root;
+
+	/** メッシュ */
+	UPROPERTY(VisibleAnywhere)
+	USkeletalMeshComponent* Mesh;
+
+	/** トリガーボリューム */
+	UPROPERTY(VisibleAnywhere)
 	USphereComponent* Trigger;
 
+	/** アクターパラメータ */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
 	FActorParams ActorParams;
 };

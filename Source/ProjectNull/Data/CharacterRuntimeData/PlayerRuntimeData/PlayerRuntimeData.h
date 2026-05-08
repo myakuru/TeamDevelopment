@@ -102,15 +102,29 @@ struct FGearRuntimeData
 
 public:
 
-	FGearRuntimeData()
-		: GearEnergy(0.0f)
+	FGearRuntimeData():
+		GearEnergy(0.0f),
+		GearChangeEnergyCost(TArray<float>())
 	{
 	}
 
 public:
+
+	inline bool CanChangeGear(int32 CurrentGearLevel)
+	{
+		if (!GearChangeEnergyCost.IsValidIndex(CurrentGearLevel))	{ return false; }
+		if (GearEnergy < GearChangeEnergyCost[CurrentGearLevel])	{ return false; }
+		return true;
+	}
+
+
 	/** 現在のギアエネルギー */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gear")
 	float GearEnergy;
+
+	/** ギアチェンジに必要エネルギー */
+	UPROPERTY(EditAnywhere, Category = "Gear")
+	TArray<float> GearChangeEnergyCost;
 };
 
 /** プレイヤー中間基底クラス */
@@ -123,9 +137,7 @@ struct FSpeedParameterData;
 struct FExperienceParameterData;
 
 
-/**
- * プレイヤーのRuntimeデータクラス
- */
+/** プレイヤーのRuntimeデータクラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UPlayerRuntimeData final : public UCharacterRuntimeData
 {
@@ -142,6 +154,14 @@ public:
 	 * @param Amount 加算される経験値
 	 */
 	void AddExperience(float Amount);
+
+	/**
+	 * @brief プレイヤーのギアエネルギー加算処理
+	 * @param Amount 加算されるギアエネルギー
+	 */
+	void AddGearEnergy(float Amount);
+
+	bool CanChangeGear(int32 CurrentGearLevel);
 
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)

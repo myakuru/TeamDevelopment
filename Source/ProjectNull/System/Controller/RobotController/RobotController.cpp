@@ -10,8 +10,9 @@
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 
 
-ARobotController::ARobotController()
-	:	InputContext(nullptr),
+ARobotController::ARobotController():
+		PlayerBase(nullptr),
+		InputContext(nullptr),
 		MoveAction(nullptr),
 		LookAction(nullptr),
 		JumpAction(nullptr),
@@ -24,10 +25,10 @@ void ARobotController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ���̓}�b�s���O�R���e�L�X�g�֘A�̏�����
+	PlayerBase = Cast<APlayerBase>(GetCharacter());
+
 	InitializeInputContext();
 
-	// UI�̏�����
 	InitializeUI();
 }
 
@@ -64,33 +65,35 @@ void ARobotController::Move(const FInputActionValue& MoveActionValue)
 
 void ARobotController::Look(const FInputActionValue& LookActionValue)
 {
-	const FVector2D lookVector = LookActionValue.Get<FVector2D>();
-	AddYawInput(lookVector.X);
-	AddPitchInput(lookVector.Y);
+	const FVector2D LookVector = LookActionValue.Get<FVector2D>();
+	AddYawInput(LookVector.X);
+	AddPitchInput(LookVector.Y);
 }
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
-	// �W�����v�̎��s
 	if (ACharacter* controlledCharacter = GetCharacter())
 	{
 		controlledCharacter->Jump();
 	}
 }
 
+void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
+{
+	if (!PlayerBase) { return; }
+	PlayerBase->ChangeGear();
+}
+
 void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 {
-	UE_LOG(LogTemp, Warning, TEXT("aaaaa"));
-	if (APlayerBase* controlledPlayer = Cast<APlayerBase>(GetCharacter()))
+	if (!PlayerBase) { return; }
+	
+	if (UPlayerGearComponent* gearComponent = PlayerBase->GetGearComponent())
 	{
-		if (UPlayerGearComponent* gearComponent = controlledPlayer->GetGearComponent())
-		{
-			gearComponent->ExecuteGear(0);
-		}
+		gearComponent->ExecuteGear(0);
 	}
 }
 
-// UI�̏������֐�
 void ARobotController::InitializeUI()
 {
 
@@ -98,7 +101,6 @@ void ARobotController::InitializeUI()
 	{
 		PlayerHUD		= CreateWidget<UPlayerHUDWidget>	(this, PlayerHUDClass);
 
-		// HUD�̕\��
 		if (PlayerHUD)
 		{
 			PlayerHUD->AddToViewport();

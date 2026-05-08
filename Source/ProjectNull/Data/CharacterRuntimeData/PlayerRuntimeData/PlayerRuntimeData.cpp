@@ -5,7 +5,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData():
 	Owner(nullptr),
@@ -26,7 +26,7 @@ void UPlayerRuntimeData::Initialize()
 	}
 
 	// プレイヤーのパラメータデータ取得
-	const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
 	// プレイヤーのHPを更新
 	//Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
@@ -48,9 +48,19 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 	OnExperienceChanged.Broadcast(Experience.Current, Experience.ExperienceToNextLevel);
 }
 
+void UPlayerRuntimeData::AddGearEnergy(float Amount)
+{
+	Gear.GearEnergy += Amount;
+}
+
+bool UPlayerRuntimeData::CanChangeGear(int32 CurrentGearLevel)
+{
+	return Gear.CanChangeGear(CurrentGearLevel);
+}
+
 void UPlayerRuntimeData::ApplyMovementSpeed()
 {
-	if (!Owner->GetCharacterMovement()) { return; }
+	if (!Owner || !Owner->GetCharacterMovement()) { return; }
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed.Final;
 }
 
@@ -63,7 +73,7 @@ void UPlayerRuntimeData::LevelUp()
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
 	UE_LOG(LogTemp, Warning, TEXT("hi ExperienceToNextLevel %.0f"), Experience.ExperienceToNextLevel);
 	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);*/
-	UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
+	//UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
 	
 }
 
@@ -92,7 +102,7 @@ void UPlayerRuntimeData::UpdateStatus()
 		return;
 	}
 
-	/* プレイヤーのパラメータデータ取得 */
+	// プレイヤーのパラメータデータ取得
 	const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
 	CalculateExperience(ParameterData->GetExperienceData());

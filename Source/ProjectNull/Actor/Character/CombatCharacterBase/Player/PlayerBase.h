@@ -29,19 +29,15 @@ public:
 
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void ApplyDamage(float Damage = 1.0f)										override;
-
-	/**
-	 * @brief ギアエネルギーを加算する処理
-	 * @param Amount 加算量
-	 */
-	void AddGearEnergy(float Amount);
-
 
 	void Move(const FVector2d& InputVector);
 
+	void ChangeGear();
+	void CanChangeGear() const;
+
 	int32 GetCurrentGearLevel() const;
 
+	/** ゲッター */
 	inline UPlayerGearComponent*			GetGearComponent() const		{ return GearComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const	{ return Instance; }
 
@@ -56,18 +52,17 @@ private:
 	UPROPERTY()
 	UPlayerHUDWidget* HUDWidget;
 
-	
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	USpringArmComponent* SpringArmComponent;
 
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	UCameraComponent* CameraComponent;
 
+	UPROPERTY(VisibleAnywhere, Category = "Gear")
+	UPlayerGearComponent* GearComponent;
+
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
 	TObjectPtr<UAutoAttack> AutoAttack;
-	
-	UPROPERTY(VisibleAnywhere,Category = "Gear")
-	UPlayerGearComponent* GearComponent;
 
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> Instance;

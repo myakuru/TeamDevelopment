@@ -12,6 +12,8 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -284,13 +286,14 @@ void AEnemyBase::OnDeath()
 			Color,
 			Size
 		);
+	}
 
-		/*ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
-			GetActorLocation(),
-			static_cast<float>(EnemyStatus.EXP),
-			Color,
-			Size
-		);*/
+	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
+	if (USuperGameInstance* GameInstance =
+		GetWorld()->GetGameInstance<USuperGameInstance>())
+	{
+		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.EXP);
+		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
 
 	// PoolSubSystemに返却する
@@ -299,11 +302,7 @@ void AEnemyBase::OnDeath()
 		GetWorld()->GetSubsystem<UEnemyPoolSubSystem>())
 	{
 		PoolSubSystem->Return(this);
-		return;
 	}
-
-	// 自身をレベルから消す
-	Destroy();
 }
 
 void AEnemyBase::CheckCanAttack()
