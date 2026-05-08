@@ -27,7 +27,7 @@ struct FWeaponData : public FTableRowBase
     FText DisplayName;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UTexture2D* Icon;
+    UTexture2D* Icon = nullptr;
 
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     TSubclassOf <UGearBase> Gear;

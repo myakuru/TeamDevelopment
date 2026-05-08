@@ -12,8 +12,8 @@ void USuperGameInstance::Init()
 {
 	Super::Init();
 
-	m_WeaponManager = NewObject<UWeaponManager>(this);
-	if (m_WeaponManager) m_WeaponManager->Initialize(m_WeaponDataTable,m_WeaponMaterialDataTable);
+	WeaponManager = NewObject<UWeaponManager>(this);
+	if (WeaponManager) WeaponManager->Initialize(WeaponDataTable,WeaponMaterialDataTable);
 
 	if (PlayerRuntimeData) {
 		PlayerRuntimeData->Initialize();
@@ -30,34 +30,34 @@ void USuperGameInstance::LoadGameData()
 
 	if (UGameplayStatics::DoesSaveGameExist(SlotName, UserIndex))
 	{
-		m_CurrentSaveData = Cast<UMySaveGame>(
+		CurrentSaveData = Cast<UMySaveGame>(
 			UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)
 		);
 	}
 	else
 	{
-		m_CurrentSaveData = Cast<UMySaveGame>(
+		CurrentSaveData = Cast<UMySaveGame>(
 			UGameplayStatics::CreateSaveGameObject(UMySaveGame::StaticClass())
 		);
 	}
 
-	if (m_WeaponManager) {
-		m_WeaponManager->LoadFromSaveData(m_CurrentSaveData);
+	if (WeaponManager) {
+		WeaponManager->LoadFromSaveData(CurrentSaveData);
 	}
 
 }
 
 void USuperGameInstance::SaveGameData()
 {
-	if (!m_CurrentSaveData)return;
+	if (!CurrentSaveData)return;
 
-	if (m_WeaponManager) {
-		m_WeaponManager->SaveToData(m_CurrentSaveData);
+	if (WeaponManager) {
+		WeaponManager->SaveToData(CurrentSaveData);
 	}
 
 	const FString SlotName = UMySaveGame::GetSaveSlotName();
 	const int32 UserIndex = 0;
 
-	UGameplayStatics::SaveGameToSlot(m_CurrentSaveData, SlotName, UserIndex);
+	UGameplayStatics::SaveGameToSlot(CurrentSaveData, SlotName, UserIndex);
 
 }

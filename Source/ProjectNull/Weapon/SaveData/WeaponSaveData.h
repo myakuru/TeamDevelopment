@@ -19,7 +19,7 @@ struct FWeaponSaveData
     TArray<FWeaponInstance> Weapons;
 
 	UPROPERTY()
-	int64 NextUniqueID;
+	int64 NextUniqueID = 0;
 
 	UPROPERTY()
 	TArray<int64> EquippedWeaponIDs;
