@@ -12,6 +12,8 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -301,6 +303,8 @@ void AEnemyBase::OnDeath()
 		PoolSubSystem->Return(this);
 		return;
 	}
+
+	GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData()->AddExperience(EnemyStatus.EXP);
 
 	// 自身をレベルから消す
 	Destroy();
