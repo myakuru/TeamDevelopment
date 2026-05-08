@@ -34,13 +34,16 @@ public:
 protected:
 
 	UPROPERTY()
-	UMySaveGame* m_CurrentSaveData;
+	UMySaveGame* CurrentSaveData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UDataTable* m_WeaponDataTable;
+	UDataTable* WeaponDataTable;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UDataTable* WeaponMaterialDataTable;
 
 	UPROPERTY(BlueprintReadOnly)
-	UWeaponManager* m_WeaponManager;
+	UWeaponManager* WeaponManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UPlayerParameterData> CharacterParameterData;

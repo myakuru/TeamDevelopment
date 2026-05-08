@@ -11,6 +11,7 @@ void ACombatCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	
 }
 
 void ACombatCharacterBase::Tick(float DeltaTime)
