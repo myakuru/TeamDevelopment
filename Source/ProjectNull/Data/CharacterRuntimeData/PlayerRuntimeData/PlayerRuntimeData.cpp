@@ -5,7 +5,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData():
 	Owner(nullptr),
