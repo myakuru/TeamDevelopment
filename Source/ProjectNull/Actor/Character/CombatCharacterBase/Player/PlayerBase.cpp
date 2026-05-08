@@ -131,7 +131,8 @@ bool APlayerBase::CanMove()
 
 void APlayerBase::UpdateHUDHP()
 {
-	if (HUDWidget) {
+	if (HUDWidget)
+	{
 		HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
 	}
 }
