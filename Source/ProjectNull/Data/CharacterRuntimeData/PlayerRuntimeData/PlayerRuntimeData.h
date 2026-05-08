@@ -118,7 +118,6 @@ public:
 		return true;
 	}
 
-
 	/**
 	 * @brief ギアチェンジ時にデータをリセット
 	 * @param CurrentGearLevel 現在のギアレベル
