@@ -59,6 +59,7 @@ void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 
 void UPlayerGearComponent::ChangeGear()
 {
+	if (!CanChangeGear()) { return; }
 	CurrentGearLevel = ++CurrentGearLevel % 4;
 }
 

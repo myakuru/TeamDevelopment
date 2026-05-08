@@ -32,6 +32,9 @@ public:
 
 	void Move(const FVector2d& InputVector);
 
+	void ChangeGear();
+	void CanChangeGear() const;
+
 	int32 GetCurrentGearLevel() const;
 
 	/** ゲッター */

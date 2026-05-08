@@ -98,6 +98,12 @@ void APlayerBase::Move(const FVector2d& InputVector)
 	AddMovementInput(Right, InputVector.X);
 }
 
+void APlayerBase::ChangeGear()
+{
+	if (!GearComponent) { return; }
+	GearComponent->ChangeGear();
+}
+
 int32 APlayerBase::GetCurrentGearLevel() const
 {
 	if (!GearComponent) { return 0; }

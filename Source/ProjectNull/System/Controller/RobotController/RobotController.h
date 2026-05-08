@@ -6,6 +6,7 @@
 
 struct FInputActionValue;
 
+class APlayerBase;
 class UInputMappingContext;
 
 class UInputAction;
@@ -53,27 +54,21 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputContext;
 
-	// �ړ����̓A�N�V����
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
 
-	// ���_���̓A�N�V����
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> LookAction;
 
-	// �W�����v���̓A�N�V����
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> JumpAction;
 
-	// �M�A���̓A�N�V���� 01
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> GearAction01;
 
-	// �v���C���[HUD�E�B�W�F�b�g�N���X
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UPlayerHUDWidget> PlayerHUDClass;
 
-	// �v���C���[HUD�E�B�W�F�b�g�̃C���X�^���X
 	UPROPERTY()
 	TObjectPtr<UPlayerHUDWidget> PlayerHUD;
 

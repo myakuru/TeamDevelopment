@@ -10,8 +10,9 @@
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 
 
-ARobotController::ARobotController()
-	:	InputContext(nullptr),
+ARobotController::ARobotController():
+		PlayerBase(nullptr),
+		InputContext(nullptr),
 		MoveAction(nullptr),
 		LookAction(nullptr),
 		JumpAction(nullptr),
@@ -64,9 +65,9 @@ void ARobotController::Move(const FInputActionValue& MoveActionValue)
 
 void ARobotController::Look(const FInputActionValue& LookActionValue)
 {
-	const FVector2D lookVector = LookActionValue.Get<FVector2D>();
-	AddYawInput(lookVector.X);
-	AddPitchInput(lookVector.Y);
+	const FVector2D LookVector = LookActionValue.Get<FVector2D>();
+	AddYawInput(LookVector.X);
+	AddPitchInput(LookVector.Y);
 }
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
@@ -79,9 +80,8 @@ void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 
 void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
 {
-	if (!PlayerBase || ) { return; }
-	
-
+	if (!PlayerBase) { return; }
+	PlayerBase->ChangeGear();
 }
 
 void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
@@ -101,7 +101,6 @@ void ARobotController::InitializeUI()
 	{
 		PlayerHUD		= CreateWidget<UPlayerHUDWidget>	(this, PlayerHUDClass);
 
-		// HUD�̕\��
 		if (PlayerHUD)
 		{
 			PlayerHUD->AddToViewport();
