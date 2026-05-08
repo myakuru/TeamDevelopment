@@ -88,7 +88,7 @@ public:
 
 	// ギアエネルギー
 	UPROPERTY(EditAnywhere)
-	int GearEnergy = 0;
+	float GearEnergy = 0;
 
 	// ターゲットとの簡易距離
 	float TargetDistanceSqr = 0.0f;
