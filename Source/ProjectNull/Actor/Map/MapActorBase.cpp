@@ -6,9 +6,16 @@ AMapActorBase::AMapActorBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	Trigger = CreateDefaultSubobject<USphereComponent>(TEXT("Trigger"));
-	RootComponent = Trigger;
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
 
+	//メッシュ
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(Root);
+
+	//トリガー
+	Trigger = CreateDefaultSubobject<USphereComponent>(TEXT("Trigger"));
+	Trigger->SetupAttachment(Mesh);
 	Trigger->InitSphereRadius(ActorParams.HitDistance);
 
 	// 衝突設定
@@ -16,12 +23,6 @@ AMapActorBase::AMapActorBase()
 	Trigger->SetCollisionObjectType(ECC_WorldDynamic);
 	Trigger->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Trigger->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-
-	//// イベント登録
-	//Trigger->OnComponentBeginOverlap.AddDynamic(
-	//	this,
-	//	&AMapActorBase::HitReaction
-	//);
 }
 
 void AMapActorBase::BeginPlay()
