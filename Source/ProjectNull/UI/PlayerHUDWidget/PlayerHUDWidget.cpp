@@ -18,7 +18,7 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 
 // キャラクターパラメーターデータへの参照
-#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 // ギアチェンジのUI
