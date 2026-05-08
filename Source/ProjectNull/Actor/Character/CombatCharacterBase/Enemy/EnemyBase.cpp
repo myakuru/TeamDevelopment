@@ -286,13 +286,14 @@ void AEnemyBase::OnDeath()
 			Color,
 			Size
 		);
+	}
 
-		/*ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
-			GetActorLocation(),
-			static_cast<float>(EnemyStatus.EXP),
-			Color,
-			Size
-		);*/
+	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
+	if (USuperGameInstance* GameInstance =
+		GetWorld()->GetGameInstance<USuperGameInstance>())
+	{
+		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.EXP);
+		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
 
 	// PoolSubSystemに返却する
@@ -301,13 +302,7 @@ void AEnemyBase::OnDeath()
 		GetWorld()->GetSubsystem<UEnemyPoolSubSystem>())
 	{
 		PoolSubSystem->Return(this);
-		return;
 	}
-
-	GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData()->AddExperience(EnemyStatus.EXP);
-
-	// 自身をレベルから消す
-	Destroy();
 }
 
 void AEnemyBase::CheckCanAttack()
