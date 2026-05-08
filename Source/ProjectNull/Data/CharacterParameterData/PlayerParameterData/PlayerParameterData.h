@@ -75,20 +75,25 @@ struct FGearParameterData
 public:
 
 	FGearParameterData() :
-		GearEnergy(0.0f),
-		MaxGearEnergy(0.0f)
+		BaseInvincibilityTime(0.0f),
+		ExtraInvincibilityTimePerExcessRatio(0.0f),
+		InvincibilityCollisionRadiusSquared(0.0f)
 	{
 	}
 
 public:
 
-	/** 現在のギアエネルギー */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gear")
-	float GearEnergy;
+	/** 基礎無敵時間 */
+	UPROPERTY(EditAnywhere, Category = "Gear")
+	float BaseInvincibilityTime;
 
-	/** 最大ギアエネルギー */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gear")
-	float MaxGearEnergy;
+	/** 超過割合による無敵時間増加量 */
+	UPROPERTY(EditAnywhere, Category = "Gear")
+	float ExtraInvincibilityTimePerExcessRatio;
+
+	/** 無敵状態用当たり判定半径の二乗値 */
+	UPROPERTY(EditAnywhere, Category = "Gear")
+	float InvincibilityCollisionRadiusSquared;
 };
 
 /**

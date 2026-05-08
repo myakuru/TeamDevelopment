@@ -60,22 +60,22 @@ void UGearBase::Update(float DeltaTime)
 
 	ElapsedTime += DeltaTime;
 
-	const int32		stateIndex		= ExecutedGearLevel - 1;
-	UGearStateBase* currentState	= GearStates.IsValidIndex(stateIndex) ? GearStates[stateIndex] : nullptr;
+	const int32		StateIndex		= ExecutedGearLevel - 1;
+	UGearStateBase* CurrentState	= GearStates.IsValidIndex(StateIndex) ? GearStates[StateIndex] : nullptr;
 	float			duration		= 0.0f;
 
-	if (!currentState) { return; }
+	if (!CurrentState) { return; }
 
-	currentState->Update(DeltaTime);
+	CurrentState->Update(DeltaTime);
 	
-	if (GearStatuses.IsValidIndex(stateIndex)) 
+	if (GearStatuses.IsValidIndex(StateIndex))
 	{
-		duration = GearStatuses[stateIndex].Duration;
+		duration = GearStatuses[StateIndex].Duration;
 	}
 
 	if (ElapsedTime >= duration)
 	{
-		currentState->End();
+		CurrentState->End();
 		bIsActive	= false;
 		ElapsedTime = 0.0f;
 	}
