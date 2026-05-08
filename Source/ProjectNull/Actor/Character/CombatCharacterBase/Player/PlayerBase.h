@@ -29,14 +29,6 @@ public:
 
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void ApplyDamage(float Damage = 1.0f)										override;
-
-	/**
-	 * @brief ギアエネルギーを加算する処理
-	 * @param Amount 加算量
-	 */
-	void AddGearEnergy(float Amount);
-
 
 	void Move(const FVector2d& InputVector);
 

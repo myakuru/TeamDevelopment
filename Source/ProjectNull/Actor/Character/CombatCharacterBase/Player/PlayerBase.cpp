@@ -1,8 +1,8 @@
 ﻿#include "PlayerBase.h"
 
 #include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
+#include <GameFramework/SpringArmComponent.h>
+#include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
@@ -20,27 +20,25 @@ APlayerBase::APlayerBase()
 		GearComponent(nullptr)
 {
 	// ================================================================
-	// ���g�̐ݒ�
+	// プレイヤーの初期化
 	// ================================================================
 
-	// Tick��L���ɂ���
 	PrimaryActorTick.bCanEverTick = true;
-
-	// �R���g���[���[��Yaw��]��L�����N�^�[�ɔ��f�����Ȃ�
 	bUseControllerRotationYaw = false;
 
 	// ================================================================
-	// �J�����X�v�����O�A�[���R���|�[�l���g�̍쐬�Ɛݒ�
+	// スプリングアームの初期化
 	// ================================================================
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
+	if (!SpringArmComponent) { return; }
 	SpringArmComponent->SetupAttachment(GetRootComponent());
-	SpringArmComponent->TargetArmLength = 600.0f;
 	SpringArmComponent->bUsePawnControlRotation = true;
 
 	// ================================================================
-	// �J�����R���|�[�l���g�̍쐬�Ɛݒ�
+	// カメラコンポーネントの初期化
 	// ================================================================
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
+	if (!CameraComponent) { return; }
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->bUsePawnControlRotation = false;
 
@@ -87,20 +85,6 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 }
 
-void APlayerBase::ApplyDamage(float Damage)
-{
-	ACombatCharacterBase::ApplyDamage(Damage);
-
-	UpdateHUDHP();
-}
-
-void APlayerBase::AddGearEnergy(float Amount)
-{
-	/*if (!Instance || !Instance->GetCharacterParameterData()) { return; }
-	
-	Instance->GetCharacterParameterData()->AddGearEnergy(Amount);*/
-}
-
 void APlayerBase::Move(const FVector2d& InputVector)
 {
 	if (!CanMove()) { return; }
@@ -132,6 +116,6 @@ bool APlayerBase::CanMove()
 void APlayerBase::UpdateHUDHP()
 {
 	if (HUDWidget) {
-		HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
+		//HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
 	}
 }
