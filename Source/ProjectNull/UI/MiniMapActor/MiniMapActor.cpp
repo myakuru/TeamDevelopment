@@ -12,63 +12,55 @@ AMiniMapActor::AMiniMapActor()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// �L���v�`���R���|�[�l���g�̍쐬
+	// 上から見た視点のカメラを作成
 	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent"));
 	RootComponent = SceneCaptureComponent;
 
-	// �^�������
+	// カメラの回転を設定
 	SceneCaptureComponent->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 
-	// ========================================
-	// �~�j�}�b�v�œK���ݒ�
-	// ========================================
 
-	// ���e�ݒ� - �����e�iOrthographic�j�Ńt���b�g�ȕ\��
+	// 平面投影に設定
 	SceneCaptureComponent->ProjectionType = ECameraProjectionMode::Orthographic;
 
 	SceneCaptureComponent->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 
-	// �`��ݒ� - �ȈՓI�ȕ\��
-	SceneCaptureComponent->ShowFlags.SetFog(false);              // �t�H�O����
-	SceneCaptureComponent->ShowFlags.SetAtmosphere(false);       // ��C����
-	SceneCaptureComponent->ShowFlags.SetVolumetricFog(false);    // �{�������g���b�N�t�H�O����
-	SceneCaptureComponent->ShowFlags.SetMotionBlur(false);       // ���[�V�����u���[����
-	SceneCaptureComponent->ShowFlags.SetBloom(false);            // �u���[������
-	SceneCaptureComponent->ShowFlags.SetAmbientOcclusion(false); // �A���r�G���g�I�N���[�W��������
-	SceneCaptureComponent->ShowFlags.SetAntiAliasing(false);     // �A���`�G�C���A�X�����i�y�ʉ��j
-	SceneCaptureComponent->ShowFlags.SetEyeAdaptation(false);    // �ڂ̏�������
-	SceneCaptureComponent->ShowFlags.SetTemporalAA(false);       // TAA����
+	// 映すものを制限するためのShowFlagsの設定
+
+	SceneCaptureComponent->ShowFlags.SetFog(false);              // フォグを無効化
+	SceneCaptureComponent->ShowFlags.SetAtmosphere(false);       // 大気を無効化
+	SceneCaptureComponent->ShowFlags.SetVolumetricFog(false);    // 体積フォグを無効化
+	SceneCaptureComponent->ShowFlags.SetMotionBlur(false);       // モーションブラーを無効化
+	SceneCaptureComponent->ShowFlags.SetBloom(false);            // ブルームを無効化
+	SceneCaptureComponent->ShowFlags.SetAmbientOcclusion(false); // アンビエントオクルージョンを無効化
+	SceneCaptureComponent->ShowFlags.SetAntiAliasing(false);     // アンチエイリアシングを無効化
+	SceneCaptureComponent->ShowFlags.SetEyeAdaptation(false);    // 露出を無効化
+	SceneCaptureComponent->ShowFlags.SetTemporalAA(false);       // Temporal AAを無効化
 
 	// ========================================
-	// �e����S�ɖ�����
+	// シャドウ関連の設定
 	// ========================================
-	SceneCaptureComponent->ShowFlags.SetDynamicShadows(false);      // ���I�e����
-	SceneCaptureComponent->ShowFlags.SetContactShadows(false);      // �R���^�N�g�V���h�E����
-	SceneCaptureComponent->ShowFlags.SetCapsuleShadows(false);      // �J�v�Z���V���h�E����
-	SceneCaptureComponent->ShowFlags.SetShadowFrustums(false);      // �V���h�E�t���X�^������
+	SceneCaptureComponent->ShowFlags.SetDynamicShadows(false);      // 動的シャドウ
+	SceneCaptureComponent->ShowFlags.SetContactShadows(false);      // 接触シャドウ
+	SceneCaptureComponent->ShowFlags.SetCapsuleShadows(false);      // カプセルシャドウ
+	SceneCaptureComponent->ShowFlags.SetShadowFrustums(false);      // シャドウフラスタム
 
-	// ���C�e�B���O��ȑf���i�I�v�V�����F���S�t���b�g�ɂ������ꍇ��Lighting��������j
-	SceneCaptureComponent->ShowFlags.SetLighting(false); // ���C�e�B���O���S����
-	SceneCaptureComponent->ShowFlags.SetReflectionEnvironment(false); // ���˖���
-	SceneCaptureComponent->ShowFlags.SetGlobalIllumination(false);    // GI����
+	// ライディング関連の設定
+	SceneCaptureComponent->ShowFlags.SetLighting(false);			 // ライティングを無効化
+	SceneCaptureComponent->ShowFlags.SetReflectionEnvironment(false); // 環境反射を無効化
+	SceneCaptureComponent->ShowFlags.SetGlobalIllumination(false);    // グローバルイルミネーションを無効化
 
-	// �p�[�e�B�N����f�J�[���̕\���i�K�v�ɉ����Ē����j
-	SceneCaptureComponent->ShowFlags.SetParticles(false);  // �p�[�e�B�N���\��
-	SceneCaptureComponent->ShowFlags.SetDecals(false);    // �f�J�[����\��
-
-	// LOD�ݒ� - �Œ�LOD��g�p���ăp�t�H�[�}���X����
+	// パーティクル関連の設定
+	SceneCaptureComponent->ShowFlags.SetParticles(false);  // パーティクルを無効化
+	SceneCaptureComponent->ShowFlags.SetDecals(false);    // デカールを無効化
+	
+	// LOD関連の設定
 	SceneCaptureComponent->ShowFlags.SetLOD(false);
 
-	// ���̑��̍œK��
-	SceneCaptureComponent->ShowFlags.SetScreenSpaceReflections(false); // SSR����
-	SceneCaptureComponent->ShowFlags.SetAmbientCubemap(false);         // �A���r�G���g�L���[�u�}�b�v����
-	SceneCaptureComponent->ShowFlags.SetDistanceFieldAO(false);        // DFAO����
-
-	// ========================================
-	// �I�v�V����: ����̃A�N�^�[�̂ݕ\��
-	// ========================================
-	// Unreal Engine�́uShow Only Actors�v�@�\��g�p����ꍇ
-	// �G�f�B�^�܂��̓R�[�h��ShowOnlyComponents��ݒ�\
+	// その他の設定
+	SceneCaptureComponent->ShowFlags.SetScreenSpaceReflections(false); // SSRを無効化
+	SceneCaptureComponent->ShowFlags.SetAmbientCubemap(false);         // 環境キューブマップを無効化
+	SceneCaptureComponent->ShowFlags.SetDistanceFieldAO(false);        // DFAOを無効化
 
 	TargetCharacter = nullptr;
 
@@ -89,15 +81,15 @@ void AMiniMapActor::Tick(float DeltaTime)
 	{
 		FVector CharacterLocation = TargetCharacter->GetActorLocation();
 
-		// �J�����̍�����l�����ĐV�����ʒu��v�Z
+		// カメラの高さを考慮して新しい位置を計算
 		FVector NewLocation = FVector(CharacterLocation.X, CharacterLocation.Y, CharacterLocation.Z + CameraHeight);
 
-		// �J�����̈ʒu��X�V
+		// カメラの位置を更新
 		SetActorLocation(NewLocation);
 	}
 	else
 	{
-		// �L�����N�^�[��������Ȃ��ꍇ�͍Ď擾����݂�
+		// 見つからなかったら再度取得
 		TargetCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	}
 

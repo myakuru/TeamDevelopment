@@ -1,9 +1,12 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SuperGameInstance.h"
-#include "../Weapon/Manager/WeaponManager.h"
-#include "../SaveGame/MySaveGame.h"
 #include "Kismet/GameplayStatics.h"
+
+#include <ProjectNull/Weapon/Manager/WeaponManager.h>
+#include <ProjectNull/SaveGame/MySaveGame.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 void USuperGameInstance::Init()
 {
@@ -11,6 +14,10 @@ void USuperGameInstance::Init()
 
 	m_WeaponManager = NewObject<UWeaponManager>(this);
 	if (m_WeaponManager) m_WeaponManager->Initialize(m_WeaponDataTable,m_WeaponMaterialDataTable);
+
+	if (PlayerRuntimeData) {
+		PlayerRuntimeData->Initialize();
+	}
 
 	LoadGameData();
 

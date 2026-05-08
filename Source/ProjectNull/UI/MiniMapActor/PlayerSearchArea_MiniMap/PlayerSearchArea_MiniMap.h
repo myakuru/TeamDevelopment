@@ -7,7 +7,7 @@
 #include "PlayerSearchArea_MiniMap.generated.h"
 
 /**
- * 
+ * プレイヤーの索敵範囲を表示するためのウィジェットクラス
  */
 UCLASS()
 class PROJECTNULL_API UPlayerSearchArea_MiniMap : public UUserWidget
@@ -15,20 +15,16 @@ class PROJECTNULL_API UPlayerSearchArea_MiniMap : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-
-	// �~�j�}�b�v�̃v���C���[���������Image
+	/** プレイヤーの索敵範囲を表示するための画像 */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UImage* PlayerSearchArea;
 
-	// �������֐�
 	virtual void NativeConstruct() override;
 
-	// Tick������L���ɂ��邽�߂̃I�[�o�[���C�h
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
-
-	// �v���C���[�̕�����X�V����֐�
+	/** プレイヤーのUIの索敵範囲を変更 */
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlayerSearchArea(float CameraYaw);
 	

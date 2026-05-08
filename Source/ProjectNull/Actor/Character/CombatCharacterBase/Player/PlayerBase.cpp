@@ -1,73 +1,80 @@
 ﻿#include "PlayerBase.h"
 
 #include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h"
-#include "ProjectNull/Component/PlayerAttackComponent/PlayerAttackComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include <GameFramework/SpringArmComponent.h>
+#include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
+#include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+
 
 APlayerBase::APlayerBase()
 	:	SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
-		AttackComponent(nullptr),
+		AutoAttack(nullptr),
 		GearComponent(nullptr)
 {
 	// ================================================================
-	// ���g�̐ݒ�
+	// プレイヤーの初期化
 	// ================================================================
 
-	// Tick��L���ɂ���
 	PrimaryActorTick.bCanEverTick = true;
-
-	// �R���g���[���[��Yaw��]��L�����N�^�[�ɔ��f�����Ȃ�
 	bUseControllerRotationYaw = false;
 
 	// ================================================================
-	// �J�����X�v�����O�A�[���R���|�[�l���g�̍쐬�Ɛݒ�
+	// スプリングアームの初期化
 	// ================================================================
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
+	if (!SpringArmComponent) { return; }
 	SpringArmComponent->SetupAttachment(GetRootComponent());
-	SpringArmComponent->TargetArmLength = 600.0f;
 	SpringArmComponent->bUsePawnControlRotation = true;
 
 	// ================================================================
-	// �J�����R���|�[�l���g�̍쐬�Ɛݒ�
+	// カメラコンポーネントの初期化
 	// ================================================================
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
+	if (!CameraComponent) { return; }
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->bUsePawnControlRotation = false;
 
-
-	AttackComponent = CreateDefaultSubobject<UPlayerAttackComponent>("Attack");
-	GearComponent	= CreateDefaultSubobject<UPlayerGearComponent>("Gear");
+	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
 }
 
 void APlayerBase::BeginPlay()
 {
+	ACombatCharacterBase::BeginPlay();
 
-	if (AttackComponent)
-	{
-		AttackComponent->SetOwnerPlayer(this);
-	}
+	Instance = GetWorld()->GetGameInstance<USuperGameInstance>();
 
-	if (GearComponent)
-	{
+	if (GearComponent) {
 		GearComponent->SetOwnerPlayer(this);
 	}
 
-	ACombatCharacterBase::BeginPlay();
+	if (AutoAttack) {
+		AutoAttack->Initialize(this);
+	}
 
 	UpdateHUDHP();
 }
 
 void APlayerBase::Tick(float DeltaTime)
 {
+	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+	if (!enemyManager) { return; }
+
+	
 	ACombatCharacterBase::Tick(DeltaTime);
 
-	if (ARobotController* RobotController = Cast<ARobotController>(GetController()))
-	{
+	if (AutoAttack) {
+		AutoAttack->Update(DeltaTime,nullptr,enemyManager);
+	}
+
+	if (ARobotController* RobotController = Cast<ARobotController>(GetController())) {
 		HUDWidget = RobotController->GetPlayerHUD();
 	}
 }
@@ -78,30 +85,34 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 }
 
-void APlayerBase::ApplyDamage(float Damage)
-{
-	ACombatCharacterBase::ApplyDamage(Damage);
-
-	UpdateHUDHP();
-}
-
 void APlayerBase::Move(const FVector2d& InputVector)
 {
 	if (!CanMove()) { return; }
 
-	const FRotator yawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
+	const FRotator YawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
 
-	const FVector forward = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
-	const FVector right = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
+	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(forward, InputVector.Y);
-	AddMovementInput(right, InputVector.X);
+	AddMovementInput(Forward, InputVector.Y);
+	AddMovementInput(Right, InputVector.X);
+}
+
+void APlayerBase::ChangeGear()
+{
+	if (!GearComponent) { return; }
+	GearComponent->ChangeGear();
+}
+
+int32 APlayerBase::GetCurrentGearLevel() const
+{
+	if (!GearComponent) { return 0; }
+	return GearComponent->GetCurrentGearLevel();
 }
 
 bool APlayerBase::CanMove()
 {
-	if(GearComponent && GearComponent->IsMovementBlockedByGear())
-	{
+	if(GearComponent && GearComponent->IsMovementBlockedByGear()) {
 		return false;
 	}
 
@@ -110,8 +121,7 @@ bool APlayerBase::CanMove()
 
 void APlayerBase::UpdateHUDHP()
 {
-	if (HUDWidget)
-	{
-		HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
+	if (HUDWidget) {
+		//HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
 	}
 }

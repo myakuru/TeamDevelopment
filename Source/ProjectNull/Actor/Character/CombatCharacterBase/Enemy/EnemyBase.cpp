@@ -1,39 +1,54 @@
 ﻿
 #include "EnemyBase.h"
+#include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
+#include <ProjectNull/Utility/StateMachine/StateMachine.h>
+#include <ProjectNull/Actor/Item/Pickup/ExperiencePickup/ExperiencePickup.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
+#include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
+#include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
 	,	GameProgress(nullptr)
+	,	EnemyRuntimeData(nullptr)
 	,	EnemyStatus(FEnemyStatus())
 	,	LanchVelocity(FVector::ZeroVector)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
-	// �G�̍U���R���|�[�l���g�̐���
-	EnemyAttackComponent = CreateDefaultSubobject<UEnemyAttackComponent>("EnemyAttack");
+	// 敵の攻撃コンポーネントの生成
+	EnemyAttackComponent	= CreateDefaultSubobject<UEnemyAttackComponent>("EnemyAttack");
+	
+	// 敵のランタイムパラメータ管理クラスの生成
+	EnemyRuntimeData		= CreateDefaultSubobject<UEnemyRuntimeData>("EnemyRuntimeData");
 }
 
+AEnemyBase::~AEnemyBase() = default;
 
 void AEnemyBase::BeginPlay()
 {
 	ACombatCharacterBase::BeginPlay();
 	
-	// �G�Ǘ��N���X�̏��擾
+	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 
 
-	// �G���������ꂽ�ۂɓG�Ǘ��N���X�o�R�Ń��X�g�֓o�^����
+	// 敵が生成された際に敵管理クラス経由でリストへ登録する
 	if (EnemyManager) {
 		EnemyManager->RegisterEnemy(this);
 	}
 
 	CapsuleCollision = GetCapsuleComponent();
 
-	// �R���W�����v���Z�b�g�ݒ�
+	// コリジョンプリセット設定
 	if (CapsuleCollision)
 	{
 		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -43,51 +58,53 @@ void AEnemyBase::BeginPlay()
 		CapsuleCollision->SetGenerateOverlapEvents(true);
 	}
 
-	// �����蔻��̐ݒ�
-	{
-		//// ���g�̃A�N�^�ɂ��Ă���SphereComponent��T��
-		//CapsuleCollision = FindComponentByClass<UCapsuleComponent>();
+	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
+		new TStateMachine<AEnemyBase>()
+	);
 
-		//// SphereCollision�̒��Ƀf�[�^������΁o�p�����s����
-		//if (CapsuleCollision)
-		//{
-		//	// �I�[�o�[���b�v�J�n����onOverlap�֐���ĂԂ悤�ɐݒ�
-		//	CapsuleCollision->OnComponentBeginOverlap.AddDynamic
-		//	(
-		//		this,
-		//		&AEnemyBase::OnOverlap
-		//	);
-
-		//	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase BeginPlay ==="));
-		//}
-	}
-
-	// �R���|�[�l���g�Ɏ��g�̎Q�Ƃ�n��
+	// コンポーネントに自身の参照を渡す
 	{
 		if (EnemyAttackComponent)EnemyAttackComponent->SetOwnerEnemy(this);
 	}
 
-	// �Q�[���̐i�s�ɍ��킹�ēG�p�����[�^��ݒ�
+	// ゲームの進行に合わせて敵パラメータを設定
 	UpdateParams();
+
+	// デリゲートへの関数登録
+	RegisterDelegates();
+}
+
+void AEnemyBase::RegisterDelegates()
+{
+	if (!EnemyRuntimeData) { return; }
+
+	// ~ AddUObject() ~
+	// GC管理・Weak参照
+	// EnemyDestroyした後、残存しても呼ばれない
+
+	// 移動方向
+	EnemyRuntimeData->OnMoveDirChanged.AddUObject(this,&AEnemyBase::SetMoveDir);
+
+	// 距離の二乗値
+	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &AEnemyBase::SetTargetDistanceSqr);
 }
 
 void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
 {
-	EnemyStatus.MoveDir = PlayerLocation - GetActorLocation();
-	EnemyStatus.DistancePlayer = EnemyStatus.MoveDir.Size();
-	EnemyStatus.MoveDir.Normalize();
+	// ランタイムデータ側で計算
+	EnemyRuntimeData->CalcDistanceToTarget(PlayerLocation, GetActorLocation());
 	
-	// �ړ������֕�Ԃ����]��v�Z
+	// 移動方向へ補間する回転を計算
 	const FRotator calcResultRotation = CalculateRotationToMoveDirection(
 										GetActorRotation(),
 										EnemyStatus.MoveDir.Rotation(),
 										EnemyStatus.RotationInterpSpeed,
 										DeltaTime);
 
-	// ��]��X�V
+	// 回転を更新
 	SetActorRotation(calcResultRotation);
 
-	// ���W��X�V
+	// 座標を更新
 	SetActorLocation(CalculateNextActorLocation(EnemyStatus.MoveDir,EnemyStatus.MoveSpeed,DeltaTime), true);
 }
 
@@ -95,35 +112,29 @@ void AEnemyBase::UpdateParams()
 {
 	if (!GameProgress) { return; }
 
-	// �|�����G�������
+	// 倒した敵数を元に
 	const int32 killCount = GameProgress->GetKillCount();
 
-	// �q�b�g�|�C���g�̍X�V
+	// ヒットポイントの更新
 	EnemyStatus.FinalHP = EnemyStatus.HPScaling.GetFinalValue(killCount);
 
-	// �U���͂̍X�V
+	// 攻撃力の更新
 	EnemyStatus.FinalAttack = EnemyStatus.AttackScaling.GetFinalValue(killCount);
 }
-
-//void AEnemyBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	// �ق��̃A�N�^�Əd�Ȃ�����h�����KnockBack�֐���Ăяo��
-//	UE_LOG(LogTemp, Warning, TEXT("=== AEnemyBase OnOverlap ==="));
-//}
 
 void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight)
 {
 	if (EnemyStatus.KnockBackFlg)return;
-	// ������΂��Ɏg�����l����߂�
-	int knockBackPowerLevel = AttackPower - EnemyWeight;
-	if (knockBackPowerLevel < 0)
+	// 吹き飛ばしに使う数値を決める
+	int KnockBackPowerLevel = AttackPower - EnemyWeight;
+	if (KnockBackPowerLevel < 0)
 	{
-		knockBackPowerLevel = 0;
+		KnockBackPowerLevel = 0;
 	}
 
-	const FName RowName = FName(*FString::FromInt(knockBackPowerLevel));
+	const FName RowName = FName(*FString::FromInt(KnockBackPowerLevel));
 
-	// RowName����^�t�Ŏ擾
+	// RowNameから型付で取得
 	const FKnockBackData* KnockBackData =
 		KnockBackDataTable->FindRow<FKnockBackData>(RowName, TEXT("KnockBack"));
 	if (!KnockBackData)
@@ -132,27 +143,25 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 		return;
 	}
 
-	// ��������
+	// 水平方向
 	FVector HorizontalDir = GetActorLocation() - PlayerLocation;
 	HorizontalDir.Z = 0.0f;
 	HorizontalDir.Normalize();
 
-	// ������ъp�x
+	// 吹き飛び角度
 	const float Rad = FMath::DegreesToRadians(KnockBackData->LaunchAngleDeg);
-	// ���������̊p�x�ƃ��W�A���p���Ƃɏ�����̊p�x����
+	// 水平方向の角度とラジアン角をもとに上向きの角度を作る
 	FVector LanchDir = HorizontalDir * FMath::Cos(Rad) + FVector::UpVector * FMath::Sin(Rad);
 	LanchDir.Normalize();
 
 	EnemyStatus.KNockBackVelocity	= LanchDir * KnockBackData->LaunchSpeed;
 	EnemyStatus.KnockBackFlg		= true;
 	EnemyStatus.CanAttack			= false;
-
-	UE_LOG(LogTemp, Warning, TEXT("=== �m�b�N�o�b�N�����l���� ==="));
 }
 
 void AEnemyBase::SetTakeDamaged(int32 AttackPower)
 {
-	// �ȈՓI�ɓn���ꂽ�l��,FinalHP����Z
+	// 簡易的に渡された値分,FinalHPを減算
 	EnemyStatus.FinalHP -= AttackPower;
 
 	if (EnemyStatus.FinalHP <= 0)
@@ -165,36 +174,35 @@ void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPow
 {
 	FVector CurrentLocation = GetActorLocation();
 
-	// �d�́i���j
+	// 重力（仮）
 	const float Gravity = -980.0f;
 
-	// �d�͂𑬓x�ɉ��Z
+	// 重力を速度に加算
 	EnemyStatus.KNockBackVelocity.Z += Gravity * DeltaTime;
 
-	// �ʒu�X�V
+	// 位置更新
 	FVector NextLocation = CurrentLocation + EnemyStatus.KNockBackVelocity * DeltaTime;
 
 	FHitResult HitResult;
 	SetActorLocation(NextLocation, true, &HitResult);
 
-	// �ǂ����ɓ����������~
+	// どこかに当たったら停止
 	if (HitResult.bBlockingHit)
 	{
 		AActor* HitActor = HitResult.GetActor();
 
 		if (HitActor)
 		{
-			// �v���C���[ or �G�l�~�[�Ȃ疳��
+			// プレイヤー or エネミーなら無視
 			if (HitActor->IsA(ACharacter::StaticClass()) ||
 				HitActor->IsA(AEnemyBase::StaticClass()))
 			{
-				return; // ��~���Ȃ�
+				return; // 停止しない
 			}
 		}
 
 		EnemyStatus.KnockBackFlg = false;
 		EnemyStatus.KNockBackVelocity = FVector::ZeroVector;
-		UE_LOG(LogTemp, Warning, TEXT("=== �m�b�N�o�b�N��~ ==="));
 	}
 }
 
@@ -211,18 +219,90 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AEnemyBase::OnDeath()
 {
-	// �G�����񂾍ۂɓG�Ǘ��N���X�o�R�Ń��X�g���玩�g��폜����
+	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
 	if (EnemyManager) {
 		EnemyManager->RemoveEnemy(this);
 	}
 
-	// �G�����񂾍ۂɃQ�[���̐i�s�Ǘ��N���X�o�R�œ|�����G������Z����
+	// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
 	if (GameProgress) {
 		GameProgress->AddKillCount();
 	}
 
-	// ���g����x���������
-	Destroy();
+	// 敵が死んだ際にパーティクルを出す
+	if (EnemyParticle.DeathEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			EnemyParticle.DeathEffect,
+			GetActorLocation(),
+			GetActorRotation(),
+			FVector(1.0f),
+			true,   // bAutoDestroy
+			true,   // bAutoActivate
+			ENCPoolMethod::None,
+			true    // bPreCullCheck
+		);
+	}
+
+	/** 敵が死んだ際に経験値を落とす*/
+	//if (ExperiencePickupClass)
+	//{
+	//	/** Actorのパラメータ設定*/
+	//	FActorSpawnParameters SpawnParams;
+	//	SpawnParams.Owner = this;
+
+	//	/** 経験値クラスにパラメータをセット*/
+	//	AExperiencePickup* ExpPickup = GetWorld()->SpawnActor<AExperiencePickup>(
+	//		ExperiencePickupClass,
+	//		GetActorLocation(),
+	//		FRotator::ZeroRotator,
+	//		SpawnParams
+	//	);
+
+	//	if (ExpPickup)
+	//	{
+	//		ExpPickup->SetExpValue(EnemyStatus.EXP);
+
+	//		if (UItemManagerSubsystem* ItemSubsystem =
+	//			GetWorld()->GetSubsystem<UItemManagerSubsystem>())
+	//		{
+	//			ItemSubsystem->RegisterPickupItem(ExpPickup);
+	//			UE_LOG(LogTemp, Warning, TEXT("Register ExpPickup"));
+	//		}
+	//	}
+	//}
+
+	// 経験値ドロップ
+	if (UItemManagerSubsystem* ItemSubsystem =
+		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
+	{
+		const FLinearColor Color = EnemyStatus.ExpColor;
+		const float Size = EnemyStatus.ExpSize;
+
+		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
+			GetActorLocation(),
+			static_cast<float>(EnemyStatus.EXP),
+			Color,
+			Size
+		);
+	}
+
+	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
+	if (USuperGameInstance* GameInstance =
+		GetWorld()->GetGameInstance<USuperGameInstance>())
+	{
+		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.EXP);
+		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
+	}
+
+	// PoolSubSystemに返却する
+	// Return()の中でDeactivate()が呼ばれて非表示・Tick停止でPool待機に戻る
+	if (UEnemyPoolSubSystem* PoolSubSystem =
+		GetWorld()->GetSubsystem<UEnemyPoolSubSystem>())
+	{
+		PoolSubSystem->Return(this);
+	}
 }
 
 void AEnemyBase::CheckCanAttack()
@@ -230,8 +310,8 @@ void AEnemyBase::CheckCanAttack()
 	// ���ɍU���\�Ȃ珈����I��
 	//if (CanAttack()) { return; }
 
-	// �v���C���[�Ƃ̋������U���\�������
-	if (EnemyStatus.DistancePlayer < EnemyStatus.AttackDistance)
+	// プレイヤーとの距離が攻撃可能距離内か
+	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
 	{
 		EnemyStatus.CanAttack = true;
 	}
@@ -254,3 +334,84 @@ FRotator AEnemyBase::CalculateRotationToMoveDirection(const FRotator& CurrentRot
 							RotationInterpSpeed);
 }
 
+void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
+{
+	// ヌルチェック
+	check(InData != nullptr);
+	EnemyDataAsset = InData;
+	// Stateを初期化してChaseから開始
+	StateMachine->Start(this);
+
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	//SetActorTickEnabled(true);
+
+	// 敵管理クラスの情報取得
+	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+
+
+	// 敵が生成された際に敵管理クラス経由でリストへ登録する
+	if (EnemyManager) {
+		EnemyManager->RegisterEnemy(this);
+	}
+
+	CapsuleCollision = GetCapsuleComponent();
+
+	// コリジョンプリセット設定
+	if (CapsuleCollision)
+	{
+		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CapsuleCollision->SetCollisionObjectType(ECC_Pawn);
+		CapsuleCollision->SetCollisionResponseToAllChannels(ECR_Block);
+		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CapsuleCollision->SetGenerateOverlapEvents(true);
+	}
+
+	//StateMachine = MakeUnique<TStateMachine<AEnemyBase>>();
+
+	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
+		new TStateMachine<AEnemyBase>()
+	);
+
+	// コンポーネントに自身の参照を渡す
+	{
+		if (EnemyAttackComponent)EnemyAttackComponent->SetOwnerEnemy(this);
+	}
+
+	// ゲームの進行に合わせて敵パラメータを設定
+	UpdateParams();
+
+	SetActorLocation(LocalPos);
+
+#if WITH_EDITOR
+	SetFolderPath(TEXT("Pool/Active"));
+#endif
+
+	UE_LOG(LogTemp, Warning, TEXT("EnemyBase Activate"));
+}
+
+void AEnemyBase::Deactivate()
+{
+	StateMachine->ClearState();
+	
+	/** エディタ上でフォルダに入れる*/
+#if WITH_EDITOR
+	SetFolderPath(TEXT("Pool/Inactive"));
+#endif
+
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+
+	EnemyStatus.KnockBackFlg = false;
+}
+
+TStateMachine<AEnemyBase>& AEnemyBase::GetStateMachine()
+{
+	return *StateMachine;
+}
+
+void FStateMachineDeleter::operator()(TStateMachine<AEnemyBase>* Ptr) const
+{
+	delete Ptr;
+}

@@ -6,6 +6,7 @@ void UGameProgressSubsystem::AddKillCount(int32 Value)
 {
 	// ���Z����
 	KillCount += Value;
+	UE_LOG(LogTemp, Warning, TEXT("hi KillCount"), KillCount);
 
 	// �t�F�[�Y�X�V���\�b�h��Ă�
 	UpdatePhase();

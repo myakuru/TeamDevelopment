@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
@@ -8,9 +6,11 @@
 
 class UWeaponManager;
 class UMySaveGame;
+class UPlayerParameterData;
+class UPlayerRuntimeData;
 
 /**
- * 
+ * ゲーム全体で共有されるデータや機能を管理するクラス
  */
 UCLASS()
 class PROJECTNULL_API USuperGameInstance : public UGameInstance
@@ -21,25 +21,31 @@ public:
 
 	virtual void Init()override;
 
-	UPROPERTY()
-	UMySaveGame* m_CurrentSaveData;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	UDataTable* m_WeaponDataTable;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	UDataTable* m_WeaponMaterialDataTable;
-	
-	UPROPERTY(BlueprintReadOnly)
-	UWeaponManager* m_WeaponManager;
-
 	UFUNCTION(BlueprintCallable)
 	void LoadGameData();
 
 	UFUNCTION(BlueprintCallable)
 	void SaveGameData();
 
-private:
-	
+	/** パラメーターを取得する */
+	inline TObjectPtr<UPlayerParameterData> GetCharacterParameterData() const { return CharacterParameterData; }
+	inline TObjectPtr<UPlayerRuntimeData> GetPlayerRuntimeData() const { return PlayerRuntimeData; }
 
+protected:
+
+	UPROPERTY()
+	UMySaveGame* m_CurrentSaveData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UDataTable* m_WeaponDataTable;
+
+	UPROPERTY(BlueprintReadOnly)
+	UWeaponManager* m_WeaponManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UPlayerParameterData> CharacterParameterData;
+
+	/** Runtimeデータ 実行時に変更されるデータを計算、適用するクラス */
+	UPROPERTY(EditAnywhere, Instanced)
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 };

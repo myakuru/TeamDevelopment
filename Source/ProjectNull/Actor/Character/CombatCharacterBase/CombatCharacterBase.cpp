@@ -22,11 +22,6 @@ void ACombatCharacterBase::Tick(float DeltaTime)
 void ACombatCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
-void ACombatCharacterBase::ApplyDamage(float Damage)
-{
-	CombatStats.HP.Current -= Damage;
-}
 

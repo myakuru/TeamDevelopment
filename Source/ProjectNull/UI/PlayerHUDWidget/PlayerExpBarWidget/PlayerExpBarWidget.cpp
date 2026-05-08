@@ -5,15 +5,16 @@
 
 #include "Components/Image.h"
 
-void UPlayerExpBarWidget::SetExp(int32 CurrentExp, int32 NextLevelExp)
+void UPlayerExpBarWidget::SetExp(float CurrentExp, float NextLevelExp)
 {
-	if (!ExpImage || NextLevelExp <= 0)
+	if (ExpImage)
 	{
-		return;
+		float ExpRatio = CurrentExp / NextLevelExp;
+
+		UE_LOG(LogTemp, Log, TEXT("CurrentExp: %f, NextLevelExp: %f, ExpRatio: %f"), CurrentExp, NextLevelExp, ExpRatio);
+
+		ExpImage->SetRenderTransformPivot(FVector2D(0.0f, 0.5f));
+
+		ExpImage->SetRenderScale(FVector2D(ExpRatio, 1.0f));
 	}
-
-	const float ExpRatio = static_cast<float>(CurrentExp) / static_cast<float>(NextLevelExp);
-
-	ExpImage->SetRenderTransformPivot(FVector2D(0.0f, 0.5f));
-	ExpImage->SetRenderScale(FVector2D(FMath::Clamp(ExpRatio, 0.0f, 1.0f), 1.0f));
 }

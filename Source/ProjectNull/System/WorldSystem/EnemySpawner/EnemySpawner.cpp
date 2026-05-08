@@ -10,6 +10,7 @@
 
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/System/WorldSystem/EnemySpawner/EnemyPhaseSpawnTable.h>
+#include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 #include "Engine/GameInstance.h"
 
 AEnemySpawner::AEnemySpawner()
@@ -21,6 +22,28 @@ AEnemySpawner::AEnemySpawner()
 void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// フェーズテーブル情報が存在する時のみ実行
+	if (PhaseSpawnTable)
+	{
+		UEnemyPoolSubSystem* PoolSubSystem =
+			GetWorld()->GetSubsystem<UEnemyPoolSubSystem>();
+
+		for (const FPhaseSpawnWave& WaveData : PhaseSpawnTable->PhaseWaves)
+		{
+			if (!WaveData.WaveData) { continue; }
+
+			// ウェーブデータ分のプールを確保
+			for (const FEnemySpawnUnit& SpawnUnit : WaveData.WaveData->Enemies)
+			{
+				if (SpawnUnit.PoolConfig && PoolSubSystem)
+				{
+					// 生成するデータのDataAssetを入れる
+					PoolSubSystem->WarmUp(SpawnUnit.PoolConfig);
+				}
+			}
+		}
+	}
 
 	// 出現タイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
@@ -42,6 +65,7 @@ void AEnemySpawner::BeginPlay()
 void AEnemySpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	// 登録していたフェーズ情報を解除
+	// レベル遷移時にダングリングポインタが発生する
 	if (CachedSubsystem)
 	{
 		CachedSubsystem->OnPhaseChanged.RemoveAll(this);
@@ -63,17 +87,20 @@ void AEnemySpawner::SpawnEnemy()
 	}
 
 	// プレイヤーの情報を取得する（0番:1P）
-	const APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (!pPlayerPawn) { return; }
+	const APawn* PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (!PPlayerPawn) { return; }
 
 	// プレイヤーの場所（Location）
-	const FVector playerLocation = pPlayerPawn->GetActorLocation();
+	const FVector PlayerLocation = PPlayerPawn->GetActorLocation();
 
 	// フェーズに対応した生成数を取得
-	const int32 spawnNum = PhaseSpawnTable->FindEnemyNumByPhase(NowPhase);
+	const int32 SpawnNum = PhaseSpawnTable->FindEnemyNumByPhase(NowPhase);
+
+	// プールのサブシステムを取得
+	UEnemyPoolSubSystem* poolSubSystem = GetWorld()->GetSubsystem<UEnemyPoolSubSystem>();
 
 	// 各データテーブルの持つフェーズの敵生成数に応じて敵を生成
-	for (int i = 0; i < spawnNum; i++)
+	for (int i = 0; i < SpawnNum; i++)
 	{
 		// 確率の合計を計算
 		int TotalWeight = 0;
@@ -99,20 +126,31 @@ void AEnemySpawner::SpawnEnemy()
 
 				// 座標を出現パターンの派生先から取得
 				TArray<FVector> SpawnLocations =
-					Unit.SpawnPattern->GenerateSpawnTransforms(1, playerLocation);
+					Unit.SpawnPattern->GenerateSpawnTransforms(1, PlayerLocation);
 
 				for (FVector& SpawnLocation : SpawnLocations)
 				{
 					FHitResult HitResult;
-					if (IsIntersectingStaticObjects(HitResult, SpawnLocation)
-						&& HitResult.Normal.Z > SpawnParams.MinGroundNormalZ)
-						// 情報に基づいてアクターを出現させる
+					//if (IsIntersectingStaticObjects(HitResult, SpawnLocation)
+					//&& HitResult.Normal.Z > SpawnParams.MinGroundNormalZ)
+					if (!IsIntersectingStaticObjects(HitResult, SpawnLocation)) { continue; }
+					if (HitResult.Normal.Z <= SpawnParams.MinGroundNormalZ) { continue; }
+					// 情報に基づいてアクターを出現させる
 					{
-						GetWorld()->SpawnActor<AActor>(
-							Unit.EnemyClass, SpawnLocation, FRotator::ZeroRotator);
+						// プール経由でスポーンする
+						if (Unit.PoolConfig && poolSubSystem)
+						{
+							poolSubSystem->Spawn(Unit.PoolConfig, SpawnLocation);
+						}
+						else if (Unit.EnemyClass)
+						{
+							// PoolConfig未設定の場合はSpawnActorにフォールバック
+							AActor* Ac = GetWorld()->SpawnActor<AActor>(
+								Unit.EnemyClass, SpawnLocation, FRotator::ZeroRotator);
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
 	}
@@ -121,20 +159,20 @@ void AEnemySpawner::SpawnEnemy()
 bool AEnemySpawner::IsIntersectingStaticObjects(FHitResult& HitResult, FVector& SpawnLocationXY)
 {
 	// Rayの座標を求める
-	FVector rayStart = SpawnLocationXY + FVector(0.0f, 0.0f, SpawnParams.RayStartHeight);
-	FVector rayEnd = SpawnLocationXY - FVector(0.0f, 0.0f, SpawnParams.RayEndDepth);
+	FVector RayStart = SpawnLocationXY + FVector(0.0f, 0.0f, SpawnParams.RayStartHeight);
+	FVector RayEnd = SpawnLocationXY - FVector(0.0f, 0.0f, SpawnParams.RayEndDepth);
 
 	// Rayがワールドの静的オブジェクトに衝突しているか調べる
-	const bool isIntersect = GetWorld()->LineTraceSingleByChannel(HitResult, rayStart, rayEnd, ECollisionChannel::ECC_Visibility);
+	const bool IsIntersect = GetWorld()->LineTraceSingleByChannel(HitResult, RayStart, RayEnd, ECollisionChannel::ECC_Visibility);
 
 	// 衝突していたら衝突した座標を出現座標にする
-	if (isIntersect)
+	if (IsIntersect)
 	{
 		SpawnLocationXY = HitResult.Location;
 		SpawnLocationXY.Z += SpawnParams.SpawnOffsetZ;
 	}
 
-	return isIntersect;
+	return IsIntersect;
 }
 
 void AEnemySpawner::HandlePhaseChanged(int NewPhase)

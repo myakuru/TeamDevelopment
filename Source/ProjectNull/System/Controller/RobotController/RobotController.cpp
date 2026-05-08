@@ -10,11 +10,14 @@
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 
 
-ARobotController::ARobotController()
-	:	InputContext(nullptr),
+ARobotController::ARobotController():
+		PlayerBase(nullptr),
+		InputContext(nullptr),
 		MoveAction(nullptr),
 		LookAction(nullptr),
 		JumpAction(nullptr),
+		ChangeGearAction(nullptr),
+		GearAction01(nullptr),
 		PlayerHUD(nullptr)
 {
 	bReplicates = true;
@@ -24,10 +27,10 @@ void ARobotController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ���̓}�b�s���O�R���e�L�X�g�֘A�̏�����
+	PlayerBase = Cast<APlayerBase>(GetCharacter());
+
 	InitializeInputContext();
 
-	// UI�̏�����
 	InitializeUI();
 }
 
@@ -35,62 +38,58 @@ void ARobotController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* enhacedInput = Cast<UEnhancedInputComponent>(InputComponent)) 
-	{
-		enhacedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
-		enhacedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
-		enhacedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ARobotController::Jump);
-		enhacedInput->BindAction(GearAction01, ETriggerEvent::Started, this, &ARobotController::GearExecute01);
-	}
+	if (!Cast<UEnhancedInputComponent>(InputComponent)) { return; }
+	auto* EnhacedInput = Cast<UEnhancedInputComponent>(InputComponent);
+	
+	EnhacedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
+	EnhacedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
+	EnhacedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ARobotController::Jump);
+	EnhacedInput->BindAction(ChangeGearAction, ETriggerEvent::Started, this, &ARobotController::ChangeGear);
+	EnhacedInput->BindAction(GearAction01, ETriggerEvent::Started, this, &ARobotController::GearExecute01);
 }
 
 void ARobotController::InitializeInputContext()
 {
 	if (!InputContext) { return; }
 
-	if (UEnhancedInputLocalPlayerSubsystem* subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer())) 
-	{
-		subSystem->AddMappingContext(InputContext, 0);
+	if (auto* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer())) {
+		SubSystem->AddMappingContext(InputContext, 0);
 	}
 }
 
 void ARobotController::Move(const FInputActionValue& MoveActionValue)
 {
-	APlayerBase* controlledPlayer = Cast<APlayerBase>(GetCharacter());
-	if (!controlledPlayer) { return; }
+	if (!Cast<APlayerBase>(GetCharacter())) { return; }
+	auto* ControlledPlayer = Cast<APlayerBase>(GetCharacter());
 
-	controlledPlayer->Move(MoveActionValue.Get<FVector2D>());
+	ControlledPlayer->Move(MoveActionValue.Get<FVector2D>());
 }
 
 void ARobotController::Look(const FInputActionValue& LookActionValue)
 {
-	const FVector2D lookVector = LookActionValue.Get<FVector2D>();
-	AddYawInput(lookVector.X);
-	AddPitchInput(lookVector.Y);
+	const FVector2D LookVector = LookActionValue.Get<FVector2D>();
+	AddYawInput(LookVector.X);
+	AddPitchInput(LookVector.Y);
 }
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
-	// �W�����v�̎��s
-	if (ACharacter* controlledCharacter = GetCharacter())
-	{
-		controlledCharacter->Jump();
-	}
+	if (!GetCharacter()) { return; }
+	GetCharacter()->Jump();
+}
+
+void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
+{
+	if (!PlayerBase) { return; }
+	PlayerBase->ChangeGear();
 }
 
 void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 {
-	UE_LOG(LogTemp, Warning, TEXT("aaaaa"));
-	if (APlayerBase* controlledPlayer = Cast<APlayerBase>(GetCharacter()))
-	{
-		if (UPlayerGearComponent* gearComponent = controlledPlayer->GetGearComponent())
-		{
-			gearComponent->ExecuteGear(0);
-		}
-	}
+	if (!PlayerBase || !PlayerBase->GetGearComponent()) { return; }
+	PlayerBase->GetGearComponent()->ExecuteGear(0);
 }
 
-// UI�̏������֐�
 void ARobotController::InitializeUI()
 {
 
@@ -98,7 +97,6 @@ void ARobotController::InitializeUI()
 	{
 		PlayerHUD		= CreateWidget<UPlayerHUDWidget>	(this, PlayerHUDClass);
 
-		// HUD�̕\��
 		if (PlayerHUD)
 		{
 			PlayerHUD->AddToViewport();

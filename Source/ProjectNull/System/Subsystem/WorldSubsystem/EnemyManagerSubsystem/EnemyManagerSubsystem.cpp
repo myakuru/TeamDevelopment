@@ -26,16 +26,16 @@ void UEnemyManagerSubsystem::RemoveEnemy(AEnemyBase* Enemy)
 
 void UEnemyManagerSubsystem::UpdateEnemies(float DeltaTime)
 {
-	// �v���C���[�̏���擾����i0��:1P�j
-	APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (!pPlayerPawn) { return; }
+	// プレイヤーの情報を取得する（0番:1P）
+	APawn* PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (!PPlayerPawn) { return; }
 	
-	// ���ׂēG�̍X�V���\�b�h��Ă�
-	for (AEnemyBase* enemy : EnemyGruntList) 
+	// すべて敵の更新メソッドを呼ぶ
+	for (AEnemyBase* Enemy : EnemyGruntList) 
 	{
-		if (enemy) 
+		if (Enemy) 
 		{
-			enemy->OnUpdate(pPlayerPawn, DeltaTime);
+			Enemy->OnUpdate(PPlayerPawn, DeltaTime);
 		}
 	}
 }
