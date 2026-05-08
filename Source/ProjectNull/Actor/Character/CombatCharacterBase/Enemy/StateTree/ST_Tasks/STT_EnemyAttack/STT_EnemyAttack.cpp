@@ -1,7 +1,7 @@
 ﻿#include "STT_EnemyAttack.h"
 
 USTT_EnemyAttack::USTT_EnemyAttack(const FObjectInitializer& a_ObjInit)
-	:	Super(a_ObjInit)
+	: Super(a_ObjInit)
 {
 	// Tick処理有効化
 	bShouldCallTick = true;

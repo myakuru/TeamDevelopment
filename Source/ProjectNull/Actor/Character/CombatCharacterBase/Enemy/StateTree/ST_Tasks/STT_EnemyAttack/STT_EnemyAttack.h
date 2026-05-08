@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/StateTreeTaskBlueprintBase.h"
@@ -27,7 +25,7 @@ public:
 
 private:
 
-	UPROPERTY(EditAnywhere, Instaced, Category = "AttackPara")
+	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
 	TObjectPtr<UAttackBase> Attack;
 
 };
