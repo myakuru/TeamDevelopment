@@ -1,6 +1,6 @@
-/**
-* ƒAƒCƒeƒ€ŠÖ˜A‚ğŠÇ—‚·‚éƒ}ƒl[ƒWƒƒ[
-* Šeí—Ş‚ÌƒAƒCƒeƒ€‚ğŠÇ—‚·‚éƒ}ƒl[ƒWƒƒ[’B‚ğŠÇ—‚·‚é
+ï»¿/**
+* ã‚¢ã‚¤ãƒ†ãƒ é–¢é€£ã‚’ç®¡ç†ã™ã‚‹ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
+* å„ç¨®é¡ã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’ç®¡ç†ã™ã‚‹ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼é”ã‚’ç®¡ç†ã™ã‚‹
 */
 
 #pragma once
@@ -9,18 +9,26 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "ItemManagerSubsystem.generated.h"
 
-/** ƒAƒCƒeƒ€‚Ì’†ŠÔƒNƒ‰ƒX*/
+/** ã‚¢ã‚¤ãƒ†ãƒ ã®ä¸­é–“ã‚¯ãƒ©ã‚¹*/
 class AItemBase;
 
-/** E‚¢W‚ß‚éƒAƒCƒeƒ€‚ÌŠÇ—ƒNƒ‰ƒX*/
+/** æ‹¾ã„é›†ã‚ã‚‹ã‚¢ã‚¤ãƒ†ãƒ ã®ç®¡ç†ã‚¯ãƒ©ã‚¹*/
 class FPickupItemManager;
+
+/** çµŒé¨“å€¤ã‚’ãƒŠã‚¤ã‚¢ã‚¬ãƒ©ã§ç®¡ç†ã™ã‚‹ã‚¯ãƒ©ã‚¹*/
+class FExperiencePickupManager;
 
 struct FPickupItemManagerDeleter
 {
 	void operator()(FPickupItemManager* Ptr) const;
 };
 
-/** ƒAƒCƒeƒ€ŠÇ—ƒNƒ‰ƒX*/
+struct FExperiencePickupManagerDeleter
+{
+	void operator()(FExperiencePickupManager* Ptr) const;
+};
+
+/** ã‚¢ã‚¤ãƒ†ãƒ ç®¡ç†ã‚¯ãƒ©ã‚¹*/
 UCLASS()
 class PROJECTNULL_API UItemManagerSubsystem : public UWorldSubsystem
 {
@@ -28,21 +36,25 @@ class PROJECTNULL_API UItemManagerSubsystem : public UWorldSubsystem
 
 public:
 
-	/** ƒTƒuƒVƒXƒeƒ€‚Ì¶¬‰Šú‰»*/
+	/** ã‚µãƒ–ã‚·ã‚¹ãƒ†ãƒ ã®ç”Ÿæˆæ™‚åˆæœŸåŒ–*/
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	void Deinitialize();
 
-	/** ‚·‚×‚Ä‚ÌƒAƒCƒeƒ€ƒ}ƒl[ƒWƒƒ[‚ÌXV*/
+	/** ã™ã¹ã¦ã®ã‚¢ã‚¤ãƒ†ãƒ ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®æ›´æ–°*/
 	void UpdateItemManagers(float DeltaTime);
 
-	/** E‚¢W‚ß‚éƒAƒCƒeƒ€‚Ì“o˜^Aíœ*/
+	/** æ‹¾ã„é›†ã‚ã‚‹ã‚¢ã‚¤ãƒ†ãƒ ã®ç™»éŒ²ã€å‰Šé™¤*/
 	void RegisterPickupItem(AItemBase* Item);
 	void RemovePickupItem(AItemBase* Item);
 
-	/** ‘ƒAƒCƒeƒ€”æ“¾*/
+	/** ç·ã‚¢ã‚¤ãƒ†ãƒ æ•°å–å¾—*/
 	int GetItemNum() const;
+
+	/** çµŒé¨“å€¤ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã¸ã®ã‚¢ã‚¯ã‚»ã‚¹*/
+	FExperiencePickupManager& GetExperiencePickupManager();
 
 private:
 
 	TUniquePtr<FPickupItemManager, FPickupItemManagerDeleter> PickupItemManager;
-
+	TUniquePtr<FExperiencePickupManager, FExperiencePickupManagerDeleter> ExperiencePickupManager;
 };

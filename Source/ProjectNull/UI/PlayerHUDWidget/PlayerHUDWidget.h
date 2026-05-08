@@ -13,6 +13,7 @@ class UGearChangeWidget;
 class USkillWidgetBase;
 class UGameTimerWidget;
 class UPlayerHpBarWidget;
+class UPlayerRuntimeData;
 
 UCLASS()
 class PROJECTNULL_API UPlayerHUDWidget : public UUserWidget
@@ -68,6 +69,9 @@ protected:
 
 	/** ゲームインスタンスへの参照 */
 	TObjectPtr<USuperGameInstance> GameInstance;
+
+	/** プレイヤーのランタイムデータへの参照 */
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 
 public:
 

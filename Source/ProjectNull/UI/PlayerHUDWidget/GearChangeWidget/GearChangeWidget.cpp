@@ -6,7 +6,7 @@
 #include "Components/TextBlock.h"
 
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Data/CharacterParameterData/CharacterParameterData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 void UGearChangeWidget::NativeConstruct()
 {

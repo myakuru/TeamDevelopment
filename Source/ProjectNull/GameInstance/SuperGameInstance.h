@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
@@ -8,7 +6,8 @@
 
 class UWeaponManager;
 class UMySaveGame;
-class UCharacterParameterData;
+class UPlayerParameterData;
+class UPlayerRuntimeData;
 
 /**
  * ゲーム全体で共有されるデータや機能を管理するクラス
@@ -29,7 +28,8 @@ public:
 	void SaveGameData();
 
 	/** パラメーターを取得する */
-	TObjectPtr<UCharacterParameterData> GetCharacterParameterData() const { return CharacterParameterData; }
+	inline TObjectPtr<UPlayerParameterData> GetCharacterParameterData() const { return CharacterParameterData; }
+	inline TObjectPtr<UPlayerRuntimeData> GetPlayerRuntimeData() const { return PlayerRuntimeData; }
 
 protected:
 
@@ -43,6 +43,9 @@ protected:
 	UWeaponManager* m_WeaponManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UCharacterParameterData> CharacterParameterData;
+	TObjectPtr<UPlayerParameterData> CharacterParameterData;
 
+	/** Runtimeデータ 実行時に変更されるデータを計算、適用するクラス */
+	UPROPERTY(EditAnywhere, Instanced)
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 };

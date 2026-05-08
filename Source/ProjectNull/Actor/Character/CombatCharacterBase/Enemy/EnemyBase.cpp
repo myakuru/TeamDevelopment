@@ -1,26 +1,34 @@
 ﻿
 #include "EnemyBase.h"
-#include <ProjectNull/Utility/StateMachine/StateMachine.h>
+#include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
+#include <ProjectNull/Utility/StateMachine/StateMachine.h>
+#include <ProjectNull/Actor/Item/Pickup/ExperiencePickup/ExperiencePickup.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
+#include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
+#include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
-#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
-#include <ProjectNull/Actor/Item/Pickup/ExperiencePickup/ExperiencePickup.h>
-#include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
-#include "EnemyDataAsset.h"
+#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
 	,	GameProgress(nullptr)
+	,	EnemyRuntimeData(nullptr)
 	,	EnemyStatus(FEnemyStatus())
 	,	LanchVelocity(FVector::ZeroVector)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
 	// 敵の攻撃コンポーネントの生成
-	EnemyAttackComponent = CreateDefaultSubobject<UEnemyAttackComponent>("EnemyAttack");
+	EnemyAttackComponent	= CreateDefaultSubobject<UEnemyAttackComponent>("EnemyAttack");
+	
+	// 敵のランタイムパラメータ管理クラスの生成
+	EnemyRuntimeData		= CreateDefaultSubobject<UEnemyRuntimeData>("EnemyRuntimeData");
 }
 
 AEnemyBase::~AEnemyBase() = default;
@@ -61,13 +69,30 @@ void AEnemyBase::BeginPlay()
 
 	// ゲームの進行に合わせて敵パラメータを設定
 	UpdateParams();
+
+	// デリゲートへの関数登録
+	RegisterDelegates();
+}
+
+void AEnemyBase::RegisterDelegates()
+{
+	if (!EnemyRuntimeData) { return; }
+
+	// ~ AddUObject() ~
+	// GC管理・Weak参照
+	// EnemyDestroyした後、残存しても呼ばれない
+
+	// 移動方向
+	EnemyRuntimeData->OnMoveDirChanged.AddUObject(this,&AEnemyBase::SetMoveDir);
+
+	// 距離の二乗値
+	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &AEnemyBase::SetTargetDistanceSqr);
 }
 
 void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
 {
-	EnemyStatus.MoveDir = PlayerLocation - GetActorLocation();
-	EnemyStatus.DistancePlayer = EnemyStatus.MoveDir.Size();
-	EnemyStatus.MoveDir.Normalize();
+	// ランタイムデータ側で計算
+	EnemyRuntimeData->CalcDistanceToTarget(PlayerLocation, GetActorLocation());
 	
 	// 移動方向へ補間する回転を計算
 	const FRotator calcResultRotation = CalculateRotationToMoveDirection(
@@ -101,13 +126,13 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 {
 	if (EnemyStatus.KnockBackFlg)return;
 	// 吹き飛ばしに使う数値を決める
-	int knockBackPowerLevel = AttackPower - EnemyWeight;
-	if (knockBackPowerLevel < 0)
+	int KnockBackPowerLevel = AttackPower - EnemyWeight;
+	if (KnockBackPowerLevel < 0)
 	{
-		knockBackPowerLevel = 0;
+		KnockBackPowerLevel = 0;
 	}
 
-	const FName RowName = FName(*FString::FromInt(knockBackPowerLevel));
+	const FName RowName = FName(*FString::FromInt(KnockBackPowerLevel));
 
 	// RowNameから型付で取得
 	const FKnockBackData* KnockBackData =
@@ -221,31 +246,53 @@ void AEnemyBase::OnDeath()
 	}
 
 	/** 敵が死んだ際に経験値を落とす*/
-	if (ExperiencePickupClass)
-	{
-		/** Actorのパラメータ設定*/
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
+	//if (ExperiencePickupClass)
+	//{
+	//	/** Actorのパラメータ設定*/
+	//	FActorSpawnParameters SpawnParams;
+	//	SpawnParams.Owner = this;
 
-		/** 経験値クラスにパラメータをセット*/
-		AExperiencePickup* ExpPickup = GetWorld()->SpawnActor<AExperiencePickup>(
-			ExperiencePickupClass,
+	//	/** 経験値クラスにパラメータをセット*/
+	//	AExperiencePickup* ExpPickup = GetWorld()->SpawnActor<AExperiencePickup>(
+	//		ExperiencePickupClass,
+	//		GetActorLocation(),
+	//		FRotator::ZeroRotator,
+	//		SpawnParams
+	//	);
+
+	//	if (ExpPickup)
+	//	{
+	//		ExpPickup->SetExpValue(EnemyStatus.EXP);
+
+	//		if (UItemManagerSubsystem* ItemSubsystem =
+	//			GetWorld()->GetSubsystem<UItemManagerSubsystem>())
+	//		{
+	//			ItemSubsystem->RegisterPickupItem(ExpPickup);
+	//			UE_LOG(LogTemp, Warning, TEXT("Register ExpPickup"));
+	//		}
+	//	}
+	//}
+
+	// 経験値ドロップ
+	if (UItemManagerSubsystem* ItemSubsystem =
+		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
+	{
+		const FLinearColor Color = EnemyStatus.ExpColor;
+		const float Size = EnemyStatus.ExpSize;
+
+		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
 			GetActorLocation(),
-			FRotator::ZeroRotator,
-			SpawnParams
+			static_cast<float>(EnemyStatus.EXP),
+			Color,
+			Size
 		);
 
-		if (ExpPickup)
-		{
-			ExpPickup->SetExpValue(EnemyStatus.EXP);
-
-			if (UItemManagerSubsystem* ItemSubsystem =
-				GetWorld()->GetSubsystem<UItemManagerSubsystem>())
-			{
-				ItemSubsystem->RegisterPickupItem(ExpPickup);
-				UE_LOG(LogTemp, Warning, TEXT("Register ExpPickup"));
-			}
-		}
+		/*ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
+			GetActorLocation(),
+			static_cast<float>(EnemyStatus.EXP),
+			Color,
+			Size
+		);*/
 	}
 
 	// PoolSubSystemに返却する
@@ -257,6 +304,8 @@ void AEnemyBase::OnDeath()
 		return;
 	}
 
+	GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData()->AddExperience(EnemyStatus.EXP);
+
 	// 自身をレベルから消す
 	Destroy();
 }
@@ -267,7 +316,7 @@ void AEnemyBase::CheckCanAttack()
 	//if (CanAttack()) { return; }
 
 	// プレイヤーとの距離が攻撃可能距離内か
-	if (EnemyStatus.DistancePlayer < EnemyStatus.AttackDistance)
+	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
 	{
 		EnemyStatus.CanAttack = true;
 	}
@@ -339,12 +388,22 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 
 	SetActorLocation(LocalPos);
 
+#if WITH_EDITOR
+	SetFolderPath(TEXT("Pool/Active"));
+#endif
+
 	UE_LOG(LogTemp, Warning, TEXT("EnemyBase Activate"));
 }
 
 void AEnemyBase::Deactivate()
 {
 	StateMachine->ClearState();
+	
+	/** エディタ上でフォルダに入れる*/
+#if WITH_EDITOR
+	SetFolderPath(TEXT("Pool/Inactive"));
+#endif
+
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);

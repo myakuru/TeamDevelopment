@@ -51,6 +51,7 @@ void UDashGearStateBase::Dash()
 void UDashGearStateBase::PlayDashEffect()
 {
 	UNiagaraComponent* NiagaraComp = nullptr;
+	if (!OwnerPlayer) { return; }
 
 	if (DashEffect)
 	{

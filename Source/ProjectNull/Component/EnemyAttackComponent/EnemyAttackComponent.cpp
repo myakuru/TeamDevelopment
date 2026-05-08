@@ -1,7 +1,7 @@
 ﻿#include "EnemyAttackComponent.h"
 
-#include <ProjectNull/System/Combat/Attack/AttackBase.h>
 #include <Kismet/GameplayStatics.h>
+#include <ProjectNull/System/Combat/Attack/AttackBase.h>
 
 UEnemyAttackComponent::UEnemyAttackComponent():
 	OwnerEnemy(nullptr),
@@ -43,7 +43,7 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			attack->Execute();
 		}
 
-		attack->Update(DeltaTime, pPlayerPawn, nullptr);
+		attack->Update(DeltaTime, pPlayerPawn);
 	}
 }
 
