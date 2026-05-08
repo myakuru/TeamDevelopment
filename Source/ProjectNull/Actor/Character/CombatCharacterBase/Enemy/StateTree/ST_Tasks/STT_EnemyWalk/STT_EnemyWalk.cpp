@@ -2,6 +2,13 @@
 #include "StateTreeExecutionContext.h"
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
 
+USTT_EnemyWalk::USTT_EnemyWalk(const FObjectInitializer& a_ObjInit)
+	: Super(a_ObjInit)
+{
+	// Tick処理有効化	
+	bShouldCallTick = true;
+}
+
 EStateTreeRunStatus USTT_EnemyWalk::EnterState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
 	Super::EnterState(a_Context, a_Transition);
@@ -32,6 +39,7 @@ void USTT_EnemyWalk::Move(const float a_DeltaTime)
 {
 	if (!OwnerEnemy) { return; }
 
+	// 仮でマジックナンバーにしてるがゲッターを別途用意
 	static float _RotSpeed = 5.0f;
 	static float _MoveSpeed = 300.0f;
 
