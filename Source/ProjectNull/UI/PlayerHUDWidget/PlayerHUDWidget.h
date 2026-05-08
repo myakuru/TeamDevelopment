@@ -89,7 +89,7 @@ public:
 	 * @param NextLevelExp 次のレベルに必要な経験値
 	 */
 	UFUNCTION(BlueprintCallable)
-	void SetPlayerExp(int32 CurrentExp, int32 NextLevelExp);
+	void SetPlayerExp(float CurrentExp, float NextLevelExp);
 
 	/**
 	 * @brief プレイヤーのスキルのクールダウンを更新する関数

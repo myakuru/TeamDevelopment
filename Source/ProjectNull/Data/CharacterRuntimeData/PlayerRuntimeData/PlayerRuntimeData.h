@@ -6,7 +6,7 @@
 #include "PlayerRuntimeData.generated.h"
 
 /** 経験値が変更されたときに呼び出されるデリゲート */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExperienceChanged, int32, NewExperience, int32, MaxExperience);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExperienceChanged, float, NewExperience, float, MaxExperience);
 
 /** HPが変更されたときに呼び出されるデリゲート */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, NewHealth, float, MaxHealth);
