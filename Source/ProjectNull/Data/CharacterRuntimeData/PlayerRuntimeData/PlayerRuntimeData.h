@@ -6,7 +6,7 @@
 #include "PlayerRuntimeData.generated.h"
 
 /** 経験値が変更されたときに呼び出されるデリゲート */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExperienceChanged, int32, NewExperience, int32, MaxExperience);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExperienceChanged, float, NewExperience, float, MaxExperience);
 
 /** HPが変更されたときに呼び出されるデリゲート */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, NewHealth, float, MaxHealth);
@@ -104,7 +104,8 @@ public:
 
 	FGearRuntimeData():
 		GearEnergy(0.0f),
-		GearChangeEnergyCost(TArray<float>())
+		GearChangeEnergyCost(TArray<float>()),
+		GearChangeEnergyExcess(0.0f)
 	{
 	}
 
@@ -118,6 +119,19 @@ public:
 	}
 
 
+	/**
+	 * @brief ギアチェンジ時にデータをリセット
+	 * @param CurrentGearLevel 現在のギアレベル
+	 */
+	inline void ResetDataOnGearChange(int32 CurrentGearLevel)
+	{
+		if (!GearChangeEnergyCost.IsValidIndex(CurrentGearLevel)) { return; }
+		const float EnergyCost = GearChangeEnergyCost[CurrentGearLevel];
+		GearChangeEnergyExcess = GearEnergy - EnergyCost;
+		GearEnergy = 0.0f;
+	}
+	
+
 	/** 現在のギアエネルギー */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gear")
 	float GearEnergy;
@@ -125,6 +139,9 @@ public:
 	/** ギアチェンジに必要エネルギー */
 	UPROPERTY(EditAnywhere, Category = "Gear")
 	TArray<float> GearChangeEnergyCost;
+
+	/** ギアチェンジ必要量を超えたエネルギー */
+	float GearChangeEnergyExcess;
 };
 
 /** プレイヤー中間基底クラス */
@@ -162,6 +179,9 @@ public:
 	void AddGearEnergy(float Amount);
 
 	bool CanChangeGear(int32 CurrentGearLevel);
+
+	void ResetDataOnGearChange(int32 CurrentGearLevel);
+	
 
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)

@@ -17,7 +17,7 @@ struct FWeaponInstance
 public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int32 UniqueId = 0;
+	int64 UniqueId = 0;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FName WeaponId;

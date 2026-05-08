@@ -58,6 +58,11 @@ bool UPlayerRuntimeData::CanChangeGear(int32 CurrentGearLevel)
 	return Gear.CanChangeGear(CurrentGearLevel);
 }
 
+void UPlayerRuntimeData::ResetDataOnGearChange(int32 CurrentGearLevel)
+{
+	Gear.ResetDataOnGearChange(CurrentGearLevel);
+}
+
 void UPlayerRuntimeData::ApplyMovementSpeed()
 {
 	if (!Owner || !Owner->GetCharacterMovement()) { return; }
