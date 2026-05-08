@@ -53,9 +53,14 @@ void UPlayerRuntimeData::AddGearEnergy(float Amount)
 	Gear.GearEnergy += Amount;
 }
 
+bool UPlayerRuntimeData::CanChangeGear(int32 CurrentGearLevel)
+{
+	return Gear.CanChangeGear(CurrentGearLevel);
+}
+
 void UPlayerRuntimeData::ApplyMovementSpeed()
 {
-	if (!Owner->GetCharacterMovement()) { return; }
+	if (!Owner || !Owner->GetCharacterMovement()) { return; }
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed.Final;
 }
 

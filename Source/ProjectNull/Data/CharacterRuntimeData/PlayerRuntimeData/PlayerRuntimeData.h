@@ -110,6 +110,14 @@ public:
 
 public:
 
+	inline bool CanChangeGear(int32 CurrentGearLevel)
+	{
+		if (!GearChangeEnergyCost.IsValidIndex(CurrentGearLevel))	{ return false; }
+		if (GearEnergy < GearChangeEnergyCost[CurrentGearLevel])	{ return false; }
+		return true;
+	}
+
+
 	/** 現在のギアエネルギー */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gear")
 	float GearEnergy;
@@ -152,6 +160,8 @@ public:
 	 * @param Amount 加算されるギアエネルギー
 	 */
 	void AddGearEnergy(float Amount);
+
+	bool CanChangeGear(int32 CurrentGearLevel);
 
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)

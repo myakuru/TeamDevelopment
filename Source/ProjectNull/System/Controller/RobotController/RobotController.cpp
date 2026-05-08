@@ -24,10 +24,10 @@ void ARobotController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ���̓}�b�s���O�R���e�L�X�g�֘A�̏�����
+	PlayerBase = Cast<APlayerBase>(GetCharacter());
+
 	InitializeInputContext();
 
-	// UI�̏�����
 	InitializeUI();
 }
 
@@ -71,26 +71,29 @@ void ARobotController::Look(const FInputActionValue& LookActionValue)
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
-	// �W�����v�̎��s
 	if (ACharacter* controlledCharacter = GetCharacter())
 	{
 		controlledCharacter->Jump();
 	}
 }
 
+void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
+{
+	if (!PlayerBase || ) { return; }
+	
+
+}
+
 void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 {
-	UE_LOG(LogTemp, Warning, TEXT("aaaaa"));
-	if (APlayerBase* controlledPlayer = Cast<APlayerBase>(GetCharacter()))
+	if (!PlayerBase) { return; }
+	
+	if (UPlayerGearComponent* gearComponent = PlayerBase->GetGearComponent())
 	{
-		if (UPlayerGearComponent* gearComponent = controlledPlayer->GetGearComponent())
-		{
-			gearComponent->ExecuteGear(0);
-		}
+		gearComponent->ExecuteGear(0);
 	}
 }
 
-// UI�̏������֐�
 void ARobotController::InitializeUI()
 {
 

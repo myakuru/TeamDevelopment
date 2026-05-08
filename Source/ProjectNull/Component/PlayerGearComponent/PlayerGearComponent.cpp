@@ -1,6 +1,9 @@
 ﻿#include "PlayerGearComponent.h"
 
-#include "ProjectNull\System\Gear\GearBase.h"
+#include <ProjectNull/System/Gear/GearBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 
 UPlayerGearComponent::UPlayerGearComponent()
@@ -16,11 +19,10 @@ void UPlayerGearComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// �M�A�̏�����
-	for (auto& gear : PlayerGears)
+	for (auto& Gear : PlayerGears)
 	{
-		if (!gear) { continue; }
-		gear->Initialize(OwnerPlayer,this);
+		if (!Gear) { continue; }
+		Gear->Initialize(OwnerPlayer,this);
 	}
 }
 
@@ -28,23 +30,18 @@ void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// �M�A�̍X�V
-	for(auto& gear : PlayerGears)
-	{
-		if (!gear) { continue; }
-		gear->Update(DeltaTime);
+	for(auto& Gear : PlayerGears) {
+		if (!Gear) { continue; }
+		Gear->Update(DeltaTime);
 	}
 
 }
 
 bool UPlayerGearComponent::IsMovementBlockedByGear() const
 {
-	// �M�A�̒��Ɉړ���u���b�N�����̂����邩�ǂ����𔻒�
-	for (auto& gear : PlayerGears)
-	{
-		if (!gear) { continue; }
-		if (gear->BlocksMovement())
-		{
+	for (auto& Gear : PlayerGears) {
+		if (!Gear) { continue; }
+		if (Gear->BlocksMovement()) {
 			return true;
 		}
 	}
@@ -53,12 +50,25 @@ bool UPlayerGearComponent::IsMovementBlockedByGear() const
 
 void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 {
-	if (PlayerGears.IsValidIndex(GearIndex))
-	{
-		if (PlayerGears[GearIndex])
-		{
+	if (PlayerGears.IsValidIndex(GearIndex)) {
+		if (PlayerGears[GearIndex]) {
 			PlayerGears[GearIndex]->Execute(CurrentGearLevel);
 		}
 	}
+}
+
+void UPlayerGearComponent::ChangeGear()
+{
+	CurrentGearLevel = ++CurrentGearLevel % 4;
+}
+
+bool UPlayerGearComponent::CanChangeGear() const
+{
+	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance() || !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()) {
+		return false;
+	}
+
+	const TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
+	return PlayerRuntimeData->CanChangeGear(CurrentGearLevel);
 }
 
