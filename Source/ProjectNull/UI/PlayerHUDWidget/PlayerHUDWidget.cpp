@@ -87,7 +87,7 @@ void UPlayerHUDWidget::SetPlayerHp(float CurrentHp, float MaxHp)
 	}
 }
 
-void UPlayerHUDWidget::SetPlayerExp(int32 CurrentExp, int32 NextLevelExp)
+void UPlayerHUDWidget::SetPlayerExp(float CurrentExp, float NextLevelExp)
 {
 	if (PlayerExpBar)
 	{

@@ -23,6 +23,6 @@ protected:
 
 public:
 	/** 経験値を設定する関数 */
-	void SetExp(int32 CurrentExp, int32 NextLevelExp);
+	void SetExp(float CurrentExp, float NextLevelExp);
 	
 };
