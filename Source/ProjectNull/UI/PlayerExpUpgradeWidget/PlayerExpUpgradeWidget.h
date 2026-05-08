@@ -16,6 +16,6 @@ class PROJECTNULL_API UPlayerExpUpgradeWidget : public UUserWidget
 
 protected:
 
-	virtual void NativeConstruct() override;
+	//virtual void NativeConstruct() override;
 	
 };
