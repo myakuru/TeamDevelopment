@@ -34,6 +34,21 @@ public:
 
 	//~ End Setter
 
+	//~ Start Getter
+	
+	/**
+	 * EnemyBaseを弄れないので一旦コメント化
+	 * デリゲートをprivateに隠蔽して使う
+	 * @brief 進行方向変更デリゲートを登録用で公開
+	 * @return TMulticastDelegateRegistration 型として公開
+	 */
+	/*FOnMoveDirChanged::RegistrationType& GetOnMoveDirChanged()
+	{
+		return OnMoveDirChanged;
+	}*/
+
+	//~ End Getter
+
 	/** 進行方向が変更された時に呼び出される */
 	FOnMoveDirChanged		OnMoveDirChanged;
 
