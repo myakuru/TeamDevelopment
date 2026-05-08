@@ -17,5 +17,8 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	// プレイヤーだけにしたい場合
 	if (!Pawn->IsPlayerControlled()) return;
 
-	Destroy();
+	//Destroy();
+
+	//Mesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	Mesh->PlayAnimation(OpenAnimation, false);
 }
