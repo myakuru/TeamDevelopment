@@ -34,6 +34,7 @@ public:
 
 	int32 GetCurrentGearLevel() const;
 
+	/** ゲッター */
 	inline UPlayerGearComponent*			GetGearComponent() const		{ return GearComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const	{ return Instance; }
 
@@ -48,18 +49,17 @@ private:
 	UPROPERTY()
 	UPlayerHUDWidget* HUDWidget;
 
-	
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	USpringArmComponent* SpringArmComponent;
 
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	UCameraComponent* CameraComponent;
 
+	UPROPERTY(VisibleAnywhere, Category = "Gear")
+	UPlayerGearComponent* GearComponent;
+
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
 	TObjectPtr<UAutoAttack> AutoAttack;
-	
-	UPROPERTY(VisibleAnywhere,Category = "Gear")
-	UPlayerGearComponent* GearComponent;
 
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> Instance;

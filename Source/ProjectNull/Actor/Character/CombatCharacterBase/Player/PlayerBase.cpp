@@ -89,13 +89,13 @@ void APlayerBase::Move(const FVector2d& InputVector)
 {
 	if (!CanMove()) { return; }
 
-	const FRotator yawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
+	const FRotator YawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
 
-	const FVector forward = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::X);
-	const FVector right = FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
+	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(forward, InputVector.Y);
-	AddMovementInput(right, InputVector.X);
+	AddMovementInput(Forward, InputVector.Y);
+	AddMovementInput(Right, InputVector.X);
 }
 
 int32 APlayerBase::GetCurrentGearLevel() const
