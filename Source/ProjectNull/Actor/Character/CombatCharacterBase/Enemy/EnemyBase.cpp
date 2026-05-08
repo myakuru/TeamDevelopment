@@ -293,7 +293,7 @@ void AEnemyBase::OnDeath()
 		GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
 		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.EXP);
-		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
+		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(10.0f);
 	}
 
 	// PoolSubSystemに返却する
