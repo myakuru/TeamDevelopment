@@ -38,6 +38,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void MyDestroy(){ Destroy(); }
+
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	/** プレイヤーとの距離当たり判定 */
