@@ -220,34 +220,6 @@ void AEnemyBase::OnDeath()
 		);
 	}
 
-	/** 敵が死んだ際に経験値を落とす*/
-	//if (ExperiencePickupClass)
-	//{
-	//	/** Actorのパラメータ設定*/
-	//	FActorSpawnParameters SpawnParams;
-	//	SpawnParams.Owner = this;
-
-	//	/** 経験値クラスにパラメータをセット*/
-	//	AExperiencePickup* ExpPickup = GetWorld()->SpawnActor<AExperiencePickup>(
-	//		ExperiencePickupClass,
-	//		GetActorLocation(),
-	//		FRotator::ZeroRotator,
-	//		SpawnParams
-	//	);
-
-	//	if (ExpPickup)
-	//	{
-	//		ExpPickup->SetExpValue(EnemyStatus.EXP);
-
-	//		if (UItemManagerSubsystem* ItemSubsystem =
-	//			GetWorld()->GetSubsystem<UItemManagerSubsystem>())
-	//		{
-	//			ItemSubsystem->RegisterPickupItem(ExpPickup);
-	//			UE_LOG(LogTemp, Warning, TEXT("Register ExpPickup"));
-	//		}
-	//	}
-	//}
-
 	// 経験値ドロップ
 	if (UItemManagerSubsystem* ItemSubsystem =
 		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
@@ -319,7 +291,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
-	//SetActorTickEnabled(true);
 
 	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
@@ -330,8 +301,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		EnemyManager->RegisterEnemy(this);
 	}
 
-	//CapsuleCollision = GetCapsuleComponent();
-
 	// コリジョンプリセット設定
 	if (CapsuleCollision)
 	{
@@ -341,8 +310,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		CapsuleCollision->SetGenerateOverlapEvents(true);
 	}
-
-	//StateMachine = MakeUnique<TStateMachine<AEnemyBase>>();
 
 	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
 		new TStateMachine<AEnemyBase>()
