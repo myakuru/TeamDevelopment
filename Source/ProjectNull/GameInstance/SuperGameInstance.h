@@ -28,22 +28,25 @@ public:
 	void SaveGameData();
 
 	/** パラメーターを取得する */
-	inline TObjectPtr<UPlayerParameterData> GetCharacterParameterData() const { return CharacterParameterData; }
+	inline TObjectPtr<UPlayerParameterData> GetPlayerParameterData() const { return PlayerParameterData; }
 	inline TObjectPtr<UPlayerRuntimeData> GetPlayerRuntimeData() const { return PlayerRuntimeData; }
 
 protected:
 
 	UPROPERTY()
-	UMySaveGame* m_CurrentSaveData;
+	UMySaveGame* CurrentSaveData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UDataTable* m_WeaponDataTable;
+	UDataTable* WeaponDataTable;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UDataTable* WeaponMaterialDataTable;
 
 	UPROPERTY(BlueprintReadOnly)
-	UWeaponManager* m_WeaponManager;
+	UWeaponManager* WeaponManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UPlayerParameterData> CharacterParameterData;
+	TObjectPtr<UPlayerParameterData> PlayerParameterData;
 
 	/** Runtimeデータ 実行時に変更されるデータを計算、適用するクラス */
 	UPROPERTY(EditAnywhere, Instanced)

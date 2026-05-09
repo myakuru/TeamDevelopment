@@ -20,10 +20,10 @@ struct FEffectInstance
 public:
 
 	UPROPERTY(BlueprintReadWrite)
-	UEffectData* Data;
+	UEffectData* Data = nullptr;
 
 	UPROPERTY()
-	UUEffectBase* RuntimeEffect;
+	UUEffectBase* RuntimeEffect = nullptr;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int32 Level = 0;

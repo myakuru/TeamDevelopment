@@ -91,14 +91,11 @@ void UDashGearStateBase::UpdateDashAttack()
 {
 	if (!OwnerPlayer) { return; }
 
-	// �v���C���[�̈ʒu�̎擾
 	const FVector playerLocation = OwnerPlayer->GetActorLocation();
 
-	// �G�Ǘ��N���X�̏��擾
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!enemyManager) { return; }
 
-	// �G�̃��X�g���狗�����r���čU���͈͓�̓G��U��
 	for (const auto& enemy : enemyManager->GetEnemyList())
 	{
 		if (!enemy) { continue; }
@@ -112,7 +109,6 @@ void UDashGearStateBase::UpdateDashAttack()
 		}
 	}
 
-	// �U���͈͂̃f�o�b�O�\��
 	DrawDebugSphere(
 		GetWorld(),
 		OwnerPlayer->GetActorLocation(),

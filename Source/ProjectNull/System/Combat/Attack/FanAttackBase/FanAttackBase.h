@@ -24,7 +24,7 @@ public:
 	void Start();
 
 	/// <summary>
-	/// UŒ‚‚ÌÀs
+	/// ï¿½Uï¿½ï¿½ï¿½Ìï¿½ï¿½s
 	/// </summary>
 	virtual void Execute()override;
 	

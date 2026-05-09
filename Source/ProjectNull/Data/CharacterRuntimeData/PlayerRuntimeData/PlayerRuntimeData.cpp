@@ -51,11 +51,17 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 void UPlayerRuntimeData::AddGearEnergy(float Amount)
 {
 	Gear.GearEnergy += Amount;
+	UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
 }
 
 bool UPlayerRuntimeData::CanChangeGear(int32 CurrentGearLevel)
 {
 	return Gear.CanChangeGear(CurrentGearLevel);
+}
+
+void UPlayerRuntimeData::ResetDataOnGearChange(int32 CurrentGearLevel)
+{
+	Gear.ResetDataOnGearChange(CurrentGearLevel);
 }
 
 void UPlayerRuntimeData::ApplyMovementSpeed()
@@ -96,14 +102,19 @@ void UPlayerRuntimeData::CalculateFinalSpeed(const FSpeedParameterData& Data, in
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
 }
 
+void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Data)
+{	
+	Gear.CalculateInvincibilityTime(Data.BaseInvincibilityTime,Data.ExtraInvincibilityTimePerExcessRatio);
+}
+
 void UPlayerRuntimeData::UpdateStatus()
 {
-	if (!Owner || !Owner->GetSuperGameInstance() || !Owner->GetSuperGameInstance()->GetCharacterParameterData()) {
+	if (!Owner || !Owner->GetSuperGameInstance() || !Owner->GetSuperGameInstance()->GetPlayerParameterData()) {
 		return;
 	}
 
 	// プレイヤーのパラメータデータ取得
-	const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+	const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetPlayerParameterData();
 
 	CalculateExperience(ParameterData->GetExperienceData());
 	CalculateFinalSpeed(ParameterData->GetSpeedData(), Owner->GetCurrentGearLevel());

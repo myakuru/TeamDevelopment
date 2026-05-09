@@ -80,4 +80,7 @@ private:
 	 */
 	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
 	float TargetDistanceSqr = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Output")
+	TObjectPtr<UAnimSequenceBase> TestAnime;
 };

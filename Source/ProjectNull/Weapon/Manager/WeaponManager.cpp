@@ -3,21 +3,29 @@
 
 #include "WeaponManager.h"
 #include"../../SaveGame/MySaveGame.h"
+#include"../Data/WeaponMaterialData.h"
 
-void UWeaponManager::Initialize(UDataTable* InDataTable)
+void UWeaponManager::Initialize(UDataTable* a_DTWeapon, UDataTable* a_DTMaterial)
 {
-    WeaponDataTable = InDataTable;
+    m_WeaponDataTable = a_DTWeapon;
+	m_MaterialDataTable = a_DTMaterial;
+	m_EquippedWeaponIDs.Add(-1);
+	m_EquippedWeaponIDs.Add(-1);
+	m_EquippedWeaponIDs.Add(-1);
 }
 
 void UWeaponManager::SaveToData(UMySaveGame* a_SaveGame)
 {
     if (!a_SaveGame)return;
 
-    a_SaveGame->m_WeaponData.Weapons.Empty();
+	a_SaveGame->m_WeaponData.NextUniqueID = m_NextWeaponID;
 
+    a_SaveGame->m_WeaponData.Weapons.Empty();
     for (const FWeaponInstance& Weapon : m_Weapons) {
         a_SaveGame->m_WeaponData.Weapons.Add(Weapon);
     }
+
+	a_SaveGame->m_WeaponData.EquippedWeaponIDs = m_EquippedWeaponIDs;
 
 }
 
@@ -25,12 +33,15 @@ void UWeaponManager::LoadFromSaveData(UMySaveGame* a_SaveGame)
 {
     if (!a_SaveGame)return;
 
-    m_Weapons.Empty();
+	m_NextWeaponID = a_SaveGame->m_WeaponData.NextUniqueID;
 
-    for (const FWeaponInstance& Data : a_SaveGame->m_WeaponData.Weapons)
-    {
-        m_Weapons.Add(Data);
-    }
+    m_Weapons.Empty();
+	m_Weapons = a_SaveGame->m_WeaponData.Weapons;
+
+	if (!a_SaveGame->m_WeaponData.EquippedWeaponIDs.IsEmpty()) {
+		m_EquippedWeaponIDs.Empty();
+		m_EquippedWeaponIDs = a_SaveGame->m_WeaponData.EquippedWeaponIDs;
+	}
 
 }
 
@@ -39,18 +50,58 @@ const TArray<FWeaponInstance>& UWeaponManager::GetWeapons() const
 	return m_Weapons;
 }
 
-void UWeaponManager::AddWeapon(const FWeaponInstance& NewWeapon)
+void UWeaponManager::AddWeapon(const FWeaponInstance& a_NewWeapon)
 {
-	m_Weapons.Add(NewWeapon);
+	m_Weapons.Add(a_NewWeapon);
+	m_Weapons.Last().UniqueId = m_NextWeaponID;
+	m_NextWeaponID++;
 }
 
-bool UWeaponManager::GetWeaponMaster(FName WeaponId, FWeaponData& OutData) const
+void UWeaponManager::AddWeaponMaterial(const FWeaponMaterialInstance& a_NewMaterial)
 {
-    if (!WeaponDataTable)return false;
-    FWeaponData* FoundData = WeaponDataTable->FindRow<FWeaponData>(WeaponId, TEXT(""));
-    //if (!FoundData)return false;
+	m_Materials.Add(a_NewMaterial);
+	m_Materials.Last().UniqueId = m_NextMaterialID;
+	m_NextMaterialID++;
+}
 
+bool UWeaponManager::GetWeaponMaster(FName a_WeaponId, FWeaponData& a_OutData) const
+{
+    if (!m_WeaponDataTable)return false;
+    FWeaponData* FoundData = m_WeaponDataTable->FindRow<FWeaponData>(a_WeaponId, TEXT(""));
 
-    OutData = *FoundData;
+    if (!FoundData)return false;
+    a_OutData = *FoundData;
     return true;
+}
+
+bool UWeaponManager::GetMaterialMaster(FName a_MaterialID, FWeaponMaterialData& a_OutData) const
+{
+	if (!m_MaterialDataTable)return false;
+	FWeaponMaterialData* FoundData = m_MaterialDataTable->FindRow<FWeaponMaterialData>(a_MaterialID, TEXT(""));
+
+	if (!FoundData)return false;
+	a_OutData = *FoundData;
+	return true;
+}
+
+void UWeaponManager::SetEquippedWeapon(int32 a_Index, const FWeaponInstance& a_Weapon)
+{
+	if (!m_EquippedWeaponIDs.IsValidIndex(a_Index))return;
+
+	m_EquippedWeaponIDs[a_Index] = a_Weapon.UniqueId;
+
+}
+
+bool UWeaponManager::GetEquippedWeapon(FWeaponInstance& a_EquippedWeapon, int32 a_Index)
+{
+	if (!m_EquippedWeaponIDs.IsValidIndex(a_Index))return false;
+
+	for (const FWeaponInstance& weapon : m_Weapons) {
+		if (weapon.UniqueId == m_EquippedWeaponIDs[a_Index]) {
+			a_EquippedWeapon = weapon;
+			return true;
+		}
+	}
+
+	return false;
 }

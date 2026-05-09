@@ -56,9 +56,9 @@ void UPlayerHUDWidget::NativeConstruct()
 void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	// デバック用
-	if (GameInstance && GameInstance->GetCharacterParameterData())
+	if (GameInstance && GameInstance->GetPlayerParameterData())
 	{
-		UPlayerParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
+		UPlayerParameterData* CharacterParameterData = GameInstance->GetPlayerParameterData();
 
 		for(int32 i = 0; i < SkillWidgets.Num(); ++i)
 		{
@@ -69,7 +69,7 @@ void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 void UPlayerHUDWidget::OnClickedActionButton()
 {
-	UPlayerParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
+	UPlayerParameterData* CharacterParameterData = GameInstance->GetPlayerParameterData();
 	if (CharacterParameterData)
 	{
 		for (int32 i = 0; i < SkillWidgets.Num(); ++i)
@@ -87,7 +87,7 @@ void UPlayerHUDWidget::SetPlayerHp(float CurrentHp, float MaxHp)
 	}
 }
 
-void UPlayerHUDWidget::SetPlayerExp(int32 CurrentExp, int32 NextLevelExp)
+void UPlayerHUDWidget::SetPlayerExp(float CurrentExp, float NextLevelExp)
 {
 	if (PlayerExpBar)
 	{
@@ -120,9 +120,9 @@ void UPlayerHUDWidget::RegisterDelegates()
 	// ワールドからインスタンス所得
 	GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
 
-	if (GameInstance && GameInstance->GetCharacterParameterData())
+	if (GameInstance && GameInstance->GetPlayerParameterData())
 	{
-		UPlayerParameterData* CharacterParameterData = GameInstance->GetCharacterParameterData();
+		UPlayerParameterData* CharacterParameterData = GameInstance->GetPlayerParameterData();
 
 		UPlayerRuntimeData* PlayerRuntimeDataInstance = GameInstance->GetPlayerRuntimeData();
 

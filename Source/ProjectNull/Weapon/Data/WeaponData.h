@@ -20,11 +20,14 @@ struct FWeaponData : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FName WeaponID;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FName DecomposeMaterialID;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FText DisplayName;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UTexture2D* Icon;
+    UTexture2D* Icon = nullptr;
 
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     TSubclassOf <UGearBase> Gear;

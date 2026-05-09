@@ -41,9 +41,6 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 		return;
 	}
 
-	// プレイヤーへ向かう処理を更新
-	MoveToPlayer(playerLocation,DeltaTime);
-
 	// 攻撃可能か判断
 	CheckCanAttack();
 }
