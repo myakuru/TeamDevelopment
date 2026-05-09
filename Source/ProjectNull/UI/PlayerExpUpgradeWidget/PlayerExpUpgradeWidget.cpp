@@ -3,3 +3,6 @@
 
 #include "PlayerExpUpgradeWidget.h"
 
+void UPlayerExpUpgradeWidget::NativeConstruct()
+{
+}
