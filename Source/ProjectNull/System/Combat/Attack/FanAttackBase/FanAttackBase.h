@@ -21,7 +21,7 @@ public:
 	/// <summary>
 	/// 開始の際の初期化
 	/// </summary>
-	void Start();
+	virtual void Start();
 
 	/// <summary>
 	/// �U���̎��s

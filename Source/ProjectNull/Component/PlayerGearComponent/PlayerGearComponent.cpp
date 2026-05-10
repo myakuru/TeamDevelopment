@@ -37,7 +37,7 @@ void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		Gear->Update(DeltaTime);
 	}
 
-
+	UpdateCollisionByInvincibility();
 
 }
 
@@ -131,6 +131,7 @@ void UPlayerGearComponent::UpdateCollisionByInvincibility()
 		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData()) {
 		return;
 	}
+
 	const TObjectPtr<UPlayerRuntimeData> RuntimeData = GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData();
 	const TObjectPtr<UPlayerParameterData> ParameterData = OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
 
