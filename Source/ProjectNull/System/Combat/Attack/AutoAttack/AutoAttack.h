@@ -4,17 +4,16 @@
 #include "../AttackBase.h"
 #include "AutoAttack.generated.h"
 
-
-// 敵管理クラス
+/** 敵管理クラス */
 class UEnemyManagerSubsystem;
 
-// 円型の斬撃攻撃クラス
+/** 円型の斬撃攻撃クラス */
 class UFloatingWeaponAttack;
 
-// Niagaraエフェクトクラス
+/** Niagaraエフェクトクラス */
 class UFloatingWeaponEffect;
 
-// 自動攻撃種類
+/** 自動攻撃種類 */
 UENUM(BlueprintType)
 enum class EAutoAttackType : uint8
 {
