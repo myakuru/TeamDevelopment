@@ -120,4 +120,3 @@ void UPlayerRuntimeData::UpdateStatus()
 	CalculateFinalSpeed(ParameterData->GetSpeedData(), Owner->GetCurrentGearLevel());
 	ApplyMovementSpeed();
 }
-

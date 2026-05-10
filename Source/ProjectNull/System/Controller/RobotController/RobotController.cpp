@@ -8,6 +8,7 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/Robot/Robot.h>
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
+#include <ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h>
 
 
 ARobotController::ARobotController():
@@ -18,7 +19,7 @@ ARobotController::ARobotController():
 		JumpAction(nullptr),
 		ChangeGearAction(nullptr),
 		GearAction01(nullptr),
-		PlayerHUD(nullptr)
+		PlayerHud(nullptr)
 {
 	bReplicates = true;
 }
@@ -31,7 +32,7 @@ void ARobotController::BeginPlay()
 
 	InitializeInputContext();
 
-	InitializeUI();
+	InitializeUi();
 }
 
 void ARobotController::SetupInputComponent()
@@ -90,16 +91,17 @@ void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 	PlayerBase->GetGearComponent()->ExecuteGear(0);
 }
 
-void ARobotController::InitializeUI()
+void ARobotController::InitializeUi()
 {
-
-	if (IsLocalController() && PlayerHUDClass)
+	if (IsLocalController() && PlayerHUDClass && PlayerExpUpgradeWidgetClass)
 	{
-		PlayerHUD		= CreateWidget<UPlayerHUDWidget>	(this, PlayerHUDClass);
+		PlayerHud					= CreateWidget<UPlayerHUDWidget>(this,PlayerHUDClass);
+		PlayerExpUpgradeWidget		= CreateWidget<UPlayerExpUpgradeWidget>(this,PlayerExpUpgradeWidgetClass);
 
-		if (PlayerHUD)
+		if (PlayerHud && PlayerExpUpgradeWidget)
 		{
-			PlayerHUD->AddToViewport();
+			PlayerHud->AddToViewport();
+			PlayerExpUpgradeWidget->AddToViewport();
 		}
 	}
 }

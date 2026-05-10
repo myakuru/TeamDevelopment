@@ -8,16 +8,33 @@
 
 class USuperGameInstance;
 class UPlayerRuntimeData;
+class UExpUpgradeWidget0;
 
 /**
- * 
+ * 経験値がレベルアップしたら呼ばれるクラス
  */
 UCLASS()
 class PROJECTNULL_API UPlayerExpUpgradeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	/** プレイヤー側が呼び出す */
+	void OpenUpgradeWidget();
+
 protected:
+
+	virtual void NativeConstruct() override;
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	/** 強化画面を開く */
+	UFUNCTION(BlueprintCallable, Category = "Upgrade")
+	virtual void OpenWidget();
+
+	/** 強化画面を閉じる */
+	UFUNCTION(BlueprintCallable, Category = "Upgrade")
+	virtual void CloseWidget();
 
 	/** ゲームインスタンスへの参照 */
 	TObjectPtr<USuperGameInstance> GameInstance;
@@ -25,27 +42,10 @@ protected:
 	/** プレイヤーのランタイムデータへの参照 */
 	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 
-	virtual void NativeConstruct() override;
+private:
 
-	/**
-	 * @brief 強化が確定されたときに呼ばれる（サブクラスでオーバーライド）
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category = "Upgrade")
-	void OnUpgradeConfirmed() {};
-	virtual void OnUpgradeConfirmed_Implementation() {};
-
-public:
-
-	/**
-	 * @brief 強化画面を開く
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Upgrade")
-	virtual void OpenWidget();
-
-	/**
-	 * @brief 強化画面を閉じる
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Upgrade")
-	virtual void CloseWidget();
+	/** 強化画面0のウィジェット */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UExpUpgradeWidget0> ExpUpgradeWidget0;
 	
 };
