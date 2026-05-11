@@ -28,9 +28,6 @@ public:
 
 public:
 
-	/// <summary>
-	/// ����������
-	/// </summary>
 	virtual void Initialize(class APlayerBase* Player, class UPlayerGearComponent* GearComponent,class UGearBase* Gear);
 
 	/// <summary>

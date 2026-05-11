@@ -4,9 +4,7 @@
 #include "../DashGearStateBase.h"
 #include "DashGearState_Lv1.generated.h"
 
-/// <summary>
-/// �_�b�V���M�A��ԃ��x��1�N���X
-/// </summary>
+/** ダッシュギアのレベル1状態クラス */
 UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UDashGearState_Lv1 final : public UDashGearStateBase
 {
