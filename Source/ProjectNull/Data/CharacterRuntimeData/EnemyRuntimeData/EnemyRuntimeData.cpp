@@ -3,6 +3,7 @@
 UEnemyRuntimeData::UEnemyRuntimeData()
 	:	MoveDir(FVector::ZeroVector)
 	,	TargetDistanceSqr(0.0f)
+	,	IsKnockBack(false)
 {
 }
 
@@ -26,4 +27,13 @@ void UEnemyRuntimeData::CalcDistanceToTarget(const FVector& a_TargetPos, const F
 		TargetDistanceSqr = NewTargetDistSqr;
 		OnTargetDistChanged.Broadcast(TargetDistanceSqr);
 	}
+}
+
+void UEnemyRuntimeData::ChangedIsKnockBack(const bool a_IsKnockBack)
+{
+	if (IsKnockBack == a_IsKnockBack) { return; }
+
+	// 変更があればブロードキャスト発火
+	IsKnockBack = a_IsKnockBack;
+	OnIsKnockBackChanged.Broadcast(IsKnockBack);
 }

@@ -92,6 +92,9 @@ void AEnemyBase::RegisterDelegates()
 
 	// 距離の二乗値
 	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &AEnemyBase::SetTargetDistanceSqr);
+
+	// ノックバックするか
+	EnemyRuntimeData->OnIsKnockBackChanged.AddUObject(this, &AEnemyBase::SetIsKnockBack);
 }
 
 void AEnemyBase::UpdateParams()
