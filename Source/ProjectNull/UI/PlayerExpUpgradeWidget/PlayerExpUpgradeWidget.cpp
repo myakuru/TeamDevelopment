@@ -4,7 +4,7 @@
 #include "PlayerExpUpgradeWidget.h"
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include "Kismet/GameplayStatics.h"
-#include <ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidget0/ExpUpgradeWidget0.h>
+#include <ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.h>
 
 void UPlayerExpUpgradeWidget::NativeConstruct()
 {
@@ -31,10 +31,19 @@ void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
 	// UI表示させる
 	OpenWidget();
 
-	// 強化画面１つ目表示
-	if (ExpUpgradeWidget0)
+	if (UpgradeWidget_0)
 	{
-		ExpUpgradeWidget0->ChoicesExpUpgrade();
+		UpgradeWidget_0->ChoicesExpUpgrade();
+	}
+
+	if (UpgradeWidget_1)
+	{
+		UpgradeWidget_1->ChoicesExpUpgrade();
+	}
+
+	if (UpgradeWidget_2)
+	{
+		UpgradeWidget_2->ChoicesExpUpgrade();
 	}
 }
 

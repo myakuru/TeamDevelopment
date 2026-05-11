@@ -1,17 +1,25 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ExpUpgradeWidget0.h"
+#include "ExpUpgradeWidgetBase.h"
 #include <Components/TextBlock.h>
 
 #include <ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h>
 
-void UExpUpgradeWidget0::ChoicesExpUpgrade()
+void UExpUpgradeWidgetBase::NativeConstruct()
+{
+	if (UpgradeText)
+	{
+		UpgradeText->SetWrappingPolicy(ETextWrappingPolicy::AllowPerCharacterWrapping);
+	}
+}
+
+void UExpUpgradeWidgetBase::ChoicesExpUpgrade()
 {
 	int32 Index = GetRandomTextId();
 
 	UDataTable* LoadedTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ExpUpgrade"));
-	 
+
 	if (!LoadedTable) return;
 
 	// 全ての行名を取得
@@ -30,10 +38,9 @@ void UExpUpgradeWidget0::ChoicesExpUpgrade()
 			UpgradeText->SetText(RowData->UpgradeText);
 		}
 	}
-
 }
 
-int32 UExpUpgradeWidget0::GetRandomTextId()
+int32 UExpUpgradeWidgetBase::GetRandomTextId()
 {
 	// データーテーブルのブループリント取得
 	UDataTable* LoadedTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ExpUpgrade"));

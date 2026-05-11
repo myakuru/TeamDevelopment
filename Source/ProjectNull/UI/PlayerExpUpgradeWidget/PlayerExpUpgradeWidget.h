@@ -8,7 +8,7 @@
 
 class USuperGameInstance;
 class UPlayerRuntimeData;
-class UExpUpgradeWidget0;
+class UExpUpgradeWidgetBase;
 
 /**
  * 経験値がレベルアップしたら呼ばれるクラス
@@ -42,10 +42,16 @@ protected:
 	/** プレイヤーのランタイムデータへの参照 */
 	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 
-private:
-
 	/** 強化画面0のウィジェット */
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UExpUpgradeWidget0> ExpUpgradeWidget0;
+	TObjectPtr<UExpUpgradeWidgetBase> UpgradeWidget_0;
+
+	/** 強化画面1のウィジェット */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UExpUpgradeWidgetBase> UpgradeWidget_1;
+
+	/** 強化画面2のウィジェット */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UExpUpgradeWidgetBase> UpgradeWidget_2;
 	
 };
