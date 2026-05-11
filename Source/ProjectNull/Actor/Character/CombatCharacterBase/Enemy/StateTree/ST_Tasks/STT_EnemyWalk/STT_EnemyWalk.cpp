@@ -4,6 +4,7 @@
 
 USTT_EnemyWalk::USTT_EnemyWalk(const FObjectInitializer& a_ObjInit)
 	: Super(a_ObjInit)
+	, MoveDir(FVector::ZeroVector)
 {
 	// Tick処理有効化	
 	bShouldCallTick = true;

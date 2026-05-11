@@ -7,6 +7,7 @@
 USTT_EnemyAttack::USTT_EnemyAttack(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
 	,	OwnerEnemy(nullptr)
+	,	TargetActor(nullptr)
 	,	Attack(nullptr)
 {
 	// Tick処理有効化
