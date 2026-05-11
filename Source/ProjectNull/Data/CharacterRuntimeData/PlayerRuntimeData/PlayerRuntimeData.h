@@ -104,8 +104,7 @@ public:
 
 	FGearRuntimeData():
 		GearEnergy(0.0f),
-		GearChangeEnergyCost(TArray<float>()),
-		GearChangeEnergyExcess(0.0f)
+		GearChangeEnergyCost(TArray<float>())
 	{
 	}
 
@@ -113,8 +112,9 @@ public:
 
 	inline bool CanChangeGear(int32 CurrentGearLevel)
 	{
-		if (!GearChangeEnergyCost.IsValidIndex(CurrentGearLevel))	{ return false; }
-		if (GearEnergy < GearChangeEnergyCost[CurrentGearLevel])	{ return false; }
+		const int32 Index = --CurrentGearLevel;
+		if (!GearChangeEnergyCost.IsValidIndex(Index))	{ return false; }
+		if (GearEnergy < GearChangeEnergyCost[Index])	{ return false; }
 		return true;
 	}
 
@@ -125,12 +125,24 @@ public:
 	 */
 	inline void ResetDataOnGearChange(int32 CurrentGearLevel)
 	{
-		if (!GearChangeEnergyCost.IsValidIndex(CurrentGearLevel)) { return; }
-		const float EnergyCost = GearChangeEnergyCost[CurrentGearLevel];
-		GearChangeEnergyExcess = GearEnergy - EnergyCost;
-		GearEnergy = 0.0f;
+		const int32 Index = --CurrentGearLevel;
+		if (!GearChangeEnergyCost.IsValidIndex(Index)) { return; }
+		const float EnergyCost = GearChangeEnergyCost[Index];
+		UE_LOG(LogTemp, Warning, TEXT("hi EnergyCost %.0f"), EnergyCost);
+		ExcessRatio = (GearEnergy / EnergyCost) - 1.0f;
+		UE_LOG(LogTemp, Warning, TEXT("hi ExcessRatio %.2f"), ExcessRatio);
+
+		GearEnergy -= EnergyCost;
+
 	}
 	
+	/**
+	 * @brief 無敵時間を計算する
+	 */
+	inline void CalculateInvincibilityTime(float BaseTime,float ExtraInvincibilityTimePerExcessRatio)
+	{
+		GearChangeInvincibilityTime = BaseTime + ExcessRatio * ExtraInvincibilityTimePerExcessRatio;
+	}
 
 	/** 現在のギアエネルギー */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gear")
@@ -140,8 +152,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Gear")
 	TArray<float> GearChangeEnergyCost;
 
-	/** ギアチェンジ必要量を超えたエネルギー */
-	float GearChangeEnergyExcess;
+	/** ギアチェンジによる無敵時間
+	* 無敵時間 = 基礎無敵時間 + 超過した割合(124%なら24%) * 超過した無敵時間増加量 */
+	float GearChangeInvincibilityTime;
+
+	/** 超過割合（124% → 0.24f）*/
+	float ExcessRatio;
 };
 
 /** プレイヤー中間基底クラス */
@@ -152,6 +168,9 @@ struct FSpeedParameterData;
 
 /** 経験値パラメータ構造体 */
 struct FExperienceParameterData;
+
+/** ギアパラメータ構造体 */
+struct FGearParameterData;
 
 
 /** プレイヤーのRuntimeデータクラス */
@@ -181,7 +200,14 @@ public:
 	bool CanChangeGear(int32 CurrentGearLevel);
 
 	void ResetDataOnGearChange(int32 CurrentGearLevel);
-	
+
+	void CalculateInvincibilityTime(const FGearParameterData& Data);
+
+
+	inline void SetIsInvincible(bool SetFlg) { bIsInvincible = SetFlg; }
+
+	inline bool IsInvincible() const { return bIsInvincible; }
+	inline FGearRuntimeData& GetGearData() { return Gear; }
 
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
@@ -219,6 +245,8 @@ private:
 	 */
 	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
 
+	
+
 	/**
 	 * @brief 計算済みの速度をCharacterMovementに適用する
 	 */
@@ -247,4 +275,8 @@ private:
 
 	/** レベル */
 	int32 Level;
+
+	/** 無敵状態かどうか */
+	bool bIsInvincible;
+
 };

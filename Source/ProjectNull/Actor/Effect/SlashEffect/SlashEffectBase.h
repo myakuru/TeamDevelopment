@@ -8,7 +8,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API USlashEffectBase : public UEffectBase
 {
 	GENERATED_BODY()

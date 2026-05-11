@@ -2,14 +2,17 @@
 
 #include <ProjectNull/System/Gear/GearBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 
-UPlayerGearComponent::UPlayerGearComponent()
-	:	OwnerPlayer(nullptr)
-	,	PlayerGears(TArray<UGearBase*>())
-	,	CurrentGearLevel(1)
+UPlayerGearComponent::UPlayerGearComponent():
+		OwnerPlayer(nullptr),
+		PlayerGears(TArray<UGearBase*>()),
+		CurrentGearLevel(1)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -19,8 +22,7 @@ void UPlayerGearComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (auto& Gear : PlayerGears)
-	{
+	for (auto& Gear : PlayerGears) {
 		if (!Gear) { continue; }
 		Gear->Initialize(OwnerPlayer,this);
 	}
@@ -34,6 +36,8 @@ void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		if (!Gear) { continue; }
 		Gear->Update(DeltaTime);
 	}
+
+	UpdateCollisionByInvincibility();
 
 }
 
@@ -59,13 +63,30 @@ void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 
 void UPlayerGearComponent::ChangeGear()
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance() || !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()) {
+	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
+		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()
+		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData()) {
 		return;
 	}
 	if (!CanChangeGear()) { return; }
-	const TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
-	PlayerRuntimeData->ResetDataOnGearChange(CurrentGearLevel);
-	CurrentGearLevel = ++CurrentGearLevel % 4;
+	const TObjectPtr<UPlayerRuntimeData> RuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
+	RuntimeData->ResetDataOnGearChange(CurrentGearLevel);
+
+	// プレイヤーのパラメータデータ取得
+	const TObjectPtr<UPlayerParameterData> ParameterData = OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
+	RuntimeData->CalculateInvincibilityTime(ParameterData->GetGearData());
+	CurrentGearLevel = (CurrentGearLevel % 4 + 1);
+	UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
+
+	OnInvincibilityStart();
+}
+
+void UPlayerGearComponent::SetIsInvincible(bool SetFlg)
+{
+	if (!GetWorld()->GetGameInstance<USuperGameInstance>()
+		|| !GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData()) { return; }
+	const TObjectPtr<UPlayerRuntimeData> RuntimeData = GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData();
+	RuntimeData->SetIsInvincible(SetFlg);
 }
 
 bool UPlayerGearComponent::CanChangeGear() const
@@ -76,5 +97,72 @@ bool UPlayerGearComponent::CanChangeGear() const
 
 	const TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
 	return PlayerRuntimeData->CanChangeGear(CurrentGearLevel);
+}
+
+void UPlayerGearComponent::OnInvincibilityStart()
+{
+	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
+		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData())
+	{
+		return;
+	}
+
+	const TObjectPtr<UPlayerRuntimeData> RuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
+
+	SetIsInvincible(true);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		InvincibilityTimerHandle,
+		this,
+		&UPlayerGearComponent::OnInvincibilityEnd,
+		RuntimeData->GetGearData().GearChangeInvincibilityTime,
+		false);
+}
+
+void UPlayerGearComponent::OnInvincibilityEnd()
+{
+	SetIsInvincible(false);
+}
+
+void UPlayerGearComponent::UpdateCollisionByInvincibility()
+{
+	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
+		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()
+		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData()) {
+		return;
+	}
+
+	const TObjectPtr<UPlayerRuntimeData> RuntimeData = GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData();
+	const TObjectPtr<UPlayerParameterData> ParameterData = OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
+
+	if (!RuntimeData->IsInvincible()) { return; }
+	
+	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
+	const float InvincibilityCollisionRadiusSquared = ParameterData->GetGearData().InvincibilityCollisionRadiusSquared;
+	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+	if (!EnemyManager) { return; }
+
+	for (const auto& Enemy : EnemyManager->GetEnemyList())
+	{
+		if (!Enemy) { continue; }
+
+		const float DistSq = FVector::DistSquared(PlayerLocation, Enemy->GetActorLocation());
+
+		if (DistSq <= InvincibilityCollisionRadiusSquared)
+		{
+			Enemy->SetKnockBackData(PlayerLocation, 3, 1);
+			Enemy->SetTakeDamaged();
+		}
+	}
+
+	DrawDebugSphere(
+		GetWorld(),
+		OwnerPlayer->GetActorLocation(),
+		FMath::Sqrt(InvincibilityCollisionRadiusSquared),
+		16,
+		FColor::Green,
+		false,
+		0.1f);
+
 }
 

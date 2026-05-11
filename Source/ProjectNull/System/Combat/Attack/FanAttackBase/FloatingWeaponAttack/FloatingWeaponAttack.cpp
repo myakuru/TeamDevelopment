@@ -1,6 +1,7 @@
 ﻿
 #include "FloatingWeaponAttack.h"
 
+#include <ProjectNull/Actor/Effect/SlashEffect/SlashEffectBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
 
@@ -21,6 +22,19 @@ void UFloatingWeaponAttack::Initialize(AActor* Owner)
 	FloatingWeaponEffect->Initialize();
 	FloatingWeaponEffect->Start(Owner->GetRootComponent());
 	
+}
+
+void UFloatingWeaponAttack::Start()
+{
+	if (!OwnerActor) { return; }
+
+	auto* ActorRootComponent = OwnerActor->GetRootComponent();
+
+	UFanAttackBase::Start();
+
+	for (auto& SlashEffect : SlashEffectArray) {
+		SlashEffect->Start(ActorRootComponent);
+	}
 }
 
 void UFloatingWeaponAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
@@ -46,20 +60,20 @@ bool UFloatingWeaponAttack::IsAttackStateStep()
 
 float UFloatingWeaponAttack::TotalTransitionStateTime()
 {
-	float resultTime = 0.0f;
-	if (!AutoAttack) { return resultTime; }
-	const float interval = AutoAttack->GetAutoAttackInterval();
+	float ResultTime = 0.0f;
+	if (!AutoAttack) { return ResultTime; }
+	const float Interval = AutoAttack->GetAutoAttackInterval();
 	const float TotalTransitionTimeRatio = 1.0f - StandTimeRatio;
-	resultTime = (interval - Duration) * TotalTransitionTimeRatio;
-	return resultTime;
+	ResultTime = (Interval - Duration) * TotalTransitionTimeRatio;
+	return ResultTime;
 }
 
 float UFloatingWeaponAttack::StandStateTime()
 {
-	float resultTime = 0.0f;
-	if (!AutoAttack) { return resultTime; }
-	const float interval = AutoAttack->GetAutoAttackInterval();
-	resultTime = (interval - Duration) * StandTimeRatio;
+	float ResultTime = 0.0f;
+	if (!AutoAttack) { return ResultTime; }
+	const float Interval = AutoAttack->GetAutoAttackInterval();
+	ResultTime = (Interval - Duration) * StandTimeRatio;
 
-	return resultTime;
+	return ResultTime;
 }
