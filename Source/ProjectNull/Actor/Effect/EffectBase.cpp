@@ -20,4 +20,7 @@ void UEffectBase::Start(USceneComponent* RootComponent)
 		FRotator::ZeroRotator,
 		EAttachLocation::KeepRelativeOffset,
 		true);
+
+	if (!EffectComponent) { return; }
+	EffectComponent->SetRelativeTransform(RelativeTransform);
 }

@@ -5,6 +5,7 @@
 #include "STT_EnemyAttack.generated.h"
 
 class UAttackBase;
+class AEnemyBase;
 
 /**
  * 敵の攻撃ステートタスク
@@ -25,6 +26,23 @@ public:
 
 private:
 
+	void AttackJudge();
+
+
+protected:
+
+	UPROPERTY()
+	TObjectPtr<AEnemyBase>	OwnerEnemy;
+
+	/**
+	 * @brief 攻撃対象となるアクター
+	 */
+	UPROPERTY()
+	TObjectPtr<APawn>		TargetActor;
+
+	/**
+	 * @brief 攻撃オブジェクト
+	 */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
 	TObjectPtr<UAttackBase> Attack;
 
