@@ -26,6 +26,7 @@ void UFloatingWeaponAttack::Initialize(AActor* Owner)
 void UFloatingWeaponAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
 {
 	UFanAttackBase::Update(DeltaTime, Player, EnemyManager);
+
 	if (FloatingWeaponEffect)
 	{
 		FloatingWeaponEffect->Update(DeltaTime);

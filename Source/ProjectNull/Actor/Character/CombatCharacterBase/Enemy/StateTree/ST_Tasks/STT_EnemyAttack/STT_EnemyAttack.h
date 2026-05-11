@@ -38,10 +38,10 @@ protected:
 	 * @brief 攻撃対象となるアクター
 	 */
 	UPROPERTY()
-	TObjectPtr<AActor>		TargetActor;
+	TObjectPtr<APawn>		TargetActor;
 
 	/**
-	 * @brief 攻撃
+	 * @brief 攻撃オブジェクト
 	 */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
 	TObjectPtr<UAttackBase> Attack;

@@ -1,4 +1,5 @@
 ﻿#include "STT_EnemyAttack.h"
+#include "Kismet/GameplayStatics.h"
 #include "StateTreeExecutionContext.h"
 #include <ProjectNull\System\Combat\Attack\AttackBase.h>
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
@@ -24,16 +25,24 @@ EStateTreeRunStatus USTT_EnemyAttack::EnterState(FStateTreeExecutionContext& a_C
 
 	Attack->Initialize(OwnerEnemy);
 
+	TargetActor = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (!TargetActor) { return EStateTreeRunStatus::Failed; }
+
 	return EStateTreeRunStatus::Running;
 }
 
 EStateTreeRunStatus USTT_EnemyAttack::Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)
 {
+	if (!OwnerEnemy || !Attack || !TargetActor) { return EStateTreeRunStatus::Failed; }
 
+	Attack->Update(a_DeltaTime,TargetActor);
 
-	return EStateTreeRunStatus();
+	Attack->AttackJudge(TargetActor);
+
+	return EStateTreeRunStatus::Running;
 }
 
 void USTT_EnemyAttack::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
+	Super::ExitState(a_Context, a_Transition);
 }
