@@ -28,6 +28,8 @@ public:
 	float Speed;
 };
 
+class UAnimationAsset;
+
 /** ダッシュギアのレベル4状態クラス */
 UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UDashGearState_Lv4 final : public UDashGearStateBase
@@ -50,4 +52,13 @@ private:
 	/** ダッシュギア必殺技の高速移動データ */
 	UPROPERTY(EditAnywhere)
 	TArray<FDashSpecialMoveData> DashSpecialMoveDataArray;
+
+	UPROPERTY(EditAnywhere, Category = "Ghost")
+	TObjectPtr<UMaterialInterface> GhostMaterial;
+
+	UPROPERTY(EditAnywhere)
+	UAnimationAsset* Animation;
+
+	UPROPERTY(EditAnywhere)
+	float AnimTime;
 };

@@ -2,6 +2,7 @@
 #include "DashGearState_Lv4.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/Actor/GhostActor/GhostActor.h>
 #include <ProjectNull/System/Gear/GearBase.h>
 
 UDashGearState_Lv4::UDashGearState_Lv4()
@@ -27,7 +28,23 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 {
 	if (!OwnerPlayer || !OwnerGear) { return; }
 
-	float ElapsedTime = OwnerGear->GetElapsedTime();
+	auto* Ghost =
+		GetWorld()->SpawnActor<AGhostActor>();
+
+	if (Ghost) {
+		Ghost->SetActorTransform(
+			OwnerPlayer->GetActorTransform()
+		);
+
+		Ghost->Initialize(
+			OwnerPlayer->GetMesh()->GetSkeletalMeshAsset(),
+			Animation,
+			GhostMaterial,
+			AnimTime
+		);
+	}
+
+	/*float ElapsedTime = OwnerGear->GetElapsedTime();
 
 	int32 ResultIndex = 0;
 	for (int32 Index = 0; Index < DashSpecialMoveDataArray.Num(); ++Index) {
@@ -44,6 +61,6 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 	const float Speed = DashSpecialMoveData.Speed;
 	
 	OwnerPlayer->SetActorRotation(Dir.Rotation());
-	OwnerPlayer->LaunchCharacter(Dir * Speed, true, true);
+	OwnerPlayer->LaunchCharacter(Dir * Speed, true, true);*/
 
 }
