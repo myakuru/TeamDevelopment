@@ -26,8 +26,10 @@ public:
 
 private:
 
-	void AttackJudge();
-
+	/**
+	 * @brief 攻撃判定処理
+	 */
+	void AttackJudge(const float a_DeltaTime);
 
 protected:
 
