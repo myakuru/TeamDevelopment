@@ -15,7 +15,8 @@ public class ProjectNull : ModuleRules
 			"InputCore",
 			"EnhancedInput",
 			"Niagara",
-			"StateTreeModule"
+			"StateTreeModule",
+			"GameplayTags"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

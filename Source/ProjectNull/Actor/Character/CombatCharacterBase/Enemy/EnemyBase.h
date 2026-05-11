@@ -247,4 +247,8 @@ private:
 
 	TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter> StateMachine;
 
+	/** Stateのタグ*/
+	//UPROPERTY(BlueprintReadOnly, Category = "Enemy")
+	//FGamePlayTag CurrentStateTag;
+
 };

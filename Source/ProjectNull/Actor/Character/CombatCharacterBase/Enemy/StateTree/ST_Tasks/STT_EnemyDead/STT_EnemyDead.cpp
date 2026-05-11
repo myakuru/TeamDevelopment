@@ -1,6 +1,6 @@
 ﻿//#include "STT_EnemyDead.h"
 //
-//USTT_EnemyDead::USTT_EnemyAttack(const FObjectInitializer& a_ObjInit)
+//USTT_EnemyDead::USTT_EnemyDead(const FObjectInitializer& a_ObjInit)
 //	: Super(a_ObjInit)
 //{
 //	// Tick処理有効化

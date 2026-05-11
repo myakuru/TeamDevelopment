@@ -4,6 +4,8 @@
 //#include "Blueprint/StateTreeTaskBlueprintBase.h"
 //#include "STT_EnemyDead.generated.h"
 //
+//class AEnemyBase;
+//
 ///**
 //* 敵の死亡ステートタスク
 //* 死亡アニメーション、死亡エフェクト、アイテムドロップなどを行う
@@ -15,7 +17,7 @@
 //
 //public:
 //
-//	USTT_EnemyAttack(const FObjectInitializer& a_ObjInit);
+//	USTT_EnemyDead(const FObjectInitializer& a_ObjInit);
 //
 //	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)	override;
 //	virtual EStateTreeRunStatus Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)								override;
@@ -24,7 +26,18 @@
 //private:
 //
 //	/** @brief 持ち主のアドレス*/
-//	UPROPERTY()
+//	UPROPERTY(EditAnywhere, Category = "Input")
 //	TObjectPtr<AEnemyBase> OwnerEnemy = nullptr;
 //
+//	/**	内部状態*/
+//	
+//	/** 死亡アニメーションが終わったか*/
+//	bool bIsDeathAnimFinished = false;
+//
+//	/** 経過時間*/
+//	float ElapsedTime = 0.0f;
+//	
+//	/** 死亡アニメーションの長さ*/
+//	UPROPERTY(EditAnywhere, Category = "Dead")
+//	float DeathAnimDuration = 1.0f;
 //};
