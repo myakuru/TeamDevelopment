@@ -120,9 +120,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	float ConeAngle;
 
-	// 攻撃中か
-	bool bIsActive;
-
 	// 全フレームでアクティブだったか
 	bool bPrevActive;
 

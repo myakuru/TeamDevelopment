@@ -12,7 +12,6 @@ UFanAttackBase::UFanAttackBase()
 	, RotationSpeed(1000.0f)
 	, Radius(300.0f)
 	, ConeAngle(30.0f)
-	, bIsActive(false)
 	, bPrevActive(false)
 	, CurrentAngle(0.0f)
 	, KnockbackPower(2.0f)
@@ -118,6 +117,7 @@ void UFanAttackBase::AttackJudgePlayer(AActor* Player)
 	if (IsTargetInRange(Player))
 	{
 		// ダメージを与える(未実装)
+		
 	}
 }
 

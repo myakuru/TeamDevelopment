@@ -70,8 +70,17 @@ public:
 	/// <returns></returns>
 	virtual FVector CalcAttackDir(const FVector& forwardVector)const;
 
-	// �Q�b�^�[
-	bool CanExecute() const { return bCanExecute; }
+	/**
+	 * @brief 攻撃実行可能か
+	 * @return 攻撃実行可能ならtrue
+	 */
+	bool CanExecute()	const { return bCanExecute; }
+
+	/**
+	 * @brief 攻撃が有効かどうか
+	 * @return 有効であればtrue
+	 */
+	bool IsActive()		const { return bIsActive; }
 
 protected:
 
@@ -87,9 +96,7 @@ protected:
 	/// <param name="EnemyManager">�G�Ǘ��N���X�̃A�h���X</param>
 	virtual void AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager) { return; };
 
-	/// <summary>
-	/// ������̃A�N�^�[�̃|�C���^
-	/// </summary>
+	/**	オーナー */
 	UPROPERTY()
 	AActor* OwnerActor;
 	
@@ -97,9 +104,11 @@ protected:
 	UPROPERTY()
 	USceneComponent* RootComponent;
 
-	bool bCanExecute;
+	/**	攻撃可能フラグ */
+	bool bCanExecute = true;
 
-	bool bIsActive;
+	/**	攻撃有効フラグ */
+	bool bIsActive = false;
 
 	FTransform Transform;
 };
