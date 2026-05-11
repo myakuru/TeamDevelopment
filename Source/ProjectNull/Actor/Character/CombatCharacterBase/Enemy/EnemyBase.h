@@ -103,6 +103,12 @@ public:
 	 */
 	virtual void SetTargetDistanceSqr(float a_DistSqr)	{ EnemyStatus.TargetDistanceSqr = a_DistSqr; }
 
+	/**
+	 * @brief ノックバックするかセット
+	 * @param a_IsKnockBack trueでノックバック
+	 */
+	virtual void SetIsKnockBack(bool a_IsKnockBack) { EnemyStatus.KnockBackFlg = a_IsKnockBack; }
+
 	//~ End Setter
 	
 	//~ Begin Getter
