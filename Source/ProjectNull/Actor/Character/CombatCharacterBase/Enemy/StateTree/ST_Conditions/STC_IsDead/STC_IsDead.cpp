@@ -7,12 +7,12 @@ bool USTC_IsDead::TestCondition(FStateTreeExecutionContext& Context) const
 	Super::TestCondition(Context);
 
 	// 敵の体力が０以下ならtrue
-	if (CurrentHelth <= 0)
+	if (!IsAlive)
 	{
-		return true;
+		return false;
 	}
 	else
 	{
-		return false;
+		return true;
 	}
 }

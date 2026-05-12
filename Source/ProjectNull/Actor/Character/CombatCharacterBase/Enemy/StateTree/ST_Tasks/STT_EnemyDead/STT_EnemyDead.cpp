@@ -1,4 +1,6 @@
 ﻿#include "STT_EnemyDead.h"
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyDataStruct.h>
 
 USTT_EnemyDead::USTT_EnemyDead(const FObjectInitializer& a_ObjInit)
 	: Super(a_ObjInit)
@@ -15,7 +17,7 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
 	// 死亡アニメーションの再生やエフェクトの発生を行う
-
+	OwnerEnemy->SetEnemyState(EEnemyState::Dead);
 
 	return EStateTreeRunStatus();
 }

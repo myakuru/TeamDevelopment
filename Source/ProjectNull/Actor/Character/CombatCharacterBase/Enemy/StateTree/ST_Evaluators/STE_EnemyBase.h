@@ -66,6 +66,12 @@ public:
 	 */
 	virtual void SetIsKnockBack(bool a_IsKnockBack) { IsKnockBack = a_IsKnockBack; }
 
+	/**
+	* @brief 生存状態のセット
+	* @param IsAliveがtrueで生存
+	*/
+	virtual void SetIsAlive(bool a_IsAlive) { IsAlive = a_IsAlive; }
+
 	//~ End Setter
 
 private:
@@ -89,4 +95,8 @@ private:
 	/**	ノックバック中か */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
 	bool IsKnockBack = 0.0f;
+
+	/** 死亡判定フラグ*/
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	bool IsAlive = true;
 };

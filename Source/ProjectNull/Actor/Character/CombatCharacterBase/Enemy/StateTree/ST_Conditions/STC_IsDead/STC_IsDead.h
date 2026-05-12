@@ -23,7 +23,7 @@ protected:
 
 private:
 
-	UPROPERTY(visible,Category="Input")
-	float CurrentHelth=0.0f;
+	UPROPERTY(VisibleAnywhere,Category="Input")
+	bool IsAlive = true;
 
 };
