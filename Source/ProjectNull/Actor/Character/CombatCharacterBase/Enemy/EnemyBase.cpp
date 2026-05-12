@@ -155,6 +155,8 @@ void AEnemyBase::SetTakeDamaged(int32 AttackPower)
 
 	if (EnemyStatus.FinalHP <= 0)
 	{
+		EnemyStatus.IsAlive = false;
+		EnemyRuntimeData->ChangedIsAlive(EnemyStatus.IsAlive);
 		OnDeath();
 	}
 }
@@ -271,6 +273,15 @@ void AEnemyBase::CheckCanAttack()
 	}
 }
 
+void AEnemyBase::SetAnimSequence(UAnimSequence* AnimSequence, bool LoopFlg = false)
+{
+	if (EnemyMesh && AnimSequence)
+	{
+		EnemyMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+		EnemyMesh->PlayAnimation(AnimSequence, LoopFlg);
+	}
+}
+
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)
 {
 	return GetActorLocation() + MoveDir * Speed * DeltaTime;
@@ -294,6 +305,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
+
+	EnemyStatus.IsAlive = true;
 
 	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();

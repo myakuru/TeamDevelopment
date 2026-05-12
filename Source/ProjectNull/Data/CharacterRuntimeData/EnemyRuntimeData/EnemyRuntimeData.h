@@ -13,6 +13,9 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetDistChanged,	float /*DistSqr*/);
 /** ノックバック状態が変更された時に呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsKnockBackChanged,	bool /*IsKnockBack*/);
 
+/** 敵のHPが0を下回った時に呼び出される*/
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsAliveChanged,		bool /*IsKnockBack*/);
+
 /**
  * 敵のランタイムな値を管理する
  */
@@ -42,6 +45,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
 	void ChangedIsKnockBack(const bool a_IsKnockBack);
 
+	/** 死亡判定*/
+	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
+	void ChangedIsAlive(const bool a_IsAlive);
+
 	//~ End Setter
 
 	//~ Start Getter
@@ -68,6 +75,9 @@ public:
 	/**	ノックバック状態が変更された時に呼び出される */
 	FOnIsKnockBackChanged	OnIsKnockBackChanged;
 
+	/** 敵の生存フラグが変更されたときに呼び出される*/
+	FOnIsAliveChanged		OnIsAliveChanged;
+
 private:
 
 	/** 進行ベクトル */
@@ -81,4 +91,8 @@ private:
 	/**	ノックバック中か */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	bool	IsKnockBack = false;
+
+	/** 死亡判定*/
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	bool	IsAlive = true;
 };

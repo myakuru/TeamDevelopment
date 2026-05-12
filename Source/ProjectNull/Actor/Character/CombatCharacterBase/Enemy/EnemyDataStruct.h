@@ -3,6 +3,16 @@
 #include "CoreMinimal.h"
 #include "EnemyDataStruct.generated.h"
 
+// アニメーション用Enum
+UENUM(BlueprintType)
+enum class EEnemyState : uint8
+{
+	Spawn UMETA(DisplayName = "生成"),
+	Chase UMETA(DisplayName = "追跡"),
+	Attack UMETA(DisplayName = "攻撃"),
+	Dead UMETA(DisplayName = "死亡"),
+};
+
 /// <summary>
 /// 敵ステータスのスケーリング情報
 /// </summary>
@@ -99,6 +109,9 @@ public:
 
 	// 攻撃可能フラグ
 	bool CanAttack = false;
+
+	/** 生存フラグ*/
+	bool IsAlive = true;
 
 	// 死んだときのパーティクルの色
 	UPROPERTY(EditAnywhere, Category = "Experience")

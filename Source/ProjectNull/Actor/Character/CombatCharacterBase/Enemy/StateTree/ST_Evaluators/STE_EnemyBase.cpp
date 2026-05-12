@@ -45,4 +45,7 @@ void USTE_EnemyBase::RegisterDelegate()
 
 	// ノックバックするか
 	EnemyRuntimeData->OnIsKnockBackChanged.AddUObject(this, &USTE_EnemyBase::SetIsKnockBack);
+
+	// 死んでいるかどうか
+	EnemyRuntimeData->OnIsAliveChanged.AddUObject(this, &USTE_EnemyBase::SetIsAlive);
 }
