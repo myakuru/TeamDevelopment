@@ -7,6 +7,7 @@
 USTT_EnemyAttack::USTT_EnemyAttack(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
 	,	OwnerEnemy(nullptr)
+	,	TargetActor(nullptr)
 	,	Attack(nullptr)
 {
 	// Tick処理有効化
@@ -15,18 +16,19 @@ USTT_EnemyAttack::USTT_EnemyAttack(const FObjectInitializer& a_ObjInit)
 
 EStateTreeRunStatus USTT_EnemyAttack::EnterState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
-	if(!Attack){ return EStateTreeRunStatus::Failed; }
-	
 	Super::EnterState(a_Context, a_Transition);
 
-	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
-
-	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
-
+	// 攻撃処理初期化
 	Attack->Initialize(OwnerEnemy);
+	if (!Attack)		{ return EStateTreeRunStatus::Failed; }
+	
+	// オーナーセット
+	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
+	if (!OwnerEnemy)	{ return EStateTreeRunStatus::Failed; }
 
+	// ターゲット(プレイヤー)をセット
 	TargetActor = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (!TargetActor) { return EStateTreeRunStatus::Failed; }
+	if (!TargetActor)	{ return EStateTreeRunStatus::Failed; }
 
 	return EStateTreeRunStatus::Running;
 }
@@ -35,11 +37,25 @@ EStateTreeRunStatus USTT_EnemyAttack::Tick(FStateTreeExecutionContext& a_Context
 {
 	if (!OwnerEnemy || !Attack || !TargetActor) { return EStateTreeRunStatus::Failed; }
 
-	Attack->Update(a_DeltaTime,TargetActor);
+	// 無効ならステート終了
+	if (Attack->IsActive())
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	// 攻撃処理
+	AttackJudge(a_DeltaTime);
+	
+	return EStateTreeRunStatus::Running;
+}
+
+void USTT_EnemyAttack::AttackJudge(const float a_DeltaTime)
+{
+	if (!Attack || !TargetActor) { return; }
+
+	Attack->Update(a_DeltaTime, TargetActor);
 
 	Attack->AttackJudge(TargetActor);
-
-	return EStateTreeRunStatus::Running;
 }
 
 void USTT_EnemyAttack::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)

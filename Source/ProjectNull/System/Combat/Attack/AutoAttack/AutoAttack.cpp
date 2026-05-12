@@ -56,7 +56,7 @@ void UAutoAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem
 	{
 		if (!ConeSlashParams) { continue; }
 
-		if (!ConeSlashParams->bIsActive) { continue; }
+		if (!ConeSlashParams->IsActive()) { continue; }
 		ConeSlashParams->AttackJudge(nullptr, EnemyManager);
 	}
 }

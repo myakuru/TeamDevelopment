@@ -30,7 +30,7 @@ void USTE_EnemyBase::RegisterDelegate()
 {
 	if (!OwnerEnemy) { return; }
 
-	UEnemyRuntimeData* EnemyRuntimeData = OwnerEnemy->GetEnemyRuntimeData();
+	EnemyRuntimeData = OwnerEnemy->GetEnemyRuntimeData();
 	if (!EnemyRuntimeData) { return; }
 
 	// ~ AddUObject() ~
@@ -42,4 +42,7 @@ void USTE_EnemyBase::RegisterDelegate()
 
 	// 距離の二乗値
 	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &USTE_EnemyBase::SetTargetDistanceSqr);
+
+	// ノックバックするか
+	EnemyRuntimeData->OnIsKnockBackChanged.AddUObject(this, &USTE_EnemyBase::SetIsKnockBack);
 }

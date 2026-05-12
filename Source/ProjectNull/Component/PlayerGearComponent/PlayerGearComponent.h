@@ -30,7 +30,6 @@ public:
 	void ChangeGear();
 
 	/** セッター */
-	inline void SetOwnerPlayer(APlayerBase* Player) { OwnerPlayer = Player; }
 
 	/** ゲッター */
 	inline const TArray<UGearBase*>& GetPlayerGears() const { return PlayerGears; }

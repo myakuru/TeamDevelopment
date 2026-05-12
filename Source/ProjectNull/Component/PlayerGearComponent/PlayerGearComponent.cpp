@@ -22,6 +22,8 @@ void UPlayerGearComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	OwnerPlayer = Cast<APlayerBase>(GetOwner());
+
 	for (auto& Gear : PlayerGears) {
 		if (!Gear) { continue; }
 		Gear->Initialize(OwnerPlayer,this);

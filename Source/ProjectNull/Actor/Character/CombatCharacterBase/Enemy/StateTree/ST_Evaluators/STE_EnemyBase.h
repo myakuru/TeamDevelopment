@@ -4,10 +4,11 @@
 #include "Blueprint/StateTreeEvaluatorBlueprintBase.h"
 #include "STE_EnemyBase.generated.h"
 
-/**
-* 敵クラス
-*/
+/** 敵クラス */
 class AEnemyBase;
+
+/** 敵のランタイムデータクラス */
+class UEnemyRuntimeData;
 
 /**
  * 敵のステートツリーの基底クラス
@@ -59,28 +60,33 @@ public:
 	 */
 	virtual void SetTargetDistanceSqr(float a_DistSqr) { TargetDistanceSqr = a_DistSqr; }
 
+	/**
+	 * @brief ノックバックするかセット
+	 * @param a_IsKnockBack trueでノックバック
+	 */
+	virtual void SetIsKnockBack(bool a_IsKnockBack) { IsKnockBack = a_IsKnockBack; }
+
 	//~ End Setter
 
 private:
 
-	/**
-	 * @brief 持ち主
-	 */
+	/** 持ち主 */
 	UPROPERTY()
 	TObjectPtr<AEnemyBase>	OwnerEnemy = nullptr;
 
-	/**
-	 * @brief 移動ベクトル
-	 */
+	/** 敵のランタイムデータを管理するクラス */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowAbstract = "true"))
+	TObjectPtr<UEnemyRuntimeData>	EnemyRuntimeData;
+
+	/** 移動ベクトル */
 	UPROPERTY(VisibleAnywhere, Category = "Output",meta = (AllowPrivateAccess = "true"))
 	FVector MoveDir = FVector::ZeroVector;
 
-	/**
-	 * @brief ターゲットとの距離の二乗値
-	 */
+	/** ターゲットとの距離の二乗値 */
 	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
 	float TargetDistanceSqr = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Output")
-	TObjectPtr<UAnimSequenceBase> TestAnime;
+	/**	ノックバック中か */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	bool IsKnockBack = 0.0f;
 };
