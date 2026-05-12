@@ -11,6 +11,7 @@ namespace ExperienceNiagaraParams
 	static const FName Positions = TEXT("User.Positions");
 	static const FName Colors = TEXT("User.Colors");
 	static const FName Sizes = TEXT("User.Sizes");
+	static const FName SpawnCount = TEXT("User.SpawnCount");
 }
 
 // 
@@ -23,7 +24,7 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 	UNiagaraSystem* LoadedNiagaraSystem = LoadObject<UNiagaraSystem>(
 		nullptr,
 		TEXT("/Game/FreeNiagaraPack/Effects/Matsuura_Test_Niagara/ExperiencePickup.ExperiencePickup")
-		// ↑ アセットを右クリック → Copy Reference で正確なパスを取得
+		// アセットを右クリック → Copy Reference で正確なパスを取得
 	);
 
 	if (!LoadedNiagaraSystem)
@@ -58,8 +59,6 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 
 	const FVector PlayerLocation = Player->GetActorLocation();
 
-	UE_LOG(LogTemp, Warning, TEXT("ExperiencePickupManager: Update"));
-
 	// 逆順ループで安全にRemoveを行う
 	for (int32 i = ExperienceList.Num() - 1; i >= 0; --i)
 	{
@@ -79,7 +78,6 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 		// 取得判定（PickupRange以内）
 		if (DistSq <= FMath::Square(Exp.PickupRange))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ExperiencePickupManager: Remove"));
 			PendingExpValue += Exp.ExpValue;
 			ExperienceList.RemoveAt(i);
 			continue;
@@ -88,14 +86,12 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 		// 吸引開始（DetectRange以内）
 		if (!Exp.bChasing && DistSq <= FMath::Square(Exp.DetectRange))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ExperiencePickupManager: Chasing True"));
 			Exp.bChasing = true;
 		}
 
 		// 吸引移動
 		if (Exp.bChasing)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ExperiencePickupManager: Chasing Now"));
 			const FVector Direction = (PlayerLocation - Exp.Location).GetSafeNormal();
 			Exp.Location += Direction * Exp.ChaseSpeed * DeltaTime;
 		}
@@ -150,16 +146,32 @@ void FExperiencePickupManager::SyncToNiagara()
 		UE_LOG(LogTemp, Error, TEXT("NiagaraComponent None"));
 		return;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("SyncToNiagara ParticleNum: %d"), ExperienceList.Num());
 	
 	if (!NiagaraComponent.IsValid()) { return; }
 
 	const int32 Count = ExperienceList.Num();
 
+	// オーブが0個のときはNiagaraを止める
+	// ナイアガラで、Spawn Burst Instantaneousを使用している場合
+	// SpawnCountが０の時でも最低１個はパーティクルを発生してしまうため、非表示にしておく
+	if (Count == 0)
+	{
+		if (NiagaraComponent->IsActive())
+		{
+			NiagaraComponent->DeactivateImmediate();
+		}
+		return;
+	}
+
+	// オーブが増えたとき非アクティブなら再起動
+	if (!NiagaraComponent->IsActive())
+	{
+		NiagaraComponent->Activate();
+	}
+
 	TArray<FVector>			Positions;
 	TArray<FLinearColor>	Colors;
-	TArray<float>				Sizes;
+	TArray<float>			Sizes;
 
 	Positions.Reserve(Count);
 	Colors.Reserve(Count);
@@ -189,4 +201,8 @@ void FExperiencePickupManager::SyncToNiagara()
 		NiagaraComponent.Get(),
 		ExperienceNiagaraParams::Sizes,
 		Sizes);
+
+	// 配列サイズをSpawnCountとして渡す
+	NiagaraComponent->SetNiagaraVariableInt(
+		TEXT("User.SpawnCount"), Count);
 }

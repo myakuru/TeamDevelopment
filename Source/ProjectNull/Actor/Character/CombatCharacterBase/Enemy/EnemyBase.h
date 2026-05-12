@@ -230,6 +230,20 @@ public:
 	virtual void SetCanAttack(bool CanAttack) { EnemyStatus.CanAttack = CanAttack; }
 	virtual bool CanAttack()const { return EnemyStatus.CanAttack; }
 
+	// アニメーションEnum
+	void SetEnemyState(EEnemyState NewState) { CurrentState = NewState; }
+	EEnemyState GetEnemyState() const { return CurrentState; }
+
+	/**
+	 * @brief * アニメーションのセット
+	 */
+	void SetAnimSequence(UAnimSequence* InAnimSequence, bool LoopFlg);
+
+public:
+
+	/** アニメーション*/
+	//void PlayAnimationMontage();
+
 private:
 
 	/// <summary>
@@ -252,5 +266,12 @@ private:
 	FRotator CalculateRotationToMoveDirection(const FRotator& CurrentRotation, const FRotator& TargetRotation, float RotationInterpSpeed, float DeltaTime);
 
 	TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter> StateMachine;
+
+	/** Stateのタグ*/
+	//UPROPERTY(BlueprintReadOnly, Category = "Enemy")
+	//FGamePlayTag CurrentStateTag;
+
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	EEnemyState CurrentState = EEnemyState::Spawn;
 
 };

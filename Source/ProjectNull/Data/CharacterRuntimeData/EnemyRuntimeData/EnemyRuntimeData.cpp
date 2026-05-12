@@ -37,3 +37,12 @@ void UEnemyRuntimeData::ChangedIsKnockBack(const bool a_IsKnockBack)
 	IsKnockBack = a_IsKnockBack;
 	OnIsKnockBackChanged.Broadcast(IsKnockBack);
 }
+
+void UEnemyRuntimeData::ChangedIsAlive(const bool a_IsAlive)
+{
+	if (IsAlive == a_IsAlive) { return; }
+
+	// 変更があればブロードキャスト発火
+	IsAlive = a_IsAlive;
+	OnIsAliveChanged.Broadcast(IsAlive);
+}

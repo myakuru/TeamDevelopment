@@ -26,6 +26,9 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 
 void UDashGearStateBase::Update(float DeltaTime)
 {
+	/*UE_LOG(LogTemp, Warning, TEXT("hi OwnerPlayer %d"), OwnerPlayer);
+	UE_LOG(LogTemp, Warning, TEXT("hi OwnerGear %d"), OwnerGear);*/
+
 	if (!OwnerGear || !OwnerPlayer) { return; }
 
 	Dash();
@@ -35,15 +38,12 @@ void UDashGearStateBase::Dash()
 {
 	if (!OwnerPlayer) { return; }
 
-	const FVector dir = OwnerPlayer->GetActorForwardVector();
-	OwnerPlayer->LaunchCharacter(dir * DashSpeed, true, true);
+	const FVector Dir = OwnerPlayer->GetActorForwardVector();
+	OwnerPlayer->LaunchCharacter(Dir * DashSpeed, true, true);
 
-	if (OwnerGear)
-	{
+	if (OwnerGear) {
 		OwnerGear->SetBlocksMovement(true);
 	}
-
-
 
 	UpdateDashAttack();
 }
@@ -69,7 +69,7 @@ void UDashGearStateBase::PlayDashEffect()
 
 	if (NiagaraComp)
 	{
-		NiagaraComp->SetAutoDestroy(true); // �I������玩���폜
+		NiagaraComp->SetAutoDestroy(true);
 
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(
@@ -91,7 +91,7 @@ void UDashGearStateBase::UpdateDashAttack()
 {
 	if (!OwnerPlayer) { return; }
 
-	const FVector playerLocation = OwnerPlayer->GetActorLocation();
+	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
 
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!enemyManager) { return; }
@@ -100,11 +100,11 @@ void UDashGearStateBase::UpdateDashAttack()
 	{
 		if (!enemy) { continue; }
 
-		const float DistSq = FVector::DistSquared(playerLocation, enemy->GetActorLocation());
+		const float DistSq = FVector::DistSquared(PlayerLocation, enemy->GetActorLocation());
 
 		if (DistSq <= DashAttackRangeSquared)
 		{
-			enemy->SetKnockBackData(playerLocation,3,1);
+			enemy->SetKnockBackData(PlayerLocation,3,1);
 			enemy->SetTakeDamaged();
 		}
 	}

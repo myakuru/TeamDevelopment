@@ -7,10 +7,7 @@
 
 #include "DashGearState_Lv2.generated.h"
 
-
-/// <summary>
-/// �_�b�V���M�A��ԃ��x��2�N���X
-/// </summary>
+/** ダッシュギアのレベル2状態クラス */
 UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UDashGearState_Lv2 final : public UDashGearStateBase
 {
