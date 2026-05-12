@@ -21,13 +21,15 @@ public:
 	/// <summary>
 	/// 開始の際の初期化
 	/// </summary>
-	void Start();
+	virtual void Start();
 
 	/// <summary>
-	/// �U���̎��s
+	/// �U���̎��s
 	/// </summary>
 	virtual void Execute()override;
 	
+	virtual void Update(float DeltaTime, AActor* Player = nullptr, UEnemyManagerSubsystem* EnemyManager = nullptr)override;
+
 	/// <summary>
 	/// 更新処理
 	/// </summary>
@@ -117,9 +119,6 @@ public:
 	// 扇の広さ（角度）
 	UPROPERTY(EditAnywhere)
 	float ConeAngle;
-
-	// 攻撃中か
-	bool bIsActive;
 
 	// 全フレームでアクティブだったか
 	bool bPrevActive;

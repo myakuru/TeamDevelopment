@@ -21,14 +21,7 @@ class PROJECTNULL_API USTT_EnemyWalk : public UStateTreeTaskBlueprintBase
 	
 public:
 
-	USTT_EnemyWalk(const FObjectInitializer& a_ObjInit)
-		: Super(a_ObjInit)
-	{
-		/*
-		* Tick処理有効化
-		*/
-		bShouldCallTick = true;
-	}
+	USTT_EnemyWalk(const FObjectInitializer& a_ObjInit);
 
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)	override;
 	virtual EStateTreeRunStatus Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)								override;

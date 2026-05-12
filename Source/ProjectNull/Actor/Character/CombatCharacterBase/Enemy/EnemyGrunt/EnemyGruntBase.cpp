@@ -31,7 +31,7 @@ void AEnemyGruntBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
-
+	
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
 
@@ -40,9 +40,6 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 		MoveToKnockBack(FVector::ZeroVector, 0, DeltaTime);
 		return;
 	}
-
-	// プレイヤーへ向かう処理を更新
-	MoveToPlayer(playerLocation,DeltaTime);
 
 	// 攻撃可能か判断
 	CheckCanAttack();

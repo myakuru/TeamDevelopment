@@ -2,6 +2,7 @@
 #include "EnemyBase.h"
 #include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include <ProjectNull/Utility/StateMachine/StateMachine.h>
 #include <ProjectNull/Actor/Item/Pickup/ExperiencePickup/ExperiencePickup.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
@@ -35,8 +36,8 @@ AEnemyBase::~AEnemyBase() = default;
 
 void AEnemyBase::BeginPlay()
 {
-	ACombatCharacterBase::BeginPlay();
-	
+	AActor::BeginPlay();
+
 	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 
@@ -46,7 +47,11 @@ void AEnemyBase::BeginPlay()
 		EnemyManager->RegisterEnemy(this);
 	}
 
-	CapsuleCollision = GetCapsuleComponent();
+	CapsuleCollision = nullptr;
+
+	CapsuleCollision = FindComponentByClass<UCapsuleComponent>();
+
+	//CapsuleCollision = GetCapsuleComponent();
 
 	// コリジョンプリセット設定
 	if (CapsuleCollision)
@@ -87,25 +92,9 @@ void AEnemyBase::RegisterDelegates()
 
 	// 距離の二乗値
 	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &AEnemyBase::SetTargetDistanceSqr);
-}
 
-void AEnemyBase::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
-{
-	// ランタイムデータ側で計算
-	EnemyRuntimeData->CalcDistanceToTarget(PlayerLocation, GetActorLocation());
-	
-	// 移動方向へ補間する回転を計算
-	const FRotator calcResultRotation = CalculateRotationToMoveDirection(
-										GetActorRotation(),
-										EnemyStatus.MoveDir.Rotation(),
-										EnemyStatus.RotationInterpSpeed,
-										DeltaTime);
-
-	// 回転を更新
-	SetActorRotation(calcResultRotation);
-
-	// 座標を更新
-	SetActorLocation(CalculateNextActorLocation(EnemyStatus.MoveDir,EnemyStatus.MoveSpeed,DeltaTime), true);
+	// ノックバックするか
+	EnemyRuntimeData->OnIsKnockBackChanged.AddUObject(this, &AEnemyBase::SetIsKnockBack);
 }
 
 void AEnemyBase::UpdateParams()
@@ -206,17 +195,6 @@ void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPow
 	}
 }
 
-void AEnemyBase::Tick(float DeltaTime)
-{
-	ACombatCharacterBase::Tick(DeltaTime);
-}
-
-void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	ACombatCharacterBase::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
 void AEnemyBase::OnDeath()
 {
 	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
@@ -245,34 +223,6 @@ void AEnemyBase::OnDeath()
 		);
 	}
 
-	/** 敵が死んだ際に経験値を落とす*/
-	//if (ExperiencePickupClass)
-	//{
-	//	/** Actorのパラメータ設定*/
-	//	FActorSpawnParameters SpawnParams;
-	//	SpawnParams.Owner = this;
-
-	//	/** 経験値クラスにパラメータをセット*/
-	//	AExperiencePickup* ExpPickup = GetWorld()->SpawnActor<AExperiencePickup>(
-	//		ExperiencePickupClass,
-	//		GetActorLocation(),
-	//		FRotator::ZeroRotator,
-	//		SpawnParams
-	//	);
-
-	//	if (ExpPickup)
-	//	{
-	//		ExpPickup->SetExpValue(EnemyStatus.EXP);
-
-	//		if (UItemManagerSubsystem* ItemSubsystem =
-	//			GetWorld()->GetSubsystem<UItemManagerSubsystem>())
-	//		{
-	//			ItemSubsystem->RegisterPickupItem(ExpPickup);
-	//			UE_LOG(LogTemp, Warning, TEXT("Register ExpPickup"));
-	//		}
-	//	}
-	//}
-
 	// 経験値ドロップ
 	if (UItemManagerSubsystem* ItemSubsystem =
 		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
@@ -282,7 +232,7 @@ void AEnemyBase::OnDeath()
 
 		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
 			GetActorLocation(),
-			static_cast<float>(EnemyStatus.EXP),
+			static_cast<float>(EnemyStatus.Exp),
 			Color,
 			Size
 		);
@@ -292,7 +242,7 @@ void AEnemyBase::OnDeath()
 	if (USuperGameInstance* GameInstance =
 		GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
-		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.EXP);
+		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
 		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
 
@@ -344,7 +294,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
-	//SetActorTickEnabled(true);
 
 	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
@@ -355,8 +304,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		EnemyManager->RegisterEnemy(this);
 	}
 
-	CapsuleCollision = GetCapsuleComponent();
-
 	// コリジョンプリセット設定
 	if (CapsuleCollision)
 	{
@@ -366,8 +313,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		CapsuleCollision->SetGenerateOverlapEvents(true);
 	}
-
-	//StateMachine = MakeUnique<TStateMachine<AEnemyBase>>();
 
 	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
 		new TStateMachine<AEnemyBase>()

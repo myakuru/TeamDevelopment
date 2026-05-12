@@ -5,11 +5,13 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
+#include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
 #include "EnemyBase.generated.h"
 
 // 前方宣言
 class UCapsuleComponent;
+class USkeletalMeshComponent;
 class UPrimitiveComponent;
 class UEnemyDataAsset;
 
@@ -19,112 +21,6 @@ class TStateMachine;
 struct FStateMachineDeleter
 {
 	void operator()(TStateMachine<AEnemyBase>* Ptr) const;
-};
-
-/// <summary>
-/// 敵ステータスのスケーリング情報
-/// </summary>
-USTRUCT(BlueprintType)
-struct FStatScaling
-{
-	GENERATED_BODY()
-
-public:
-	// 基礎数値
-	UPROPERTY(EditAnywhere)
-	int32 Base = 100;
-
-	// 倍率
-	UPROPERTY(EditAnywhere)
-	float Scale = 1.0f;
-
-	// 倍率増加量
-	UPROPERTY(EditAnywhere)
-	float ScalePerKill = 0.005f;
-
-	/// <summary>
-	/// 基礎数値 * 倍率
-	/// </summary>
-	/// <returns>最終的な数値を返す</returns>
-	int32 GetFinalValue(int32 Count)
-	{
-		Scale = 1.0f + Count * ScalePerKill;
-		return static_cast<int32>(Base * Scale);
-	}
-};
-
-/// <summary>
-/// 敵基本ステータス
-/// </summary>
-USTRUCT(BlueprintType)
-struct FEnemyStatus
-{
-	GENERATED_BODY()
-
-public:
-	// 移動方向
-	UPROPERTY(EditAnywhere)
-	FVector MoveDir = FVector::ZeroVector;
-
-	// 移動速度
-	UPROPERTY(EditAnywhere)
-	float	MoveSpeed = 300.0f;
-
-	// 回転補間速度
-	UPROPERTY(EditAnywhere)
-	float	RotationInterpSpeed = 5.0f;
-
-	// 最終的なヒットポイント
-	UPROPERTY(EditAnywhere)
-	int32	FinalHP = 100;
-
-	// スケーリング計算用ヒットポイント
-	UPROPERTY(EditAnywhere)
-	FStatScaling HPScaling;
-
-	// 最終的な攻撃力
-	UPROPERTY(EditAnywhere)
-	int32	FinalAttack = 1;
-
-	// スケーリング計算用攻撃力
-	UPROPERTY(EditAnywhere)
-	FStatScaling AttackScaling;
-
-	// エネミーの重量
-	UPROPERTY(EditAnywhere)
-	float	KnockBackWeight = 1.0f;
-
-	// ノックバック方向
-	FVector KNockBackVelocity = FVector::ZeroVector;
-
-	// エネミーが吹き飛び中の判定フラグ
-	bool	KnockBackFlg = false;
-
-	// 経験値
-	UPROPERTY(EditAnywhere)
-	int EXP = 0;
-
-	// ギアエネルギー
-	UPROPERTY(EditAnywhere)
-	int GearEnergy = 0;
-
-	// ターゲットとの簡易距離
-	float TargetDistanceSqr = 0.0f;
-
-	// 攻撃可能距離
-	UPROPERTY(EditAnywhere)
-	float AttackDistance = 20.0f;
-
-	// 攻撃可能フラグ
-	bool CanAttack = false;
-
-	// 死んだときのパーティクルの色
-	UPROPERTY(EditAnywhere,Category = "Experience")
-	FLinearColor ExpColor = FLinearColor::Blue;
-
-	// パーティクルのサイズ
-	UPROPERTY(EditAnywhere, Category = "Experience")
-	float ExpSize = 1.0f;
 };
 
 /**
@@ -162,7 +58,7 @@ class UEnemyRuntimeData;
 ///	重くなる可能性があるためActorを継承する可能性大
 /// </summary>
 UCLASS()
-class PROJECTNULL_API AEnemyBase : public ACombatCharacterBase
+class PROJECTNULL_API AEnemyBase : public AActor
 {
 	GENERATED_BODY()
 	
@@ -207,6 +103,12 @@ public:
 	 */
 	virtual void SetTargetDistanceSqr(float a_DistSqr)	{ EnemyStatus.TargetDistanceSqr = a_DistSqr; }
 
+	/**
+	 * @brief ノックバックするかセット
+	 * @param a_IsKnockBack trueでノックバック
+	 */
+	virtual void SetIsKnockBack(bool a_IsKnockBack) { EnemyStatus.KnockBackFlg = a_IsKnockBack; }
+
 	//~ End Setter
 	
 	//~ Begin Getter
@@ -232,12 +134,6 @@ protected:
 	virtual void RegisterDelegates();
 
 	/// <summary>
-	/// 敵（自身）がプレイヤーへ向かう処理
-	/// </summary>
-	/// <param name="playerLocation"> プレイヤーの座標</param>
-	virtual void MoveToPlayer(const FVector& PlayerLocation, float DeltaTime);
-
-	/// <summary>
 	/// 敵（自身）のパラメータを更新する
 	/// </summary>
 	virtual void UpdateParams();
@@ -248,6 +144,10 @@ protected:
 	/// <summary>
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Collision")
 	UCapsuleComponent* CapsuleCollision;
+
+	/** 敵のモデル*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TObjectPtr<USkeletalMeshComponent> EnemyMesh;
 
 	/// <summary>
 	/// 敵が吹き飛ばされている状態の処理
@@ -303,9 +203,9 @@ protected:
 	TObjectPtr<UEnemyDataAsset> EnemyDataAsset;
 
 public:	
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override {}
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) {}
 
 	/// <summary>
 	/// 敵更新メソッド
@@ -352,5 +252,9 @@ private:
 	FRotator CalculateRotationToMoveDirection(const FRotator& CurrentRotation, const FRotator& TargetRotation, float RotationInterpSpeed, float DeltaTime);
 
 	TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter> StateMachine;
+
+	/** Stateのタグ*/
+	//UPROPERTY(BlueprintReadOnly, Category = "Enemy")
+	//FGamePlayTag CurrentStateTag;
 
 };

@@ -30,7 +30,6 @@ public:
 	void ChangeGear();
 
 	/** セッター */
-	inline void SetOwnerPlayer(APlayerBase* Player) { OwnerPlayer = Player; }
 
 	/** ゲッター */
 	inline const TArray<UGearBase*>& GetPlayerGears() const { return PlayerGears; }
@@ -38,7 +37,24 @@ public:
 
 private:
 
+	void SetIsInvincible(bool SetFlg);
+
 	bool CanChangeGear() const;
+
+	/**
+	 * @brief 無敵開始時に呼ばれる処理
+	 */
+	void OnInvincibilityStart();
+
+	/**
+	 * @brief 無敵終了時に呼ばれる処理
+	 */
+	void OnInvincibilityEnd();
+	
+	/**
+	 * @brief 無敵状態に応じて当たり判定を更新
+	 */
+	void UpdateCollisionByInvincibility();
 
 	UPROPERTY()
 	APlayerBase* OwnerPlayer;
@@ -48,4 +64,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	int32 CurrentGearLevel;
+
+	/** ギアチェンジによる無敵時間ハンドル */
+	FTimerHandle InvincibilityTimerHandle;
 };

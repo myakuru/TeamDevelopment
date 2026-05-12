@@ -4,18 +4,24 @@
 #include "../MapActorBase.h"
 #include "TreasureBox.generated.h"
 
-/**
- * プレイヤーが近づくと破壊される宝箱
- */
+/** プレイヤーが近づくと破壊される宝箱 */
 
-/**宝箱が落とすアイテムの種類*/
-UENUM(BlueprintType)
-enum class EDropItemsType : uint8
+ //宝箱のドロップアイテムパラメータ
+USTRUCT(BlueprintType)
+struct FDropItemParams
 {
-	EHeal	UMETA(DisplayName = "回復アイテム"),
-	EExp	UMETA(DisplayName = "経験値"),
-	EEnergy	UMETA(DisplayName = "エネルギー"),
-	EGear	UMETA(DisplayName = "ギア")
+	GENERATED_BODY()
+public:
+
+	/** EXP */
+	UPROPERTY(EditAnywhere)
+	FLinearColor ExpColor = FLinearColor::Yellow;
+
+	UPROPERTY(EditAnywhere)
+	float ExpSize = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+	float DropExp = 100.0f;
 };
 
 UCLASS()
@@ -25,7 +31,15 @@ class PROJECTNULL_API ATreasureBox : public AMapActorBase
 
 public:
 	ATreasureBox();
+
+	void SetDropItemParams(const FDropItemParams& Params) { DropItemParams = Params; }
 public:
+
+	void BeginPlay() override;
+
+	void Tick(float DeltaTime) override;
+
+	void ExtinctionStart(){ bDissolving = true; }
 
 	void HitReaction(
 		UPrimitiveComponent* OverlappedComp,
@@ -36,7 +50,28 @@ public:
 		const FHitResult& SweepResult
 	)override;
 
+	//ディゾルブ用マテリアルインスタンス
+	UPROPERTY()
+	UMaterialInstanceDynamic* DynamicMaterial;
+
+	//ディゾルブ
+	UPROPERTY()
+	bool bDissolving = false;
+
+	UPROPERTY()
+	float DissolveAmount = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float DissolveSpeed = 1.0f;
+
 	/** 開くアニメーション */
 	UPROPERTY(EditAnywhere)
 	UAnimationAsset* OpenAnimation;
+
+	/** ドロップアイテムのパラメータ */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropItemParams")
+	FDropItemParams DropItemParams;
+
+	//タイマー
+	FTimerHandle DestroyTimerHandle;
 };
