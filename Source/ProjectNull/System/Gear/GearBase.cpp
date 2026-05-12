@@ -41,7 +41,6 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 		coolTime = GearStatuses[stateIndex].CoolTime;
 	}
 
-	// �N�[���^�C���̊J�n
 	GetWorld()->GetTimerManager().SetTimer(
 		DurationTimerHandle,
 		this,
@@ -49,9 +48,10 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 		coolTime,
 		false);
 
-
+	
 	currentState->Initialize(OwnerPlayer, OwnerGearComponent, this);
 	currentState->Execute(CurrentGearLevel);
+
 }
 
 void UGearBase::Update(float DeltaTime)
