@@ -35,7 +35,13 @@ public:
 	void AddWeapon(const FWeaponInstance& a_NewWeapon);
 
 	UFUNCTION(BlueprintCallable)
+	void RemoveWeapon(int64 a_TargetUniqueID);
+
+	UFUNCTION(BlueprintCallable)
 	void AddWeaponMaterial(const FWeaponMaterialInstance& a_NewMaterial);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveWeaponMaterial(int64 a_TargetUniqueID);
 
 	UFUNCTION(BlueprintCallable)
 	bool GetWeaponMaster(FName a_WeaponId,FWeaponData& a_OutData)const;
