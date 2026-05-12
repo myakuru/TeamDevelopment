@@ -1,5 +1,4 @@
-﻿
-#include "EnemyBase.h"
+﻿#include "EnemyBase.h"
 #include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
