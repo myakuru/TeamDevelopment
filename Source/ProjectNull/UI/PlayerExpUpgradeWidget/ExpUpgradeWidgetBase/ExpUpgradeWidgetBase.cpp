@@ -3,7 +3,7 @@
 
 #include "ExpUpgradeWidgetBase.h"
 #include <Components/TextBlock.h>
-
+#include <Components/Image.h>
 #include <ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h>
 
 void UExpUpgradeWidgetBase::NativeConstruct()
@@ -35,6 +35,7 @@ void UExpUpgradeWidgetBase::ChoicesExpUpgrade()
 	{
 		if (UpgradeText)
 		{
+			ImageRotation();
 			UpgradeText->SetText(RowData->UpgradeText);
 		}
 	}
@@ -71,4 +72,24 @@ int32 UExpUpgradeWidgetBase::GetRandomTextId()
 	}
 
 	return 0;
+}
+
+void UExpUpgradeWidgetBase::ImageRotation()
+{
+	if (UpgradeImage)
+	{
+		if (UiScale.X <= UiScaleMax.X)
+		{
+			UiScale.X += GetWorld()->GetDeltaSeconds() * UiScaleSpeed.X;
+
+			UpgradeImage->SetRenderScale(UiScale);
+		}
+
+		if (UiScale.Y >= UiScaleMax.Y)
+		{
+			UiScale.Y -= GetWorld()->GetDeltaSeconds() * UiScaleSpeed.Y;
+
+			UpgradeImage->SetRenderScale(UiScale);
+		}
+	}
 }

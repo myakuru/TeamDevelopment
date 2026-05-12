@@ -16,4 +16,7 @@ struct PROJECTNULL_API FExpUpgradeRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText UpgradeText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 ImageRotation;
 };

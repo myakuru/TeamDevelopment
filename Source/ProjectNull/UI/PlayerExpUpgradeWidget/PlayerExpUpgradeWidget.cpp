@@ -11,16 +11,16 @@ void UPlayerExpUpgradeWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	GameInstance = Cast<USuperGameInstance>(GetGameInstance());
+
 	if (GameInstance)
 	{
 		PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
 	}
-
-	OpenUpgradeWidget();
 }
 
 void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
+	OpenUpgradeWidget();
 }
 
 void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
