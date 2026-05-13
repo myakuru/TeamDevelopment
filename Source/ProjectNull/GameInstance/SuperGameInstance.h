@@ -4,8 +4,9 @@
 #include "Engine/GameInstance.h"
 #include "SuperGameInstance.generated.h"
 
-class UWeaponManager;
 class UMySaveGame;
+class UWeaponManager;
+class UMapActorManager;
 class UPlayerParameterData;
 class UPlayerRuntimeData;
 
@@ -31,6 +32,7 @@ public:
 	inline TObjectPtr<UPlayerParameterData> GetPlayerParameterData() const { return PlayerParameterData; }
 	inline TObjectPtr<UPlayerRuntimeData> GetPlayerRuntimeData() const { return PlayerRuntimeData; }
 
+	UMapActorManager* GetMapActorManager() const { return MapActorManager; }
 protected:
 
 	UPROPERTY()
@@ -44,6 +46,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	UWeaponManager* WeaponManager;
+
+	/** MapActorManager */
+	UPROPERTY(BlueprintReadOnly)
+	UMapActorManager* MapActorManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UPlayerParameterData> PlayerParameterData;

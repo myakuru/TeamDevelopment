@@ -3,8 +3,9 @@
 #include "SuperGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
-#include <ProjectNull/Weapon/Manager/WeaponManager.h>
 #include <ProjectNull/SaveGame/MySaveGame.h>
+#include <ProjectNull/Weapon/Manager/WeaponManager.h>
+#include <ProjectNull/Actor/Map/MapActorManager.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
@@ -14,6 +15,9 @@ void USuperGameInstance::Init()
 
 	WeaponManager = NewObject<UWeaponManager>(this);
 	if (WeaponManager) WeaponManager->Initialize(WeaponDataTable,WeaponMaterialDataTable);
+
+	//MapActorManagerの初期化
+	MapActorManager = NewObject<UMapActorManager>(this);
 
 	if (PlayerRuntimeData) {
 		PlayerRuntimeData->Initialize();
@@ -45,6 +49,9 @@ void USuperGameInstance::LoadGameData()
 		WeaponManager->LoadFromSaveData(CurrentSaveData);
 	}
 
+	if (MapActorManager) {
+		MapActorManager->LoadFromSaveData(CurrentSaveData);
+	}
 }
 
 void USuperGameInstance::SaveGameData()

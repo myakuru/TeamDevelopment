@@ -1,4 +1,5 @@
 ﻿#include "STT_EnemyDead.h"
+#include "StateTreeExecutionContext.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyDataStruct.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
@@ -18,21 +19,23 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
-	// 死亡アニメーションの再生やエフェクトの発生を行う
-	OwnerEnemy->SetEnemyState(EEnemyState::Dead);
-	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
-	if (auto EnemyManager = OwnerEnemy->GetEnemyManagerSubsystem()) {
-		EnemyManager->RemoveEnemy(OwnerEnemy);
-	}
+	//// 死亡アニメーションの再生やエフェクトの発生を行う
+	//OwnerEnemy->SetEnemyState(EEnemyState::Dead);
+	//// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
+	//if (auto EnemyManager = OwnerEnemy->GetEnemyManagerSubsystem()) {
+	//	EnemyManager->RemoveEnemy(OwnerEnemy);
+	//}
 
-	// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
-	if (auto GameProgress = OwnerEnemy->GetGameProgressSubsystem()) {
-		GameProgress->AddKillCount();
-	}
+	//// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
+	//if (auto GameProgress = OwnerEnemy->GetGameProgressSubsystem()) {
+	//	GameProgress->AddKillCount();
+	//}
 
 	OwnerEnemy->SpawnDeathEffect();
 
 	OwnerEnemy->SpawnDeathExperience();
+
+	OwnerEnemy->OnDeath();
 
 	//// 経験値ドロップ
 	//if (UItemManagerSubsystem* ItemSubsystem =

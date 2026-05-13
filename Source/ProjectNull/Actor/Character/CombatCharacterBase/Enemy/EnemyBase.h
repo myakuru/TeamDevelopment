@@ -107,7 +107,7 @@ public:
 	 * @brief ステートEnumを切り替える処理
 	 * @param a_targetState 切り替え先ステートEnum
 	 */
-	virtual void SetEnemyState(EEnemyState a_TargetState) { EnemyStatus.StateTag = a_TargetState; }
+	virtual void SetEnemyState(EEnemyState a_TargetState);
 
 	/**
 	* @brief 生存状態をセット

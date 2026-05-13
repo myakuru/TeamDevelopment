@@ -4,6 +4,8 @@
 #include "Blueprint/StateTreeTaskBlueprintBase.h"
 #include "STT_EnemyKnockBack.generated.h"
 
+class AEnemyBase;
+
 /**
  * 敵のノックバックステート
  */
@@ -27,8 +29,19 @@ private:
 	 */
 	void SetKnockBackData();
 
+	/**
+	 * @brief ノックバック更新処理
+	 * @param a_DeltaTime デルタタイム
+	 */
+	void MoveToKnockBack(const float a_DeltaTime);
+
 protected:
 
+	/** 持ち主のアドレス */
+	UPROPERTY()
+	TObjectPtr<AEnemyBase>	OwnerEnemy = nullptr;
+
+	/**	ノックバックに必要な情報を格納しているデータテーブル */
 	UPROPERTY(EditAnywhere, Category = "Data")
 	TObjectPtr<UDataTable> KnockBackDataTable;
 

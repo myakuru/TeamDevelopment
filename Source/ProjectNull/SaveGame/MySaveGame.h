@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,7 +9,7 @@
 #include "MySaveGame.generated.h"
 
 /**
- * 
+ * ゲーム内のセーブデータを管理するクラス
  */
 UCLASS()
 class PROJECTNULL_API UMySaveGame : public USaveGame
@@ -26,4 +26,9 @@ public:
 
 	UPROPERTY()
 	FWeaponSaveData m_WeaponData;
+
+
+	/** マップの破壊するアクターのID */
+	UPROPERTY()
+	TSet<FName> DestroyedActorIDs;
 };
