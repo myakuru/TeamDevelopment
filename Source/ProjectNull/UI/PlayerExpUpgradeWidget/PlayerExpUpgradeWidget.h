@@ -7,8 +7,9 @@
 #include "PlayerExpUpgradeWidget.generated.h"
 
 class USuperGameInstance;
-class UPlayerRuntimeData;
 class UExpUpgradeWidgetBase;
+class USuperGameInstance;
+class UPlayerRuntimeData;
 
 /**
  * 経験値がレベルアップしたら呼ばれるクラス
@@ -25,7 +26,6 @@ public:
 protected:
 
 	virtual void NativeConstruct() override;
-
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	/** 強化画面を開く */
@@ -53,5 +53,4 @@ protected:
 	/** 強化画面2のウィジェット */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UExpUpgradeWidgetBase> UpgradeWidget_2;
-	
 };

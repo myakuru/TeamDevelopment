@@ -162,6 +162,9 @@ public:
 /** プレイヤー中間基底クラス */
 class APlayerBase;
 
+/** 強化画面のウィジット */
+class UPlayerExpUpgradeWidget;
+
 /** 速度パラメータ構造体 */
 struct FSpeedParameterData;
 
@@ -219,6 +222,8 @@ public:
 	/** ギアエネルギーが変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
 	FOnGearEnergyChanged OnGearEnergyChanged;
+
+	TObjectPtr<UPlayerExpUpgradeWidget> PlayerExpUpgradeWidget;
 
 private:
 

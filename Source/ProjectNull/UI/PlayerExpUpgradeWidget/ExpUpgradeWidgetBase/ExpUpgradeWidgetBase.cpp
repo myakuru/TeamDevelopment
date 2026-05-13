@@ -1,6 +1,5 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ExpUpgradeWidgetBase.h"
 #include <Components/TextBlock.h>
 #include <Components/Image.h>
@@ -91,5 +90,39 @@ void UExpUpgradeWidgetBase::ImageRotation()
 
 			UpgradeImage->SetRenderScale(UiScale);
 		}
+	}
+}
+
+void UExpUpgradeWidgetBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	if (UpgradeImage)
+	{
+		if (UiScale.X <= 1.2f)
+		{
+			UiScale.X += GetWorld()->GetDeltaSeconds() * 10.0f;
+		}
+		if (UiScale.Y <= 1.2f)
+		{
+			UiScale.Y -= GetWorld()->GetDeltaSeconds() * 10.0f;
+		}
+		UpgradeImage->SetRenderScale(UiScale);
+	}
+}
+
+void UExpUpgradeWidgetBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseLeave(InMouseEvent);
+	if (UpgradeImage)
+	{
+		if (UiScale.X >= 1.0f)
+		{
+			UiScale.X -= GetWorld()->GetDeltaSeconds() * 10.0f;
+		}
+		if (UiScale.Y >= 1.0f)
+		{
+			UiScale.Y += GetWorld()->GetDeltaSeconds() * 10.0f;
+		}
+		UpgradeImage->SetRenderScale(UiScale);
 	}
 }

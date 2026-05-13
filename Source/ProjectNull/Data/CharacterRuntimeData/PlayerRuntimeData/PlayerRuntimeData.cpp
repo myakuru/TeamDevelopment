@@ -6,6 +6,7 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
+#include <ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData():
 	Owner(nullptr),
@@ -23,6 +24,11 @@ void UPlayerRuntimeData::Initialize()
 
 	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn)) {
 		Owner = PlayerBase;
+	}
+
+	if (PlayerExpUpgradeWidget)
+	{
+		PlayerExpUpgradeWidget = NewObject<UPlayerExpUpgradeWidget>();
 	}
 
 	// プレイヤーのパラメータデータ取得
@@ -75,6 +81,9 @@ void UPlayerRuntimeData::LevelUp()
 	Level++;
 
 	UpdateStatus();
+
+	PlayerExpUpgradeWidget->OpenUpgradeWidget();
+
 	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
 	UE_LOG(LogTemp, Warning, TEXT("hi ExperienceToNextLevel %.0f"), Experience.ExperienceToNextLevel);

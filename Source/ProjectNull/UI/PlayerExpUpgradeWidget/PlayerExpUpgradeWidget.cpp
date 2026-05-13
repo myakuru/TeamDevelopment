@@ -12,6 +12,11 @@ void UPlayerExpUpgradeWidget::NativeConstruct()
 
 	GameInstance = Cast<USuperGameInstance>(GetGameInstance());
 
+	SetVisibility(ESlateVisibility::Hidden);
+	SetIsEnabled(false);
+
+	//OpenUpgradeWidget();
+
 	if (GameInstance)
 	{
 		PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
@@ -20,7 +25,8 @@ void UPlayerExpUpgradeWidget::NativeConstruct()
 
 void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	OpenUpgradeWidget();
+	//Super::NativeTick(MyGeometry, InDeltaTime);
+	//OpenUpgradeWidget();
 }
 
 void UPlayerExpUpgradeWidget::OpenUpgradeWidget()

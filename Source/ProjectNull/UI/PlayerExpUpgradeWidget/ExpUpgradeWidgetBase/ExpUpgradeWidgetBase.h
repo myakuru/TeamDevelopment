@@ -22,6 +22,15 @@ public:
 	virtual void NativeConstruct() override;
 	virtual void ChoicesExpUpgrade();
 
+	// 左ボタン押下を処理する
+	//virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	// マウスがウィジェットに入ったとき
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	// マウスがウィジェットを離れたとき（必要なら）
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+
 protected:
 	/** テキストを表示するためのウィジェット */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -39,7 +48,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	FVector2D UiScaleMax = { 0.0f,0.0f };
-
 private:
 	int32 GetRandomTextId();
 
