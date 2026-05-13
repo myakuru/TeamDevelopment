@@ -35,7 +35,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
 
-	if (EnemyStatus.KnockBackFlg)
+	if (EnemyStatus.StateTag==EEnemyState::KnockBack)
 	{
 		MoveToKnockBack(FVector::ZeroVector, 0, DeltaTime);
 		return;

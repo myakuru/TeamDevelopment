@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/StateTreeEvaluatorBlueprintBase.h"
+#include "../../EnemyDataStruct.h"
 #include "STE_EnemyBase.generated.h"
 
 /** 敵クラス */
@@ -61,10 +62,10 @@ public:
 	virtual void SetTargetDistanceSqr(float a_DistSqr) { TargetDistanceSqr = a_DistSqr; }
 
 	/**
-	 * @brief ノックバックするかセット
-	 * @param a_IsKnockBack trueでノックバック
+	 * @brief ステートEnumをセット
+	 * @param a_TargetState 切り替え先ステート
 	 */
-	virtual void SetIsKnockBack(bool a_IsKnockBack) { IsKnockBack = a_IsKnockBack; }
+	virtual void SetEnemyState(EEnemyState a_TargetState) { EnemyState = a_TargetState; }
 
 	/**
 	* @brief 生存状態のセット
@@ -92,9 +93,9 @@ private:
 	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
 	float TargetDistanceSqr = 0.0f;
 
-	/**	ノックバック中か */
+	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
-	bool IsKnockBack = 0.0f;
+	EEnemyState EnemyState = EEnemyState::None;
 
 	/** 死亡判定フラグ*/
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))

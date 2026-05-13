@@ -33,6 +33,13 @@ AEnemyBase::AEnemyBase()
 
 AEnemyBase::~AEnemyBase() = default;
 
+void AEnemyBase::NotifyChengedStateEnum(EEnemyState a_TargetState)
+{
+	if (!EnemyRuntimeData) { return; }
+
+	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
+}
+
 void AEnemyBase::BeginPlay()
 {
 	AActor::BeginPlay();
@@ -92,8 +99,8 @@ void AEnemyBase::RegisterDelegates()
 	// 距離の二乗値
 	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &AEnemyBase::SetTargetDistanceSqr);
 
-	// ノックバックするか
-	EnemyRuntimeData->OnIsKnockBackChanged.AddUObject(this, &AEnemyBase::SetIsKnockBack);
+	// ステートEnum切り替え
+	EnemyRuntimeData->OnStateEnumChanged.AddUObject(this, &AEnemyBase::SetEnemyState);
 }
 
 void AEnemyBase::UpdateParams()
@@ -112,7 +119,7 @@ void AEnemyBase::UpdateParams()
 
 void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight)
 {
-	if (EnemyStatus.KnockBackFlg)return;
+	if (EnemyStatus.StateTag == EEnemyState::KnockBack)return;
 	// 吹き飛ばしに使う数値を決める
 	int KnockBackPowerLevel = AttackPower - EnemyWeight;
 	if (KnockBackPowerLevel < 0)
@@ -143,8 +150,8 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 	LanchDir.Normalize();
 
 	EnemyStatus.KNockBackVelocity	= LanchDir * KnockBackData->LaunchSpeed;
-	EnemyStatus.KnockBackFlg		= true;
-	EnemyStatus.CanAttack			= false;
+	SetEnemyState(EEnemyState::KnockBack);
+	//EnemyStatus.CanAttack			= false;
 }
 
 void AEnemyBase::SetTakeDamaged(int32 AttackPower)
@@ -191,7 +198,7 @@ void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPow
 			}
 		}
 
-		EnemyStatus.KnockBackFlg = false;
+		EnemyStatus.StateTag = EEnemyState::None;
 		EnemyStatus.KNockBackVelocity = FVector::ZeroVector;
 	}
 }
@@ -264,11 +271,11 @@ void AEnemyBase::CheckCanAttack()
 	// プレイヤーとの距離が攻撃可能距離内か
 	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
 	{
-		EnemyStatus.CanAttack = true;
+		EnemyStatus.StateTag = EEnemyState::Attack;
 	}
 	else
 	{
-		EnemyStatus.CanAttack = false;
+		EnemyStatus.StateTag = EEnemyState::None;
 	}
 }
 
@@ -360,7 +367,7 @@ void AEnemyBase::Deactivate()
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);
 
-	EnemyStatus.KnockBackFlg = false;
+	EnemyStatus.StateTag = EEnemyState::None;
 }
 
 TStateMachine<AEnemyBase>& AEnemyBase::GetStateMachine()

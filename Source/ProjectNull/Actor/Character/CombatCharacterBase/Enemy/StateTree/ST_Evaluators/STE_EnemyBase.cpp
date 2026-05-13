@@ -43,8 +43,8 @@ void USTE_EnemyBase::RegisterDelegate()
 	// 距離の二乗値
 	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &USTE_EnemyBase::SetTargetDistanceSqr);
 
-	// ノックバックするか
-	EnemyRuntimeData->OnIsKnockBackChanged.AddUObject(this, &USTE_EnemyBase::SetIsKnockBack);
+	// ステートEnumを切り替える
+	EnemyRuntimeData->OnStateEnumChanged.AddUObject(this, &USTE_EnemyBase::SetEnemyState);
 
 	// 死んでいるかどうか
 	EnemyRuntimeData->OnIsAliveChanged.AddUObject(this, &USTE_EnemyBase::SetIsAlive);

@@ -2,19 +2,20 @@
 
 #include "CoreMinimal.h"
 #include "../CharacterRuntimeData.h"
+#include "../../../Actor/Character/CombatCharacterBase/Enemy/EnemyDataStruct.h"
 #include "EnemyRuntimeData.generated.h"
 
 /** 進行ベクトルが変更された時に呼び出される */
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoveDirChanged,		const FVector& /*MoveDir*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoveDirChanged,		const FVector&	/*MoveDir*/);
 
 /** ターゲットとの距離が変更された時にに呼び出される */
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetDistChanged,	float /*DistSqr*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetDistChanged,	float			/*DistSqr*/);
 
-/** ノックバック状態が変更された時に呼び出される */
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsKnockBackChanged,	bool /*IsKnockBack*/);
+/** ステートEnumが変更された時に呼び出される */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnStateEnumChanged,	EEnemyState		/*StateEnum*/);
 
 /** 敵のHPが0を下回った時に呼び出される*/
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsAliveChanged,		bool /*IsKnockBack*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsAliveChanged,		bool			/*IsKnockBack*/);
 
 /**
  * 敵のランタイムな値を管理する
@@ -39,11 +40,11 @@ public:
 	void CalcDistanceToTarget(const FVector& a_TargetPos, const FVector& a_OwnerPos);
 
 	/**
-	 * @brief				ノックバック中かどうかを切り替える
-	 * @param a_IsKnockBack trueでノックバック中
+	 * @brief				ステートタイプを切り替える
+	 * @param a_StateEnum 切り替え先のステートへ変更
 	 */
 	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
-	void ChangedIsKnockBack(const bool a_IsKnockBack);
+	void ChangedEnemyState(EEnemyState a_StateEnum);
 
 	/** 死亡判定*/
 	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
@@ -59,10 +60,10 @@ public:
 	 * @brief 進行方向変更デリゲートを登録用で公開
 	 * @return TMulticastDelegateRegistration 型として公開
 	*/
-	FOnMoveDirChanged::RegistrationType& GetOnMoveDirChanged()
+	/*FOnMoveDirChanged::RegistrationType& GetOnMoveDirChanged()
 	{
 		return OnMoveDirChanged;
-	}
+	}*/
 	
 	//~ End Getter
 
@@ -73,7 +74,7 @@ public:
 	FOnTargetDistChanged	OnTargetDistChanged;
 
 	/**	ノックバック状態が変更された時に呼び出される */
-	FOnIsKnockBackChanged	OnIsKnockBackChanged;
+	FOnStateEnumChanged		OnStateEnumChanged;
 
 	/** 敵の生存フラグが変更されたときに呼び出される*/
 	FOnIsAliveChanged		OnIsAliveChanged;
@@ -88,9 +89,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	float	TargetDistanceSqr = 0.0f;
 
-	/**	ノックバック中か */
+	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
-	bool	IsKnockBack = false;
+	EEnemyState StateEnum = EEnemyState::None;
 
 	/** 死亡判定*/
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
