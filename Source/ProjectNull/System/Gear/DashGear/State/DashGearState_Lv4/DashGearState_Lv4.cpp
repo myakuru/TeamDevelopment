@@ -3,6 +3,7 @@
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/GhostActor/GhostActor.h>
+#include <ProjectNull/Actor/Effect/AfterImageAttackEffect/AfterImageAttackEffect.h>
 #include <ProjectNull/System/Gear/GearBase.h>
 
 UDashGearState_Lv4::UDashGearState_Lv4()
@@ -14,53 +15,23 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 	UDashGearStateBase::Initialize(Player, GearComponent, Gear);
 
 	if (!Player || !Gear) { return; }
-	StartPlayerForwardVector = Player->GetActorForwardVector();
+	StartPlayerTransform = Player->GetTransform();
 
-	float Duration = 0.0f;
+	if (!AfterImageAttackEffect) { return; }
+	AfterImageAttackEffect->Initialize();
+	const float Duration = AfterImageAttackEffect->GetMaxTime();
+	Gear->SetGearDuration(Duration, kLv4Index);
+}
 
-	for (auto& Data : DashSpecialMoveDataArray) {
-		Duration += Data.Time;
-	}
-	Gear->SetGearDuration(Duration, 3);
+void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
+{
 }
 
 void UDashGearState_Lv4::Update(float DeltaTime)
 {
 	if (!OwnerPlayer || !OwnerGear) { return; }
 
-	auto* Ghost =
-		GetWorld()->SpawnActor<AGhostActor>();
-
-	if (Ghost) {
-		Ghost->SetActorTransform(
-			OwnerPlayer->GetActorTransform()
-		);
-
-		Ghost->Initialize(
-			OwnerPlayer->GetMesh()->GetSkeletalMeshAsset(),
-			Animation,
-			GhostMaterial,
-			AnimTime
-		);
-	}
-
-	/*float ElapsedTime = OwnerGear->GetElapsedTime();
-
-	int32 ResultIndex = 0;
-	for (int32 Index = 0; Index < DashSpecialMoveDataArray.Num(); ++Index) {
-		ElapsedTime -= DashSpecialMoveDataArray[Index].Time;
-		if (ElapsedTime <= 0.0f) {
-			ResultIndex = Index;
-			break;
-		}
-	}
-
-	if (!DashSpecialMoveDataArray.IsValidIndex(ResultIndex)) { return; }
-	const FDashSpecialMoveData DashSpecialMoveData = DashSpecialMoveDataArray[ResultIndex];
-	const FVector Dir = FRotator(0.0f, DashSpecialMoveData.AngleOffset,0.0f).RotateVector(StartPlayerForwardVector).GetSafeNormal();
-	const float Speed = DashSpecialMoveData.Speed;
+	if (!AfterImageAttackEffect) { return; }
 	
-	OwnerPlayer->SetActorRotation(Dir.Rotation());
-	OwnerPlayer->LaunchCharacter(Dir * Speed, true, true);*/
-
+	AfterImageAttackEffect->Update(DeltaTime, OwnerGear->GetElapsedTime(), StartPlayerTransform);
 }

@@ -1,0 +1,90 @@
+﻿
+#include "AfterImageAttackEffect.h"
+
+#include <ProjectNull/Actor/GhostActor/GhostActor.h>
+
+UAfterImageAttackEffect::UAfterImageAttackEffect()
+{
+
+}
+
+void UAfterImageAttackEffect::Initialize()
+{
+
+}
+
+void UAfterImageAttackEffect::Start()
+{
+
+}
+
+void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const FTransform& PlayerTransform)
+{
+
+
+	for (auto& Data : AfterImageDataArray) {
+
+		if (Data.TimeThreshold > ElapsedTime) { continue; }
+
+		const float Time = ElapsedTime - Data.TimeThreshold;
+		AGhostActor* Ghost = nullptr;
+
+		if (!Data.bSpawn) {
+			Ghost = GetWorld()->SpawnActor<AGhostActor>(GhostClass);
+
+			if (Ghost) {
+
+				Ghost->SetActorTransform(Data.Transform);
+				Ghost->Initialize(SkeletalMesh,
+					AnimationAsset, Data.PoseTime);
+				Data.GhostActor = Ghost;
+			}
+			Data.bSpawn = true;
+		}
+
+		if (Data.GhostActor) {
+			const FVector PlayerLocation = PlayerTransform.GetLocation();
+			const FMatrix PlayerMatrix = PlayerTransform.ToMatrixWithScale();
+
+			const FVector Forward = PlayerMatrix.GetUnitAxis(EAxis::X);
+			const FVector Right = PlayerMatrix.GetUnitAxis(EAxis::Y);
+			const FVector Up = PlayerMatrix.GetUnitAxis(EAxis::Z);
+			const FVector Offset = Data.CalcLocationOffset(Time / Data.Time);
+			
+			const FVector ResultLocation = PlayerLocation
+				+ Forward * Offset.X
+				+ Right * Offset.Y
+				+ Up * Offset.Z;
+			UE_LOG(LogTemp, Warning, TEXT("hi time %.2f"), Time / Data.Time);
+
+			Data.Transform.SetLocation(ResultLocation);
+			Data.Transform.SetRotation(Data.GetDir().Rotation().Quaternion());
+			Data.Transform.SetScale3D(Data.Scale);
+			Data.GhostActor->SetActorTransform(Data.Transform);
+		}
+
+	}
+}
+
+float UAfterImageAttackEffect::GetTotalTime()
+{
+	float TotalTime = 0.0f;
+	for (auto& Data : AfterImageDataArray) {
+		TotalTime += Data.Time;
+	}
+	return TotalTime;
+}
+
+float UAfterImageAttackEffect::GetMaxTime()
+{
+	float MaxTime = 0.0f;
+
+	for (auto& Data : AfterImageDataArray) {
+		if (Data.TimeThreshold + Data.Time > MaxTime)
+		{
+			MaxTime = Data.TimeThreshold + Data.Time;
+		}
+	}
+
+	return MaxTime;
+}
