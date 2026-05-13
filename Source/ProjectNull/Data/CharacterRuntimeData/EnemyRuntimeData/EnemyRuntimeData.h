@@ -8,11 +8,11 @@
 /** 進行ベクトルが変更された時に呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoveDirChanged,		const FVector&	/*MoveDir*/);
 
-/** ターゲットとの距離が変更された時にに呼び出される */
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetDistChanged,	float			/*DistSqr*/);
-
 /** ステートEnumが変更された時に呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnStateEnumChanged,	EEnemyState		/*StateEnum*/);
+
+/** ターゲットとの距離が変更された時にに呼び出される */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetDistChanged,	float			/*DistSqr*/);
 
 /** 敵のHPが0を下回った時に呼び出される*/
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsAliveChanged,		bool			/*IsKnockBack*/);

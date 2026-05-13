@@ -1,8 +1,11 @@
 ﻿#include "STT_EnemyKnockBack.h"
+#include "StateTreeExecutionContext.h"
 #include <ProjectNull\System\DataTable\KnockBackData\KnockBackData.h>
+#include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
 
 USTT_EnemyKnockBack::USTT_EnemyKnockBack(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
+	,	OwnerEnemy(nullptr)
 	,	KnockBackVelocity(FVector::ZeroVector)
 	,	MoveDir(FVector::ZeroVector)
 	,	ReceivedAttackPower(0.0f)
@@ -15,6 +18,9 @@ USTT_EnemyKnockBack::USTT_EnemyKnockBack(const FObjectInitializer& a_ObjInit)
 EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
 	Super::EnterState(a_Context, a_Transition);
+
+	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
+	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
 	/* 備忘録 */
 	// ・KnockBackFlagが有効の時に入る
@@ -64,7 +70,15 @@ void USTT_EnemyKnockBack::SetKnockBackData()
 	FVector LanchDir = HorizontalDir * FMath::Cos(Rad) + FVector::UpVector * FMath::Sin(Rad);
 	LanchDir.Normalize();
 
-	// 速度・ノックバックフラグ・攻撃不可能フラグ
+	// 速度をセット
 	KnockBackVelocity = LanchDir * KnockBackData->LaunchSpeed;
+}
+
+void USTT_EnemyKnockBack::MoveToKnockBack(const float a_DeltaTime)
+{
+	if (!OwnerEnemy) { return; }
+	FVector CurrentLocation = OwnerEnemy->GetActorLocation();
+
+	// 重力を速度に加算
 
 }
