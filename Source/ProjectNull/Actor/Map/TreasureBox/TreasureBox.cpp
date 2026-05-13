@@ -1,9 +1,11 @@
 ﻿#include "TreasureBox.h"
 
+#include <ProjectNull/Actor/Map/MapActorManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/SaveGame/MySaveGame.h>
 
 ATreasureBox::ATreasureBox()
 {
@@ -21,6 +23,20 @@ ATreasureBox::ATreasureBox()
 void ATreasureBox::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//破壊オブジェクトに登録されているなら自壊する
+	auto* MapActorMan = GetWorld()->GetGameInstance<USuperGameInstance>()->GetMapActorManager();
+	if (TreasureID.IsNone() == false && MapActorMan){
+		//DestroyedFromSaveDataがfalseならセーブデータによる自壊はしない
+		if (!DestroyedFromSaveData) {
+			MapActorMan->RemoveDestroyedActor(TreasureID);
+		}
+		else if (MapActorMan->IsDestroyedActor(TreasureID))
+		{
+			Destroy();
+			return;
+		}
+	}
 
 	// ディゾルブ用マテリアルインスタンスの生成
 	if (Mesh)
@@ -56,14 +72,23 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 
 	// プレイヤーだけにしたい場合
 	if (!pAwn->IsPlayerControlled()) return;
-	//Destroy();
+
+	//状態保存
+	auto* MapActorMan = GetWorld()->GetGameInstance<USuperGameInstance>()->GetMapActorManager();
+	if (!TreasureID.IsNone() && MapActorMan && DestroyedFromSaveData)
+	{
+		MapActorMan->RegisterDestroyedActor(TreasureID);
+	}
+
+	//セーブ
+	GetWorld()->GetGameInstance<USuperGameInstance>()->SaveGameData();
 
 	//アニメーション再生
 	if (!Mesh || !OpenAnimation) return;
 	Mesh->PlayAnimation(OpenAnimation, false);
 
 	//消滅タイマー
-	float AnimationLength = OpenAnimation->GetMaxCurrentTime();
+	float AnimationLength = OpenAnimation->GetPlayLength();
 	GetWorldTimerManager().SetTimer(
 		DestroyTimerHandle,
 		this,

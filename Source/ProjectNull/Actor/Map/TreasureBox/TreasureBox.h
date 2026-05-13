@@ -50,26 +50,33 @@ public:
 		const FHitResult& SweepResult
 	)override;
 
-	//ディゾルブ用マテリアルインスタンス
+	/** ID */
+	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
+	FName TreasureID = NAME_None;
+
+	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
+	bool DestroyedFromSaveData = true;
+
+	/**ディゾルブ用マテリアルインスタンス */
 	UPROPERTY()
 	UMaterialInstanceDynamic* DynamicMaterial;
 
-	//ディゾルブ
+	/**ディゾルブ */
 	UPROPERTY()
 	bool bDissolving = false;
 
 	UPROPERTY()
 	float DissolveAmount = 0.0f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Params|Dissolve")
 	float DissolveSpeed = 1.0f;
 
 	/** 開くアニメーション */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Params|Animation")
 	UAnimationAsset* OpenAnimation;
 
 	/** ドロップアイテムのパラメータ */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropItemParams")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
 	FDropItemParams DropItemParams;
 
 	//タイマー
