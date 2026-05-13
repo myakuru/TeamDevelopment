@@ -155,6 +155,12 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 	SetEnemyState(EEnemyState::KnockBack);
 	//EnemyStatus.CanAttack			= false;
 }
+void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
+{
+	EnemyStatus.StateTag = a_TargetState;
+
+	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
+}
 
 void AEnemyBase::SetTakeDamaged(int32 AttackPower)
 {

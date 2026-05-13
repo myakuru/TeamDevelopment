@@ -56,6 +56,7 @@ struct FEnemyStatus
 	GENERATED_BODY()
 
 public:
+
 	// 移動方向
 	UPROPERTY(EditAnywhere)
 	FVector MoveDir = FVector::ZeroVector;
