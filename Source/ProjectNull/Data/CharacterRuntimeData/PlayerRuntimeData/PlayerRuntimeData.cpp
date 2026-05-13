@@ -82,7 +82,10 @@ void UPlayerRuntimeData::LevelUp()
 
 	UpdateStatus();
 
-	PlayerExpUpgradeWidget->OpenUpgradeWidget();
+	if (PlayerExpUpgradeWidget)
+	{
+		PlayerExpUpgradeWidget->OpenUpgradeWidget();
+	}
 
 	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
