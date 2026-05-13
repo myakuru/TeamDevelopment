@@ -3,6 +3,18 @@
 #include "CoreMinimal.h"
 #include "EnemyDataStruct.generated.h"
 
+// アニメーション用Enum
+UENUM(BlueprintType)
+enum class EEnemyState : uint8
+{
+	None		UMETA(DisplayName = "None"),
+	Spawn		UMETA(DisplayName = "生成"),
+	Chase		UMETA(DisplayName = "追跡"),
+	Attack		UMETA(DisplayName = "攻撃"),
+	Dead		UMETA(DisplayName = "死亡"),
+	KnockBack	UMETA(DisplayName = "ノックバック"),
+};
+
 /// <summary>
 /// 敵ステータスのスケーリング情報
 /// </summary>
@@ -79,9 +91,6 @@ public:
 	// ノックバック方向
 	FVector KNockBackVelocity = FVector::ZeroVector;
 
-	// エネミーが吹き飛び中の判定フラグ
-	bool	KnockBackFlg = false;
-
 	// 経験値
 	UPROPERTY(EditAnywhere)
 	float Exp = 0;
@@ -97,8 +106,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AttackDistance = 20.0f;
 
-	// 攻撃可能フラグ
-	bool CanAttack = false;
+	/** 生存フラグ*/
+	bool IsAlive = true;
 
 	// 死んだときのパーティクルの色
 	UPROPERTY(EditAnywhere, Category = "Experience")
@@ -107,4 +116,8 @@ public:
 	// パーティクルのサイズ
 	UPROPERTY(EditAnywhere, Category = "Experience")
 	float ExpSize = 1.0f;
+
+	/**	ステートタグ */
+	UPROPERTY(EditAnywhere, Category = "StateTag")
+	EEnemyState StateTag = EEnemyState::None;
 };

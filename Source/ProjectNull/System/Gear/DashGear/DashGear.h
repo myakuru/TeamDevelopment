@@ -4,19 +4,13 @@
 #include "../GearBase.h"
 #include "DashGear.generated.h"
 
-
-/// <summary>
-/// �_�b�V���M�A�N���X
-/// </summary>
+/** ダッシュギアクラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UDashGear final : public UGearBase
 {
 	GENERATED_BODY()
-	
 public:
-
 	UDashGear();
-
 public:
 
 	void Initialize(class APlayerBase* Player, class UPlayerGearComponent* GearComponent)	override;

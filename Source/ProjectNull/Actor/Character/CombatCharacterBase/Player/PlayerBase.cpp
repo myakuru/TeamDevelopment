@@ -51,10 +51,6 @@ void APlayerBase::BeginPlay()
 
 	Instance = GetWorld()->GetGameInstance<USuperGameInstance>();
 
-	if (GearComponent) {
-		GearComponent->SetOwnerPlayer(this);
-	}
-
 	if (AutoAttack) {
 		AutoAttack->Initialize(this);
 	}

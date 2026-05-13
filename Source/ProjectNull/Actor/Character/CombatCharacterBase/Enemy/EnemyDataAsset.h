@@ -72,6 +72,10 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Instanced,Category = "StateData")
 	TArray<TObjectPtr<UStateDataBase>> StateDataList;
 
+	/** 生存フラグ*/
+	UPROPERTY(EditAnywhere)
+	bool IsAlive = true;
+
 	/** Stateデータをクラス型で判定する*/
 	template<typename T>
 	const T* GetStateData() const

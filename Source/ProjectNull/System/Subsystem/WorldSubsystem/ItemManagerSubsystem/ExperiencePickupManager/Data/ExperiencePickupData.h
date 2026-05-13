@@ -48,6 +48,14 @@ struct FExperiencePickupData
 	/** 現在プレイヤーを追尾しているか */
 	UPROPERTY()
 	bool bChasing = false;
+
+	/** ターゲットの座標*/
+	FVector ChaseStartPos;
+	/** 追尾のふくらみ*/
+	float RandomBulgeWidth;
+	float RandomBulgeHeight;
+	/** 追尾後の経過時間*/
+	float ChaseElapsedTime = 0.0f;
 };
 
 /** BPのClassDefaultsで編集するデフォルト設定値 */
@@ -66,9 +74,13 @@ struct FExperiencePickupSettings
 
 	/** 吸引中の移動速度（cm/s） */
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
-	float ChaseSpeed = 500.0f;
+	float ChaseSpeed = 1000.0f;
 
 	/** オーブが自然消滅するまでの時間（秒） */
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
 	float LifeTime = 30.0f;
+
+	/** オーブが追尾し始めて追いつくまでにかかる時間*/
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
+	float ChaseDurationTime = 1.0f;
 };

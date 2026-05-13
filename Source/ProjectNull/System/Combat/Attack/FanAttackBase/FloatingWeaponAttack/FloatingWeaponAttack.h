@@ -5,16 +5,16 @@
 #include "../FanAttackBase.h"
 #include "FloatingWeaponAttack.generated.h"
 
-// 浮遊武器のエフェクト
+/** 浮遊武器のエフェクト */
 class UFloatingWeaponEffect;
 
-// 自動攻撃クラス
+/** 斬撃のエフェクト */
+class USlashEffectBase;
+
+/** 自動攻撃クラス */
 class UAutoAttack;
 
-
-/// <summary>
-/// 浮遊武器の攻撃クラス
-/// </summary>
+/** 浮遊武器の攻撃クラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponAttack final : public UFanAttackBase
 {
@@ -26,6 +26,7 @@ public:
 public:
 
 	void Initialize(class AActor* Owner)						override;
+	void Start()												override;
 	void Update(float DeltaTime,
 				AActor* Player = nullptr,
 				UEnemyManagerSubsystem* EnemyManager = nullptr) override;
@@ -37,10 +38,10 @@ public:
 
 	float StandStateTime();
 
-	// セッター
+	/** セッター */
 	inline void SetAutoAttack(UAutoAttack* Attack) { AutoAttack = Attack; }
 
-	// ゲッター
+	/** ゲッター */
 	inline UAutoAttack* GetAutoAttack() const { return AutoAttack; }
 	
 private:
@@ -52,6 +53,10 @@ private:
 	/** 浮遊武器エフェクトクラス */
 	UPROPERTY(EditAnywhere, Instanced)
 	UFloatingWeaponEffect* FloatingWeaponEffect;
+
+	/** 斬撃エフェクト */
+	UPROPERTY(EditAnywhere, Instanced)
+	TArray<USlashEffectBase*> SlashEffectArray;
 
 	/** 待機状態の割合（0.0～1.0）*/
 	UPROPERTY(EditAnywhere)

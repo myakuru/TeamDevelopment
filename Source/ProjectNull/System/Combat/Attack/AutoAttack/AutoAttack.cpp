@@ -24,7 +24,7 @@ void UAutoAttack::Initialize(AActor* Owner)
 	UAttackBase::Initialize(Owner);
 
 	// 自動攻撃のパラメータクラスを初期化
-	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
+	for (auto& [Type, ConeSlashParams] : AutoAttackParamsMap)
 	{
 		if (!ConeSlashParams) { continue; }
 
@@ -46,21 +46,19 @@ void UAutoAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem
 {
 	if (!EnemyManager) { return; }
 
-	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
-	{
-		if (!ConeSlashParams) { continue; }
-
-		if (!ConeSlashParams->UpdateAttack(DeltaTime)) { continue; }
-
-		ConeSlashParams->AttackJudge(nullptr, EnemyManager);
-	}
-
-	for (auto& [type, ConeSlashParams] : AutoAttackParamsMap)
+	for (auto& [Type, ConeSlashParams] : AutoAttackParamsMap)
 	{
 		if (!ConeSlashParams) { continue; }
 		ConeSlashParams->Update(DeltaTime, Player, EnemyManager);
 	}
-	
+
+	for (auto& [Type, ConeSlashParams] : AutoAttackParamsMap)
+	{
+		if (!ConeSlashParams) { continue; }
+
+		if (!ConeSlashParams->IsActive()) { continue; }
+		ConeSlashParams->AttackJudge(nullptr, EnemyManager);
+	}
 }
 
 void UAutoAttack::StartAutoAttack()

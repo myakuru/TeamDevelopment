@@ -23,12 +23,12 @@ UFloatingWeaponEffect::UFloatingWeaponEffect():
 
 void UFloatingWeaponEffect::Initialize()
 {
-	for (auto& [type, state] : States)
+	for (auto& [Type, State] : States)
 	{
-		if (!state) { continue; }
-		state->SetOwner(this);
-		state->SetOwnerActor(OwnerActor);
-		state->Initialize();
+		if (!State) { continue; }
+		State->SetOwner(this);
+		State->SetOwnerActor(OwnerActor);
+		State->Initialize();
 	}
 	ChangeState(EFloatingWeaponState::Transition);
 }
@@ -88,21 +88,21 @@ FTransform UFloatingWeaponEffect::GetAttackStartTransformOffset()
 {
 	if (!OwnerActor || !OwnerAttack || !States.Contains(EFloatingWeaponState::Attack)
 		|| !States[EFloatingWeaponState::Attack]) { return FTransform(); }
-	auto* attakState = Cast<UFloatingWeaponAttackState>(States[EFloatingWeaponState::Attack]);
-	FTransform resultTransform;
-	if (!attakState) { return resultTransform; }
+	auto* AttakState = Cast<UFloatingWeaponAttackState>(States[EFloatingWeaponState::Attack]);
+	FTransform ResultTransform;
+	if (!AttakState) { return ResultTransform; }
 
-	resultTransform = attakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle);
-	return resultTransform;
+	ResultTransform = AttakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle);
+	return ResultTransform;
 }
 
 FTransform UFloatingWeaponEffect::GetStandStartTransformOffset()
 {
 	if(!States.Contains(EFloatingWeaponState::Stand)
 		|| !States[EFloatingWeaponState::Stand]) { return FTransform(); }
-	auto* standState = Cast<UFloatingWeaponStandState>(States[EFloatingWeaponState::Stand]);
-	if (!standState) { return FTransform(); }
-	return standState->GetStartTransformOffset();
+	auto* StandState = Cast<UFloatingWeaponStandState>(States[EFloatingWeaponState::Stand]);
+	if (!StandState) { return FTransform(); }
+	return StandState->GetStartTransformOffset();
 }
 
 void UFloatingWeaponEffect::UpdateTransform()

@@ -30,7 +30,7 @@ void USTE_EnemyBase::RegisterDelegate()
 {
 	if (!OwnerEnemy) { return; }
 
-	UEnemyRuntimeData* EnemyRuntimeData = OwnerEnemy->GetEnemyRuntimeData();
+	EnemyRuntimeData = OwnerEnemy->GetEnemyRuntimeData();
 	if (!EnemyRuntimeData) { return; }
 
 	// ~ AddUObject() ~
@@ -42,4 +42,10 @@ void USTE_EnemyBase::RegisterDelegate()
 
 	// 距離の二乗値
 	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &USTE_EnemyBase::SetTargetDistanceSqr);
+
+	// ステートEnumを切り替える
+	EnemyRuntimeData->OnStateEnumChanged.AddUObject(this, &USTE_EnemyBase::SetEnemyState);
+
+	// 死んでいるかどうか
+	EnemyRuntimeData->OnIsAliveChanged.AddUObject(this, &USTE_EnemyBase::SetIsAlive);
 }

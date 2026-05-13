@@ -40,4 +40,7 @@ protected:
 	UPROPERTY()
 	UNiagaraComponent* EffectComponent;
 
+	/** エフェクトのRelativeTransform */
+	UPROPERTY(EditAnywhere)
+	FTransform RelativeTransform;
 };

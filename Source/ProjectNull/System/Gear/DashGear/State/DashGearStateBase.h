@@ -4,13 +4,10 @@
 #include "../../State/GearStateBase.h"
 #include "DashGearStateBase.generated.h"
 
-// Niagara�G�t�F�N�g�N���X
+/** ナイアガラシステムクラス */
 class UNiagaraSystem;
 
 
-/// <summary>
-/// �_�b�V���M�A�̏�Ԃ̒��Ԋ��N���X
-/// </summary>
 UCLASS()
 class PROJECTNULL_API UDashGearStateBase : public UGearStateBase
 {
@@ -22,19 +19,14 @@ public:
 
 public:
 
-	virtual void Execute(int32 CurrentGearLevel) override;
-	virtual void Update(float DeltaTime) override;
+	virtual void Execute(int32 CurrentGearLevel)		override;
+	virtual void Update(float DeltaTime)				override;
 
 protected:
 	
-	/// <summary>
-	/// �_�b�V������
-	/// </summary>
+
 	void Dash();
 
-	/// <summary>
-	/// �_�b�V���U���G�t�F�N�g�̍Đ�
-	/// </summary>
 	void PlayDashEffect();
 
 	// ���i�O���j�����a���U���̃G�t�F�N�g
@@ -43,20 +35,14 @@ protected:
 
 private:
 
-	/// <summary>
-	/// �_�b�V���U���̍X�V
-	/// </summary>
 	void UpdateDashAttack();
 
-	// �_�b�V���U���̋����̓��i��r�p�j
 	UPROPERTY(EditAnywhere)
 	float DashAttackRangeSquared;
 
-	// �_�b�V���̑��x
 	UPROPERTY(EditAnywhere)
 	float DashSpeed;
 
-	// �_�b�V���G�t�F�N�g�̎�������
 	UPROPERTY(EditAnywhere)
 	float DashEffectDuration;
 };

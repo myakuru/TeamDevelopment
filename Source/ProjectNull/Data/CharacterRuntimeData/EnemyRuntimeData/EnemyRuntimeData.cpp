@@ -3,6 +3,8 @@
 UEnemyRuntimeData::UEnemyRuntimeData()
 	:	MoveDir(FVector::ZeroVector)
 	,	TargetDistanceSqr(0.0f)
+	,	StateEnum(EEnemyState::None)
+	,	IsAlive(true)
 {
 }
 
@@ -26,4 +28,22 @@ void UEnemyRuntimeData::CalcDistanceToTarget(const FVector& a_TargetPos, const F
 		TargetDistanceSqr = NewTargetDistSqr;
 		OnTargetDistChanged.Broadcast(TargetDistanceSqr);
 	}
+}
+
+void UEnemyRuntimeData::ChangedEnemyState(EEnemyState a_StateEnum)
+{
+	if (StateEnum == a_StateEnum) { return; }
+
+	// 変更があればブロードキャスト発火
+	StateEnum = a_StateEnum;
+	OnStateEnumChanged.Broadcast(StateEnum);
+}
+
+void UEnemyRuntimeData::ChangedIsAlive(const bool a_IsAlive)
+{
+	if (IsAlive == a_IsAlive) { return; }
+
+	// 変更があればブロードキャスト発火
+	IsAlive = a_IsAlive;
+	OnIsAliveChanged.Broadcast(IsAlive);
 }

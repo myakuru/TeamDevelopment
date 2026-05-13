@@ -20,5 +20,5 @@ void UGruntAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	
 	// OwnerChacter�ɂ܂�鏈��
 	// �U���\�t���O��擾����
-	CanAttack = OwnerCharacter->CanAttack();
+	CanAttack = OwnerCharacter->GetEnemyState() == EEnemyState::Attack;
 }

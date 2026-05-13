@@ -12,7 +12,6 @@ UFanAttackBase::UFanAttackBase()
 	, RotationSpeed(1000.0f)
 	, Radius(300.0f)
 	, ConeAngle(30.0f)
-	, bIsActive(false)
 	, bPrevActive(false)
 	, CurrentAngle(0.0f)
 	, KnockbackPower(2.0f)
@@ -30,6 +29,13 @@ void UFanAttackBase::Start()
 
 void UFanAttackBase::Execute()
 {
+}
+
+void UFanAttackBase::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
+{
+	UAttackBase::Update(DeltaTime, Player, EnemyManager);
+
+	UpdateAttack(DeltaTime);
 }
 
 bool UFanAttackBase::UpdateAttack(float DeltaTime)
@@ -102,7 +108,7 @@ bool UFanAttackBase::IsTargetInRange(AActor* Target)
 
 void UFanAttackBase::AttackJudgePlayer(AActor* Player)
 {
-	if (!Player) { return; }
+	if (!Player|| !bIsActive) { return; }
 
 	// 持ち主の座標を取得
 	const FVector ownerLocation = OwnerActor->GetActorLocation();
@@ -111,12 +117,13 @@ void UFanAttackBase::AttackJudgePlayer(AActor* Player)
 	if (IsTargetInRange(Player))
 	{
 		// ダメージを与える(未実装)
+		
 	}
 }
 
 void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
 {
-	if (!EnemyManager) { return; }
+	if (!EnemyManager||!bIsActive) { return; }
 
 	// プレイヤーの座標を取得
 	const FVector location = OwnerActor->GetActorLocation();
