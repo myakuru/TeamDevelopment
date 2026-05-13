@@ -102,15 +102,21 @@ public:
 	 * @param DistSqr 距離の二乗値
 	 */
 	virtual void SetTargetDistanceSqr(float a_DistSqr)	{ EnemyStatus.TargetDistanceSqr = a_DistSqr; }
+	
+	/**
+	 * @brief ステートEnumを切り替える処理
+	 * @param a_targetState 切り替え先ステートEnum
+	 */
+	virtual void SetEnemyState(EEnemyState a_TargetState) { EnemyStatus.StateTag = a_TargetState; }
 
 	/**
-	 * @brief ノックバックするかセット
-	 * @param a_IsKnockBack trueでノックバック
-	 */
-	virtual void SetIsKnockBack(bool a_IsKnockBack) { EnemyStatus.KnockBackFlg = a_IsKnockBack; }
+	* @brief 生存状態をセット
+	*/
+	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
 
 	//~ End Setter
 	
+
 	//~ Begin Getter
 
 	/** StateMachineへのアクセス、Stateの追加・変更に使う */
@@ -121,7 +127,49 @@ public:
 	{
 		return EnemyRuntimeData; 
 	}
-	
+
+	/**
+	 * @brief 外部からステートEnum変更を通知
+	 * @param a_TargetState 変更先ステート
+	 */
+	virtual void NotifyChengedStateEnum(EEnemyState a_TargetState);
+
+	/** エネミーマネージャーのゲッター*/
+	UEnemyManagerSubsystem* GetEnemyManagerSubsystem() const
+	{
+		return EnemyManager;
+	}
+
+	/** ゲームの進行管理クラスのゲッター */
+	UGameProgressSubsystem* GetGameProgressSubsystem() const
+	{
+		return GameProgress;
+	}
+
+	/**
+	 * @brief 汎用的なEnumビット(uint8型)上昇処理
+	 * @tparam T クラス(Enum Class名etc)
+	 * @param a_currentBit  元のBit
+	 * @param a_targetBit	上げたいBit
+	 */
+	template<typename T>
+	void UpEnumBit(uint8 a_currentBit, T a_targetBit)
+	{
+		a_currentBit |= static_cast<uint8>(a_targetBit);
+	}
+
+	/**
+	 * @brief 汎用的なEnumビット(uint8型)下降処理
+	 * @tparam T クラス(Enum Class名etc)
+	 * @param a_currentBit  元のBit
+	 * @param a_targetBit	下げたいBit
+	 */
+	template<typename T>
+	void DownEnumBit(uint8 a_currentBit, T a_targetBit)
+	{
+		a_currentBit &= ~static_cast<uint8>(a_targetBit);
+	}
+
 	//~ End Getter
 
 protected:
@@ -133,15 +181,9 @@ protected:
 	 */
 	virtual void RegisterDelegates();
 
-	/// <summary>
-	/// 敵（自身）のパラメータを更新する
-	/// </summary>
+	/** 敵（自身）のパラメータを更新する */
 	virtual void UpdateParams();
-
-
-	/// <summary>
-	/// SphereCollisionを取得して使うための関数
-	/// <summary>
+	/** SphereCollisionを取得して使うための関数 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Collision")
 	UCapsuleComponent* CapsuleCollision;
 
@@ -149,30 +191,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> EnemyMesh;
 
-	/// <summary>
-	/// 敵が吹き飛ばされている状態の処理
-	/// </summary>
+	/** 敵が吹き飛ばされている状態の処理 */
 	virtual void MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime);
 
-	// DataTable 参照
+	/** DataTable 参照 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "KnockBack")
 	UDataTable* KnockBackDataTable;
 
-	/// <summary>
-	/// 敵管理クラスのポインタ
-	/// </summary>
+	/** 敵管理クラスのポインタ */
 	UPROPERTY()
 	UEnemyManagerSubsystem* EnemyManager;
 
-	/// <summary>
-	/// ゲームの進行管理クラスのポインタ
-	/// </summary>
+	/** ゲームの進行管理クラスのポインタ */
 	UPROPERTY()
 	UGameProgressSubsystem* GameProgress;
 
-	/// <summary>
-	/// 敵の攻撃コンポーネントクラス
-	/// </summary>
+	/** 敵の攻撃コンポーネントクラス */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyAttack")
 	UEnemyAttackComponent* EnemyAttackComponent;
 
@@ -184,9 +218,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntimeData")
 	TObjectPtr<UEnemyRuntimeData> EnemyRuntimeData;
 
-	/// <summary>
-	/// 敵基本ステータス
-	/// </summary>
+	/** 敵基本ステータス */
 	UPROPERTY(EditAnywhere)
 	FEnemyStatus EnemyStatus;
 
@@ -224,15 +256,16 @@ public:
 	/// </summary>
 	virtual void CheckCanAttack();
 
+	/** 敵が死んださいにパーティクルを出すだけ*/
+	virtual void SpawnDeathEffect();
+
+	/** 敵が死んださいに経験値を出す*/
+	virtual void SpawnDeathExperience();
+
 public:
 
-	// 攻撃可能か
-	virtual void SetCanAttack(bool CanAttack) { EnemyStatus.CanAttack = CanAttack; }
-	virtual bool CanAttack()const { return EnemyStatus.CanAttack; }
-
 	// アニメーションEnum
-	void SetEnemyState(EEnemyState NewState) { CurrentState = NewState; }
-	EEnemyState GetEnemyState() const { return CurrentState; }
+	EEnemyState GetEnemyState() const { return EnemyStatus.StateTag; }
 
 	/**
 	 * @brief * アニメーションのセット
@@ -265,13 +298,12 @@ private:
 	/// <returns>補間した回転結果</returns>
 	FRotator CalculateRotationToMoveDirection(const FRotator& CurrentRotation, const FRotator& TargetRotation, float RotationInterpSpeed, float DeltaTime);
 
+	/** データアセットからデータを構造体に移す処理*/
+	void SetEnemyStatusData(UEnemyDataAsset* InData);
+
 	TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter> StateMachine;
 
 	/** Stateのタグ*/
 	//UPROPERTY(BlueprintReadOnly, Category = "Enemy")
 	//FGamePlayTag CurrentStateTag;
-
-	UPROPERTY(VisibleAnywhere, Category = "State")
-	EEnemyState CurrentState = EEnemyState::Spawn;
-
 };

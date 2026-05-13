@@ -1,6 +1,8 @@
 ﻿#include "STT_EnemyDead.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyDataStruct.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 
 USTT_EnemyDead::USTT_EnemyDead(const FObjectInitializer& a_ObjInit)
 	: Super(a_ObjInit)
@@ -18,6 +20,50 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 
 	// 死亡アニメーションの再生やエフェクトの発生を行う
 	OwnerEnemy->SetEnemyState(EEnemyState::Dead);
+	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
+	if (auto EnemyManager = OwnerEnemy->GetEnemyManagerSubsystem()) {
+		EnemyManager->RemoveEnemy(OwnerEnemy);
+	}
+
+	// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
+	if (auto GameProgress = OwnerEnemy->GetGameProgressSubsystem()) {
+		GameProgress->AddKillCount();
+	}
+
+	OwnerEnemy->SpawnDeathEffect();
+
+	OwnerEnemy->SpawnDeathExperience();
+
+	//// 経験値ドロップ
+	//if (UItemManagerSubsystem* ItemSubsystem =
+	//	GetWorld()->GetSubsystem<UItemManagerSubsystem>())
+	//{
+	//	const FLinearColor Color = EnemyStatus.ExpColor;
+	//	const float Size = EnemyStatus.ExpSize;
+
+	//	ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
+	//		GetActorLocation(),
+	//		static_cast<float>(EnemyStatus.Exp),
+	//		Color,
+	//		Size
+	//	);
+	//}
+
+	//// ゲームインスタンス経由で、経験値とギアエネルギーをセット
+	//if (USuperGameInstance* GameInstance =
+	//	GetWorld()->GetGameInstance<USuperGameInstance>())
+	//{
+	//	GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
+	//	GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
+	//}
+
+	//// PoolSubSystemに返却する
+	//// Return()の中でDeactivate()が呼ばれて非表示・Tick停止でPool待機に戻る
+	//if (UEnemyPoolSubSystem* PoolSubSystem =
+	//	GetWorld()->GetSubsystem<UEnemyPoolSubSystem>())
+	//{
+	//	PoolSubSystem->Return(this);
+	//}
 
 	return EStateTreeRunStatus();
 }

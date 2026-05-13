@@ -87,13 +87,24 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 		if (!Exp.bChasing && DistSq <= FMath::Square(Exp.DetectRange))
 		{
 			Exp.bChasing = true;
+			Exp.ChaseStartPos = Exp.Location;
+			Exp.RandomBulgeWidth = FMath::FRandRange(-100.0f, 100.0f);
+			Exp.RandomBulgeHeight = FMath::FRandRange(-100.0f, 100.0f);
 		}
 
 		// 吸引移動
 		if (Exp.bChasing)
 		{
-			const FVector Direction = (PlayerLocation - Exp.Location).GetSafeNormal();
-			Exp.Location += Direction * Exp.ChaseSpeed * DeltaTime;
+			//const FVector Direction = (PlayerLocation - Exp.Location).GetSafeNormal();
+			//Exp.Location += Direction * Exp.ChaseSpeed * DeltaTime;
+			Exp.ChaseElapsedTime += DeltaTime;
+			float t = FMath::Clamp(Exp.ChaseElapsedTime / DefaultSettings.ChaseDurationTime, 0.0f, 1.0f);
+			Exp.Location = CalculateOrbit(
+				Exp.ChaseStartPos,
+				PlayerLocation,
+				t,
+				Exp.RandomBulgeWidth,
+				Exp.RandomBulgeHeight);
 		}
 	}
 
@@ -102,7 +113,7 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 }
 
 void FExperiencePickupManager::SpawnExperience(
-	const FVector&			Location,
+	const FVector&					Location,
 	float							ExpValue,
 	const FLinearColor&	Color,
 	float							Size)
@@ -205,4 +216,31 @@ void FExperiencePickupManager::SyncToNiagara()
 	// 配列サイズをSpawnCountとして渡す
 	NiagaraComponent->SetNiagaraVariableInt(
 		TEXT("User.SpawnCount"), Count);
+}
+
+FVector FExperiencePickupManager::CalculateOrbit(
+	const FVector& StartPos, 
+	const FVector& EndPos, 
+	float ElapsedTime, 
+	float BulgeWidth, 
+	float BulgeHeight
+)
+{
+	// 直線状の位置
+	FVector LinearPos = FMath::Lerp(StartPos, EndPos, ElapsedTime);
+
+	// サイン派でふくらみを計算(中間の値が最大になる)
+	float BulgeFactor = FMath::Sin(ElapsedTime * PI); // 0-1-0の波形
+
+	// ふくらみを計算
+	// StartPosから見たEndPosの方向ベクトル
+	FVector Direction = (EndPos - StartPos).GetSafeNormal();
+	// 横方向のふくらみの方向（右手の法則で上ベクトルと直交する方向）
+	FVector BulgeDir = FVector::CrossProduct(Direction, FVector::UpVector).GetSafeNormal();
+	// 横方向のふくらみ
+	FVector Bulge = LinearPos + BulgeDir * BulgeFactor * BulgeWidth;
+	// 上方向のふくらみ
+	Bulge.Z += BulgeFactor * BulgeHeight; // 上方向のふくらみも追加
+
+	return Bulge;
 }

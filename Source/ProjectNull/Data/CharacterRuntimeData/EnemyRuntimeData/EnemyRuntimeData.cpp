@@ -3,7 +3,8 @@
 UEnemyRuntimeData::UEnemyRuntimeData()
 	:	MoveDir(FVector::ZeroVector)
 	,	TargetDistanceSqr(0.0f)
-	,	IsKnockBack(false)
+	,	StateEnum(EEnemyState::None)
+	,	IsAlive(true)
 {
 }
 
@@ -29,13 +30,13 @@ void UEnemyRuntimeData::CalcDistanceToTarget(const FVector& a_TargetPos, const F
 	}
 }
 
-void UEnemyRuntimeData::ChangedIsKnockBack(const bool a_IsKnockBack)
+void UEnemyRuntimeData::ChangedEnemyState(EEnemyState a_StateEnum)
 {
-	if (IsKnockBack == a_IsKnockBack) { return; }
+	if (StateEnum == a_StateEnum) { return; }
 
 	// 変更があればブロードキャスト発火
-	IsKnockBack = a_IsKnockBack;
-	OnIsKnockBackChanged.Broadcast(IsKnockBack);
+	StateEnum = a_StateEnum;
+	OnStateEnumChanged.Broadcast(StateEnum);
 }
 
 void UEnemyRuntimeData::ChangedIsAlive(const bool a_IsAlive)
