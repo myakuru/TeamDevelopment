@@ -14,7 +14,7 @@
  * 4.Update()後にConsumeCollectedExp()取得済み経験値を受け取る
  * 
  * ナイアガラに必要なパラメーター
- * Position : Array<Vector>        パーティクル位置
+ * Position  : Array<Vector>        パーティクル位置
  * Color     : Array<LinearColor> パーティクル色
  * Sizes     : Array<Float>          パーティクルサイズ倍率
  */
@@ -43,9 +43,9 @@ public:
 	 */
 	void SpawnExperience(
 		const FVector&			Location,
-		float							ExpValue,
+		float					ExpValue,
 		const FLinearColor&	Color = FLinearColor::Green,
-		float							Size = 1.0f
+		float					Size = 1.0f
 	);
 
 	/** 全オーブを削除してNiagaraをクリア*/
@@ -76,6 +76,9 @@ private:
 	/** ExperienceListの内容をNiagaraの配列データへ書き込む*/
 	void SyncToNiagara();
 
+	/** 楕円軌道で追尾*/
+	FVector CalculateOrbit(const FVector& StartPos, const FVector& EndPos,float ElapsedTime, float BulgeWidth, float BulgeHeight);
+
 	/** アクティブなオーブのデータ一覧*/
 	TArray<FExperiencePickupData> ExperienceList;
 	/** 取得済みだがまだ消費されていない経験値の合計*/
@@ -84,6 +87,6 @@ private:
 	/**
 	* 描画を担うNiagaraComponent（所有側はActor側）
 	*/
-	TWeakObjectPtr<AActor>						NiagaraOwnerActor;
+	TWeakObjectPtr<AActor>			  NiagaraOwnerActor;
 	TWeakObjectPtr<UNiagaraComponent> NiagaraComponent;
 };
