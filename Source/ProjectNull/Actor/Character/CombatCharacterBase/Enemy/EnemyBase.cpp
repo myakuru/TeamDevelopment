@@ -101,6 +101,8 @@ void AEnemyBase::RegisterDelegates()
 
 	// ステートEnum切り替え
 	EnemyRuntimeData->OnStateEnumChanged.AddUObject(this, &AEnemyBase::SetEnemyState);
+
+	EnemyRuntimeData->OnIsAliveChanged.AddUObject(this, &AEnemyBase::SetIsAlive);
 }
 
 void AEnemyBase::UpdateParams()
@@ -215,36 +217,9 @@ void AEnemyBase::OnDeath()
 		GameProgress->AddKillCount();
 	}
 
-	// 敵が死んだ際にパーティクルを出す
-	if (EnemyParticle.DeathEffect)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			EnemyParticle.DeathEffect,
-			GetActorLocation(),
-			GetActorRotation(),
-			FVector(1.0f),
-			true,   // bAutoDestroy
-			true,   // bAutoActivate
-			ENCPoolMethod::None,
-			true    // bPreCullCheck
-		);
-	}
+	SpawnDeathEffect();
 
-	// 経験値ドロップ
-	if (UItemManagerSubsystem* ItemSubsystem =
-		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
-	{
-		const FLinearColor Color = EnemyStatus.ExpColor;
-		const float Size = EnemyStatus.ExpSize;
-
-		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
-			GetActorLocation(),
-			static_cast<float>(EnemyStatus.Exp),
-			Color,
-			Size
-		);
-	}
+	SpawnDeathExperience();
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
 	if (USuperGameInstance* GameInstance =
@@ -305,7 +280,7 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 {
 	// ヌルチェック
 	check(InData != nullptr);
-	EnemyDataAsset = InData;
+	SetEnemyStatusData(InData);
 	// Stateを初期化してChaseから開始
 	StateMachine->Start(this);
 
@@ -368,6 +343,46 @@ void AEnemyBase::Deactivate()
 	SetActorTickEnabled(false);
 
 	EnemyStatus.StateTag = EEnemyState::None;
+}
+
+void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)
+{
+	if (!InData) { return; }
+
+	EnemyStatus.MoveSpeed = InData->MoveSpeed;
+	EnemyStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
+	EnemyStatus.FinalHP = InData->FinalHP;
+	EnemyStatus.HPScaling = InData->HPScaling;
+	EnemyStatus.FinalAttack = InData->FinalAttack;
+	EnemyStatus.AttackScaling = InData->AttackScaling;
+	EnemyStatus.KnockBackWeight = InData->KnockBackWeight;
+	EnemyStatus.Exp = InData->Exp;
+	EnemyStatus.GearEnergy = InData->GearEnergy;
+	EnemyStatus.AttackDistance = InData->AttackDistance;
+}
+
+void AEnemyBase::SpawnDeathEffect()
+{
+	// 敵が死んだ際にパーティクルを出す
+	if (EnemyParticle.DeathEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			EnemyParticle.DeathEffect,
+			GetActorLocation(),
+			GetActorRotation(),
+			FVector(1.0f),
+			true,   // bAutoDestroy
+			true,   // bAutoActivate
+			ENCPoolMethod::None,
+			true    // bPreCullCheck
+		);
+	}
+}
+
+void AEnemyBase::SpawnDeathExperience()
+{
+
 }
 
 TStateMachine<AEnemyBase>& AEnemyBase::GetStateMachine()

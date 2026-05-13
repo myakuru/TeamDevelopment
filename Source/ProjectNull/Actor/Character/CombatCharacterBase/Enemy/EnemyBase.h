@@ -109,6 +109,11 @@ public:
 	 */
 	virtual void SetEnemyState(EEnemyState a_TargetState) { EnemyStatus.StateTag = a_TargetState; }
 
+	/**
+	* @brief 生存状態をセット
+	*/
+	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
+
 	//~ End Setter
 	
 
@@ -128,6 +133,18 @@ public:
 	 * @param a_TargetState 変更先ステート
 	 */
 	virtual void NotifyChengedStateEnum(EEnemyState a_TargetState);
+
+	/** エネミーマネージャーのゲッター*/
+	UEnemyManagerSubsystem* GetEnemyManagerSubsystem() const
+	{
+		return EnemyManager;
+	}
+
+	/** ゲームの進行管理クラスのゲッター */
+	UGameProgressSubsystem* GetGameProgressSubsystem() const
+	{
+		return GameProgress;
+	}
 
 	/**
 	 * @brief 汎用的なEnumビット(uint8型)上昇処理
@@ -239,6 +256,12 @@ public:
 	/// </summary>
 	virtual void CheckCanAttack();
 
+	/** 敵が死んださいにパーティクルを出すだけ*/
+	virtual void SpawnDeathEffect();
+
+	/** 敵が死んださいに経験値を出す*/
+	virtual void SpawnDeathExperience();
+
 public:
 
 	// アニメーションEnum
@@ -274,6 +297,9 @@ private:
 	/// <param name="DeltaTime">デルタタイム</param>
 	/// <returns>補間した回転結果</returns>
 	FRotator CalculateRotationToMoveDirection(const FRotator& CurrentRotation, const FRotator& TargetRotation, float RotationInterpSpeed, float DeltaTime);
+
+	/** データアセットからデータを構造体に移す処理*/
+	void SetEnemyStatusData(UEnemyDataAsset* InData);
 
 	TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter> StateMachine;
 
