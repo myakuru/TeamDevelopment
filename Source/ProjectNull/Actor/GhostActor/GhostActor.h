@@ -28,7 +28,8 @@ public:
 	 */
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					class UAnimationAsset* Animation,
-					float PoseTime);
+					float PoseTime,
+					float InLifeTime);
 
 private:
 
@@ -48,6 +49,11 @@ private:
 	/** 描画時間 */
 	UPROPERTY(EditAnywhere)
 	float LifeTime;
+
+	UPROPERTY(EditAnywhere)
+	float OpacityDecayRate;
+
+	float Opacity;
 
 	/** 時間管理用 */
 	float CurrentTime;

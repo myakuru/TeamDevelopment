@@ -43,6 +43,7 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 		}
 
 		if (Data.GhostActor) {
+
 			const FVector PlayerLocation = PlayerTransform.GetLocation();
 			const FMatrix PlayerMatrix = PlayerTransform.ToMatrixWithScale();
 
@@ -56,9 +57,9 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 				+ Right * Offset.Y
 				+ Up * Offset.Z;
 			UE_LOG(LogTemp, Warning, TEXT("hi time %.2f"), Time / Data.Time);
-
+			const FVector MoveDir = (ResultLocation - Data.Transform.GetLocation()).GetSafeNormal();
 			Data.Transform.SetLocation(ResultLocation);
-			Data.Transform.SetRotation(Data.GetDir().Rotation().Quaternion());
+			Data.Transform.SetRotation((MoveDir.Rotation() + Data.RotationOffset).Quaternion());
 			Data.Transform.SetScale3D(Data.Scale);
 			Data.GhostActor->SetActorTransform(Data.Transform);
 		}

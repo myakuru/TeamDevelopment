@@ -21,7 +21,7 @@ AGhostActor::AGhostActor():
 void AGhostActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Opacity = StartOpacity;
 }
 
 void AGhostActor::Tick(float DeltaTime)
@@ -29,13 +29,12 @@ void AGhostActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	CurrentTime += DeltaTime;
-
-	const float Alpha = 1.0f - (CurrentTime / LifeTime);
+	Opacity -= OpacityDecayRate * DeltaTime;
 
 	for (UMaterialInstanceDynamic* Material : DynamicMaterials) {
 		if (!Material) { continue; }
 
-		Material->SetScalarParameterValue(TEXT("Opacity"), Alpha);
+		Material->SetScalarParameterValue(TEXT("Opacity"), Opacity);
 	}
 
 	if (CurrentTime >= LifeTime) {
@@ -44,9 +43,11 @@ void AGhostActor::Tick(float DeltaTime)
 
 }
 
-void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float PoseTime)
+void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float PoseTime, float InLifeTime)
 {
 	if (!SkeletalMesh || !Animation || !Mesh) { return; }
+
+	LifeTime = InLifeTime;
 
 	// SkeletalMesh設定
 	Mesh->SetSkeletalMesh(SkeletalMesh);
@@ -71,13 +72,14 @@ void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Anima
 	{
 		if (!GhostMaterial) { continue; }
 
-		auto* DynamicMaterial = UMaterialInstanceDynamic::Create(GhostMaterial,this);
+		auto* DynamicMaterial = UMaterialInstanceDynamic::Create(GhostMaterial, this);
 
 		Mesh->SetMaterial(Num, DynamicMaterial);
 		DynamicMaterials.Add(DynamicMaterial);
 
-		DynamicMaterial->SetScalarParameterValue(TEXT("Opacity"),StartOpacity);
-		DynamicMaterial->SetVectorParameterValue(TEXT("Color"),StartColor);
+		DynamicMaterial->SetScalarParameterValue(TEXT("Opacity"), StartOpacity);
+		DynamicMaterial->SetVectorParameterValue(TEXT("Color"), StartColor);
 		DynamicMaterial->SetVectorParameterValue(TEXT("BaseColor"), StartBaseColor);
 	}
 }
+

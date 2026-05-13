@@ -23,13 +23,6 @@ public:
 
 public:
 
-	inline FVector GetDir() const
-	{
-		FVector Dir = EndLocationOffset - StartLocationOffset;
-		Dir.Normalize();
-		return Dir;
-	}
-	
 	inline FVector CalcLocationOffset(float LerpAlpha) const {	
 		return FMath::Lerp(StartLocationOffset, EndLocationOffset, LerpAlpha);
 	}
@@ -50,7 +43,7 @@ public:
 	FVector Scale;
 
 	UPROPERTY(EditAnywhere)
-	FRotator Rotation;
+	FRotator RotationOffset;
 
 	UPROPERTY(EditAnywhere)
 	FTransform Transform;
