@@ -4,31 +4,7 @@
 #include "../DashGearStateBase.h"
 #include "DashGearState_Lv4.generated.h"
 
-/** ダッシュギア必殺技の高速移動データ */
-USTRUCT(BlueprintType)
-struct FDashSpecialMoveData
-{
-	GENERATED_BODY()
-public:
-	FDashSpecialMoveData():
-		AngleOffset(0.0f),
-		Time(0.0f),
-		Speed(0.0f)
-	{
-	}
-public:
-
-	UPROPERTY(EditAnywhere)
-	float AngleOffset;
-
-	UPROPERTY(EditAnywhere)
-	float Time;
-
-	UPROPERTY(EditAnywhere)
-	float Speed;
-};
-
-class UAnimationAsset;
+class UAfterImageAttackEffect;
 
 /** ダッシュギアのレベル4状態クラス */
 UCLASS(EditInlineNew, Blueprintable)
@@ -40,25 +16,16 @@ public:
 public:
 	void Initialize(class APlayerBase* Player,
 		class UPlayerGearComponent* GearComponent,
-		class UGearBase* Gear)		override;
-	void Update(float DeltaTime)	override;
+		class UGearBase* Gear)				override;
+	void Execute(int32 CurrentGearLevel)	override;
+	void Update(float DeltaTime)			override;
 private:
-	UPROPERTY(EditAnywhere)
-	FVector StartPlayerForwardVector;
 
-	UPROPERTY(EditAnywhere)
-	int32 DirCount;
+	static const int32 kLv4Index = 3;
 
-	/** ダッシュギア必殺技の高速移動データ */
-	UPROPERTY(EditAnywhere)
-	TArray<FDashSpecialMoveData> DashSpecialMoveDataArray;
+	UPROPERTY()
+	FTransform StartPlayerTransform;
 
-	UPROPERTY(EditAnywhere, Category = "Ghost")
-	TObjectPtr<UMaterialInterface> GhostMaterial;
-
-	UPROPERTY(EditAnywhere)
-	UAnimationAsset* Animation;
-
-	UPROPERTY(EditAnywhere)
-	float AnimTime;
+	UPROPERTY(EditAnywhere,Instanced,Category = "Ghost")
+	TObjectPtr<UAfterImageAttackEffect>  AfterImageAttackEffect;
 };
