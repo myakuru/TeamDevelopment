@@ -32,6 +32,9 @@ public:
 	const TArray<FWeaponInstance>& GetWeapons() const;
 
 	UFUNCTION(BlueprintCallable)
+	const TArray<FWeaponMaterialInstance>& GetMaterials()const;
+
+	UFUNCTION(BlueprintCallable)
 	void AddWeapon(const FWeaponInstance& a_NewWeapon);
 
 	UFUNCTION(BlueprintCallable)
@@ -54,6 +57,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool GetEquippedWeapon(FWeaponInstance& a_EquippedWeapon, int32 a_Index);
+
+	UFUNCTION(BlueprintCallable)
+	UDataTable* GetWeaponDataTable();
+
 
 private:
 

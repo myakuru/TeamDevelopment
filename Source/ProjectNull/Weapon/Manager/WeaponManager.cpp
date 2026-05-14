@@ -18,7 +18,7 @@ void UWeaponManager::SaveToData(UMySaveGame* a_SaveGame)
 {
     if (!a_SaveGame)return;
 
-	a_SaveGame->m_WeaponData.NextUniqueID = m_NextWeaponID;
+	a_SaveGame->m_WeaponData.NextWeaponUniqueID = m_NextWeaponID;
 
     a_SaveGame->m_WeaponData.Weapons.Empty();
     for (const FWeaponInstance& Weapon : m_Weapons) {
@@ -27,13 +27,20 @@ void UWeaponManager::SaveToData(UMySaveGame* a_SaveGame)
 
 	a_SaveGame->m_WeaponData.EquippedWeaponIDs = m_EquippedWeaponIDs;
 
+	a_SaveGame->m_WeaponData.NextMaterialUniqueID = m_NextMaterialID;
+
+	a_SaveGame->m_WeaponData.Materials.Empty();
+	for (const FWeaponMaterialInstance& Material : m_Materials) {
+		a_SaveGame->m_WeaponData.Materials.Add(Material);
+	}
+
 }
 
 void UWeaponManager::LoadFromSaveData(UMySaveGame* a_SaveGame)
 {
     if (!a_SaveGame)return;
 
-	m_NextWeaponID = a_SaveGame->m_WeaponData.NextUniqueID;
+	m_NextWeaponID = a_SaveGame->m_WeaponData.NextWeaponUniqueID;
 
     m_Weapons.Empty();
 	m_Weapons = a_SaveGame->m_WeaponData.Weapons;
@@ -43,11 +50,21 @@ void UWeaponManager::LoadFromSaveData(UMySaveGame* a_SaveGame)
 		m_EquippedWeaponIDs = a_SaveGame->m_WeaponData.EquippedWeaponIDs;
 	}
 
+	m_NextMaterialID = a_SaveGame->m_WeaponData.NextMaterialUniqueID;
+
+	m_Materials.Empty();
+	m_Materials = a_SaveGame->m_WeaponData.Materials;
+
 }
 
 const TArray<FWeaponInstance>& UWeaponManager::GetWeapons() const
 {
 	return m_Weapons;
+}
+
+const TArray<FWeaponMaterialInstance>& UWeaponManager::GetMaterials() const
+{
+	return m_Materials;
 }
 
 void UWeaponManager::AddWeapon(const FWeaponInstance& a_NewWeapon)
@@ -136,4 +153,10 @@ bool UWeaponManager::GetEquippedWeapon(FWeaponInstance& a_EquippedWeapon, int32 
 	}
 
 	return false;
+}
+
+UDataTable* UWeaponManager::GetWeaponDataTable()
+{
+	if (m_WeaponDataTable) return m_WeaponDataTable;
+	else return nullptr;
 }
