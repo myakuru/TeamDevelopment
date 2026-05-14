@@ -36,7 +36,7 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 
 				Ghost->SetActorTransform(Data.Transform);
 				Ghost->Initialize(SkeletalMesh,
-					AnimationAsset, Data.PoseTime);
+					AnimationAsset, Data.PoseTime,Data.LifeTime);
 				Data.GhostActor = Ghost;
 			}
 			Data.bSpawn = true;

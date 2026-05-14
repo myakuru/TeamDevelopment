@@ -17,7 +17,8 @@ public:
 	FAfterImageAttackData() :
 		bSpawn(false),
 		PoseTime(0.0f),
-		Time(0.0f)
+		Time(0.0f),
+		LifeTime(0.0f)
 	{
 	}
 
@@ -53,6 +54,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float TimeThreshold;
+
+	UPROPERTY(EditAnywhere)
+	float LifeTime;
 	
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	float PoseTime;
