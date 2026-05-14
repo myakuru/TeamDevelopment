@@ -162,6 +162,9 @@ public:
 /** プレイヤー中間基底クラス */
 class APlayerBase;
 
+/** ロボットコントローラークラス */
+class ARobotController;
+
 /** 強化画面のウィジット */
 class UPlayerExpUpgradeWidget;
 
@@ -222,8 +225,7 @@ public:
 	/** ギアエネルギーが変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
 	FOnGearEnergyChanged OnGearEnergyChanged;
-
-	TObjectPtr<UPlayerExpUpgradeWidget> PlayerExpUpgradeWidget;
+	TObjectPtr<ARobotController> RobotController;
 
 private:
 

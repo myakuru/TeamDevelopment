@@ -6,6 +6,7 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData():
@@ -26,11 +27,6 @@ void UPlayerRuntimeData::Initialize()
 		Owner = PlayerBase;
 	}
 
-	if (PlayerExpUpgradeWidget)
-	{
-		PlayerExpUpgradeWidget = NewObject<UPlayerExpUpgradeWidget>();
-	}
-
 	// プレイヤーのパラメータデータ取得
 	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
@@ -43,7 +39,7 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 	Experience.Add(Amount);
 	
 	// 経験値によるレベルアップ
-	while (Experience.CanLevelUp())
+	if (Experience.Current >= Experience.ExperienceToNextLevel)
 	{
 		Experience.Current -= Experience.ExperienceToNextLevel;
 
@@ -82,9 +78,9 @@ void UPlayerRuntimeData::LevelUp()
 
 	UpdateStatus();
 
-	if (PlayerExpUpgradeWidget)
+	if (RobotController)
 	{
-		PlayerExpUpgradeWidget->OpenUpgradeWidget();
+		RobotController->GetPlayerExpUpgradeWidget()->OpenUpgradeWidget();
 	}
 
 	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
