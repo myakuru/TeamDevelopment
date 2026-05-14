@@ -225,6 +225,8 @@ public:
 	/** ギアエネルギーが変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
 	FOnGearEnergyChanged OnGearEnergyChanged;
+
+
 	TObjectPtr<ARobotController> RobotController;
 
 private:

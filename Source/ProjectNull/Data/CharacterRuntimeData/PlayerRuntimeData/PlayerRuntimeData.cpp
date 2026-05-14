@@ -78,10 +78,12 @@ void UPlayerRuntimeData::LevelUp()
 
 	UpdateStatus();
 
-	if (RobotController)
+	if (!RobotController)
 	{
-		RobotController->GetPlayerExpUpgradeWidget()->OpenUpgradeWidget();
+		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
 	}
+
+	RobotController->OpenPlayerExpUpgradeWidget();
 
 	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);

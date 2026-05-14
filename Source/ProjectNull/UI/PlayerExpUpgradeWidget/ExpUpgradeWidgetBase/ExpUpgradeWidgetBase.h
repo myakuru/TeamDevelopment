@@ -31,6 +31,8 @@ public:
 	// マウスがウィジェットを離れたとき（必要なら）
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 
+	void ImageRotation();
+
 protected:
 	/** テキストを表示するためのウィジェット */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -50,6 +52,4 @@ protected:
 	FVector2D UiScaleMax = { 0.0f,0.0f };
 private:
 	int32 GetRandomTextId();
-
-	void ImageRotation();
 };

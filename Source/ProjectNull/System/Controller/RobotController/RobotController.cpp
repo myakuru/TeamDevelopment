@@ -24,6 +24,14 @@ ARobotController::ARobotController():
 	bReplicates = true;
 }
 
+void ARobotController::OpenPlayerExpUpgradeWidget()
+{
+	if (PlayerExpUpgradeWidget)
+	{
+		PlayerExpUpgradeWidget->OpenUpgradeWidget();
+	}
+}
+
 void ARobotController::BeginPlay()
 {
 	Super::BeginPlay();

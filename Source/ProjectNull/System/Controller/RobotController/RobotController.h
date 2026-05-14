@@ -24,7 +24,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHud; }
 
-	TObjectPtr<UPlayerExpUpgradeWidget> GetPlayerExpUpgradeWidget() const { return PlayerExpUpgradeWidget; }
+	void OpenPlayerExpUpgradeWidget();
 
 protected:
 
