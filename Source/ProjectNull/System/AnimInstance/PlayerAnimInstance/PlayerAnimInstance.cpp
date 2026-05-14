@@ -1,6 +1,7 @@
 ﻿#include "PlayerAnimInstance.h"
 
-UPlayerAnimInstance::UPlayerAnimInstance()
+UPlayerAnimInstance::UPlayerAnimInstance():
+	bIsCombatStance(false)
 {
 
 }

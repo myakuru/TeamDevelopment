@@ -12,6 +12,7 @@ class UPlayerGearComponent;
 class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
+class UPlayerAnimInstance;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
@@ -36,11 +37,12 @@ public:
 	void CanChangeGear() const;
 
 	int32 GetCurrentGearLevel() const;
+	
 
 	/** ゲッター */
 	inline UPlayerGearComponent*			GetGearComponent() const		{ return GearComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const	{ return Instance; }
-
+	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 
 private:
 

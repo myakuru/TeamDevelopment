@@ -23,7 +23,10 @@ public:
 	ARobotController();
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHUD; }
+	inline UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHUD; }
+
+
+	inline void SetCanReceiveInput(bool bInCanReceiveInput) { bCanReceiveInput = bInCanReceiveInput; }
 
 protected:
 
@@ -31,6 +34,7 @@ protected:
 	virtual void SetupInputComponent()	override;
 
 	virtual void GearExecute01(const FInputActionValue& GearActionValue01);
+
 
 private:
 
@@ -43,13 +47,14 @@ private:
 
 	void ChangeGear(const FInputActionValue& ActionValue);
 
-
-
 	void InitializeUI();
+
+
+	/** 入力受付可能か */
+	bool bCanReceiveInput;
 
 	UPROPERTY()
 	TObjectPtr<APlayerBase> PlayerBase;
-
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputContext;

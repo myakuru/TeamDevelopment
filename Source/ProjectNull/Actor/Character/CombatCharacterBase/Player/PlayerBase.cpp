@@ -11,6 +11,7 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
 
 APlayerBase::APlayerBase()
@@ -104,6 +105,12 @@ int32 APlayerBase::GetCurrentGearLevel() const
 {
 	if (!GearComponent) { return 0; }
 	return GearComponent->GetCurrentGearLevel();
+}
+
+UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
+{
+	if (!GetMesh() || !GetMesh()->GetAnimInstance()) { return nullptr; }
+	return Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 bool APlayerBase::CanMove()

@@ -11,6 +11,7 @@
 
 
 ARobotController::ARobotController():
+		bCanReceiveInput(true),
 		PlayerBase(nullptr),
 		InputContext(nullptr),
 		MoveAction(nullptr),
@@ -59,6 +60,7 @@ void ARobotController::InitializeInputContext()
 
 void ARobotController::Move(const FInputActionValue& MoveActionValue)
 {
+	if (!bCanReceiveInput) { return; }
 	if (!Cast<APlayerBase>(GetCharacter())) { return; }
 	auto* ControlledPlayer = Cast<APlayerBase>(GetCharacter());
 
@@ -67,6 +69,7 @@ void ARobotController::Move(const FInputActionValue& MoveActionValue)
 
 void ARobotController::Look(const FInputActionValue& LookActionValue)
 {
+	if (!bCanReceiveInput) { return; }
 	const FVector2D LookVector = LookActionValue.Get<FVector2D>();
 	AddYawInput(LookVector.X);
 	AddPitchInput(LookVector.Y);
@@ -74,18 +77,21 @@ void ARobotController::Look(const FInputActionValue& LookActionValue)
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
+	if (!bCanReceiveInput) { return; }
 	if (!GetCharacter()) { return; }
 	GetCharacter()->Jump();
 }
 
 void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
 {
+	if (!bCanReceiveInput) { return; }
 	if (!PlayerBase) { return; }
 	PlayerBase->ChangeGear();
 }
 
 void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 {
+	if (!bCanReceiveInput) { return; }
 	if (!PlayerBase || !PlayerBase->GetGearComponent()) { return; }
 	PlayerBase->GetGearComponent()->ExecuteGear(0);
 }
