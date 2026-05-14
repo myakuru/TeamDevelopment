@@ -4,6 +4,10 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyDataStruct.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
+#include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 
 USTT_EnemyDead::USTT_EnemyDead(const FObjectInitializer& a_ObjInit)
 	: Super(a_ObjInit)
@@ -20,7 +24,7 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
 	//// 死亡アニメーションの再生やエフェクトの発生を行う
-	//OwnerEnemy->SetEnemyState(EEnemyState::Dead);
+	OwnerEnemy->SetEnemyState(EEnemyState::Dead);
 	//// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
 	//if (auto EnemyManager = OwnerEnemy->GetEnemyManagerSubsystem()) {
 	//	EnemyManager->RemoveEnemy(OwnerEnemy);
