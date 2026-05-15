@@ -13,6 +13,8 @@ void UExpUpgradeWidgetBase::NativeConstruct()
 	{
 		UpgradeText->SetWrappingPolicy(ETextWrappingPolicy::AllowPerCharacterWrapping);
 	}
+
+	UiScale = UiScaleMin;
 }
 
 void UExpUpgradeWidgetBase::ChoicesExpUpgrade()
@@ -92,6 +94,14 @@ void UExpUpgradeWidgetBase::ImageRotation()
 
 			UpgradeImage->SetRenderScale(UiScale);
 		}
+	}
+}
+
+void UExpUpgradeWidgetBase::InitExpUpgradeWidget()
+{
+	if(UiScale.X >= UiScaleMax.X)
+	{
+		UiScale = UiScaleMin;
 	}
 }
 

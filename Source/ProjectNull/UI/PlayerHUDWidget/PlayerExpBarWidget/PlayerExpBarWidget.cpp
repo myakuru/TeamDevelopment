@@ -9,6 +9,8 @@ void UPlayerExpBarWidget::SetExp(float CurrentExp, float NextLevelExp)
 {
 	if (ExpImage)
 	{
+		CurrentExp = FMath::Clamp(CurrentExp, 0.0f, NextLevelExp);
+
 		float ExpRatio = CurrentExp / NextLevelExp;
 
 		UE_LOG(LogTemp, Log, TEXT("CurrentExp: %f, NextLevelExp: %f, ExpRatio: %f"), CurrentExp, NextLevelExp, ExpRatio);
