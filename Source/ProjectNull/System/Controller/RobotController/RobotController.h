@@ -8,10 +8,9 @@ struct FInputActionValue;
 
 class APlayerBase;
 class UInputMappingContext;
-
 class UInputAction;
-
 class UPlayerHUDWidget;
+class UPlayerExpUpgradeWidget;
 
 UCLASS()
 class PROJECTNULL_API ARobotController : public APlayerController
@@ -23,7 +22,9 @@ public:
 	ARobotController();
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHUD; }
+	UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHud; }
+
+	void OpenPlayerExpUpgradeWidget();
 
 protected:
 
@@ -45,7 +46,7 @@ private:
 
 
 
-	void InitializeUI();
+	void InitializeUi();
 
 	UPROPERTY()
 	TObjectPtr<APlayerBase> PlayerBase;
@@ -73,7 +74,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UPlayerHUDWidget> PlayerHUDClass;
 
-	UPROPERTY()
-	TObjectPtr<UPlayerHUDWidget> PlayerHUD;
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UPlayerExpUpgradeWidget> PlayerExpUpgradeWidgetClass;
+
+	TObjectPtr<UPlayerHUDWidget> PlayerHud;
+	TObjectPtr<UPlayerExpUpgradeWidget> PlayerExpUpgradeWidget;
 
 };

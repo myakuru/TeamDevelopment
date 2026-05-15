@@ -1,6 +1,5 @@
 ﻿#include "PlayerHUDWidget.h"
 #include <Components/Button.h>
-#include <Components/TextBlock.h>
 
 // プレイヤーの経験値バーのUI
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerExpBarWidget/PlayerExpBarWidget.h>

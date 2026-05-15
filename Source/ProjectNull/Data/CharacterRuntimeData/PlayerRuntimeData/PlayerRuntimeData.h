@@ -118,7 +118,6 @@ public:
 		return true;
 	}
 
-
 	/**
 	 * @brief ギアチェンジ時にデータをリセット
 	 * @param CurrentGearLevel 現在のギアレベル
@@ -162,6 +161,12 @@ public:
 
 /** プレイヤー中間基底クラス */
 class APlayerBase;
+
+/** ロボットコントローラークラス */
+class ARobotController;
+
+/** 強化画面のウィジット */
+class UPlayerExpUpgradeWidget;
 
 /** 速度パラメータ構造体 */
 struct FSpeedParameterData;
@@ -220,6 +225,9 @@ public:
 	/** ギアエネルギーが変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
 	FOnGearEnergyChanged OnGearEnergyChanged;
+
+
+	TObjectPtr<ARobotController> RobotController;
 
 private:
 
