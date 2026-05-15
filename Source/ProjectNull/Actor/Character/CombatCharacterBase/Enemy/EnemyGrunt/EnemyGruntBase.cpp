@@ -1,5 +1,6 @@
 ﻿
 #include "EnemyGruntBase.h"
+#include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
 
 // Sets default values
 AEnemyGruntBase::AEnemyGruntBase()
@@ -34,6 +35,8 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 	
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
+
+	EnemyRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
 
 	if (EnemyStatus.StateTag==EEnemyState::KnockBack)
 	{

@@ -2,6 +2,7 @@
 #include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StateTreeComponent.h"
 #include <ProjectNull/Utility/StateMachine/StateMachine.h>
 #include <ProjectNull/Actor/Item/Pickup/ExperiencePickup/ExperiencePickup.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
@@ -29,6 +30,8 @@ AEnemyBase::AEnemyBase()
 	
 	// 敵のランタイムパラメータ管理クラスの生成
 	EnemyRuntimeData		= CreateDefaultSubobject<UEnemyRuntimeData>("EnemyRuntimeData");
+
+	StateTreeComponent		= CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
 }
 
 AEnemyBase::~AEnemyBase() = default;
@@ -68,10 +71,6 @@ void AEnemyBase::BeginPlay()
 		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		CapsuleCollision->SetGenerateOverlapEvents(true);
 	}
-
-	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
-		new TStateMachine<AEnemyBase>()
-	);
 
 	// コンポーネントに自身の参照を渡す
 	{
@@ -156,6 +155,13 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 	//EnemyStatus.CanAttack			= false;
 }
 
+void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
+{
+	EnemyStatus.StateTag = a_TargetState;
+
+	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
+}
+
 void AEnemyBase::SetTakeDamaged(int32 AttackPower)
 {
 	// 簡易的に渡された値分,FinalHPを減算
@@ -207,6 +213,7 @@ void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPow
 
 void AEnemyBase::OnDeath()
 {
+	SetEnemyState(EEnemyState::KnockBack);
 	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
 	if (EnemyManager) {
 		EnemyManager->RemoveEnemy(this);
@@ -281,13 +288,20 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	// ヌルチェック
 	check(InData != nullptr);
 	SetEnemyStatusData(InData);
-	// Stateを初期化してChaseから開始
-	StateMachine->Start(this);
 
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 
+	EnemyStatus.StateTag = EEnemyState::None;
+	EnemyRuntimeData->ChangedEnemyState(EEnemyState::None);
+
 	EnemyStatus.IsAlive = true;
+
+	// StateTreeを起動
+	if (StateTreeComponent)
+	{
+		StateTreeComponent->StartLogic();
+	}
 
 	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
@@ -308,10 +322,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		CapsuleCollision->SetGenerateOverlapEvents(true);
 	}
 
-	StateMachine = TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter>(
-		new TStateMachine<AEnemyBase>()
-	);
-
 	// コンポーネントに自身の参照を渡す
 	{
 		if (EnemyAttackComponent)EnemyAttackComponent->SetOwnerEnemy(this);
@@ -330,9 +340,7 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 }
 
 void AEnemyBase::Deactivate()
-{
-	StateMachine->ClearState();
-	
+{	
 	/** エディタ上でフォルダに入れる*/
 #if WITH_EDITOR
 	SetFolderPath(TEXT("Pool/Inactive"));
@@ -341,6 +349,12 @@ void AEnemyBase::Deactivate()
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);
+
+	// StateTreeを停止
+	if (StateTreeComponent)
+	{
+		StateTreeComponent->StopLogic(TEXT("Deactivate"));
+	}
 
 	EnemyStatus.StateTag = EEnemyState::None;
 }
@@ -382,15 +396,18 @@ void AEnemyBase::SpawnDeathEffect()
 
 void AEnemyBase::SpawnDeathExperience()
 {
+	// 経験値ドロップ
+	if (UItemManagerSubsystem* ItemSubsystem =
+		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
+	{
+		const FLinearColor Color = EnemyStatus.ExpColor;
+		const float Size = EnemyStatus.ExpSize;
 
-}
-
-TStateMachine<AEnemyBase>& AEnemyBase::GetStateMachine()
-{
-	return *StateMachine;
-}
-
-void FStateMachineDeleter::operator()(TStateMachine<AEnemyBase>* Ptr) const
-{
-	delete Ptr;
+		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
+			GetActorLocation(),
+			static_cast<float>(EnemyStatus.Exp),
+			Color,
+			Size
+		);
+	}
 }

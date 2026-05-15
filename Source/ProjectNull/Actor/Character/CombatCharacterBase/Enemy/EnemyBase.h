@@ -11,17 +11,10 @@
 
 // 前方宣言
 class UCapsuleComponent;
+class UStateTreeComponent;
 class USkeletalMeshComponent;
 class UPrimitiveComponent;
 class UEnemyDataAsset;
-
-template<typename T>
-class TStateMachine;
-
-struct FStateMachineDeleter
-{
-	void operator()(TStateMachine<AEnemyBase>* Ptr) const;
-};
 
 /**
  * @brief パーティクル用構造体
@@ -107,7 +100,7 @@ public:
 	 * @brief ステートEnumを切り替える処理
 	 * @param a_targetState 切り替え先ステートEnum
 	 */
-	virtual void SetEnemyState(EEnemyState a_TargetState) { EnemyStatus.StateTag = a_TargetState; }
+	virtual void SetEnemyState(EEnemyState a_TargetState);
 
 	/**
 	* @brief 生存状態をセット
@@ -118,9 +111,6 @@ public:
 	
 
 	//~ Begin Getter
-
-	/** StateMachineへのアクセス、Stateの追加・変更に使う */
-	TStateMachine<AEnemyBase>& GetStateMachine();
 
 	/** EnemyRuntimeへのアクセス、デリゲートへの登録を行う */
 	inline UEnemyRuntimeData* GetEnemyRuntimeData() const
@@ -190,6 +180,10 @@ protected:
 	/** 敵のモデル*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> EnemyMesh;
+
+	/** 敵のStateTree*/
+	UPROPERTY(VisibleAnywhere, Category = "StateTree")
+	TObjectPtr<UStateTreeComponent> StateTreeComponent;
 
 	/** 敵が吹き飛ばされている状態の処理 */
 	virtual void MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime);
@@ -300,10 +294,4 @@ private:
 
 	/** データアセットからデータを構造体に移す処理*/
 	void SetEnemyStatusData(UEnemyDataAsset* InData);
-
-	TUniquePtr<TStateMachine<AEnemyBase>, FStateMachineDeleter> StateMachine;
-
-	/** Stateのタグ*/
-	//UPROPERTY(BlueprintReadOnly, Category = "Enemy")
-	//FGamePlayTag CurrentStateTag;
 };

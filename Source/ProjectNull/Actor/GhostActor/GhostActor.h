@@ -28,20 +28,45 @@ public:
 	 */
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					class UAnimationAsset* Animation,
-					TObjectPtr<UMaterialInterface> GhostMaterial,
-					float PoseTime);
+					float PoseTime,
+					float InLifeTime);
 
 private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> Mesh;
 
-	/*UPROPERTY(EditAnywhere, Category = "Ghost")
-	TObjectPtr<UMaterialInterface> GhostMaterial;*/
+	UPROPERTY(EditAnywhere, Category = "Ghost")
+	TObjectPtr<UMaterialInterface> GhostMaterial;
 
 	UPROPERTY()
 	TArray<TObjectPtr<UMaterialInstanceDynamic>> DynamicMaterials;
 
-	float LifeTime = 0.5f;
-	float CurrentTime = 0.0f;
+	/** 透過度のソート優先度 */
+	UPROPERTY(EditAnywhere)
+	int32 TranslucencySortPriority;
+
+	/** 描画時間 */
+	UPROPERTY(EditAnywhere)
+	float LifeTime;
+
+	UPROPERTY(EditAnywhere)
+	float OpacityDecayRate;
+
+	float Opacity;
+
+	/** 時間管理用 */
+	float CurrentTime;
+
+	/** 開始時の不透明度 */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float StartOpacity;
+
+	/** 縁の色 */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	FLinearColor StartColor;
+
+	/** ベース色 */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	FLinearColor StartBaseColor;
 };
