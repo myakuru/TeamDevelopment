@@ -29,7 +29,8 @@ public:
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					class UAnimationAsset* Animation,
 					float PoseTime,
-					float InLifeTime);
+					float InLifeTime,
+					float InOpacityDecayRate);
 
 private:
 

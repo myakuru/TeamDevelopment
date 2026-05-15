@@ -18,7 +18,8 @@ public:
 		bSpawn(false),
 		PoseTime(0.0f),
 		Time(0.0f),
-		LifeTime(0.0f)
+		LifeTime(0.0f),
+		OpacityDecayRate(1.0f)
 	{
 	}
 
@@ -57,6 +58,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float LifeTime;
+
+	UPROPERTY(EditAnywhere)
+	float OpacityDecayRate;
 	
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	float PoseTime;
@@ -84,9 +88,6 @@ public:
 
 	float GetTotalTime();
 	float GetMaxTime();
-
-	UPROPERTY(EditAnywhere)
-	int32 AfterImageNum;
 
 	/** 残像攻撃データ */
 	UPROPERTY(EditAnywhere)

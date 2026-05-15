@@ -25,8 +25,10 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 	for (auto& Data : AfterImageDataArray) {
 
 		if (Data.TimeThreshold > ElapsedTime) { continue; }
-
+		// 経過時間から閾値を引いてこの区間だけの時間を算出する
 		const float Time = ElapsedTime - Data.TimeThreshold;
+		if (Time > Data.Time) { continue; }
+
 		AGhostActor* Ghost = nullptr;
 
 		if (!Data.bSpawn) {
@@ -36,7 +38,7 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 
 				Ghost->SetActorTransform(Data.Transform);
 				Ghost->Initialize(SkeletalMesh,
-					AnimationAsset, Data.PoseTime,Data.LifeTime);
+					AnimationAsset, Data.PoseTime,Data.LifeTime,Data.OpacityDecayRate);
 				Data.GhostActor = Ghost;
 			}
 			Data.bSpawn = true;

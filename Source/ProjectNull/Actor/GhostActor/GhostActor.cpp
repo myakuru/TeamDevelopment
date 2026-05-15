@@ -43,11 +43,12 @@ void AGhostActor::Tick(float DeltaTime)
 
 }
 
-void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float PoseTime, float InLifeTime)
+void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float PoseTime, float InLifeTime, float InOpacityDecayRate)
 {
 	if (!SkeletalMesh || !Animation || !Mesh) { return; }
 
-	LifeTime = InLifeTime;
+	LifeTime			= InLifeTime;
+	OpacityDecayRate	= InOpacityDecayRate;
 
 	// SkeletalMesh設定
 	Mesh->SetSkeletalMesh(SkeletalMesh);
@@ -82,4 +83,5 @@ void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Anima
 		DynamicMaterial->SetVectorParameterValue(TEXT("BaseColor"), StartBaseColor);
 	}
 }
+
 
