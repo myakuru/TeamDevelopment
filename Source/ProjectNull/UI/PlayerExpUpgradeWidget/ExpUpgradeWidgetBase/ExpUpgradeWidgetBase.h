@@ -33,6 +33,8 @@ public:
 
 	void ImageRotation();
 
+	void InitExpUpgradeWidget();
+
 protected:
 	/** テキストを表示するためのウィジェット */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -42,14 +44,21 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UImage> UpgradeImage;
 
+	/** UIのスケールの変化速度 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	FVector2D UiScaleSpeed = { 0.0f,0.0f };
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	FVector2D UiScale = { 0.0f,0.0f };
-
+	/** UIの最大スケール */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	FVector2D UiScaleMax = { 0.0f,0.0f };
+
+	/** UIの最小スケール */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FVector2D UiScaleMin = { 0.0f,0.0f };
+
+	/** 現在のUIのスケール */
+	FVector2D UiScale = { 0.0f,0.0f };
+
 private:
 	int32 GetRandomTextId();
 

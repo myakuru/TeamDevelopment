@@ -5,6 +5,7 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include "Kismet/GameplayStatics.h"
 #include <ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.h>
+#include "Components/Image.h"
 
 void UPlayerExpUpgradeWidget::NativeConstruct()
 {
@@ -37,6 +38,9 @@ void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDe
 	{
 		UpgradeWidget_2->ImageRotation();
 	}
+
+	// 背景の黒い画像のフェードイン処理
+	BackgroundImageFadeIn();
 }
 
 void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
@@ -87,6 +91,9 @@ void UPlayerExpUpgradeWidget::OpenWidget()
 	SetVisibility(ESlateVisibility::Visible);
 	SetIsEnabled(true);
 
+	// 強化画面の初期化
+	InitUpgradeWidget();
+
 	// 画面を一旦停止する
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 
@@ -116,4 +123,40 @@ void UPlayerExpUpgradeWidget::CloseWidget()
 		PlayerController->bShowMouseCursor = false;
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
+}
+
+void UPlayerExpUpgradeWidget::BackgroundImageFadeIn()
+{
+	if (BackgroundImage)
+	{
+		// フェードインのアルファ値を更新
+		BackgroundFadeInAlpha += GetWorld()->GetDeltaSeconds() * BackgroundFadeInDuration;
+		BackgroundFadeInAlpha = FMath::Clamp(BackgroundFadeInAlpha, 0.0f, 0.5f);
+
+		BackgroundImage->SetColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, BackgroundFadeInAlpha));
+	}
+}
+
+void UPlayerExpUpgradeWidget::InitUpgradeWidget()
+{
+	if (BackgroundFadeInAlpha >= 0.5f)
+	{
+		BackgroundFadeInAlpha = 0.0f;
+	}
+
+	if(UpgradeWidget_0)
+	{
+		UpgradeWidget_0->InitExpUpgradeWidget();
+	}
+
+	if(UpgradeWidget_1)
+	{
+		UpgradeWidget_1->InitExpUpgradeWidget();
+	}
+
+	if(UpgradeWidget_2)
+	{
+		UpgradeWidget_2->InitExpUpgradeWidget();
+	}
+
 }
