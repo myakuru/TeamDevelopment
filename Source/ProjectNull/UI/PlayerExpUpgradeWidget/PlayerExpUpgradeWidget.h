@@ -23,6 +23,10 @@ public:
 	/** プレイヤー側が呼び出す */
 	void OpenUpgradeWidget();
 
+	// 左ボタン押下を処理する
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+
 protected:
 
 	virtual void NativeConstruct() override;
@@ -53,4 +57,7 @@ protected:
 	/** 強化画面2のウィジェット */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UExpUpgradeWidgetBase> UpgradeWidget_2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrade")
+	bool bIsUpgradeWidgetUse = false;
 };

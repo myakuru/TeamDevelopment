@@ -4,6 +4,8 @@
 #include <Components/TextBlock.h>
 #include <Components/Image.h>
 #include <ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h>
+#include "Input/Events.h"
+#include "Input/Reply.h" 
 
 void UExpUpgradeWidgetBase::NativeConstruct()
 {
@@ -96,16 +98,22 @@ void UExpUpgradeWidgetBase::ImageRotation()
 void UExpUpgradeWidgetBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+
+	bIsMouseOver = true;
+
 	if (UpgradeImage)
 	{
-		if (UiScale.X <= 1.2f)
+		if (UiScale.X <= UiScaleMax.X) return;
+
+		if (UiScale.X <= UiScaleMax.X + 0.5f)
 		{
 			UiScale.X += GetWorld()->GetDeltaSeconds() * 10.0f;
 		}
-		if (UiScale.Y <= 1.2f)
+		if (UiScale.Y <= UiScaleMax.Y + 1.0f)
 		{
-			UiScale.Y -= GetWorld()->GetDeltaSeconds() * 10.0f;
+			UiScale.Y += GetWorld()->GetDeltaSeconds() * 10.0f;
 		}
+
 		UpgradeImage->SetRenderScale(UiScale);
 	}
 }
@@ -113,15 +121,20 @@ void UExpUpgradeWidgetBase::NativeOnMouseEnter(const FGeometry& InGeometry, cons
 void UExpUpgradeWidgetBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
+
+	bIsMouseOver = false;
+
 	if (UpgradeImage)
 	{
-		if (UiScale.X >= 1.0f)
+		if (UiScale.X <= UiScaleMax.X) return;
+
+		if (UiScale.X >= UiScaleMax.X)
 		{
 			UiScale.X -= GetWorld()->GetDeltaSeconds() * 10.0f;
 		}
-		if (UiScale.Y >= 1.0f)
+		if (UiScale.Y >= UiScaleMax.Y)
 		{
-			UiScale.Y += GetWorld()->GetDeltaSeconds() * 10.0f;
+			UiScale.Y -= GetWorld()->GetDeltaSeconds() * 10.0f;
 		}
 		UpgradeImage->SetRenderScale(UiScale);
 	}

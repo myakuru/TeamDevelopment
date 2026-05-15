@@ -22,14 +22,14 @@ public:
 	virtual void NativeConstruct() override;
 	virtual void ChoicesExpUpgrade();
 
-	// 左ボタン押下を処理する
-	//virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-
 	// マウスがウィジェットに入ったとき
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
-	// マウスがウィジェットを離れたとき（必要なら）
+	// マウスがウィジェットを離れたとき
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+
+	/** マウスがウィジェット上にあるかどうかを取得 */
+	bool IsMouseOver() const { return bIsMouseOver; }
 
 	void ImageRotation();
 
@@ -52,4 +52,6 @@ protected:
 	FVector2D UiScaleMax = { 0.0f,0.0f };
 private:
 	int32 GetRandomTextId();
+
+	bool bIsMouseOver = false;
 };
