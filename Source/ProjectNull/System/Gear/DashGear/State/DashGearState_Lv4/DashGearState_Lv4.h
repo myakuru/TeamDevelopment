@@ -20,9 +20,10 @@ public:
 
 	FDashGearState_Lv4_CameraData() :
 		Time(0.0f),
-		TargetLength(0.0f),
+		TargetArmLength(0.0f),
+		ArmLengthLerpSpeed(1.0f),
 		TargetRotator(FRotator()),
-		LerpSpeed(1.0f)
+		RotatorLerpSpeed(1.0f)
 	{
 	}
 
@@ -34,15 +35,19 @@ public:
 
 	/** カメラとプレイヤーの距離 */
 	UPROPERTY(EditAnywhere)
-	float TargetLength;
+	float TargetArmLength;
+
+	/** カメラとプレイヤーの距離補間速度 */
+	UPROPERTY(EditAnywhere)
+	float ArmLengthLerpSpeed;
 
 	/** 目指すべきカメラ回転 */
 	UPROPERTY(EditAnywhere)
 	FRotator TargetRotator;
 
-	/** 補間速度 */
+	/** 回転補間速度 */
 	UPROPERTY(EditAnywhere)
-	float LerpSpeed;
+	float RotatorLerpSpeed;
 };
 
 
@@ -59,7 +64,8 @@ public:
 		class UGearBase* Gear)				override;
 	void Execute(int32 CurrentGearLevel)	override;
 	void Update(float DeltaTime)			override;
-	
+	void End()								override;
+
 private:
 
 	/**
@@ -70,8 +76,12 @@ private:
 
 	void UpdateCamera(float DeltaTime);
 
-	void SetMeshVisibility(bool bInVisibility) const;
-	void SetMeshHiddenInGame(bool bInHiddenInGame) const;
+	void UpdateCameraRotation(float DeltaTime, int32 DataIndex);
+
+	void UpdateTargetArmLength(float DeltaTime, int32 DataIndex);
+
+
+	int32 GetCurrentSectionIndex(float InElapsedTime);
 
 	static const int32 kLv4Index = 3;
 
@@ -94,6 +104,9 @@ private:
 	float StanceMaxTimeThreshold;
 
 	/** カメラデータをまとめる配列 */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Camera")
 	TArray<FDashGearState_Lv4_CameraData> CameraData;
+
+	UPROPERTY()
+	float StartTargetArmLength;
 };

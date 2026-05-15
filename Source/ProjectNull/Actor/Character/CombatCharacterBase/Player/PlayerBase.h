@@ -40,8 +40,10 @@ public:
 	
 
 	/** ゲッター */
-	inline UPlayerGearComponent*			GetGearComponent() const		{ return GearComponent; }
-	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const	{ return Instance; }
+	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
+	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
+	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
+	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return Instance; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 
 private:

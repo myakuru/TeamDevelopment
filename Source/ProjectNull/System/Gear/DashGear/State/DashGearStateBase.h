@@ -29,7 +29,6 @@ protected:
 
 	void PlayDashEffect();
 
-	// ���i�O���j�����a���U���̃G�t�F�N�g
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	UNiagaraSystem* DashEffect;
 

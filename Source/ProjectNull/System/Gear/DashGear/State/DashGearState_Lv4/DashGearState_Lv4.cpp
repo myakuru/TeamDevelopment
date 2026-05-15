@@ -1,12 +1,15 @@
 ﻿
 #include "DashGearState_Lv4.h"
 
+#include "Camera/CameraComponent.h"
+#include <GameFramework/SpringArmComponent.h>
+
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
-#include <ProjectNull/System/Controller/RobotController/RobotController.h>
-#include <ProjectNull/Actor/GhostActor/GhostActor.h>
-#include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 #include <ProjectNull/Actor/Effect/AfterImageAttackEffect/AfterImageAttackEffect.h>
+#include <ProjectNull/Actor/GhostActor/GhostActor.h>
 #include <ProjectNull/System/Gear/GearBase.h>
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
 UDashGearState_Lv4::UDashGearState_Lv4():
 	StanceMinTimeThreshold(0.0f),
@@ -30,6 +33,10 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 		TotalDuration += Data.Time;
 	}
 
+	auto* Camera = OwnerPlayer->GetSpringArmComponent();
+	if (!Camera) { return; }
+
+	StartTargetArmLength = Camera->TargetArmLength;
 
 	Gear->SetGearDuration(TotalDuration, kLv4Index);
 
@@ -43,9 +50,11 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	auto* PlayerAnimInstance = OwnerPlayer->GetPlayerAnimInstance();
 	if (!PlayerAnimInstance) { return; }
 
+	// アニメーションを構え状態にする
 	PlayerAnimInstance->bIsCombatStance = true;
 
 	RobotController->SetCanReceiveInput(false);
+
 }
 
 void UDashGearState_Lv4::Update(float DeltaTime)
@@ -60,68 +69,87 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 	UpdateCamera(DeltaTime);
 }
 
+void UDashGearState_Lv4::End()
+{
+	if (!OwnerPlayer || !RobotController) { return; }
+	RobotController->SetCanReceiveInput(true);
+
+	OwnerPlayer->GetMesh()->SetHiddenInGame(false);
+	
+}
+
 void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 {	
 	if (!OwnerPlayer || !RobotController) { return; }
 
-
 	auto* PlayerAnimInstance = OwnerPlayer->GetPlayerAnimInstance();
 	if (!PlayerAnimInstance) { return; }
 
-	if (ElapsedTime >= StanceMinTimeThreshold &&
-		ElapsedTime < StanceMaxTimeThreshold) {
-		
-		/*SetMeshVisibility(false);
-		SetMeshHiddenInGame(false);*/
-		return;
-	}
-	else {
-		PlayerAnimInstance->bIsCombatStance = false;
-		RobotController->SetCanReceiveInput(true);
-		/*SetMeshVisibility(true);
-		SetMeshHiddenInGame(true);*/
+	if (ElapsedTime > StanceMaxTimeThreshold) {
+		if (PlayerAnimInstance->bIsCombatStance) {
+			PlayerAnimInstance->bIsCombatStance = false;
+		}
+		OwnerPlayer->GetMesh()->SetHiddenInGame(true);
 	}
 }
 
 void UDashGearState_Lv4::UpdateCamera(float DeltaTime)
 {
-	if (!OwnerPlayer || !RobotController) { return; }
-	float ElapsedTime = OwnerGear->GetElapsedTime();
+	if (!OwnerPlayer || !OwnerGear || !RobotController) { return; }
 
-	int32 ResultIndex = 0;
-	float TotalTime = 0.f;
+	const int32 ResultIndex = GetCurrentSectionIndex(OwnerGear->GetElapsedTime());
+	
+	UpdateCameraRotation(DeltaTime, ResultIndex);
 
-	for (int32 DataIndex = 0; DataIndex < CameraData.Num(); ++DataIndex) {
+	UpdateTargetArmLength(DeltaTime,ResultIndex);
+}
 
-		ElapsedTime -= CameraData[DataIndex].Time;
-
-		if (ElapsedTime <= 0.0f) {
-			ResultIndex = DataIndex;
-		}
-	}
-
-	if (!CameraData.IsValidIndex(ResultIndex)) { return; }
-	const FRotator	TargetRotator	= CameraData[ResultIndex].TargetRotator;
-	const float		LerpSpeed		= CameraData[ResultIndex].LerpSpeed;
+void UDashGearState_Lv4::UpdateCameraRotation(float DeltaTime, int32 DataIndex)
+{
+	if (!CameraData.IsValidIndex(DataIndex)
+		|| !RobotController) { return; }
+	const FRotator	TargetRotator			= CameraData[DataIndex].TargetRotator;
+	const float		TargetRotatorLerpSpeed	= CameraData[DataIndex].RotatorLerpSpeed;
+	const float		TargetArmLength			= CameraData[DataIndex].TargetArmLength;
 
 	const FRotator Rotator = FMath::RInterpTo(
-			RobotController->GetControlRotation(),
-			TargetRotator,
-			DeltaTime,
-			LerpSpeed);
+		RobotController->GetControlRotation(),
+		TargetRotator,
+		DeltaTime,
+		TargetRotatorLerpSpeed);
 
 	RobotController->SetControlRotation(Rotator);
 }
 
-void UDashGearState_Lv4::SetMeshVisibility(bool bInVisibility) const
+void UDashGearState_Lv4::UpdateTargetArmLength(float DeltaTime, int32 DataIndex)
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetMesh()) { return; }
-	OwnerPlayer->GetMesh()->SetVisibility(bInVisibility);
+	if (!CameraData.IsValidIndex(DataIndex)
+		|| !OwnerPlayer->GetSpringArmComponent()) { return; }
+
+	auto* Camera = OwnerPlayer->GetSpringArmComponent();
+
+	const float CurrentArmLength	= Camera->TargetArmLength;
+	const float TargetArmLength		= CameraData[DataIndex].TargetArmLength;
+	const float ArmLengthLerpSpeed	= CameraData[DataIndex].ArmLengthLerpSpeed;
+
+	const float ResultArmLength = FMath::FInterpTo(
+		CurrentArmLength, TargetArmLength, DeltaTime, ArmLengthLerpSpeed);
+
+	Camera->TargetArmLength = ResultArmLength;
 }
 
-void UDashGearState_Lv4::SetMeshHiddenInGame(bool bInHiddenInGame) const
+int32 UDashGearState_Lv4::GetCurrentSectionIndex(float InElapsedTime)
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetMesh()) { return; }
-	OwnerPlayer->GetMesh()->SetHiddenInGame(bInHiddenInGame);
+	float ElapsedTime = InElapsedTime;
 
+	for (int32 DataIndex = 0; DataIndex < CameraData.Num(); ++DataIndex) {
+
+		ElapsedTime -= CameraData[DataIndex].Time;
+		if (ElapsedTime <= 0.f) {
+			return DataIndex;
+		}
+	}
+
+	return 0;
 }
+
