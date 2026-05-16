@@ -2,6 +2,11 @@
 
 #include "Camera/CameraComponent.h"
 #include <GameFramework/SpringArmComponent.h>
+
+#include "Animation/AnimSingleNodeInstance.h"
+#include "Animation/AnimationAsset.h"
+#include "Components/SkeletalMeshComponent.h"
+
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
@@ -12,6 +17,7 @@
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
+#include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 
 
 APlayerBase::APlayerBase()
@@ -56,6 +62,11 @@ void APlayerBase::BeginPlay()
 		AutoAttack->Initialize(this);
 	}
 
+	if (ModelAfterimageTrailEffect) {
+		ModelAfterimageTrailEffect->SetOwnerActor(this);
+		ModelAfterimageTrailEffect->SetCanAddTrailPoint(true);
+	}
+
 	UpdateHUDHP();
 }
 
@@ -71,6 +82,16 @@ void APlayerBase::Tick(float DeltaTime)
 		AutoAttack->Update(DeltaTime,nullptr,enemyManager);
 	}
 
+	
+	if (ModelAfterimageTrailEffect) {
+
+		if (!GetMesh()->GetSingleNodeInstance()) { return; }
+		UE_LOG(LogTemp, Warning, TEXT("hi ssss"));
+		ModelAfterimageTrailEffect->Update(DeltaTime, GetMesh()->GetSkeletalMeshAsset(),
+			GetMesh()->GetSingleNodeInstance()->GetAnimationAsset(), GetMesh()->GetPosition());
+	}
+	
+	
 	if (ARobotController* RobotController = Cast<ARobotController>(GetController())) {
 		HUDWidget = RobotController->GetPlayerHUD();
 	}

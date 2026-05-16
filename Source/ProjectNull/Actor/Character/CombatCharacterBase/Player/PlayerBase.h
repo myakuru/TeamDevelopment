@@ -13,6 +13,7 @@ class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
 class UPlayerAnimInstance;
+class UModelAfterimageTrailEffect;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
@@ -71,4 +72,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> Instance;
 
+
+	UPROPERTY(EditAnywhere,Instanced,Category = "ModelAfterimageTrailEffect")
+	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;
 };

@@ -6,7 +6,7 @@
 #include "GhostActor.generated.h"
 
 /** ゴーストアクタークラス
-* アクターオブジェクトの残像表現 */
+* アクターオブジェクトの残像表現クラス */
 UCLASS()
 class PROJECTNULL_API AGhostActor final : public AActor
 {
@@ -18,7 +18,10 @@ protected:
 	void BeginPlay() override;
 public:	
 
-	void Tick(float DeltaTime) override;
+
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					class UAnimationAsset* Animation,
+					float InAnimPoseTime);
 
 	/**
 	 * @brief 初期化処理
@@ -31,6 +34,8 @@ public:
 					float PoseTime,
 					float InLifeTime,
 					float InOpacityDecayRate);
+
+	void Update(float DeltaTime);
 
 private:
 
