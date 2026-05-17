@@ -2,9 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Delegates/DelegateCombinations.h"
 #include "StageButtonWidget.generated.h"
 
 class UButton;
+
+/** デリゲート宣言 */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedStageButton, int32, InStageIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHoveredStageButton, int32, InStageIndex);
 
 /**
  * stageSelectHUDWidgetで使用するstageボタン
@@ -18,14 +23,17 @@ protected:
 
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UButton> StageButton;
+	UPROPERTY(meta = (BindWidget))
+	UButton* StageButton;
 
 	UFUNCTION()
 	void OnClickedStageButton();
 
+	UFUNCTION()
+	void OnHoveredStageButton();
+
 	UPROPERTY()
-	int32 StageIndex = 0;
+	int32 StageIndex = 1;
 
 public:
 
@@ -33,4 +41,10 @@ public:
 	UFUNCTION()
 	void Setup(int32 InStageIndex);
 
+	//デリゲートの宣言
+	UPROPERTY(BlueprintAssignable)
+	FOnClickedStageButton OnClicked;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHoveredStageButton OnHovered;
 };

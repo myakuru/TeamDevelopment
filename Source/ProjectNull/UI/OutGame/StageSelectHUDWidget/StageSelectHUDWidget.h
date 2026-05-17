@@ -6,7 +6,7 @@
 
 class UTextBlock;
 class UStageDataAsset;
-class UVerticalBox;
+class UCanvasPanel;
 class UStageButtonWidget;
 
 /**
@@ -21,20 +21,32 @@ protected:
 
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> StageNameText;
+	void CreateStageButtons();
 
-	/** ステージのデータリスト */
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStageDataAsset> StageDataAsset;
+	/** ステージボタンのデリゲート */
+	UFUNCTION()
+	void OnClickedStageButton(int32 InStageIndex);
 
-	/** ステージリストを表示するVerticalBox */
-	//UPROPERTY(meta = (BindWidget))
-	//UVerticalBox* StageListBox;
+	UFUNCTION()
+	void OnHoveredStageButton(int32 InStageIndex);
 
+	/** ステージデータの参照 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
+	UStageDataAsset* StageDataList;
+
+	/** 現在選択されているステージのインデックス */
 	UPROPERTY()
 	int32 CurrentSelectedStageIndex = 0;
 
+	/** ステージ詳細UI */
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UStageButtonWidget> StageButton;
+	TObjectPtr<UTextBlock> StageNameText;
+
+	/** ステージリストを表示するCanvasPanel */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UCanvasPanel> StageCanvas;
+
+	/** ステージボタンのクラス参照 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stage")
+	TSubclassOf<UStageButtonWidget> StageButtonWidgetClass;
 };

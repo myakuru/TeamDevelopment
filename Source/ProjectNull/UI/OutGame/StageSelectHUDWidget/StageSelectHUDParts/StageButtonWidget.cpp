@@ -1,21 +1,29 @@
 ﻿#include "StageButtonWidget.h"
 #include "Components/Button.h"
 
-#include "Kismet/GameplayStatics.h"
-
 void UStageButtonWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	if (StageButton)
 	{
+		StageButton->bIsVariable = true;
+
 		StageButton->OnClicked.AddUniqueDynamic(this, &UStageButtonWidget::OnClickedStageButton);
+		StageButton->OnHovered.AddUniqueDynamic(this, &UStageButtonWidget::OnHoveredStageButton);
 	}
 }
 
 void UStageButtonWidget::OnClickedStageButton()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), FName(*FString::Printf(TEXT("Stage%dMapVer4"), StageIndex)));
+	if (!OnClicked.IsBound())return;
+	OnClicked.Broadcast(StageIndex);
+}
+
+void UStageButtonWidget::OnHoveredStageButton()
+{
+	if (!OnHovered.IsBound())return;
+	OnHovered.Broadcast(StageIndex);
 }
 
 void UStageButtonWidget::Setup(int32 InStageIndex)
