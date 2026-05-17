@@ -82,11 +82,25 @@ void APlayerBase::Tick(float DeltaTime)
 		AutoAttack->Update(DeltaTime,nullptr,enemyManager);
 	}
 
-	
+	//Main Status
+
+	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (!AnimInstance) return;
+
+	int32 MachineIndex =
+		AnimInstance->GetStateMachineIndex(TEXT("Main Status"));
+
+	FName StateName =
+		AnimInstance->GetCurrentStateName(MachineIndex);
+
+	float CurrentTime =
+		AnimInstance->GetRelevantAnimTime(MachineIndex, );*/
+
 	if (ModelAfterimageTrailEffect) {
 
 		if (!GetMesh()->GetSingleNodeInstance()) { return; }
-		UE_LOG(LogTemp, Warning, TEXT("hi ssss"));
+		//UE_LOG(LogTemp, Warning, TEXT("hi ssss"));
 		ModelAfterimageTrailEffect->Update(DeltaTime, GetMesh()->GetSkeletalMeshAsset(),
 			GetMesh()->GetSingleNodeInstance()->GetAnimationAsset(), GetMesh()->GetPosition());
 	}
