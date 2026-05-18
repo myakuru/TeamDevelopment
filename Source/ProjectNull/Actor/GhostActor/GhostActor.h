@@ -27,10 +27,18 @@ public:
 					float InLifeTime,
 					float InOpacityDecayRate);
 
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					class UAnimationAsset* Animation,
+					float InPoseTime,
+					float InLifeTime,
+					float InOpacityDecayRate);
+
 
 	void Update(float DeltaTime);
 
 private:
+
+	void Initialize(class USkeletalMesh* SkeletalMesh);
 
 
 	UPROPERTY(VisibleAnywhere)
@@ -39,7 +47,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> Mesh;
 
-	UPROPERTY(EditAnywhere, Category = "Ghost")
+	UPROPERTY(EditAnywhere, Category = "Material")
 	TObjectPtr<UMaterialInterface> GhostMaterial;
 
 	UPROPERTY()
@@ -53,11 +61,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float LifeTime;
 
-	UPROPERTY(EditAnywhere)
-	float OpacityDecayRate;
-
-	float Opacity;
-
 	/** 時間管理用 */
 	float CurrentTime;
 
@@ -69,4 +72,16 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Material")
 	FLinearColor StartRimColor;
 
+	/** 縁の鮮明さ */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float RimSharpness;
+
+	/** 縁の強さ */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float RimStrength;
+
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float OpacityDecayRate;
+
+	float Opacity;
 };

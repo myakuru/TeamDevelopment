@@ -145,6 +145,16 @@ UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 	return Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
+FPoseSnapshot& APlayerBase::GetPlayerPoseSnapshot()
+{
+	FPoseSnapshot PoseSnapshot;
+	if (!GetMesh() || !GetMesh()->GetAnimInstance()
+		|| !Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance())) { return PoseSnapshot; }
+
+	auto* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	return PlayerAnimInstance->GetPlayerPoseSnapshot();
+}
+
 bool APlayerBase::CanMove()
 {
 	if(GearComponent && GearComponent->IsMovementBlockedByGear()) {

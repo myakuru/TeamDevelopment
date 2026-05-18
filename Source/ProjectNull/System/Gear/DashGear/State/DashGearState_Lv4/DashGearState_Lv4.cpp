@@ -64,7 +64,7 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 
 	UpdateCombatStance(ElapsedTime);
 
-	AfterImageAttackEffect->Update(DeltaTime, ElapsedTime, StartPlayerTransform);
+	AfterImageAttackEffect->Update(DeltaTime, ElapsedTime,OwnerPlayer->GetActorTransform());
 
 	UpdateCamera(DeltaTime);
 }

@@ -21,7 +21,6 @@ void UAfterImageAttackEffect::Start()
 void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const FTransform& PlayerTransform)
 {
 
-
 	for (auto& Data : AfterImageDataArray) {
 
 		if (Data.TimeThreshold > ElapsedTime) { continue; }
@@ -37,8 +36,7 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 			if (Ghost) {
 
 				Ghost->SetActorTransform(Data.Transform);
-				Ghost->Initialize(SkeletalMesh,
-					AnimationAsset, Data.PoseTime,Data.LifeTime,Data.OpacityDecayRate);
+				Ghost->Initialize(SkeletalMesh,AnimationAsset,Data.PoseTime,Data.LifeTime, Data.OpacityDecayRate);
 				Data.GhostActor = Ghost;
 			}
 			Data.bSpawn = true;
@@ -53,7 +51,7 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 			const FVector Right = PlayerMatrix.GetUnitAxis(EAxis::Y);
 			const FVector Up = PlayerMatrix.GetUnitAxis(EAxis::Z);
 			const FVector Offset = Data.CalcLocationOffset(Time / Data.Time);
-			
+
 			const FVector ResultLocation = PlayerLocation
 				+ Forward * Offset.X
 				+ Right * Offset.Y
@@ -67,15 +65,6 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 		}
 
 	}
-}
-
-float UAfterImageAttackEffect::GetTotalTime()
-{
-	float TotalTime = 0.0f;
-	for (auto& Data : AfterImageDataArray) {
-		TotalTime += Data.Time;
-	}
-	return TotalTime;
 }
 
 float UAfterImageAttackEffect::GetMaxTime()

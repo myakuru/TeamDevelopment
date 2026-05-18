@@ -46,6 +46,7 @@ public:
 	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return Instance; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
+	FPoseSnapshot&							GetPlayerPoseSnapshot();
 
 private:
 

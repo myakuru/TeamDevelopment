@@ -86,7 +86,6 @@ public:
 				const FTransform& PlayerTransform);
 
 
-	float GetTotalTime();
 	float GetMaxTime();
 
 	/** 残像攻撃データ */

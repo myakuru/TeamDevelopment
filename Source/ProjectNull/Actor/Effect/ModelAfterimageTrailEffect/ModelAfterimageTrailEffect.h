@@ -21,24 +21,6 @@ public:
 	/**
 	 * @brief 更新
 	 * @param DeltaTime デルタタイム
-	 */
-	void Update(float DeltaTime);
-
-	/**
-	 * @brief UAnimationAsset
-	 * @param DeltaTime デルタタイム
-	 * @param SkeletalMesh スケルタルメッシュ
-	 * @param AnimationAsset アニメーション
-	 * @param InAnimPoseTime アニメーションを停止して描画する際のアニメーション時間閾値
-	 */
-	void Update(float DeltaTime,
-				class USkeletalMesh* InSkeletalMesh,
-				class UAnimationAsset* InAnimationAsset,
-				float InAnimPoseTime);
-
-	/**
-	 * @brief 更新
-	 * @param DeltaTime デルタタイム
 	 * @param InSkeletalMesh スケルタルメッシュ
 	 * @param InSnapshot スナップショット
 	 */
@@ -60,11 +42,6 @@ private:
 	 * @brief 残像ポイントの追加処理
 	 * @param InAnimPoseTime アニメーションを停止して描画する際のアニメーション時間閾値
 	 */
-	void AddAfterimageTrail();
-
-	void AddAfterimageTrail(class USkeletalMesh* InSkeletalMesh,
-		class UAnimationAsset* InAnimationAsset,
-		float InAnimPoseTime);
 
 	void AddAfterimageTrail(class USkeletalMesh* InSkeletalMesh,
 		const FPoseSnapshot& InSnapshot);
