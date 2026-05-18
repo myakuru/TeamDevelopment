@@ -32,8 +32,9 @@ private:
 	/**
 	 * @brief ノックバック更新処理
 	 * @param a_DeltaTime デルタタイム
+	 * @return ノックバック停止時はtrue
 	 */
-	void MoveToKnockBack(const float a_DeltaTime);
+	bool MoveToKnockBack(const float a_DeltaTime);
 
 protected:
 
@@ -43,7 +44,7 @@ protected:
 
 	/**	ノックバックに必要な情報を格納しているデータテーブル */
 	UPROPERTY(EditAnywhere, Category = "Data")
-	TObjectPtr<UDataTable> KnockBackDataTable;
+	TObjectPtr<UDataTable> KnockBackDataTable = nullptr;
 
 	/**	ノックバック速度 */
 	UPROPERTY()

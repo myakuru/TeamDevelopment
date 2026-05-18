@@ -32,6 +32,18 @@ AEnemyBase::AEnemyBase()
 	// 敵のランタイムパラメータ管理クラスの生成
 	EnemyRuntimeData		= CreateDefaultSubobject<UEnemyRuntimeData>("EnemyRuntimeData");
 
+	// カプセル形状コリジョンの生成・プリセット設定
+	{
+		CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("CapsuleCollision");
+		CapsuleComponent->InitCapsuleSize(34.f, 88.f);
+		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+		CapsuleComponent->CanCharacterStepUpOn = ECB_No;
+		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
+		CapsuleComponent->SetCanEverAffectNavigation(false);
+		CapsuleComponent->bDynamicObstacle = true;
+		RootComponent = CapsuleComponent;
+	}
+
 	StateTreeComponent		= CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
 }
 
@@ -57,20 +69,10 @@ void AEnemyBase::BeginPlay()
 		EnemyManager->RegisterEnemy(this);
 	}
 
-	CapsuleCollision = nullptr;
-
-	CapsuleCollision = FindComponentByClass<UCapsuleComponent>();
-
-	//CapsuleCollision = GetCapsuleComponent();
-
-	// コリジョンプリセット設定
-	if (CapsuleCollision)
+	// カプセルコリジョンをRootにセット
+	if (CapsuleComponent)
 	{
-		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		CapsuleCollision->SetCollisionObjectType(ECC_Pawn);
-		CapsuleCollision->SetCollisionResponseToAllChannels(ECR_Block);
-		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		CapsuleCollision->SetGenerateOverlapEvents(true);
+		RootComponent = CapsuleComponent;
 	}
 
 	// コンポーネントに自身の参照を渡す
@@ -236,7 +238,7 @@ void AEnemyBase::OnDeath()
 		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
 		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
-
+	
 	// PoolSubSystemに返却する
 	// Return()の中でDeactivate()が呼ばれて非表示・Tick停止でPool待機に戻る
 	if (UEnemyPoolSubSystem* PoolSubSystem =
@@ -313,24 +315,14 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		EnemyManager->RegisterEnemy(this);
 	}
 
-	AnimTime = 0.0f;
-	AnimIndex = 0;
-
-	
-	{
-		//EnemyMesh->SetVisibility(false);
-		//EnemyMesh()->GetMesh()->SetVisibility(false);
-		//EnemyMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-
 	// コリジョンプリセット設定
-	if (CapsuleCollision)
+	if (CapsuleComponent)
 	{
-		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		CapsuleCollision->SetCollisionObjectType(ECC_Pawn);
-		CapsuleCollision->SetCollisionResponseToAllChannels(ECR_Block);
-		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		CapsuleCollision->SetGenerateOverlapEvents(true);
+		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CapsuleComponent->SetCollisionObjectType(ECC_Pawn);
+		CapsuleComponent->SetCollisionResponseToAllChannels(ECR_Block);
+		CapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CapsuleComponent->SetGenerateOverlapEvents(true);
 	}
 
 	// コンポーネントに自身の参照を渡す

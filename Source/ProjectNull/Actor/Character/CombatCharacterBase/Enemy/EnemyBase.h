@@ -191,11 +191,7 @@ protected:
 
 	/** SphereCollisionを取得して使うための関数 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Collision")
-	UCapsuleComponent* CapsuleCollision;
-
-	/** 敵のモデル*/
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
-	//TObjectPtr<USkeletalMeshComponent> EnemyMesh;
+	TObjectPtr<UCapsuleComponent> CapsuleComponent;
 
 	/** 敵のStateTree*/
 	UPROPERTY(VisibleAnywhere, Category = "StateTree")
