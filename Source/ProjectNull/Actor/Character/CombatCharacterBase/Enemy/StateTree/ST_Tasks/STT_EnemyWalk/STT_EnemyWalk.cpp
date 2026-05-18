@@ -35,7 +35,6 @@ void USTT_EnemyWalk::ExitState(FStateTreeExecutionContext& a_Context, const FSta
 	Super::ExitState(a_Context, a_Transition);
 }
 
-
 void USTT_EnemyWalk::Move(const float a_DeltaTime)
 {
 	if (!OwnerEnemy) { return; }
@@ -48,8 +47,8 @@ void USTT_EnemyWalk::Move(const float a_DeltaTime)
 	const FRotator calcResultRot = CalculateRotationToMoveDir(
 									OwnerEnemy->GetActorRotation(),
 									MoveDir.Rotation(),
-									_RotSpeed,
-									a_DeltaTime
+									a_DeltaTime,
+									_RotSpeed
 								);
 	// 角度更新
 	OwnerEnemy->SetActorRotation(calcResultRot);
@@ -70,11 +69,11 @@ FVector USTT_EnemyWalk::CalculateNextActorLocation(const FVector& a_CurrentLocat
 	return a_CurrentLocation + a_MoveDir * a_MoveSpeed * a_DeltaTime;
 }
 
-FRotator USTT_EnemyWalk::CalculateRotationToMoveDir(const FRotator& a_CurrentRot, const FRotator& a_TargetRot, float a_RotSpeed, float a_DeltaTime)
+FRotator USTT_EnemyWalk::CalculateRotationToMoveDir(const FRotator& a_CurrentRot, const FRotator& a_TargetRot, float a_DeltaTime, float a_RotSpeed)
 {
 	return FMath::RInterpTo(
 						a_CurrentRot,
 						a_TargetRot,
-						a_RotSpeed,
-						a_DeltaTime);
+						a_DeltaTime,
+						a_RotSpeed);
 }

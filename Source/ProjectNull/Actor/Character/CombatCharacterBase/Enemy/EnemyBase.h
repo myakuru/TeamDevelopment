@@ -173,9 +173,10 @@ protected:
 
 	/** 敵（自身）のパラメータを更新する */
 	virtual void UpdateParams();
-	/** SphereCollisionを取得して使うための関数 */
+	
+	/** CupsuleCollisionを取得して使うための関数 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Collision")
-	UCapsuleComponent* CapsuleCollision;
+	TObjectPtr<UCapsuleComponent> CapsuleComponent;
 
 	/** 敵のモデル*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")

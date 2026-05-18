@@ -51,7 +51,7 @@ private:
 	 * @param a_DeltaTime	デルタタイム
 	 * @return	更新結果 
 	 */
-	FVector CalculateNextActorLocation(const FVector& a_CurrentLocation,const FVector& a_MoveDir, float a_MoveSpeed, float a_DeltaTime);
+	FVector CalculateNextActorLocation(const FVector& a_CurrentLocation, const FVector& a_MoveDir, float a_DeltaTime, float a_MoveSpeed);
 
 private:
 
