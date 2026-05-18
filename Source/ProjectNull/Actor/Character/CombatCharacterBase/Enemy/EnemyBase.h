@@ -193,10 +193,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Collision")
 	TObjectPtr<UCapsuleComponent> CapsuleComponent;
 
-	/** 敵のモデル*/
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
-	//TObjectPtr<USkeletalMeshComponent> EnemyMesh;
-
 	/** 敵のStateTree*/
 	UPROPERTY(VisibleAnywhere, Category = "StateTree")
 	TObjectPtr<UStateTreeComponent> StateTreeComponent;

@@ -44,9 +44,6 @@ AEnemyBase::AEnemyBase()
 		RootComponent = CapsuleComponent;
 	}
 
-	EnemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>("SkeltalMesh");
-	EnemyMesh->SetupAttachment(CapsuleComponent);
-
 	StateTreeComponent		= CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
 }
 
@@ -319,13 +316,13 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	}
 
 	// コリジョンプリセット設定
-	if (CapsuleCollision)
+	if (CapsuleComponent)
 	{
-		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		CapsuleCollision->SetCollisionObjectType(ECC_Pawn);
-		CapsuleCollision->SetCollisionResponseToAllChannels(ECR_Block);
-		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		CapsuleCollision->SetGenerateOverlapEvents(true);
+		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CapsuleComponent->SetCollisionObjectType(ECC_Pawn);
+		CapsuleComponent->SetCollisionResponseToAllChannels(ECR_Block);
+		CapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CapsuleComponent->SetGenerateOverlapEvents(true);
 	}
 
 	// コンポーネントに自身の参照を渡す
@@ -403,7 +400,7 @@ void AEnemyBase::SpawnDeathEffect()
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			EnemyParticle.DeathEffect,
-			EnemyMesh->GetComponentLocation(),
+			GetActorLocation(),
 			GetActorRotation(),
 			FVector(1.0f),
 			true,   // bAutoDestroy
