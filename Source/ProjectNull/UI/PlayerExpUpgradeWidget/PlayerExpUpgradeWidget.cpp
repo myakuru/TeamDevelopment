@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include <ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.h>
 #include "Components/Image.h"
+#include "Components/CanvasPanel.h"
 
 void UPlayerExpUpgradeWidget::NativeConstruct()
 {
@@ -94,9 +95,6 @@ void UPlayerExpUpgradeWidget::OpenWidget()
 	// 強化画面の初期化
 	InitUpgradeWidget();
 
-	// 画面を一旦停止する
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
-
 	// マウスカーソルを表示する
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
@@ -105,6 +103,9 @@ void UPlayerExpUpgradeWidget::OpenWidget()
 		PlayerController->bShowMouseCursor = true;
 		PlayerController->SetInputMode(FInputModeUIOnly());
 	}
+
+	// 画面を一旦停止する
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
 
 void UPlayerExpUpgradeWidget::CloseWidget()
@@ -112,17 +113,20 @@ void UPlayerExpUpgradeWidget::CloseWidget()
 	SetVisibility(ESlateVisibility::Hidden);
 	SetIsEnabled(false);
 
-	// 画面を再生する
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
-
 	// マウスカーソルを非表示にする
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
 	if (PlayerController)
 	{
 		PlayerController->bShowMouseCursor = false;
+		PlayerController->FlushPressedKeys();
+		PlayerController->SetIgnoreMoveInput(false);
+		PlayerController->SetIgnoreLookInput(false);
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
+
+	// 画面を再生する
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
 void UPlayerExpUpgradeWidget::BackgroundImageFadeIn()
