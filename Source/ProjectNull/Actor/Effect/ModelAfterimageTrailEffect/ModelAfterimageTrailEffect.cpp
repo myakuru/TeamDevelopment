@@ -111,7 +111,7 @@ void UModelAfterimageTrailEffect::AddAfterimageTrail()
 
 	auto* Ghost = GetWorld()->SpawnActor<AGhostActor>(GhostClass);
 	if (!Ghost) { return; }
-	Ghost->Initialize(SkeletalMesh, AnimationAsset, AnimPoseTime);
+	Ghost->Initialize(SkeletalMesh,);
 
 	if (!OwnerActor) { return; }
 

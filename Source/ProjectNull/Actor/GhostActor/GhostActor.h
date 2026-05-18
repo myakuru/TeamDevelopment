@@ -20,27 +20,18 @@ public:
 
 
 	void Initialize(class USkeletalMesh* SkeletalMesh,
-					class UAnimationAsset* Animation,
-					float InAnimPoseTime);
-
-	void Initialize(class USkeletalMesh* SkeletalMesh,
 					const FPoseSnapshot& InSnapshot);
 
-	/**
-	 * @brief 初期化処理
-	 * @param SkeletalMesh 残像表現するスケルタルメッシュ
-	 * @param Animation アニメーション
-	 * @param PoseTime 固定するアニメーションを地点時間
-	 */
 	void Initialize(class USkeletalMesh* SkeletalMesh,
-					class UAnimationAsset* Animation,
-					float PoseTime,
+					const FPoseSnapshot& InSnapshot,
 					float InLifeTime,
 					float InOpacityDecayRate);
+
 
 	void Update(float DeltaTime);
 
 private:
+
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
@@ -76,9 +67,6 @@ private:
 
 	/** 縁の色 */
 	UPROPERTY(EditAnywhere, Category = "Material")
-	FLinearColor StartColor;
+	FLinearColor StartRimColor;
 
-	/** ベース色 */
-	UPROPERTY(EditAnywhere, Category = "Material")
-	FLinearColor StartBaseColor;
 };

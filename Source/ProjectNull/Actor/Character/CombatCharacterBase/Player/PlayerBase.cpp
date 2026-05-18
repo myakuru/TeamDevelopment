@@ -86,24 +86,7 @@ void APlayerBase::Tick(float DeltaTime)
 
 	auto* AnimInstance = GetMesh()->GetAnimInstance();
 	if (!AnimInstance) { return; }
-	/*FPoseSnapshot Snapshot;
-	AnimInstance->SnapshotPose(Snapshot);
-
-	AnimInstance->GetPoseSnapshot();*/
-
-	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (!AnimInstance) return;
-
-	int32 MachineIndex =
-		AnimInstance->GetStateMachineIndex(TEXT("Main Status"));
-
-	FName StateName =
-		AnimInstance->GetCurrentStateName(MachineIndex);
-
-	float CurrentTime =
-		AnimInstance->GetRelevantAnimTime(MachineIndex, );*/
-
+	
 	//FPoseSnapshot
 
 	FPoseSnapshot Result;
