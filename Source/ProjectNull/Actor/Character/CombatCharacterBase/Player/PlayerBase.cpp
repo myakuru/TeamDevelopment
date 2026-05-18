@@ -72,17 +72,24 @@ void APlayerBase::BeginPlay()
 
 void APlayerBase::Tick(float DeltaTime)
 {
-	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!enemyManager) { return; }
+	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+	if (!EnemyManager) { return; }
 
 	
 	ACombatCharacterBase::Tick(DeltaTime);
 
 	if (AutoAttack) {
-		AutoAttack->Update(DeltaTime,nullptr,enemyManager);
+		AutoAttack->Update(DeltaTime,nullptr, EnemyManager);
 	}
 
 	//Main Status
+
+	auto* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance) { return; }
+	/*FPoseSnapshot Snapshot;
+	AnimInstance->SnapshotPose(Snapshot);
+
+	AnimInstance->GetPoseSnapshot();*/
 
 	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
@@ -97,12 +104,19 @@ void APlayerBase::Tick(float DeltaTime)
 	float CurrentTime =
 		AnimInstance->GetRelevantAnimTime(MachineIndex, );*/
 
+	//FPoseSnapshot
+
+	FPoseSnapshot Result;
+
+	if (auto* Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		Result = Anim->GetPlayerPoseSnapshot();
+	}
+
 	if (ModelAfterimageTrailEffect) {
 
-		if (!GetMesh()->GetSingleNodeInstance()) { return; }
-		//UE_LOG(LogTemp, Warning, TEXT("hi ssss"));
 		ModelAfterimageTrailEffect->Update(DeltaTime, GetMesh()->GetSkeletalMeshAsset(),
-			GetMesh()->GetSingleNodeInstance()->GetAnimationAsset(), GetMesh()->GetPosition());
+			Result);
 	}
 	
 	

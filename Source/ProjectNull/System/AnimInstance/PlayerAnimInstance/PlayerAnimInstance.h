@@ -6,22 +6,25 @@
 
 /** プレイヤーのアニメーションインスタンスクラス */
 UCLASS()
-class PROJECTNULL_API UPlayerAnimInstance : public UAnimInstance
+class PROJECTNULL_API UPlayerAnimInstance final : public UAnimInstance
 {
 	GENERATED_BODY()
 public:
 	UPlayerAnimInstance();
 public:
+
+	void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	inline FPoseSnapshot& GetPlayerPoseSnapshot() { return PlayerPoseSnapshot; }
+
 	/** 戦闘構え状態か */
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsCombatStance;
 
-	/** 現在のアニメーションアセット */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TObjectPtr<UAnimationAsset> CurrentAnimationAsset;
+private:
 
-	/** 現在のアニメーション閾値 */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float CurrentAnimationTime;
+	void SavePoseSnapshot();
 
+	UPROPERTY()
+	FPoseSnapshot PlayerPoseSnapshot;
 };

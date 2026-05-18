@@ -37,6 +37,16 @@ public:
 				float InAnimPoseTime);
 
 	/**
+	 * @brief 更新
+	 * @param DeltaTime デルタタイム
+	 * @param InSkeletalMesh スケルタルメッシュ
+	 * @param InSnapshot スナップショット
+	 */
+	void Update(float DeltaTime,
+				class USkeletalMesh* InSkeletalMesh,
+				const FPoseSnapshot& InSnapshot);
+
+	/**
 	 * @brief このクラスで管理しているすべての残像オブジェクトをワールドから削除
 	 */
 	void AllDestroy();
@@ -55,6 +65,9 @@ private:
 	void AddAfterimageTrail(class USkeletalMesh* InSkeletalMesh,
 		class UAnimationAsset* InAnimationAsset,
 		float InAnimPoseTime);
+
+	void AddAfterimageTrail(class USkeletalMesh* InSkeletalMesh,
+		const FPoseSnapshot& InSnapshot);
 
 	UPROPERTY()
 	TObjectPtr<AActor> OwnerActor;

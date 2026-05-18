@@ -72,6 +72,32 @@ void UModelAfterimageTrailEffect::Update(float DeltaTime, USkeletalMesh* InSkele
 	}
 }
 
+void UModelAfterimageTrailEffect::Update(float DeltaTime, USkeletalMesh* InSkeletalMesh, const FPoseSnapshot& InSnapshot)
+{
+	if (!InSkeletalMesh) { return; }
+	if (!bCanAddTrailPoint) {
+		if (TrailAddTimer != 0.0f) { TrailAddTimer = 0.0f; }
+		return;
+	}
+
+	TrailAddTimer += DeltaTime;
+
+	if (TrailAddTimer >= TrailAddInterval) {
+		AddAfterimageTrail(InSkeletalMesh,InSnapshot);
+		TrailAddTimer = 0.0f;
+	}
+
+	if (TrailPointDataArray.Num() > TrailMaxLength) {
+		auto* PopData = TrailPointDataArray.Pop();
+		if (!PopData) { return; }
+		PopData->Destroy();
+	}
+
+	for (auto& Data : TrailPointDataArray) {
+		Data->Update(DeltaTime);
+	}
+}
+
 void UModelAfterimageTrailEffect::AllDestroy()
 {
 	for (auto& Data : TrailPointDataArray) {
@@ -102,6 +128,22 @@ void UModelAfterimageTrailEffect::AddAfterimageTrail(USkeletalMesh* InSkeletalMe
 	auto* Ghost = GetWorld()->SpawnActor<AGhostActor>(GhostClass);
 	if (!Ghost) { return; }
 	Ghost->Initialize(InSkeletalMesh, InAnimationAsset, InAnimPoseTime);
+
+	if (!OwnerActor) { return; }
+
+	Ghost->SetActorTransform(OwnerActor->GetActorTransform());
+
+	TrailPointDataArray.Insert(Ghost, 0);
+}
+
+void UModelAfterimageTrailEffect::AddAfterimageTrail(USkeletalMesh* InSkeletalMesh, const FPoseSnapshot& InSnapshot)
+{
+	if (!InSkeletalMesh) { return; }
+	if (!bCanAddTrailPoint) { return; }
+
+	auto* Ghost = GetWorld()->SpawnActor<AGhostActor>(GhostClass);
+	if (!Ghost) { return; }
+	Ghost->Initialize(InSkeletalMesh,InSnapshot);
 
 	if (!OwnerActor) { return; }
 

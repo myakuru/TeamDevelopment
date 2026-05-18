@@ -23,6 +23,9 @@ public:
 					class UAnimationAsset* Animation,
 					float InAnimPoseTime);
 
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					const FPoseSnapshot& InSnapshot);
+
 	/**
 	 * @brief 初期化処理
 	 * @param SkeletalMesh 残像表現するスケルタルメッシュ
@@ -38,6 +41,9 @@ public:
 	void Update(float DeltaTime);
 
 private:
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> Root;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> Mesh;
