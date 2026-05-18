@@ -26,13 +26,14 @@ void AEnemyGruntBase::Tick(float DeltaTime)
 void AEnemyGruntBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	AEnemyBase::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 	
+	AnimTime += DeltaTime;
+
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
 

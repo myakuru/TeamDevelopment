@@ -15,6 +15,7 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -263,11 +264,11 @@ void AEnemyBase::CheckCanAttack()
 
 void AEnemyBase::SetAnimSequence(UAnimSequence* AnimSequence, bool LoopFlg = false)
 {
-	if (EnemyMesh && AnimSequence)
+	/*if (EnemyMesh && AnimSequence)
 	{
 		EnemyMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 		EnemyMesh->PlayAnimation(AnimSequence, LoopFlg);
-	}
+	}*/
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)
@@ -312,6 +313,16 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		EnemyManager->RegisterEnemy(this);
 	}
 
+	AnimTime = 0.0f;
+	AnimIndex = 0;
+
+	
+	{
+		//EnemyMesh->SetVisibility(false);
+		//EnemyMesh()->GetMesh()->SetVisibility(false);
+		//EnemyMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
 	// コリジョンプリセット設定
 	if (CapsuleCollision)
 	{
@@ -331,6 +342,12 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	UpdateParams();
 
 	SetActorLocation(LocalPos);
+
+	/** ISMManagerへの自己登録*/
+	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
+	{
+		ISMManager->RegisterEnemy(this);
+	}
 
 #if WITH_EDITOR
 	SetFolderPath(TEXT("Pool/Active"));
@@ -357,6 +374,14 @@ void AEnemyBase::Deactivate()
 	}
 
 	EnemyStatus.StateTag = EEnemyState::None;
+
+	if (!EnemyManager) { return; }
+
+	/** ISMManagerから解除*/
+	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
+	{
+		ISMManager->UnregisterEnemy(this);
+	}
 }
 
 void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)
