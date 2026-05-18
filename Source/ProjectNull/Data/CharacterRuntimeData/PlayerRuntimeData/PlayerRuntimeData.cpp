@@ -6,6 +6,8 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData():
 	Owner(nullptr),
@@ -37,7 +39,7 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 	Experience.Add(Amount);
 	
 	// 経験値によるレベルアップ
-	while (Experience.CanLevelUp())
+	if (Experience.Current >= Experience.ExperienceToNextLevel)
 	{
 		Experience.Current -= Experience.ExperienceToNextLevel;
 
@@ -75,6 +77,14 @@ void UPlayerRuntimeData::LevelUp()
 	Level++;
 
 	UpdateStatus();
+
+	if (!RobotController)
+	{
+		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
+	}
+
+	RobotController->OpenPlayerExpUpgradeWidget();
+
 	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
 	UE_LOG(LogTemp, Warning, TEXT("hi ExperienceToNextLevel %.0f"), Experience.ExperienceToNextLevel);
@@ -120,4 +130,3 @@ void UPlayerRuntimeData::UpdateStatus()
 	CalculateFinalSpeed(ParameterData->GetSpeedData(), Owner->GetCurrentGearLevel());
 	ApplyMovementSpeed();
 }
-

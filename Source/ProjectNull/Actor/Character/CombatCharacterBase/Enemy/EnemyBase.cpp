@@ -15,6 +15,7 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -268,11 +269,11 @@ void AEnemyBase::CheckCanAttack()
 
 void AEnemyBase::SetAnimSequence(UAnimSequence* AnimSequence, bool LoopFlg = false)
 {
-	if (EnemyMesh && AnimSequence)
+	/*if (EnemyMesh && AnimSequence)
 	{
 		EnemyMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 		EnemyMesh->PlayAnimation(AnimSequence, LoopFlg);
-	}
+	}*/
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)
@@ -317,6 +318,16 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		EnemyManager->RegisterEnemy(this);
 	}
 
+	// コリジョンプリセット設定
+	if (CapsuleCollision)
+	{
+		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CapsuleCollision->SetCollisionObjectType(ECC_Pawn);
+		CapsuleCollision->SetCollisionResponseToAllChannels(ECR_Block);
+		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CapsuleCollision->SetGenerateOverlapEvents(true);
+	}
+
 	// コンポーネントに自身の参照を渡す
 	{
 		if (EnemyAttackComponent)EnemyAttackComponent->SetOwnerEnemy(this);
@@ -326,6 +337,12 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	UpdateParams();
 
 	SetActorLocation(LocalPos);
+
+	/** ISMManagerへの自己登録*/
+	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
+	{
+		ISMManager->RegisterEnemy(this);
+	}
 
 #if WITH_EDITOR
 	SetFolderPath(TEXT("Pool/Active"));
@@ -352,6 +369,14 @@ void AEnemyBase::Deactivate()
 	}
 
 	EnemyStatus.StateTag = EEnemyState::None;
+
+	if (!EnemyManager) { return; }
+
+	/** ISMManagerから解除*/
+	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
+	{
+		ISMManager->UnregisterEnemy(this);
+	}
 }
 
 void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)

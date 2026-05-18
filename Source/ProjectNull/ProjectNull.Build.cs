@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -16,8 +16,11 @@ public class ProjectNull : ModuleRules
 			"EnhancedInput",
 			"Niagara",
 			"StateTreeModule",
-			"GameplayTags"
-		});
+			"GameplayTags",
+            "UMG",
+			"Slate",
+			"SlateCore"
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

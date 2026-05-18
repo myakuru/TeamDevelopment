@@ -1,16 +1,14 @@
-#include "EnemyPoolSubSystem.h"
+ï»¿#include "EnemyPoolSubSystem.h"
 #include "EnemyPoolConfig.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
 void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
 {
-    // EnemyClass‚ª–¢İ’è‚È‚ç‰½‚à‚µ‚È‚¢
+    // EnemyClassãŒæœªè¨­å®šãªã‚‰ä½•ã‚‚ã—ãªã„
     if (!InPoolConfig || !InPoolConfig->EnemyClass) { return; }
 
-    UE_LOG(LogTemp, Warning, TEXT("WarmUp In"));
-
-    // EnemyData‚ª–¢İ’è‚Ìê‡‚ÍƒGƒ‰[ƒƒO‚ğo‚µ‚ÄI—¹‚·‚é
-    // EnemyData‚ª‹ó‚Ìê‡‚ÍSpawn‚ÉActivate‚ÅƒNƒ‰ƒbƒVƒ…‚·‚é
+    // EnemyDataãŒæœªè¨­å®šã®å ´åˆã¯ã‚¨ãƒ©ãƒ¼ãƒ­ã‚°ã‚’å‡ºã—ã¦çµ‚äº†ã™ã‚‹
+    // EnemyDataãŒç©ºã®å ´åˆã¯Spawnæ™‚ã«Activateã§ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ã™ã‚‹
     if (!InPoolConfig->EnemyData)
     {
         UE_LOG(LogTemp, Error,
@@ -21,9 +19,9 @@ void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
 
     FPrimaryAssetId Key = InPoolConfig->GetPrimaryAssetId();
 
-    // ‚·‚Å‚É“¯‚¶PoolConfig‚ÅWarmUpÏ‚İ‚È‚çƒXƒLƒbƒv‚·‚é
-    // “¯‚¶Config‚ª•¡”ƒtƒF[ƒYƒEƒF[ƒu‚É“o˜^‚³‚ê‚Ä‚¢‚Ä‚à
-    // Actor‚ª“ñd‚É¶¬‚³‚ê‚é‚±‚Æ‚ğ–h‚®
+    // ã™ã§ã«åŒã˜PoolConfigã§WarmUpæ¸ˆã¿ãªã‚‰ã‚¹ã‚­ãƒƒãƒ—ã™ã‚‹
+    // åŒã˜ConfigãŒè¤‡æ•°ãƒ•ã‚§ãƒ¼ã‚ºã‚¦ã‚§ãƒ¼ãƒ–ã«ç™»éŒ²ã•ã‚Œã¦ã„ã¦ã‚‚
+    // ActorãŒäºŒé‡ã«ç”Ÿæˆã•ã‚Œã‚‹ã“ã¨ã‚’é˜²ã
     if (Pools.Contains(Key))
     {
         UE_LOG(LogTemp, Log,
@@ -31,7 +29,7 @@ void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
         return;
     }
 
-    // Pool‚ğV‹Kì¬‚µ‚ÄPoolNum‘Ì•ªActor‚ğ¶¬‚·‚é
+    // Poolã‚’æ–°è¦ä½œæˆã—ã¦PoolNumä½“åˆ†Actorã‚’ç”Ÿæˆã™ã‚‹
     FEnemyPool& Pool = Pools.FindOrAdd(Key);
 
     for (int32 i = 0; i < InPoolConfig->PoolSize; ++i)
@@ -39,14 +37,12 @@ void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
         AEnemyBase* Enemy = CreateNewEnemy(InPoolConfig);
         if (!Enemy) { continue; }
 
-        // ¶¬‚µ‚½Actor‚ğ”ñ•\¦ETick’â~‚Å‘Ò‹@ó‘Ô‚É‚·‚é
+        // ç”Ÿæˆã—ãŸActorã‚’éè¡¨ç¤ºãƒ»Tickåœæ­¢ã§å¾…æ©ŸçŠ¶æ…‹ã«ã™ã‚‹
         Enemy->Deactivate();
         Pool.Inactive.Add(Enemy);
-        // Returnij‚É‚Ç‚ÌPool‚É–ß‚·‚©‹tˆø‚«‚Å‚«‚é‚æ‚¤‚Éƒ}ƒbƒv‚É“o˜^‚·‚é
+        // Returnï¼ˆï¼‰æ™‚ã«ã©ã®Poolã«æˆ»ã™ã‹é€†å¼•ãã§ãã‚‹ã‚ˆã†ã«ãƒãƒƒãƒ—ã«ç™»éŒ²ã™ã‚‹
         EnemyToConfig.Add(Enemy, InPoolConfig);
     }
-
-    UE_LOG(LogTemp, Warning, TEXT("WarmUp Out"));
 }
 
 AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVector& Location)
@@ -55,8 +51,8 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
 
     UE_LOG(LogTemp, Warning, TEXT("Spawn In"));
 
-    // EnemyData‚ª–¢İ’è‚Ìê‡‚ÍSpawn‚µ‚È‚¢
-    // ‚±‚±‚ªnull‚¾‚ÆActivate“à‚Ìcheck‚ÅƒNƒ‰ƒbƒVƒ…‚·‚é‚½‚ß–‘O‚É‚Í‚¶‚­
+    // EnemyDataãŒæœªè¨­å®šã®å ´åˆã¯Spawnã—ãªã„
+    // ã“ã“ãŒnullã ã¨Activateå†…ã®checkã§ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ã™ã‚‹ãŸã‚äº‹å‰ã«ã¯ã˜ã
     if (!InPoolConfig->EnemyData)
     {
         UE_LOG(LogTemp, Error,
@@ -68,7 +64,7 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
     FPrimaryAssetId Key = InPoolConfig->GetPrimaryAssetId();
     FEnemyPool* Pool = Pools.Find(Key);
 
-    // WarmUp‚ªŒÄ‚Î‚ê‚Ä‚¢‚È‚¢ê‡‚Ínullptr‚ª•Ô‚é
+    // WarmUpãŒå‘¼ã°ã‚Œã¦ã„ãªã„å ´åˆã¯nullptrãŒè¿”ã‚‹
     if (!Pool)
     {
         UE_LOG(LogTemp, Error,
@@ -76,7 +72,7 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
         return nullptr;
     }
 
-    // Inactive‚ª‹ó‚Ìê‡‚ÍPoolNum•s‘«
+    // InactiveãŒç©ºã®å ´åˆã¯PoolNumä¸è¶³
     if (Pool->Inactive.IsEmpty())
     {
         UE_LOG(LogTemp, Warning,
@@ -84,16 +80,16 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
         return nullptr;
     }
 
-    // Inactive‚©‚çActor‚ğæ‚èo‚µ‚ÄActivate‚·‚é
+    // Inactiveã‹ã‚‰Actorã‚’å–ã‚Šå‡ºã—ã¦Activateã™ã‚‹
     AEnemyBase* Enemy = Pool->Inactive.Pop();
 
-    // EnemyData‚ğActivate‚É“n‚·
-    // InConfig->EnemyData‚Í‚±‚Ì“_‚Ånullƒ`ƒFƒbƒNÏ‚İ‚È‚Ì‚ÅˆÀ‘S
+    // EnemyDataã‚’Activateã«æ¸¡ã™
+    // InConfig->EnemyDataã¯ã“ã®æ™‚ç‚¹ã§nullãƒã‚§ãƒƒã‚¯æ¸ˆã¿ãªã®ã§å®‰å…¨
     Enemy->Activate(Location, InPoolConfig->EnemyData);
 
     UE_LOG(LogTemp, Warning, TEXT("Spawn Out"));
 
-    // ActiveƒŠƒXƒg‚ÉAdd‚µ‚Ä‰Ò“­’†‚Æ‚µ‚ÄŠÇ—‚·‚é
+    // Activeãƒªã‚¹ãƒˆã«Addã—ã¦ç¨¼åƒä¸­ã¨ã—ã¦ç®¡ç†ã™ã‚‹
     Pool->Active.Add(Enemy);
     return Enemy;
 }
@@ -104,7 +100,7 @@ void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
 
     UE_LOG(LogTemp, Warning, TEXT("Return In"));
 
-    // ‚Ç‚ÌPoolConfig‚ÌActor‚©‚ğ‹tˆø‚«‚·‚é
+    // ã©ã®PoolConfigã®Actorã‹ã‚’é€†å¼•ãã™ã‚‹
     UEnemyPoolConfig** DataPtr = EnemyToConfig.Find(Enemy);
     if (!DataPtr) { return; }
 
@@ -112,7 +108,7 @@ void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
     FEnemyPool* Pool = Pools.Find(Key);
     if (!Pool) { return; }
 
-    // Active‚©‚çInactive‚ÉˆÚ‚µ‚ÄDeactivate‚·‚é
+    // Activeã‹ã‚‰Inactiveã«ç§»ã—ã¦Deactivateã™ã‚‹
     Pool->Active.Remove(Enemy);
     Enemy->Deactivate();
     Pool->Inactive.Add(Enemy);
@@ -123,13 +119,13 @@ void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
 AEnemyBase* UEnemyPoolSubSystem::CreateNewEnemy(UEnemyPoolConfig* InData)
 {
     FActorSpawnParameters Params;
-    // ƒRƒŠƒWƒ‡ƒ“”»’è‚ğ–³‹‚µ‚Ä•K‚¸¶¬‚·‚é
-    // Pool‘Ò‹@—p‚Ì‰æ–ÊŠO‚É¶¬‚·‚é‚½‚ßáŠQ•¨‚Í‚È‚¢‚ª”O‚Ì‚½‚ßİ’è‚·‚é
+    // ã‚³ãƒªã‚¸ãƒ§ãƒ³åˆ¤å®šã‚’ç„¡è¦–ã—ã¦å¿…ãšç”Ÿæˆã™ã‚‹
+    // Poolå¾…æ©Ÿç”¨ã®ç”»é¢å¤–ã«ç”Ÿæˆã™ã‚‹ãŸã‚éšœå®³ç‰©ã¯ãªã„ãŒå¿µã®ãŸã‚è¨­å®šã™ã‚‹
     Params.SpawnCollisionHandlingOverride =
         ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-    // Pool‘Ò‹@—p‚Ì‰æ–ÊŠOÀ•W
-    // Deteactive‚Å”ñ•\¦‚É‚È‚é‚ªÀ•W‚à‰“‚­‚É’u‚¢‚Ä‚¨‚­
+    // Poolå¾…æ©Ÿç”¨ã®ç”»é¢å¤–åº§æ¨™
+    // Deteactiveã§éè¡¨ç¤ºã«ãªã‚‹ãŒåº§æ¨™ã‚‚é ãã«ç½®ã„ã¦ãŠã
     FVector HoldPos(0.f, 0.f, -10000.f);
 
     return GetWorld()->SpawnActor<AEnemyBase>(

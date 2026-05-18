@@ -15,6 +15,7 @@ class UStateTreeComponent;
 class USkeletalMeshComponent;
 class UPrimitiveComponent;
 class UEnemyDataAsset;
+class AEnemyISMManager;
 
 /**
  * @brief パーティクル用構造体
@@ -130,6 +131,20 @@ public:
 		return EnemyManager;
 	}
 
+	/** エネミーマネージャーのゲッター*/
+	/*AEnemyGruntManager* GetEnemyGruntManager() const
+	{
+		return 
+	}*/
+
+	TSubclassOf<AEnemyISMManager> GetISMManagerClass() const
+	{
+		return ISMManagerClass;
+	}
+
+	/** 敵の種類ごとにメッシュを返す*/
+	virtual UStaticMesh* GetEnemyMesh() const PURE_VIRTUAL(AEnemyBase::GetEnemyMesh, return nullptr;);
+
 	/** ゲームの進行管理クラスのゲッター */
 	UGameProgressSubsystem* GetGameProgressSubsystem() const
 	{
@@ -173,14 +188,14 @@ protected:
 
 	/** 敵（自身）のパラメータを更新する */
 	virtual void UpdateParams();
-	
-	/** CupsuleCollisionを取得して使うための関数 */
+
+	/** SphereCollisionを取得して使うための関数 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Collision")
 	TObjectPtr<UCapsuleComponent> CapsuleComponent;
 
 	/** 敵のモデル*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> EnemyMesh;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
+	//TObjectPtr<USkeletalMeshComponent> EnemyMesh;
 
 	/** 敵のStateTree*/
 	UPROPERTY(VisibleAnywhere, Category = "StateTree")
@@ -193,8 +208,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "KnockBack")
 	UDataTable* KnockBackDataTable;
 
-	/** 敵管理クラスのポインタ */
-	UPROPERTY()
+	///** 敵管理クラスのポインタ */
+	//UPROPERTY()
 	UEnemyManagerSubsystem* EnemyManager;
 
 	/** ゲームの進行管理クラスのポインタ */
@@ -272,6 +287,26 @@ public:
 	/** アニメーション*/
 	//void PlayAnimationMontage();
 
+
+	/** ISMのどのインスタンスに対応するかを示すインデックス*/
+	int32 ISMInstanceIndex = INDEX_NONE;
+
+	/** AnimToTexture用：アニメーションの現在の再生時間*/
+	float GetAnimTime() const { return AnimTime; }
+	/** AnimToTexture用：再生中のアニメーションのインデックス*/
+	int32 GetAnimIndex() const { return AnimIndex; }
+
+protected:
+
+	/**
+	 * どのISMManagerに登録するかを指定するためのクラス
+	 */
+	UPROPERTY(EditDefaultsOnly, Category = "SetupISM")
+	TSubclassOf<AEnemyISMManager> ISMManagerClass;
+
+	float AnimTime = 0.0f;
+	int AnimIndex = 0;
+
 private:
 
 	/// <summary>
@@ -295,4 +330,14 @@ private:
 
 	/** データアセットからデータを構造体に移す処理*/
 	void SetEnemyStatusData(UEnemyDataAsset* InData);
+
+	///**
+	// * ISMComponentのインスタンスのインデックス
+	// * 敵管理クラスのISMComponentに登録した際に割り当てられるインデックス
+	// */
+	//UPROPERTY()
+	//int32 ISMInstanceIndex = INDEX_NONE;
+
+	/** 敵のメッシュ*/
+	//TObjectPtr<UStaticMesh> ISMMesh;	// 敵管理クラスのISMComponentに登録された際に割り当てられるメッシュ
 };

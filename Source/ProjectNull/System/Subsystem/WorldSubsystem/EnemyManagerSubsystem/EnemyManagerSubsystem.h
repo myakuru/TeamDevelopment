@@ -9,6 +9,10 @@
 // 敵の中間基底クラス
 class AEnemyBase;
 
+class AEnemyISMManager;
+
+class UEnemyISMManagerConfig;
+
 /// <summary>
 /// 敵管理クラス
 /// </summary>
@@ -16,9 +20,11 @@ UCLASS()
 class PROJECTNULL_API UEnemyManagerSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
 	/// <summary>
 	/// 敵の更新処理
@@ -47,7 +53,18 @@ public:
 	/// <summary>
 	/// 敵をまとめるリスト
 	/// </summary>
-	TArray<AEnemyBase*> GetEnemyList() const { return EnemyGruntList; }	
+	TArray<AEnemyBase*> GetEnemyList() const { return EnemyGruntList; }
+
+	/** ISMManager登録
+	*	ISMManagerが自己登録するための関数
+	*/
+	void RegisterISMManager(AEnemyISMManager* Manager);
+
+	/**
+	*	指定したクラスのISMManagerを返す
+	*	EnemyBaseのBeginPlayでManagerを探すための関数
+	*/
+	AEnemyISMManager* GetISMManager(TSubclassOf<AEnemyISMManager> ManagerClass) const;
 
 private:
 
@@ -55,5 +72,18 @@ private:
 	/// 敵をまとめるリスト
 	/// </summary>
 	UPROPERTY()
-	TArray<AEnemyBase*> EnemyGruntList;
+	TArray<TObjectPtr<AEnemyBase>> EnemyGruntList;
+
+	/** 
+	* ISMManager管理
+	* 種類ごとのISMManagerをクラスをキーに管理する
+	* GetISMManagerでクラスを指定して対応するISSMManagerを返す
+	*/
+	UPROPERTY()
+	TMap<UClass*, TObjectPtr<AEnemyISMManager>> ISMManagerMap;
+
+	/** ISMManagerの一覧を持つDataAssetの参照*/
+	UPROPERTY()
+	TSoftObjectPtr<UEnemyISMManagerConfig> ISMManagerConfig;
+
 };
