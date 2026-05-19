@@ -227,9 +227,9 @@ void AEnemyBase::OnDeath()
 		GameProgress->AddKillCount();
 	}
 
-	SpawnDeathEffect();
+	//SpawnDeathEffect();
 
-	SpawnDeathExperience();
+	//SpawnDeathExperience();
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
 	if (USuperGameInstance* GameInstance =

@@ -5,6 +5,9 @@
 class AEnemyBase;
 class UStaticMesh;
 class UInstancedStaticMeshComponent;
+class UEnemyAnimDataAsset;
+
+struct FAnimData;
 
 UCLASS()
 class PROJECTNULL_API AEnemyISMManager : public AActor
@@ -37,12 +40,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	TObjectPtr<UStaticMesh> EnemyMesh;
 
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	TObjectPtr<UEnemyAnimDataAsset> AnimDataAsset;
+
 	/** 
 	* AnimToTextureのCustomDataチャンネル数
 	* マテリアル側のNumCustomDataFloatsと合わせる必要がある
 	*/
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	int32 NumCustomDataFloats = 2;
+	int32 NumCustomDataFloats = 5;
 
 private:
 

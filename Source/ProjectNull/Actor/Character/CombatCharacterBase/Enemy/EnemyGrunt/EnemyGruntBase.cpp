@@ -31,8 +31,15 @@ void AEnemyGruntBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
+
+	PrevAnimTime = AnimTime;
 	
 	AnimTime += DeltaTime;
+
+	if (AnimTime >= 5.0f)
+	{
+		AnimIndex = 1;
+	}
 
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
