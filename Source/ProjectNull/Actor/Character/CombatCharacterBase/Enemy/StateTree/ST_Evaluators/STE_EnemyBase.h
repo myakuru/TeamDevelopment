@@ -41,6 +41,11 @@ public:
 	virtual void TreeStop(FStateTreeExecutionContext& a_Context)						override;
 
 	/**
+	 * @brief 固定パラメーターの登録
+	 */
+	virtual void RegisterFixedParams();
+
+	/**
 	 * @brief デリゲートへの関数登録
 	 */
 	virtual void RegisterDelegate();
@@ -92,6 +97,10 @@ private:
 	/** ターゲットとの距離の二乗値 */
 	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
 	float TargetDistanceSqr = 0.0f;
+	
+	/** ノックバック時の重さ */
+	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
+	float KnockBackWeight = 0.0f;
 
 	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))

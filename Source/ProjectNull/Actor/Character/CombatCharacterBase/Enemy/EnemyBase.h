@@ -108,22 +108,32 @@ public:
 	*/
 	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
 
+	/**
+	 * @brief 外部からステートEnum変更を通知
+	 * @param a_TargetState 変更先ステート
+	 */
+	virtual void NotifyChengedStateEnum(EEnemyState a_TargetState);
+
+	/**
+	 * @brief 所持する当たり判定チャンネルのレスポンス設定を変更
+	 * @param Channel 変更対象チャンネル(WorldStatic,Pawn,etc..)
+	 * @param NewResponse レスポンスタイプ(Block・Overlap・Ignore)
+	 */
+	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse);
+
 	//~ End Setter
 	
 
 	//~ Begin Getter
+
+	/** ノックバック時の重さを取得 */
+	float GetKnockBackWeight()const { return EnemyStatus.KnockBackWeight; }
 
 	/** EnemyRuntimeへのアクセス、デリゲートへの登録を行う */
 	inline UEnemyRuntimeData* GetEnemyRuntimeData() const
 	{
 		return EnemyRuntimeData; 
 	}
-
-	/**
-	 * @brief 外部からステートEnum変更を通知
-	 * @param a_TargetState 変更先ステート
-	 */
-	virtual void NotifyChengedStateEnum(EEnemyState a_TargetState);
 
 	/** エネミーマネージャーのゲッター*/
 	UEnemyManagerSubsystem* GetEnemyManagerSubsystem() const
@@ -289,6 +299,8 @@ public:
 
 	/** AnimToTexture用：アニメーションの現在の再生時間*/
 	float GetAnimTime() const { return AnimTime; }
+	/** PrevAnimToTexture用：アニメーションの前フレームの再生時間*/
+	float GetPrevAnimTime() const { return PrevTime; }
 	/** AnimToTexture用：再生中のアニメーションのインデックス*/
 	int32 GetAnimIndex() const { return AnimIndex; }
 
@@ -301,6 +313,7 @@ protected:
 	TSubclassOf<AEnemyISMManager> ISMManagerClass;
 
 	float AnimTime = 0.0f;
+	float PrevTime = 0.0f;
 	int AnimIndex = 0;
 
 private:

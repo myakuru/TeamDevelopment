@@ -10,15 +10,24 @@ void USTE_EnemyBase::TreeStart(FStateTreeExecutionContext& a_Context)
 
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 
-	UE_LOG(LogTemp, Warning, TEXT("GameGravity : %.2f"), GetWorld()->GetGravityZ());
-
 	// デリゲートへの関数登録
 	RegisterDelegate();
+
+	// 固定パラメーターの登録
+	RegisterFixedParams();
 }
 
 void USTE_EnemyBase::TreeStop(FStateTreeExecutionContext& a_Context)
 {
 	Super::TreeStop(a_Context);
+}
+
+void USTE_EnemyBase::RegisterFixedParams()
+{
+	if (!OwnerEnemy) { return; }
+
+	// ノックバックの時の重さ
+	KnockBackWeight = OwnerEnemy->GetKnockBackWeight();
 }
 
 void USTE_EnemyBase::Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)

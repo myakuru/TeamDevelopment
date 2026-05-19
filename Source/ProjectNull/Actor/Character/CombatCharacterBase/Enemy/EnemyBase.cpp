@@ -43,7 +43,6 @@ AEnemyBase::AEnemyBase()
 		CapsuleComponent->bDynamicObstacle = true;
 		RootComponent = CapsuleComponent;
 	}
-
 	StateTreeComponent		= CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
 }
 
@@ -54,6 +53,13 @@ void AEnemyBase::NotifyChengedStateEnum(EEnemyState a_TargetState)
 	if (!EnemyRuntimeData) { return; }
 
 	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
+}
+
+void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse)
+{
+	if (!CapsuleComponent) { return; }
+
+	CapsuleComponent->SetCollisionResponseToChannel(Channel, NewResponse);
 }
 
 void AEnemyBase::BeginPlay()
@@ -318,11 +324,12 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	// コリジョンプリセット設定
 	if (CapsuleComponent)
 	{
-		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		CapsuleComponent->SetCollisionObjectType(ECC_Pawn);
-		CapsuleComponent->SetCollisionResponseToAllChannels(ECR_Block);
-		CapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		CapsuleComponent->SetGenerateOverlapEvents(true);
+		CapsuleComponent->InitCapsuleSize(34.f, 88.f);
+		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+		CapsuleComponent->CanCharacterStepUpOn = ECB_No;
+		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
+		CapsuleComponent->SetCanEverAffectNavigation(false);
+		CapsuleComponent->bDynamicObstacle = true;
 	}
 
 	// コンポーネントに自身の参照を渡す
@@ -366,7 +373,6 @@ void AEnemyBase::Deactivate()
 	}
 
 	EnemyStatus.StateTag = EEnemyState::None;
-
 	if (!EnemyManager) { return; }
 
 	/** ISMManagerから解除*/

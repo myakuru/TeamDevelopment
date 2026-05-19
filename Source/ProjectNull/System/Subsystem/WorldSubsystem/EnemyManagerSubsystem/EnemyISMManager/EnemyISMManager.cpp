@@ -11,6 +11,7 @@ AEnemyISMManager::AEnemyISMManager()
 	// RootComponentとしてISMを生成
 	ISM = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ISM"));
 	RootComponent = ISM;
+	ISM->NumCustomDataFloats = NumCustomDataFloats;
 }
 
 void AEnemyISMManager::BeginPlay()
@@ -20,7 +21,6 @@ void AEnemyISMManager::BeginPlay()
 	// エディタで設定したメッシュをISMに適用する
 	if (EnemyMesh)
 	{
-		ISM->NumCustomDataFloats = NumCustomDataFloats;
 		ISM->SetStaticMesh(EnemyMesh);
 	}
 	else
@@ -136,8 +136,9 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 
 		// AnimTimeからフレーム番号を計算する
 		const float TotalTime = FMath::Fmod(Enemy->GetAnimTime(), NumFrames / SampleRate);
+		const float TotalTime2 = FMath::Fmod(Enemy->GetPrevAnimTime(), NumFrames / SampleRate);
 		const float CurrentFrame = TotalTime * SampleRate;
-		const float PrevFrame = FMath::Fmod(CurrentFrame - 1.0f + NumFrames, NumFrames);
+		const float PrevFrame = TotalTime2 * SampleRate;
 
 		// ActorのTransformをISMに反映
 		// bMarkRenderStateDirtyをfalseにして最後にまとめてDirtyを立てる
@@ -153,8 +154,8 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 		// AnimToTextureのパラメータをマテリアルに渡す
 		// Channel 0 : AnimTime - アニメーションの現在の再生時間
 		// Channel 1 : AnimIndex - 現在再生中のアニメーションのインデックス（どのアニメーションを再生するか）
-		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 0, /*Enemy->GetAnimTime()*/30);
-		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 1, /*static_cast<float>(Enemy->GetAnimIndex())*/29);
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 0, /*Enemy->GetAnimTime()*/CurrentFrame);
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 1, /*static_cast<float>(Enemy->GetAnimIndex())*/PrevFrame);
 	}
 
 	if (Enemies.Num() > 0)

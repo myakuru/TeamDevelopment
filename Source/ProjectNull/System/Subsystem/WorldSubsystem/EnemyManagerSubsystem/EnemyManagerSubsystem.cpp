@@ -15,7 +15,7 @@ void UEnemyManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 void UEnemyManagerSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
-
+	
 	// データアセットのパスを直接指定して読む
 	const FSoftObjectPath ISMManagerPath(TEXT("/Game/Actor/Manager/DA_EnemyISMManagerConfig.DA_EnemyISMManagerConfig"));
 	auto* Config = Cast<UEnemyISMManagerConfig>(ISMManagerPath.TryLoad());
