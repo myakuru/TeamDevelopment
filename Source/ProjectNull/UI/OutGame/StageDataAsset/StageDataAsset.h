@@ -4,7 +4,6 @@
 #include "Engine/DataAsset.h"
 #include "StageDataAsset.generated.h"
 
-
 /** ステージのデータ構造体 */
 USTRUCT(BlueprintType)
 struct FStageDataStruct : public FTableRowBase
@@ -22,14 +21,6 @@ struct FStageDataStruct : public FTableRowBase
 	/** 開くレベルの名前 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName LevelName;
-
-	/** 解放フラグ */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUnlocked = false;
-
-	/** ハイスコア */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 HighScore = 0;
 }; 
 
 /** ステージのデータアセットクラス */

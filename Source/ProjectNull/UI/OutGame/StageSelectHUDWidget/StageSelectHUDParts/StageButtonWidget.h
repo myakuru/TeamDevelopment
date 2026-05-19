@@ -24,7 +24,7 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	UButton* StageButton;
+	TObjectPtr<UButton> StageButton;
 
 	UFUNCTION()
 	void OnClickedStageButton();
@@ -33,13 +33,16 @@ protected:
 	void OnHoveredStageButton();
 
 	UPROPERTY()
-	int32 StageIndex = 1;
+	int32	StageIndex	= 1;
+
+	UPROPERTY()
+	bool	bUnlocked	= false;
 
 public:
 
 	/** ボタンのセットアップ関数 */
 	UFUNCTION()
-	void Setup(int32 InStageIndex);
+	void Setup(int32 InStageIndex, bool bInUnlocked);
 
 	//デリゲートの宣言
 	UPROPERTY(BlueprintAssignable)
