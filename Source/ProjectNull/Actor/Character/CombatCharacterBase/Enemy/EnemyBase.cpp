@@ -15,6 +15,7 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -30,6 +31,18 @@ AEnemyBase::AEnemyBase()
 	
 	// 敵のランタイムパラメータ管理クラスの生成
 	EnemyRuntimeData		= CreateDefaultSubobject<UEnemyRuntimeData>("EnemyRuntimeData");
+
+	// カプセル形状コリジョンの生成・プリセット設定
+	{
+		CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("CapsuleCollision");
+		CapsuleComponent->InitCapsuleSize(34.f, 88.f);
+		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+		CapsuleComponent->CanCharacterStepUpOn = ECB_No;
+		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
+		CapsuleComponent->SetCanEverAffectNavigation(false);
+		CapsuleComponent->bDynamicObstacle = true;
+		RootComponent = CapsuleComponent;
+	}
 
 	StateTreeComponent		= CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
 }
@@ -56,20 +69,10 @@ void AEnemyBase::BeginPlay()
 		EnemyManager->RegisterEnemy(this);
 	}
 
-	CapsuleCollision = nullptr;
-
-	CapsuleCollision = FindComponentByClass<UCapsuleComponent>();
-
-	//CapsuleCollision = GetCapsuleComponent();
-
-	// コリジョンプリセット設定
-	if (CapsuleCollision)
+	// カプセルコリジョンをRootにセット
+	if (CapsuleComponent)
 	{
-		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		CapsuleCollision->SetCollisionObjectType(ECC_Pawn);
-		CapsuleCollision->SetCollisionResponseToAllChannels(ECR_Block);
-		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		CapsuleCollision->SetGenerateOverlapEvents(true);
+		RootComponent = CapsuleComponent;
 	}
 
 	// コンポーネントに自身の参照を渡す
@@ -224,9 +227,9 @@ void AEnemyBase::OnDeath()
 		GameProgress->AddKillCount();
 	}
 
-	SpawnDeathEffect();
+	//SpawnDeathEffect();
 
-	SpawnDeathExperience();
+	//SpawnDeathExperience();
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
 	if (USuperGameInstance* GameInstance =
@@ -235,7 +238,7 @@ void AEnemyBase::OnDeath()
 		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
 		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
-
+	
 	// PoolSubSystemに返却する
 	// Return()の中でDeactivate()が呼ばれて非表示・Tick停止でPool待機に戻る
 	if (UEnemyPoolSubSystem* PoolSubSystem =
@@ -263,11 +266,11 @@ void AEnemyBase::CheckCanAttack()
 
 void AEnemyBase::SetAnimSequence(UAnimSequence* AnimSequence, bool LoopFlg = false)
 {
-	if (EnemyMesh && AnimSequence)
+	/*if (EnemyMesh && AnimSequence)
 	{
 		EnemyMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 		EnemyMesh->PlayAnimation(AnimSequence, LoopFlg);
-	}
+	}*/
 }
 
 FVector AEnemyBase::CalculateNextActorLocation(const FVector& MoveDir, float Speed, float DeltaTime)
@@ -313,13 +316,13 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	}
 
 	// コリジョンプリセット設定
-	if (CapsuleCollision)
+	if (CapsuleComponent)
 	{
-		CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		CapsuleCollision->SetCollisionObjectType(ECC_Pawn);
-		CapsuleCollision->SetCollisionResponseToAllChannels(ECR_Block);
-		CapsuleCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		CapsuleCollision->SetGenerateOverlapEvents(true);
+		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CapsuleComponent->SetCollisionObjectType(ECC_Pawn);
+		CapsuleComponent->SetCollisionResponseToAllChannels(ECR_Block);
+		CapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CapsuleComponent->SetGenerateOverlapEvents(true);
 	}
 
 	// コンポーネントに自身の参照を渡す
@@ -331,6 +334,12 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	UpdateParams();
 
 	SetActorLocation(LocalPos);
+
+	/** ISMManagerへの自己登録*/
+	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
+	{
+		ISMManager->RegisterEnemy(this);
+	}
 
 #if WITH_EDITOR
 	SetFolderPath(TEXT("Pool/Active"));
@@ -357,6 +366,14 @@ void AEnemyBase::Deactivate()
 	}
 
 	EnemyStatus.StateTag = EEnemyState::None;
+
+	if (!EnemyManager) { return; }
+
+	/** ISMManagerから解除*/
+	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
+	{
+		ISMManager->UnregisterEnemy(this);
+	}
 }
 
 void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)

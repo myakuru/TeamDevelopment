@@ -6,6 +6,7 @@
 USTT_EnemyKnockBack::USTT_EnemyKnockBack(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
 	,	OwnerEnemy(nullptr)
+	,	KnockBackDataTable(nullptr)
 	,	KnockBackVelocity(FVector::ZeroVector)
 	,	MoveDir(FVector::ZeroVector)
 	,	ReceivedAttackPower(0.0f)
@@ -22,11 +23,7 @@ EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& 
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
-	/* 備忘録 */
-	// ・KnockBackFlagが有効の時に入る
-	// ・デリゲートを用いて、フラグを管理する
-	// ・Enemy側にデリゲート発火用ラップ関数を作成
-	
+	// ノックバックに必要な情報を取得・設定
 	SetKnockBackData();
 
 	return EStateTreeRunStatus::Running;
@@ -34,11 +31,24 @@ EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& 
 
 EStateTreeRunStatus USTT_EnemyKnockBack::Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)
 {
+	Super::Tick(a_Context, a_DeltaTime);
+
+	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
+
+	// ノックバックが停止したらステート終了
+	if(MoveToKnockBack(a_DeltaTime)){ return EStateTreeRunStatus::Succeeded; }
+
 	return EStateTreeRunStatus::Running;
 }
 
 void USTT_EnemyKnockBack::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
+	Super::ExitState(a_Context, a_Transition);
+
+	if (!OwnerEnemy) { return; }
+
+	// ステートタイプを切り替え
+	OwnerEnemy->NotifyChengedStateEnum(EEnemyState::None);
 }
 
 void USTT_EnemyKnockBack::SetKnockBackData()
@@ -74,11 +84,35 @@ void USTT_EnemyKnockBack::SetKnockBackData()
 	KnockBackVelocity = LanchDir * KnockBackData->LaunchSpeed;
 }
 
-void USTT_EnemyKnockBack::MoveToKnockBack(const float a_DeltaTime)
+bool USTT_EnemyKnockBack::MoveToKnockBack(const float a_DeltaTime)
 {
-	if (!OwnerEnemy) { return; }
+	if (!OwnerEnemy) { return false; }
 	FVector CurrentLocation = OwnerEnemy->GetActorLocation();
 
-	// 重力を速度に加算
+	// 重力(-980.f)を速度に加算
+	KnockBackVelocity.Z += GetWorld()->GetGravityZ() * a_DeltaTime;
 
+	// 位置更新
+	FVector NextLocation = CurrentLocation + KnockBackVelocity * a_DeltaTime;
+
+	// どこかに当たったら停止
+	FHitResult HitResult;
+	OwnerEnemy->SetActorLocation(NextLocation, true, &HitResult);
+	if (HitResult.bBlockingHit)
+	{
+		TObjectPtr<AActor> HitActor = HitResult.GetActor();
+
+		if (HitActor)
+		{
+			// プレイヤー or エネミーなら無視
+			if (HitActor->IsA(ACharacter::StaticClass()) ||
+				HitActor->IsA(AEnemyBase::StaticClass()))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	return false;
 }
