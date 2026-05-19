@@ -301,8 +301,10 @@ public:
 	float GetAnimTime() const { return AnimTime; }
 	/** PrevAnimToTexture用：アニメーションの前フレームの再生時間*/
 	float GetPrevAnimTime() const { return PrevTime; }
+	float GetBeginAnimTime() const { return PrevAnimTime; }
 	/** AnimToTexture用：再生中のアニメーションのインデックス*/
 	int32 GetAnimIndex() const { return AnimIndex; }
+	float GetAnimNumFrames() const { return AnimNumFrames; }
 
 protected:
 
@@ -313,8 +315,12 @@ protected:
 	TSubclassOf<AEnemyISMManager> ISMManagerClass;
 
 	float AnimTime = 0.0f;
-	float PrevTime = 0.0f;
+	float PrevAnimTime = 0.0f;
+
 	int AnimIndex = 0;
+
+	UPROPERTY(EditAnywhere, Category = "SetupISM")
+	float AnimNumFrames = 0.0f;
 
 private:
 

@@ -32,8 +32,14 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	PrevTime = AnimTime;
+	PrevAnimTime = AnimTime;
+	
 	AnimTime += DeltaTime;
+
+	if (AnimTime >= 5.0f)
+	{
+		AnimIndex = 1;
+	}
 
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();

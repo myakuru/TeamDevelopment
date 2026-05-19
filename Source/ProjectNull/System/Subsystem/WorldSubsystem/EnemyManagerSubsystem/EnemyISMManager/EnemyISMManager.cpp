@@ -4,6 +4,7 @@
 #include "Engine/StaticMesh.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
 
 AEnemyISMManager::AEnemyISMManager()
 {
@@ -130,15 +131,16 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 	{
 		if (!IsValid(Enemy) || Enemy->ISMInstanceIndex == INDEX_NONE) { continue; }
 
+		const int AnimIndex = Enemy->GetAnimIndex();
+
 		// SampleRate = 30fps、NumFrames はアニメーションのフレーム総数
 		const float SampleRate = 30.0f;
-		const float NumFrames = 60.0f; // AnimToTextureベイク時のフレーム数に合わせる
+		const float NumFrames = AnimDataAsset->Animations[AnimIndex].NumFrames; // AnimToTextureベイク時のフレーム数に合わせる
 
 		// AnimTimeからフレーム番号を計算する
-		const float TotalTime = FMath::Fmod(Enemy->GetAnimTime(), NumFrames / SampleRate);
-		const float TotalTime2 = FMath::Fmod(Enemy->GetPrevAnimTime(), NumFrames / SampleRate);
-		const float CurrentFrame = TotalTime * SampleRate;
-		const float PrevFrame = TotalTime2 * SampleRate;
+		const float CurrentFrame = FMath::Fmod(Enemy->GetAnimTime() * SampleRate, NumFrames);
+		const float PrevFrame = FMath::Fmod(Enemy->GetBeginAnimTime() * SampleRate, NumFrames);
+		const FAnimData& AnimData = AnimDataAsset->Animations[AnimIndex];
 
 		// ActorのTransformをISMに反映
 		// bMarkRenderStateDirtyをfalseにして最後にまとめてDirtyを立てる
@@ -152,10 +154,16 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 		UE_LOG(LogTemp, Warning, TEXT("CurrentFrame: %f"), CurrentFrame);
 
 		// AnimToTextureのパラメータをマテリアルに渡す
-		// Channel 0 : AnimTime - アニメーションの現在の再生時間
-		// Channel 1 : AnimIndex - 現在再生中のアニメーションのインデックス（どのアニメーションを再生するか）
-		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 0, /*Enemy->GetAnimTime()*/CurrentFrame);
-		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 1, /*static_cast<float>(Enemy->GetAnimIndex())*/PrevFrame);
+		// Channel 0 : CurrentFrame - アニメーションの現在の再生時間
+		// Channel 1 : PrevFrame - 前フレームのアニメーション
+		// Channel 2 : AnimIndex - 現在再生中のアニメーションのインデックス（どのアニメーションを再生するか）
+		// Channel 3 : StartTime - 次のアニメーションの始まる時間（マテリアルノードで前のアニメーションのNumFramesに加算して、次のアニメーションの始まりを指定）
+		// Channel 4 : NumFrames - そのアニメーションまでの時間の総合フレーム
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 0, CurrentFrame);
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 1, PrevFrame);
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 2, AnimIndex);
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 3, AnimData.StartTime);
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 4, AnimData.NumFrames);
 	}
 
 	if (Enemies.Num() > 0)

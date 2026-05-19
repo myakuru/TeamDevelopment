@@ -42,9 +42,9 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 		GameProgress->AddKillCount();
 	}
 
-	OwnerEnemy->SpawnDeathEffect();
+	//OwnerEnemy->SpawnDeathEffect();
 
-	OwnerEnemy->SpawnDeathExperience();
+	//OwnerEnemy->SpawnDeathExperience();
 
 	OwnerEnemy->OnDeath();
 
