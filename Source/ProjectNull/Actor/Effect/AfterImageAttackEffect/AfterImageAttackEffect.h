@@ -37,6 +37,10 @@ public:
 		return FMath::Lerp(StartLocationOffset, EndLocationOffset, LerpAlpha);
 	}
 
+	inline FVector CalcMoveDir() const {	
+		return (EndLocationOffset - StartLocationOffset).GetSafeNormal();
+	}
+
 	/** モデル残像エフェクトクラス */
 	UPROPERTY(EditAnywhere,Instanced)
 	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;

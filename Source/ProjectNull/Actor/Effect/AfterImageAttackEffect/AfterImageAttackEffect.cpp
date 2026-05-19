@@ -65,13 +65,12 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const F
 				+ Forward * Offset.X
 				+ Right * Offset.Y
 				+ Up * Offset.Z;
-			const FVector MoveDir = (ResultLocation - Data.Transform.GetLocation()).GetSafeNormal();
+			const FVector MoveDir = Data.CalcMoveDir();
 			Data.Transform.SetLocation(ResultLocation);
 			Data.Transform.SetRotation((MoveDir.Rotation() + Data.RotationOffset).Quaternion());
 			Data.Transform.SetScale3D(Data.Scale);
 
 			Data.ModelAfterimageTrailEffect->Update(DeltaTime, Data.Transform,SkeletalMesh,AnimationAsset,Data.PoseTime);
-			//Data.GhostActor->SetActorTransform(Data.Transform);
 		}
 
 	}
