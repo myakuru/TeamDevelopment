@@ -25,15 +25,21 @@ public:
 	 * @param InSnapshot スナップショット
 	 */
 	void Update(float DeltaTime,
+				const FTransform& InTransform,
 				class USkeletalMesh* InSkeletalMesh,
 				const FPoseSnapshot& InSnapshot);
+
+	void Update(float DeltaTime,
+				const FTransform& InTransform,
+				class USkeletalMesh* InSkeletalMesh,
+				class UAnimationAsset* InAnimation,
+				float InPoseTime);
 
 	/**
 	 * @brief このクラスで管理しているすべての残像オブジェクトをワールドから削除
 	 */
 	void AllDestroy();
 
-	inline void SetOwnerActor(AActor* Owner) { OwnerActor = Owner; }
 	inline void SetCanAddTrailPoint(bool bInCanAddTrailPoint) { bCanAddTrailPoint = bInCanAddTrailPoint; }
 
 private:
@@ -43,11 +49,14 @@ private:
 	 * @param InAnimPoseTime アニメーションを停止して描画する際のアニメーション時間閾値
 	 */
 
-	void AddAfterimageTrail(class USkeletalMesh* InSkeletalMesh,
-		const FPoseSnapshot& InSnapshot);
+	void AddAfterimageTrail(const FTransform& InTransform,
+							class USkeletalMesh* InSkeletalMesh,
+							const FPoseSnapshot& InSnapshot);
 
-	UPROPERTY()
-	TObjectPtr<AActor> OwnerActor;
+	void AddAfterimageTrail(const FTransform& InTransform,
+							class USkeletalMesh* InSkeletalMesh,
+							class UAnimationAsset* InAnimation,
+							float InPoseTime);
 
 	/** ポイント追加してよいか */
 	bool bCanAddTrailPoint;

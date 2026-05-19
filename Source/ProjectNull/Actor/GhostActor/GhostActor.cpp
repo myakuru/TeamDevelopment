@@ -9,7 +9,7 @@ AGhostActor::AGhostActor():
 	CurrentTime(0.0f),
 	StartOpacity(1.0f)
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
@@ -60,6 +60,20 @@ void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, const FPoseSnapshot& I
 	GhostAnimInstance->GhostPoseSnapshot = InSnapshot;
 }
 
+void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float InPoseTime)
+{
+	if (!SkeletalMesh) { return; }
+
+	Initialize(SkeletalMesh);
+
+	Mesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	Mesh->SetAnimation(Animation);
+	Mesh->SetPosition(InPoseTime);
+
+	// アニメ停止
+	Mesh->bPauseAnims = true;
+}
+
 void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float InPoseTime, float InLifeTime, float InOpacityDecayRate)
 {
 	if (!SkeletalMesh) { return; }
@@ -77,8 +91,10 @@ void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Anima
 	Mesh->bPauseAnims = true;
 }
 
-void AGhostActor::Update(float DeltaTime)
+void AGhostActor::Tick(float DeltaTime)
 {
+	AActor::Tick(DeltaTime);
+
 	CurrentTime += DeltaTime;
 	Opacity -= OpacityDecayRate * DeltaTime;
 

@@ -87,6 +87,7 @@ private:
 
 	/** ギアスキル開始時プレイヤーのTransform */
 	FTransform StartPlayerTransform;
+	FRotator StartControlRotation;
 
 	/** ロボットコントローラークラス */
 	UPROPERTY()

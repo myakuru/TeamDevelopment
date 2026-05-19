@@ -63,7 +63,6 @@ void APlayerBase::BeginPlay()
 	}
 
 	if (ModelAfterimageTrailEffect) {
-		ModelAfterimageTrailEffect->SetOwnerActor(this);
 		ModelAfterimageTrailEffect->SetCanAddTrailPoint(true);
 	}
 
@@ -89,7 +88,7 @@ void APlayerBase::Tick(float DeltaTime)
 	
 	//FPoseSnapshot
 
-	FPoseSnapshot Result;
+	/*FPoseSnapshot Result;
 
 	if (auto* Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
 	{
@@ -98,9 +97,9 @@ void APlayerBase::Tick(float DeltaTime)
 
 	if (ModelAfterimageTrailEffect) {
 
-		ModelAfterimageTrailEffect->Update(DeltaTime, GetMesh()->GetSkeletalMeshAsset(),
+		ModelAfterimageTrailEffect->Update(DeltaTime,GetActorTransform(),GetMesh()->GetSkeletalMeshAsset(),
 			Result);
-	}
+	}*/
 	
 	
 	if (ARobotController* RobotController = Cast<ARobotController>(GetController())) {

@@ -29,12 +29,15 @@ public:
 
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					class UAnimationAsset* Animation,
+					float InPoseTime);
+
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					class UAnimationAsset* Animation,
 					float InPoseTime,
 					float InLifeTime,
 					float InOpacityDecayRate);
 
-
-	void Update(float DeltaTime);
+	void Tick(float DeltaTime) override;
 
 private:
 

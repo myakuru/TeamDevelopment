@@ -26,6 +26,7 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 
 	if (!AfterImageAttackEffect) { return; }
 	AfterImageAttackEffect->Initialize();
+	AfterImageAttackEffect->StartTransfrom = Player->GetTransform();
 	//const float TotalDuration = AfterImageAttackEffect->GetMaxTime();
 	float TotalDuration = 0.f;
 
@@ -37,6 +38,11 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 	if (!Camera) { return; }
 
 	StartTargetArmLength = Camera->TargetArmLength;
+
+	if (auto* Controller = OwnerPlayer->GetController())
+	{
+		StartControlRotation = Controller->GetControlRotation();
+	}
 
 	Gear->SetGearDuration(TotalDuration, kLv4Index);
 
@@ -108,7 +114,7 @@ void UDashGearState_Lv4::UpdateCameraRotation(float DeltaTime, int32 DataIndex)
 {
 	if (!CameraData.IsValidIndex(DataIndex)
 		|| !RobotController) { return; }
-	const FRotator	TargetRotator			= CameraData[DataIndex].TargetRotator;
+	const FRotator	TargetRotator			= CameraData[DataIndex].TargetRotator + StartControlRotation;
 	const float		TargetRotatorLerpSpeed	= CameraData[DataIndex].RotatorLerpSpeed;
 	const float		TargetArmLength			= CameraData[DataIndex].TargetArmLength;
 
