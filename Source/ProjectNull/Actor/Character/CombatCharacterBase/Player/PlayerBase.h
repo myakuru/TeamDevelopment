@@ -79,4 +79,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialParameterCollection> MaterialCollection;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> RadialBlurMaterial;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> RadialBlurMID;
 };
