@@ -76,4 +76,7 @@ private:
 
 	UPROPERTY(EditAnywhere,Instanced,Category = "ModelAfterimageTrailEffect")
 	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialParameterCollection> MaterialCollection;
 };

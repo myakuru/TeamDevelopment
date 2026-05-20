@@ -4,16 +4,15 @@
 #include "Camera/CameraComponent.h"
 #include <GameFramework/SpringArmComponent.h>
 
+#include <ProjectNull/Actor/GhostActor/GhostActor.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Effect/AfterImageAttackEffect/AfterImageAttackEffect.h>
-#include <ProjectNull/Actor/GhostActor/GhostActor.h>
+
 #include <ProjectNull/System/Gear/GearBase.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
-UDashGearState_Lv4::UDashGearState_Lv4():
-	StanceMinTimeThreshold(0.0f),
-	StanceMaxTimeThreshold(0.0f)
+UDashGearState_Lv4::UDashGearState_Lv4()
 {
 }
 
@@ -27,12 +26,6 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 	if (!AfterImageAttackEffect) { return; }
 	AfterImageAttackEffect->Initialize();
 	AfterImageAttackEffect->StartTransfrom = Player->GetTransform();
-	//const float TotalDuration = AfterImageAttackEffect->GetMaxTime();
-	float TotalDuration = 0.f;
-
-	for (auto& Data : CameraData) {
-		TotalDuration += Data.Time;
-	}
 
 	auto* Camera = OwnerPlayer->GetSpringArmComponent();
 	if (!Camera) { return; }
@@ -42,6 +35,15 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 	if (auto* Controller = OwnerPlayer->GetController())
 	{
 		StartControlRotation = Controller->GetControlRotation();
+	}
+
+
+	float TotalDuration = 0.f;
+	TotalDuration += StanceTime.GetRange();
+	TotalDuration += DashTime.GetRange();
+	
+	for (auto& Data : CameraData) {
+		TotalDuration += Data.Time;
 	}
 
 	Gear->SetGearDuration(TotalDuration, kLv4Index);
@@ -59,8 +61,8 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	// アニメーションを構え状態にする
 	PlayerAnimInstance->bIsCombatStance = true;
 
+	// 入力を無効化
 	RobotController->SetCanReceiveInput(false);
-
 }
 
 void UDashGearState_Lv4::Update(float DeltaTime)
@@ -73,6 +75,8 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 	AfterImageAttackEffect->Update(DeltaTime, ElapsedTime,OwnerPlayer->GetActorTransform());
 
 	UpdateCamera(DeltaTime);
+
+	UpdateFinalDash(DeltaTime,ElapsedTime);
 }
 
 void UDashGearState_Lv4::End()
@@ -91,7 +95,7 @@ void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 	auto* PlayerAnimInstance = OwnerPlayer->GetPlayerAnimInstance();
 	if (!PlayerAnimInstance) { return; }
 
-	if (ElapsedTime > StanceMaxTimeThreshold) {
+	if (!StanceTime.IsWithinRange(ElapsedTime)) {
 		if (PlayerAnimInstance->bIsCombatStance) {
 			PlayerAnimInstance->bIsCombatStance = false;
 		}
@@ -142,6 +146,14 @@ void UDashGearState_Lv4::UpdateTargetArmLength(float DeltaTime, int32 DataIndex)
 		CurrentArmLength, TargetArmLength, DeltaTime, ArmLengthLerpSpeed);
 
 	Camera->TargetArmLength = ResultArmLength;
+}
+
+void UDashGearState_Lv4::UpdateFinalDash(float DeltaTime, float ElapsedTime)
+{
+	if (!DashTime.IsWithinRange(ElapsedTime)) { return; }
+	OwnerPlayer->GetMesh()->SetHiddenInGame(false);
+
+	Dash();
 }
 
 int32 UDashGearState_Lv4::GetCurrentSectionIndex(float InElapsedTime)
