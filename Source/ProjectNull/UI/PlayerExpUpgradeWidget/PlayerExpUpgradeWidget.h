@@ -71,9 +71,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrade")
 	bool bIsUpgradeWidgetUse = false;
 
+	/** フェードインの時間 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrade")
-	float BackgroundFadeInDuration = 1.0f; // フェードインの時間
+	float BackgroundFadeInDuration = 1.0f;
 
+	/** 背景の黒い画像のアルファ値 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrade")
-	float BackgroundFadeInAlpha = 0.0f; // 背景の黒い画像のアルファ値
+	float BackgroundFadeInAlpha = 0.0f;
+
+	/** 背景の黒い画像のアルファ値の最大値 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrade")
+	float BackgroundFadeInAlphaMax = 0.0f;
 };
