@@ -7,9 +7,6 @@
 #include "Animation/AnimationAsset.h"
 #include "Components/SkeletalMeshComponent.h"
 
-#include "Kismet/KismetMaterialLibrary.h"
-#include "Materials/MaterialParameterCollection.h"
-
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
@@ -20,6 +17,7 @@
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
+#include <ProjectNull/System/Material/PlayerMaterialCollectionUpdater/PlayerMaterialCollectionUpdater.h>
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 
 
@@ -32,7 +30,6 @@ APlayerBase::APlayerBase()
 	// ================================================================
 	// プレイヤーの初期化
 	// ================================================================
-
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = false;
 
@@ -52,29 +49,40 @@ APlayerBase::APlayerBase()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->bUsePawnControlRotation = false;
 
+	// ================================================================
+	// ギアコンポーネントの初期化
+	// ================================================================
 	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
 
+	// Material Parameter Collectionの更新処理クラスの生成
+	MaterialCollectionUpdater = NewObject<UPlayerMaterialCollectionUpdater>();
 }
 
 void APlayerBase::BeginPlay()
 {
 	ACombatCharacterBase::BeginPlay();
 
-	Instance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	// ================================================================
+	// ゲーム全体で共有されるデータや機能を管理するクラスの初期化
+	// ================================================================
+	SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
 
-	if (AutoAttack) {
-		AutoAttack->Initialize(this);
-	}
+	// ================================================================
+	// 自動攻撃の初期化
+	// ================================================================
+	if (AutoAttack) { AutoAttack->Initialize(this); }
 
-	if (ModelAfterimageTrailEffect) {
-		ModelAfterimageTrailEffect->SetCanAddTrailPoint(true);
-	}
+	// ================================================================
+	// Material Parameter Collectionの更新処理クラスの初期化
+	// ================================================================
+	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Initialize(this); }
 
-	RadialBlurMID = UMaterialInstanceDynamic::Create(RadialBlurMaterial, this);
+
+	/*RadialBlurMID = UMaterialInstanceDynamic::Create(RadialBlurMaterial, this);
 	if(CameraComponent) {
 		
-	}
-	UpdateHUDHP();
+	}*/
+	
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -85,23 +93,12 @@ void APlayerBase::Tick(float DeltaTime)
 	
 	ACombatCharacterBase::Tick(DeltaTime);
 
-	if (AutoAttack) {
-		AutoAttack->Update(DeltaTime,nullptr, EnemyManager);
-	}
+	// 自動攻撃の更新
+	if (AutoAttack) { AutoAttack->Update(DeltaTime,nullptr, EnemyManager); }
 
-	UKismetMaterialLibrary::SetVectorParameterValue(
-		GetWorld(),
-		MaterialCollection,
-		TEXT("Position"),
-		FLinearColor(GetActorTransform().GetLocation().X,
-			GetActorTransform().GetLocation().Y,
-			GetActorTransform().GetLocation().Z,
-			1.0f)
-	);
-	
-	if (ARobotController* RobotController = Cast<ARobotController>(GetController())) {
-		HUDWidget = RobotController->GetPlayerHUD();
-	}
+	// Material Parameter Collectionの更新処理クラスの更新
+	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
+
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -114,10 +111,9 @@ void APlayerBase::Move(const FVector2d& InputVector)
 {
 	if (!CanMove()) { return; }
 
-	const FRotator YawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
-
-	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	const FRotator	YawRotation = { 0.f, GetControlRotation().Yaw, 0.f };
+	const FVector	Forward		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector	Right		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 	AddMovementInput(Forward, InputVector.Y);
 	AddMovementInput(Right, InputVector.X);
@@ -160,9 +156,3 @@ bool APlayerBase::CanMove()
 	return true;
 }
 
-void APlayerBase::UpdateHUDHP()
-{
-	if (HUDWidget) {
-		//HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
-	}
-}

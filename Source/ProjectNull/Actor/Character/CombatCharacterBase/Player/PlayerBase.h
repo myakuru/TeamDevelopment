@@ -4,7 +4,6 @@
 #include "../CombatCharacterBase.h"
 #include "PlayerBase.generated.h"
 
-class UPlayerHUDWidget;
 class USpringArmComponent;
 class UCameraComponent;
 class UPlayerAttackComponent;
@@ -13,7 +12,7 @@ class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
 class UPlayerAnimInstance;
-class UModelAfterimageTrailEffect;
+class UPlayerMaterialCollectionUpdater;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
@@ -40,11 +39,12 @@ public:
 	int32 GetCurrentGearLevel() const;
 	
 
-	/** ゲッター */
+
+	/** Getter */
 	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
 	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
 	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
-	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return Instance; }
+	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 
@@ -52,33 +52,30 @@ private:
 
 	bool CanMove();
 
-	void UpdateHUDHP();
 
-
-	UPROPERTY()
-	UPlayerHUDWidget* HUDWidget;
-
+	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
-	USpringArmComponent* SpringArmComponent;
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
+	/** カメラコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
-	UCameraComponent* CameraComponent;
+	TObjectPtr<UCameraComponent> CameraComponent;
 
+	/** ギアコンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "Gear")
-	UPlayerGearComponent* GearComponent;
+	TObjectPtr<UPlayerGearComponent> GearComponent;
 
+	/** 自動攻撃クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
 	TObjectPtr<UAutoAttack> AutoAttack;
 
+	/** プレイヤークラスからMaterial Parameter Collectionへの更新処理クラス */
+	UPROPERTY(VisibleAnywhere, Category = "MaterialCollection")
+	TObjectPtr<UPlayerMaterialCollectionUpdater> MaterialCollectionUpdater;
+
+	/** ゲーム全体で共有されるデータや機能を管理するクラス */
 	UPROPERTY()
-	TObjectPtr<USuperGameInstance> Instance;
-
-
-	UPROPERTY(EditAnywhere,Instanced,Category = "ModelAfterimageTrailEffect")
-	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialParameterCollection> MaterialCollection;
+	TObjectPtr<USuperGameInstance> SuperGameInstance;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> RadialBlurMaterial;

@@ -1,6 +1,7 @@
 ﻿
 #include "GhostActorAnimInstance.h"
 
-UGhostActorAnimInstance::UGhostActorAnimInstance()
+UGhostActorAnimInstance::UGhostActorAnimInstance():
+	GhostPoseSnapshot(FPoseSnapshot())
 {
 }
