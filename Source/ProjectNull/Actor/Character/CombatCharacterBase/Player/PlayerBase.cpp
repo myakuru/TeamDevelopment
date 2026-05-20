@@ -53,6 +53,7 @@ APlayerBase::APlayerBase()
 	CameraComponent->bUsePawnControlRotation = false;
 
 	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
+
 }
 
 void APlayerBase::BeginPlay()
@@ -69,6 +70,10 @@ void APlayerBase::BeginPlay()
 		ModelAfterimageTrailEffect->SetCanAddTrailPoint(true);
 	}
 
+	RadialBlurMID = UMaterialInstanceDynamic::Create(RadialBlurMaterial, this);
+	if(CameraComponent) {
+		
+	}
 	UpdateHUDHP();
 }
 
