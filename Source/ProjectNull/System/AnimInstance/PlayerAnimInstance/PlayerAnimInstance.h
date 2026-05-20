@@ -4,16 +4,27 @@
 #include "Animation/AnimInstance.h"
 #include "PlayerAnimInstance.generated.h"
 
-/// <summary>
-/// �v���C���[�̃A�j���[�V�����C���X�^���X�N���X
-/// </summary>
+/** プレイヤーのアニメーションインスタンスクラス */
 UCLASS()
-class PROJECTNULL_API UPlayerAnimInstance : public UAnimInstance
+class PROJECTNULL_API UPlayerAnimInstance final : public UAnimInstance
 {
 	GENERATED_BODY()
-	
+public:
+	UPlayerAnimInstance();
 public:
 
-	UPlayerAnimInstance();
+	void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	inline FPoseSnapshot& GetPlayerPoseSnapshot() { return PlayerPoseSnapshot; }
+
+	/** 戦闘構え状態か */
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsCombatStance;
+
+private:
+
+	void SavePoseSnapshot();
+
+	UPROPERTY()
+	FPoseSnapshot PlayerPoseSnapshot;
 };

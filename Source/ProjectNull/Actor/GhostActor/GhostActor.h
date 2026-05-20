@@ -6,7 +6,7 @@
 #include "GhostActor.generated.h"
 
 /** ゴーストアクタークラス
-* アクターオブジェクトの残像表現 */
+* アクターオブジェクトの残像表現クラス */
 UCLASS()
 class PROJECTNULL_API AGhostActor final : public AActor
 {
@@ -18,25 +18,39 @@ protected:
 	void BeginPlay() override;
 public:	
 
-	void Tick(float DeltaTime) override;
 
-	/**
-	 * @brief 初期化処理
-	 * @param SkeletalMesh 残像表現するスケルタルメッシュ
-	 * @param Animation アニメーション
-	 * @param PoseTime 固定するアニメーションを地点時間
-	 */
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					const FPoseSnapshot& InSnapshot);
+
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					const FPoseSnapshot& InSnapshot,
+					float InLifeTime,
+					float InOpacityDecayRate);
+
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					class UAnimationAsset* Animation,
-					float PoseTime,
-					float InLifeTime);
+					float InPoseTime);
+
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					class UAnimationAsset* Animation,
+					float InPoseTime,
+					float InLifeTime,
+					float InOpacityDecayRate);
+
+	void Tick(float DeltaTime) override;
 
 private:
+
+	void Initialize(class USkeletalMesh* SkeletalMesh);
+
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> Root;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> Mesh;
 
-	UPROPERTY(EditAnywhere, Category = "Ghost")
+	UPROPERTY(EditAnywhere, Category = "Material")
 	TObjectPtr<UMaterialInterface> GhostMaterial;
 
 	UPROPERTY()
@@ -50,11 +64,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float LifeTime;
 
-	UPROPERTY(EditAnywhere)
-	float OpacityDecayRate;
-
-	float Opacity;
-
 	/** 時間管理用 */
 	float CurrentTime;
 
@@ -64,9 +73,18 @@ private:
 
 	/** 縁の色 */
 	UPROPERTY(EditAnywhere, Category = "Material")
-	FLinearColor StartColor;
+	FLinearColor StartRimColor;
 
-	/** ベース色 */
+	/** 縁の鮮明さ */
 	UPROPERTY(EditAnywhere, Category = "Material")
-	FLinearColor StartBaseColor;
+	float RimSharpness;
+
+	/** 縁の強さ */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float RimStrength;
+
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float OpacityDecayRate;
+
+	float Opacity;
 };

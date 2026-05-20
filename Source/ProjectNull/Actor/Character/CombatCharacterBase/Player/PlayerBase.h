@@ -12,6 +12,8 @@ class UPlayerGearComponent;
 class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
+class UPlayerAnimInstance;
+class UModelAfterimageTrailEffect;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
@@ -36,11 +38,15 @@ public:
 	void CanChangeGear() const;
 
 	int32 GetCurrentGearLevel() const;
+	
 
 	/** ゲッター */
-	inline UPlayerGearComponent*			GetGearComponent() const		{ return GearComponent; }
-	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const	{ return Instance; }
-
+	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
+	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
+	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
+	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return Instance; }
+	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
+	FPoseSnapshot&							GetPlayerPoseSnapshot();
 
 private:
 
@@ -67,4 +73,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> Instance;
 
+
+	UPROPERTY(EditAnywhere,Instanced,Category = "ModelAfterimageTrailEffect")
+	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;
 };

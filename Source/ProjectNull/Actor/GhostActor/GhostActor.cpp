@@ -1,19 +1,22 @@
 ﻿
 #include "GhostActor.h"
 
+#include <ProjectNull/System/AnimInstance/GhostActorAnimInstance/GhostActorAnimInstance.h>
+
 AGhostActor::AGhostActor():
 	TranslucencySortPriority(10),
 	LifeTime(0.5f),
 	CurrentTime(0.0f),
-	StartOpacity(1.0f),
-	StartColor(FLinearColor::Black),
-	StartBaseColor(FLinearColor::Black)
+	StartOpacity(1.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
+
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	if (!Mesh) { return; }
-	SetRootComponent(Mesh);
+	Mesh->SetupAttachment(Root);
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh->SetCastShadow(false);
 }
@@ -24,45 +27,93 @@ void AGhostActor::BeginPlay()
 	Opacity = StartOpacity;
 }
 
+void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, const FPoseSnapshot& InSnapshot)
+{
+	if (!SkeletalMesh) { return; }
+
+	Initialize(SkeletalMesh);
+
+	// Animation設定
+	if (!Mesh->GetAnimInstance()) { return; }
+
+	auto* GhostAnimInstance = Cast<UGhostActorAnimInstance>(Mesh->GetAnimInstance());
+	if (!GhostAnimInstance) { return; }
+	
+	GhostAnimInstance->GhostPoseSnapshot = InSnapshot;
+}
+
+void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, const FPoseSnapshot& InSnapshot, float InLifeTime, float InOpacityDecayRate)
+{
+	if (!SkeletalMesh) { return; }
+
+	LifeTime			= InLifeTime;
+	OpacityDecayRate	= InOpacityDecayRate;
+
+	Initialize(SkeletalMesh);
+
+	// Animation設定
+	if (!Mesh->GetAnimInstance()) { return; }
+
+	auto* GhostAnimInstance = Cast<UGhostActorAnimInstance>(Mesh->GetAnimInstance());
+	if (!GhostAnimInstance) { return; }
+
+	GhostAnimInstance->GhostPoseSnapshot = InSnapshot;
+}
+
+void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float InPoseTime)
+{
+	if (!SkeletalMesh) { return; }
+
+	Initialize(SkeletalMesh);
+
+	Mesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	Mesh->SetAnimation(Animation);
+	Mesh->SetPosition(InPoseTime);
+
+	// アニメ停止
+	Mesh->bPauseAnims = true;
+}
+
+void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float InPoseTime, float InLifeTime, float InOpacityDecayRate)
+{
+	if (!SkeletalMesh) { return; }
+
+	LifeTime			= InLifeTime;
+	OpacityDecayRate	= InOpacityDecayRate;
+
+	Initialize(SkeletalMesh);
+
+	Mesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	Mesh->SetAnimation(Animation);
+	Mesh->SetPosition(InPoseTime);
+
+	// アニメ停止
+	Mesh->bPauseAnims = true;
+}
+
 void AGhostActor::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	AActor::Tick(DeltaTime);
 
 	CurrentTime += DeltaTime;
 	Opacity -= OpacityDecayRate * DeltaTime;
 
-	for (UMaterialInstanceDynamic* Material : DynamicMaterials) {
+	for (auto& Material : DynamicMaterials) {
 		if (!Material) { continue; }
-
 		Material->SetScalarParameterValue(TEXT("Opacity"), Opacity);
 	}
 
-	if (CurrentTime >= LifeTime) {
+	if (CurrentTime >= LifeTime || Opacity <= 0.0f) {
 		Destroy();
 	}
-
 }
 
-void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Animation, float PoseTime, float InLifeTime)
+void AGhostActor::Initialize(class USkeletalMesh* SkeletalMesh)
 {
-	if (!SkeletalMesh || !Animation || !Mesh) { return; }
-
-	LifeTime = InLifeTime;
+	if (!SkeletalMesh || !Mesh) { return; }
 
 	// SkeletalMesh設定
 	Mesh->SetSkeletalMesh(SkeletalMesh);
-
-	// SingleNodeモード
-	Mesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-
-	// Animation設定
-	Mesh->SetAnimation(Animation);
-
-	// 特定時間へ移動
-	Mesh->SetPosition(PoseTime);
-
-	// アニメ停止
-	Mesh->bPauseAnims = true;
 	Mesh->SetRenderCustomDepth(true);
 	Mesh->TranslucencySortPriority = TranslucencySortPriority;
 
@@ -78,8 +129,8 @@ void AGhostActor::Initialize(USkeletalMesh* SkeletalMesh, UAnimationAsset* Anima
 		DynamicMaterials.Add(DynamicMaterial);
 
 		DynamicMaterial->SetScalarParameterValue(TEXT("Opacity"), StartOpacity);
-		DynamicMaterial->SetVectorParameterValue(TEXT("Color"), StartColor);
-		DynamicMaterial->SetVectorParameterValue(TEXT("BaseColor"), StartBaseColor);
+		DynamicMaterial->SetVectorParameterValue(TEXT("Rim_Color"), StartRimColor);
+		DynamicMaterial->SetScalarParameterValue(TEXT("Rim_Sharpness"), RimSharpness);
+		DynamicMaterial->SetScalarParameterValue(TEXT("Rim_Strength"), RimStrength);
 	}
 }
-

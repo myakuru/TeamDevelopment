@@ -7,6 +7,7 @@
 
 class AGhostActor;
 class UAnimationAsset;
+class UModelAfterimageTrailEffect;
 
 /** 残像攻撃データ */
 USTRUCT(BlueprintType)
@@ -15,10 +16,18 @@ struct FAfterImageAttackData
 	GENERATED_BODY()
 public:
 	FAfterImageAttackData() :
+		ModelAfterimageTrailEffect(nullptr),
 		bSpawn(false),
+		StartLocationOffset(FVector::ZeroVector),
+		EndLocationOffset(FVector::ZeroVector),
+		Scale(FVector::OneVector),
+		RotationOffset(FRotator::ZeroRotator),
+		Transform(FTransform()),
+		MoveTime(0.0f),
+		TimeThreshold(0.0f),
+		LifeTime(0.0f),
 		PoseTime(0.0f),
-		Time(0.0f),
-		LifeTime(0.0f)
+		OpacityDecayRate(1.0f)
 	{
 	}
 
@@ -28,35 +37,48 @@ public:
 		return FMath::Lerp(StartLocationOffset, EndLocationOffset, LerpAlpha);
 	}
 
+	inline FVector CalcMoveDir() const {	
+		return (EndLocationOffset - StartLocationOffset).GetSafeNormal();
+	}
+
+	/** モデル残像エフェクトクラス */
+	UPROPERTY(EditAnywhere,Instanced)
+	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;
+
 	/** スポーンしているか */
 	bool bSpawn;
 
-	UPROPERTY()
-	AGhostActor* GhostActor;
-
+	/** 移動する際の開始座標(オフセット) */
 	UPROPERTY(EditAnywhere)
 	FVector StartLocationOffset;
 
+	/** 移動する際の終了座標(オフセット) */
 	UPROPERTY(EditAnywhere)
 	FVector EndLocationOffset;
 
+	/** 拡大率 */
 	UPROPERTY(EditAnywhere)
 	FVector Scale;
 
+	/** 回転オフセット */
 	UPROPERTY(EditAnywhere)
 	FRotator RotationOffset;
 
-	UPROPERTY(EditAnywhere)
+	/** トランスフォーム情報 */
+	UPROPERTY()
 	FTransform Transform;
 
 	UPROPERTY(EditAnywhere)
-	float Time;
+	float MoveTime;
 
 	UPROPERTY(EditAnywhere)
 	float TimeThreshold;
 
 	UPROPERTY(EditAnywhere)
 	float LifeTime;
+
+	UPROPERTY(EditAnywhere)
+	float OpacityDecayRate;
 	
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	float PoseTime;
@@ -82,11 +104,7 @@ public:
 				const FTransform& PlayerTransform);
 
 
-	float GetTotalTime();
 	float GetMaxTime();
-
-	UPROPERTY(EditAnywhere)
-	int32 AfterImageNum;
 
 	/** 残像攻撃データ */
 	UPROPERTY(EditAnywhere)
@@ -102,4 +120,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Ghost")
 	TSubclassOf<AGhostActor> GhostClass;
+	FTransform StartTransfrom;
+
 };

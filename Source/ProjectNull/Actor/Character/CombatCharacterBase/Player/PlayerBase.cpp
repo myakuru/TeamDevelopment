@@ -2,6 +2,11 @@
 
 #include "Camera/CameraComponent.h"
 #include <GameFramework/SpringArmComponent.h>
+
+#include "Animation/AnimSingleNodeInstance.h"
+#include "Animation/AnimationAsset.h"
+#include "Components/SkeletalMeshComponent.h"
+
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
@@ -11,6 +16,8 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
+#include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 
 
 APlayerBase::APlayerBase()
@@ -55,21 +62,46 @@ void APlayerBase::BeginPlay()
 		AutoAttack->Initialize(this);
 	}
 
+	if (ModelAfterimageTrailEffect) {
+		ModelAfterimageTrailEffect->SetCanAddTrailPoint(true);
+	}
+
 	UpdateHUDHP();
 }
 
 void APlayerBase::Tick(float DeltaTime)
 {
-	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!enemyManager) { return; }
+	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+	if (!EnemyManager) { return; }
 
 	
 	ACombatCharacterBase::Tick(DeltaTime);
 
 	if (AutoAttack) {
-		AutoAttack->Update(DeltaTime,nullptr,enemyManager);
+		AutoAttack->Update(DeltaTime,nullptr, EnemyManager);
 	}
 
+	//Main Status
+
+	auto* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance) { return; }
+	
+	//FPoseSnapshot
+
+	/*FPoseSnapshot Result;
+
+	if (auto* Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		Result = Anim->GetPlayerPoseSnapshot();
+	}
+
+	if (ModelAfterimageTrailEffect) {
+
+		ModelAfterimageTrailEffect->Update(DeltaTime,GetActorTransform(),GetMesh()->GetSkeletalMeshAsset(),
+			Result);
+	}*/
+	
+	
 	if (ARobotController* RobotController = Cast<ARobotController>(GetController())) {
 		HUDWidget = RobotController->GetPlayerHUD();
 	}
@@ -104,6 +136,22 @@ int32 APlayerBase::GetCurrentGearLevel() const
 {
 	if (!GearComponent) { return 0; }
 	return GearComponent->GetCurrentGearLevel();
+}
+
+UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
+{
+	if (!GetMesh() || !GetMesh()->GetAnimInstance()) { return nullptr; }
+	return Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+}
+
+FPoseSnapshot& APlayerBase::GetPlayerPoseSnapshot()
+{
+	FPoseSnapshot PoseSnapshot;
+	if (!GetMesh() || !GetMesh()->GetAnimInstance()
+		|| !Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance())) { return PoseSnapshot; }
+
+	auto* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	return PlayerAnimInstance->GetPlayerPoseSnapshot();
 }
 
 bool APlayerBase::CanMove()
