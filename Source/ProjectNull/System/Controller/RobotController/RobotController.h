@@ -21,10 +21,13 @@ public:
 
 	ARobotController();
 
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHud; }
-
 	void OpenPlayerExpUpgradeWidget();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	inline UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHud; }
+
+	/** Setter */
+	inline void SetCanReceiveInput(bool InbCanReceiveInput) { bCanReceiveInput = InbCanReceiveInput;}
 
 protected:
 
