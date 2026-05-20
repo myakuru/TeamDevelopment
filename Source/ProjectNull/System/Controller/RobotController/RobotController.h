@@ -33,6 +33,7 @@ protected:
 
 	virtual void GearExecute01(const FInputActionValue& GearActionValue01);
 
+
 private:
 
 	void InitializeInputContext();
@@ -44,13 +45,14 @@ private:
 
 	void ChangeGear(const FInputActionValue& ActionValue);
 
+	void InitializeUI();
 
 
-	void InitializeUi();
+	/** 入力受付可能か */
+	bool bCanReceiveInput;
 
 	UPROPERTY()
 	TObjectPtr<APlayerBase> PlayerBase;
-
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputContext;
