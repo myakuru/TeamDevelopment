@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "../DashGearStateBase.h"
+#include <ProjectNull/Utility/Common/GameTypes/GameTypes.h>
 #include "DashGearState_Lv4.generated.h"
 
 /** ロボットコントローラークラス */
@@ -80,6 +81,8 @@ private:
 
 	void UpdateTargetArmLength(float DeltaTime, int32 DataIndex);
 
+	void UpdateFinalDash(float DeltaTime, float ElapsedTime);
+
 
 	int32 GetCurrentSectionIndex(float InElapsedTime);
 
@@ -99,10 +102,11 @@ private:
 
 	/** 構えアニメーションの時間閾値 */
 	UPROPERTY(EditAnywhere)
-	float StanceMinTimeThreshold;
+	FThresholdRange StanceTime;
 
+	/** ダッシュの時間閾値 */
 	UPROPERTY(EditAnywhere)
-	float StanceMaxTimeThreshold;
+	FThresholdRange DashTime;
 
 	/** カメラデータをまとめる配列 */
 	UPROPERTY(EditAnywhere, Category = "Camera")

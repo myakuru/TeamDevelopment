@@ -26,9 +26,6 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 
 void UDashGearStateBase::Update(float DeltaTime)
 {
-	/*UE_LOG(LogTemp, Warning, TEXT("hi OwnerPlayer %d"), OwnerPlayer);
-	UE_LOG(LogTemp, Warning, TEXT("hi OwnerGear %d"), OwnerGear);*/
-
 	if (!OwnerGear || !OwnerPlayer) { return; }
 
 	Dash();
