@@ -77,6 +77,10 @@ FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 		if (UpgradeWidget_0->IsMouseOver() || UpgradeWidget_1->IsMouseOver() || UpgradeWidget_2->IsMouseOver())
 		{
 			CloseWidget();
+
+			UpgradeWidget_0->OnUpgradeClicked();
+			UpgradeWidget_1->OnUpgradeClicked();
+			UpgradeWidget_2->OnUpgradeClicked();
 		}
 
 		// イベントをこのウィジェットで処理したことを返す
@@ -135,7 +139,7 @@ void UPlayerExpUpgradeWidget::BackgroundImageFadeIn()
 	{
 		// フェードインのアルファ値を更新
 		BackgroundFadeInAlpha += GetWorld()->GetDeltaSeconds() * BackgroundFadeInDuration;
-		BackgroundFadeInAlpha = FMath::Clamp(BackgroundFadeInAlpha, 0.0f, 0.5f);
+		BackgroundFadeInAlpha = FMath::Clamp(BackgroundFadeInAlpha, 0.0f, BackgroundFadeInAlphaMax);
 
 		BackgroundImage->SetColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, BackgroundFadeInAlpha));
 	}
@@ -143,7 +147,7 @@ void UPlayerExpUpgradeWidget::BackgroundImageFadeIn()
 
 void UPlayerExpUpgradeWidget::InitUpgradeWidget()
 {
-	if (BackgroundFadeInAlpha >= 0.5f)
+	if (BackgroundFadeInAlpha >= BackgroundFadeInAlphaMax)
 	{
 		BackgroundFadeInAlpha = 0.0f;
 	}

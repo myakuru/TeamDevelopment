@@ -9,6 +9,7 @@
 class UTextBlock;
 class UImage;
 class UExpUpgradeWidget0;
+struct FExpUpgradeRow;
 
 /**
  * データーテーブルから取得したテキストをUIにするクラスのベースクラス
@@ -35,6 +36,9 @@ public:
 
 	void InitExpUpgradeWidget();
 
+	/** クリックで呼び出してレベルアップを行う */
+	void OnUpgradeClicked();
+
 protected:
 	/** テキストを表示するためのウィジェット */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -60,7 +64,29 @@ protected:
 	FVector2D UiScale = { 0.0f,0.0f };
 
 private:
+	/** 明示的な行名を渡してレベルアップする（クリック時にRow名を渡す場合はこちらを呼ぶ） */
+	void OnUpgradeClickedByName(FName ClickedRowName);
+
 	int32 GetRandomTextId();
 
 	bool bIsMouseOver = false;
+
+	/** プレイヤー側で保持する各行ごとの現在レベル（デフォルトは 0） */
+	TMap<FName, int32> PlayerUpgradeLevels;
+
+	/** DataTable をキャッシュしておく（毎回ロードしない） */
+	UPROPERTY()
+	UDataTable* CachedExpUpgradeTable = nullptr;
+
+	/** 現在表示中の行名（ChoicesExpUpgrade でセット） */
+	FName SelectedRowName = NAME_None;
+
+	/** 現在表示中の行データへのポインタ（DataTable の行をキャッシュ） */
+	const FExpUpgradeRow* SelectedRowData = nullptr;
+
+	/** 指定した行に対して現在レベルのテキストを表示する */
+	void ShowTextForCurrentLevel(FName RowName, const struct FExpUpgradeRow* RowData);
+
+	/** DataTable のロード（内部でキャッシュ） */
+	UDataTable* GetExpUpgradeTable();
 };

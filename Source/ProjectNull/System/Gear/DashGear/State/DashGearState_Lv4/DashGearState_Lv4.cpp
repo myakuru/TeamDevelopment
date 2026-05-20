@@ -32,8 +32,7 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 
 	StartTargetArmLength = Camera->TargetArmLength;
 
-	if (auto* Controller = OwnerPlayer->GetController())
-	{
+	if (auto* Controller = OwnerPlayer->GetController()) {
 		StartControlRotation = Controller->GetControlRotation();
 	}
 
@@ -118,7 +117,8 @@ void UDashGearState_Lv4::UpdateCameraRotation(float DeltaTime, int32 DataIndex)
 {
 	if (!CameraData.IsValidIndex(DataIndex)
 		|| !RobotController) { return; }
-	const FRotator	TargetRotator			= CameraData[DataIndex].TargetRotator + StartControlRotation;
+	FRotator	TargetRotator				= CameraData[DataIndex].TargetRotator;
+	TargetRotator.Yaw						= CameraData[DataIndex].TargetRotator.Yaw + StartControlRotation.Yaw;
 	const float		TargetRotatorLerpSpeed	= CameraData[DataIndex].RotatorLerpSpeed;
 	const float		TargetArmLength			= CameraData[DataIndex].TargetArmLength;
 
