@@ -41,7 +41,7 @@ void ARobotController::BeginPlay()
 
 	InitializeInputContext();
 
-	InitializeUi();
+	InitializeUI();
 }
 
 void ARobotController::SetupInputComponent()
@@ -105,7 +105,7 @@ void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
 	PlayerBase->GetGearComponent()->ExecuteGear(0);
 }
 
-void ARobotController::InitializeUi()
+void ARobotController::InitializeUI()
 {
 	if (IsLocalController() && PlayerHUDClass && PlayerExpUpgradeWidgetClass)
 	{
