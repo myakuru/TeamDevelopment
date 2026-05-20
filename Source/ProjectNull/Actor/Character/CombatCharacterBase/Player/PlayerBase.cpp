@@ -7,6 +7,9 @@
 #include "Animation/AnimationAsset.h"
 #include "Components/SkeletalMeshComponent.h"
 
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Materials/MaterialParameterCollection.h"
+
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
@@ -81,26 +84,15 @@ void APlayerBase::Tick(float DeltaTime)
 		AutoAttack->Update(DeltaTime,nullptr, EnemyManager);
 	}
 
-	//Main Status
-
-	auto* AnimInstance = GetMesh()->GetAnimInstance();
-	if (!AnimInstance) { return; }
-	
-	//FPoseSnapshot
-
-	/*FPoseSnapshot Result;
-
-	if (auto* Anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
-	{
-		Result = Anim->GetPlayerPoseSnapshot();
-	}
-
-	if (ModelAfterimageTrailEffect) {
-
-		ModelAfterimageTrailEffect->Update(DeltaTime,GetActorTransform(),GetMesh()->GetSkeletalMeshAsset(),
-			Result);
-	}*/
-	
+	UKismetMaterialLibrary::SetVectorParameterValue(
+		GetWorld(),
+		MaterialCollection,
+		TEXT("Position"),
+		FLinearColor(GetActorTransform().GetLocation().X,
+			GetActorTransform().GetLocation().Y,
+			GetActorTransform().GetLocation().Z,
+			1.0f)
+	);
 	
 	if (ARobotController* RobotController = Cast<ARobotController>(GetController())) {
 		HUDWidget = RobotController->GetPlayerHUD();
