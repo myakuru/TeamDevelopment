@@ -37,15 +37,7 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 	}
 
 
-	float TotalDuration = 0.f;
-	TotalDuration += StanceTime.GetRange();
-	TotalDuration += DashTime.GetRange();
-	
-	for (auto& Data : CameraData) {
-		TotalDuration += Data.Time;
-	}
-
-	Gear->SetGearDuration(TotalDuration, kLv4Index);
+	InitializeGearDuration();
 
 	RobotController = Cast<ARobotController>(OwnerPlayer->GetController());
 }
@@ -74,7 +66,6 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 	AfterImageAttackEffect->Update(DeltaTime, ElapsedTime);
 
 	UpdateCamera(DeltaTime);
-
 	UpdateFinalDash(DeltaTime,ElapsedTime);
 }
 
@@ -107,7 +98,8 @@ void UDashGearState_Lv4::UpdateCamera(float DeltaTime)
 	if (!OwnerPlayer || !OwnerGear || !RobotController) { return; }
 
 	const int32 ResultIndex = GetCurrentSectionIndex(OwnerGear->GetElapsedTime());
-	
+	UE_LOG(LogTemp, Display, TEXT("hi ResultIndex %d"), ResultIndex);
+
 	UpdateCameraRotation(DeltaTime, ResultIndex);
 
 	UpdateTargetArmLength(DeltaTime,ResultIndex);
@@ -150,10 +142,25 @@ void UDashGearState_Lv4::UpdateTargetArmLength(float DeltaTime, int32 DataIndex)
 
 void UDashGearState_Lv4::UpdateFinalDash(float DeltaTime, float ElapsedTime)
 {
-	if (!DashTime.IsWithinRange(ElapsedTime)) { return; }
+	if (!DashTime.IsWithinRange(ElapsedTime) || !OwnerPlayer || !OwnerPlayer->GetMesh()) { return; }
+
+	// プレイヤースケルタルメッシュの描画無効にする
 	OwnerPlayer->GetMesh()->SetHiddenInGame(false);
 
+	// ダッシュ処理
 	Dash();
+}
+
+void UDashGearState_Lv4::InitializeGearDuration()
+{
+	if (!OwnerGear) { return; }
+	float TotalDuration = 0.f;
+
+	for (auto& Data : CameraData) {
+		TotalDuration += Data.Time;
+	}
+
+	OwnerGear->SetGearDuration(TotalDuration, kLv4Index);
 }
 
 int32 UDashGearState_Lv4::GetCurrentSectionIndex(float InElapsedTime)

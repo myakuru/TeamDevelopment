@@ -77,11 +77,12 @@ public:
 		return (EndLocationOffset - StartLocationOffset).GetSafeNormal();
 	}
 
+	
 	/**
-	 * @brief 
-	 * @param bInCanAddTrailPoint 
+	 * @brief 残像をスポーンするかどうかのフラグをセットする
+	 * @param bInEnableSpawn 
 	 */
-	void SetCanAddTrailPoint(bool bInCanAddTrailPoint) const;
+	void SetEnableSpawn(bool bInEnableSpawn) const;
 	
 
 	/** モデル残像エフェクトクラス */
@@ -133,7 +134,7 @@ public:
 	float PoseTime;
 };
 
-/** 残像攻撃の振る舞いを管理するエフェクトクラス */
+/** 残像攻撃(連続的に描画する残像)の振る舞いを管理するエフェクトクラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UAfterImageAttackEffect final : public UObject
 {
@@ -180,15 +181,11 @@ private:
 
 	/** 残像のスケルタルメッシュ */
 	UPROPERTY(EditAnywhere, Category = "Asset")
-	USkeletalMesh* SkeletalMesh;
+	TObjectPtr<USkeletalMesh> SkeletalMesh;
 
 	/** 残像アニメーション */
 	UPROPERTY(EditAnywhere, Category = "Asset")
-	UAnimationAsset* AnimationAsset;
-
-	/** このクラスで制御する残像クラス */
-	UPROPERTY(EditAnywhere, Category = "Ghost")
-	TSubclassOf<AGhostActor> GhostClass;
+	TObjectPtr<UAnimationAsset> AnimationAsset;
 
 	/** 攻撃開始時に基準とするトランフォーム情報 */
 	FTransform StartTransfrom;

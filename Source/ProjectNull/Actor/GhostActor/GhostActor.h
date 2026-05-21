@@ -18,42 +18,74 @@ protected:
 	void BeginPlay() override;
 public:	
 
-	/** アニメーションを停止して描画する際のアニメーション時間閾値 */
+	void Tick(float DeltaTime) override;
 
+	/**
+	 * @brief 初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 * @param InSnapshot ポーズ
+	 */
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					const FPoseSnapshot& InSnapshot);
 
+	/**
+	 * @brief 初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 * @param InSnapshot ポーズ
+	 * @param InLifeTime 寿命時間
+	 * @param InOpacityDecayRate 透明度減少量
+	 */
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					const FPoseSnapshot& InSnapshot,
 					float InLifeTime,
 					float InOpacityDecayRate);
 
+	/**
+	 * @brief 初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 * @param Animation アニメーションアセット
+	 * @param InPoseTime アニメーションを停止して描画する際のアニメーション時間閾値
+	 */
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					class UAnimationAsset* Animation,
 					float InPoseTime);
 
+	/**
+	 * @brief 初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 * @param Animation アニメーションアセット
+	 * @param InPoseTime アニメーションを停止して描画する際のアニメーション時間閾値
+	 * @param InLifeTime 寿命時間
+	 * @param InOpacityDecayRate 透明度減少量
+	 */
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					class UAnimationAsset* Animation,
 					float InPoseTime,
 					float InLifeTime,
 					float InOpacityDecayRate);
 
-	void Tick(float DeltaTime) override;
-
 private:
 
-	void Initialize(class USkeletalMesh* SkeletalMesh);
+	/**
+	 * @brief 共通初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 */
+	void InitializeInternal(class USkeletalMesh* SkeletalMesh);
 
-
+	/** ルートコンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
 
+	/** 残像表示用スケルタルメッシュ */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> Mesh;
 
+	/** 残像描画時に使用するベースマテリアル */
 	UPROPERTY(EditAnywhere, Category = "Material")
 	TObjectPtr<UMaterialInterface> GhostMaterial;
 
+	/** 残像描画用動的マテリアルインスタンス
+		フェード値や色変更などを実行時に制御するために使用 */
 	UPROPERTY()
 	TArray<TObjectPtr<UMaterialInstanceDynamic>> DynamicMaterials;
 
@@ -61,31 +93,33 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 TranslucencySortPriority;
 
-	/** 描画時間 */
+	/** 寿命時間 */
 	UPROPERTY(EditAnywhere)
 	float LifeTime;
 
 	/** 時間管理用 */
 	float CurrentTime;
 
+	/** 透明度減少量 */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float OpacityDecayRate;
+
+	/** 透明度 */
+	float Opacity;
+
 	/** 開始時の不透明度 */
 	UPROPERTY(EditAnywhere, Category = "Material")
 	float StartOpacity;
 
-	/** 縁の色 */
+	/** リムライトの色 */
 	UPROPERTY(EditAnywhere, Category = "Material")
 	FLinearColor StartRimColor;
 
-	/** 縁の鮮明さ */
+	/** リムライトの鮮明さ */
 	UPROPERTY(EditAnywhere, Category = "Material")
 	float RimSharpness;
 
-	/** 縁の強さ */
+	/** リムライトの強さ */
 	UPROPERTY(EditAnywhere, Category = "Material")
 	float RimStrength;
-
-	UPROPERTY(EditAnywhere, Category = "Material")
-	float OpacityDecayRate;
-
-	float Opacity;
 };

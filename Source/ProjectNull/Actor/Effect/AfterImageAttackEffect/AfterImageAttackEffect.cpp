@@ -8,7 +8,6 @@ UAfterImageAttackEffect::UAfterImageAttackEffect():
 	AfterImageDataArray(TArray<FAfterImageAttackData>()),
 	SkeletalMesh(nullptr),
 	AnimationAsset(nullptr),
-	GhostClass(nullptr),
 	StartTransfrom(FTransform())
 {
 
@@ -31,7 +30,7 @@ void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime)
 		// 制御時間外なら非表示にし、更新を行わない
 		if(!Data.IsWithinTimeRange(ElapsedTime))
 		{
-			Data.SetCanAddTrailPoint(false);
+			Data.SetEnableSpawn(false);
 			continue;
 		}
 
@@ -58,8 +57,8 @@ float UAfterImageAttackEffect::GetMaxTime()
 
 void UAfterImageAttackEffect::UpdateAfterimageAttackData(float DeltaTime, float ElapsedTime, FAfterImageAttackData& Data)
 {
-	// ポイントを追加
-	Data.SetCanAddTrailPoint(true);
+	// 残像を追加
+	Data.SetEnableSpawn(true);
 
 	// 開始時のトランフォーム情報から行列と座標を取得する
 	const FVector Location	= StartTransfrom.GetLocation();
@@ -92,14 +91,14 @@ void UAfterImageAttackEffect::UpdateAfterimageAttackData(float DeltaTime, float 
 	Data.ModelAfterimageTrailEffect->Update(DeltaTime, Data.Transform, SkeletalMesh, AnimationAsset, Data.PoseTime);
 }
 
-void FAfterImageAttackData::SetCanAddTrailPoint(bool bInCanAddTrailPoint) const
+void FAfterImageAttackData::SetEnableSpawn(bool bInEnableSpawn) const
 {
 	// フラグ変更可能なときのみ実行できる
 	if (!ModelAfterimageTrailEffect
-		|| ModelAfterimageTrailEffect->CanAddTrailPoint() == bInCanAddTrailPoint)
+		|| ModelAfterimageTrailEffect->EnableSpawn() == bInEnableSpawn)
 	{
 		return;
 	}
 
-	ModelAfterimageTrailEffect->SetCanAddTrailPoint(bInCanAddTrailPoint);
+	ModelAfterimageTrailEffect->SetEnableSpawn(bInEnableSpawn);
 }

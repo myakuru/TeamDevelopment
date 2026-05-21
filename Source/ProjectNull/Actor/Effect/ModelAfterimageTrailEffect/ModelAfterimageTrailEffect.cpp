@@ -4,92 +4,122 @@
 #include <ProjectNull/Actor/GhostActor/GhostActor.h>
 
 UModelAfterimageTrailEffect::UModelAfterimageTrailEffect():
-	bCanAddTrailPoint(false),
-	TrailPointDataArray(TArray<AGhostActor*>()),
+	bEnableSpawn(false),
+	GhostActors(TArray<AGhostActor*>()),
 	TrailAddTimer(0.0f),
-	TrailAddInterval(1.0f),
+	SpawnInterval(1.0f),
 	TrailMaxLength(1),
 	GhostClass(nullptr)
 {
 }
 
-void UModelAfterimageTrailEffect::Update(float DeltaTime, const FTransform& InTransform, USkeletalMesh* InSkeletalMesh, const FPoseSnapshot& InSnapshot)
+void UModelAfterimageTrailEffect::Update(
+	float DeltaTime,
+	const FTransform& InTransform,
+	USkeletalMesh* InSkeletalMesh,
+	const FPoseSnapshot& InSnapshot)
 {
-	if (!InSkeletalMesh) { return; }
-
-	if (!bCanAddTrailPoint) {
-		if (TrailAddTimer != 0.0f) { TrailAddTimer = 0.0f; }
-		return;
-	}
-
-	TrailAddTimer += DeltaTime;
-
-	if (TrailAddTimer >= TrailAddInterval) {
-		AddAfterimageTrail(InTransform,InSkeletalMesh, InSnapshot);
-		TrailAddTimer = 0.0f;
-	}
-
-	if (TrailPointDataArray.Num() > TrailMaxLength) {
-		auto* PopData = TrailPointDataArray.Pop();
-		if (!PopData) { return; }
-		PopData->Destroy();
-	}
-
+	UpdateInternal(
+		DeltaTime,
+		InTransform,
+		InSkeletalMesh,
+		[this, InSkeletalMesh, InSnapshot](AGhostActor* Ghost)
+		{
+			Ghost->Initialize(InSkeletalMesh, InSnapshot);
+		});
 }
 
-void UModelAfterimageTrailEffect::Update(float DeltaTime, const FTransform& InTransform, USkeletalMesh* InSkeletalMesh, UAnimationAsset* InAnimation, float InPoseTime)
+void UModelAfterimageTrailEffect::Update(
+	float DeltaTime,
+	const FTransform& InTransform,
+	USkeletalMesh* InSkeletalMesh,
+	UAnimationAsset* InAnimation,
+	float InPoseTime)
 {
-	if (!InSkeletalMesh) { return; }
-	if (!bCanAddTrailPoint) {
-		if (TrailAddTimer != 0.0f) { TrailAddTimer = 0.0f; }
-		return;
-	}
-
-	TrailAddTimer += DeltaTime;
-
-	if (TrailAddTimer >= TrailAddInterval) {
-		AddAfterimageTrail(InTransform,InSkeletalMesh, InAnimation, InPoseTime);
-		TrailAddTimer = 0.0f;
-	}
-
-	if (TrailPointDataArray.Num() > TrailMaxLength) {
-		auto* PopData = TrailPointDataArray.Pop();
-		if (!PopData) { return; }
-		PopData->Destroy();
-	}
+	UpdateInternal(
+		DeltaTime,
+		InTransform,
+		InSkeletalMesh,
+		[this, InSkeletalMesh, InAnimation, InPoseTime](AGhostActor* Ghost)
+		{
+			Ghost->Initialize(InSkeletalMesh, InAnimation, InPoseTime);
+		});
 }
 
 void UModelAfterimageTrailEffect::AllDestroy()
 {
-	for (auto& Data : TrailPointDataArray) {
+	for (auto* Data : GhostActors)
+	{
+		if (!Data) { continue; }
 		Data->Destroy();
 	}
+
+	GhostActors.Empty();
 }
 
-void UModelAfterimageTrailEffect::AddAfterimageTrail(const FTransform& InTransform, USkeletalMesh* InSkeletalMesh, const FPoseSnapshot& InSnapshot)
+
+void UModelAfterimageTrailEffect::UpdateInternal(
+	float DeltaTime,
+	const FTransform& InTransform,
+	USkeletalMesh* InSkeletalMesh,
+	TFunction<void(AGhostActor*)> InitializeFunc)
 {
 	if (!InSkeletalMesh) { return; }
-	if (!bCanAddTrailPoint) { return; }
 
-	auto* Ghost = GetWorld()->SpawnActor<AGhostActor>(GhostClass);
-	if (!Ghost) { return; }
-	Ghost->Initialize(InSkeletalMesh, InSnapshot);
-	TrailPointDataArray.Insert(Ghost, 0);
+	if (!bEnableSpawn)
+	{
+		TrailAddTimer = 0.0f;
+		return;
+	}
 
-	Ghost->SetActorTransform(InTransform);
+	// 時間加算処理
+	TrailAddTimer += DeltaTime;
+
+	// 追加間隔に基づいて残像の追加を行う
+	if (TrailAddTimer >= SpawnInterval)
+	{
+		// 残像の追加
+		AddAfterimageTrail(
+			InTransform,
+			InitializeFunc);
+		// 時間リセット
+		TrailAddTimer = 0.0f;
+	}
+
+	// 最大保持数を超えた残像を削除
+	DestroyOverflowTrail();
 }
 
-void UModelAfterimageTrailEffect::AddAfterimageTrail(const FTransform& InTransform, USkeletalMesh* InSkeletalMesh, UAnimationAsset* InAnimation, float InPoseTime)
+void UModelAfterimageTrailEffect::AddAfterimageTrail(
+	const FTransform& InTransform,
+	TFunction<void(AGhostActor*)> InitializeFunc)
 {
-	if (!InSkeletalMesh) { return; }
-	if (!bCanAddTrailPoint) { return; }
+	if (!bEnableSpawn) { return; }
 
+	// 残像をワールドにスポーン
 	auto* Ghost = GetWorld()->SpawnActor<AGhostActor>(GhostClass);
 	if (!Ghost) { return; }
-	Ghost->Initialize(InSkeletalMesh, InAnimation, InPoseTime);
-	TrailPointDataArray.Insert(Ghost, 0);
 
+	// 初期化処理
+	InitializeFunc(Ghost);
 	Ghost->SetActorTransform(InTransform);
+
+	// 配列の先頭に追加
+	GhostActors.Insert(Ghost, 0);
 }
 
+void UModelAfterimageTrailEffect::DestroyOverflowTrail()
+{
+	// 残像の最大数を超えているとき、先頭から要素を削除
+	// ※ワールドからも削除を行う
+	while (GhostActors.Num() > TrailMaxLength)
+	{
+		auto* PopData = GhostActors.Pop();
+		
+		if (PopData)
+		{
+			PopData->Destroy();
+		}
+	}
+}
 

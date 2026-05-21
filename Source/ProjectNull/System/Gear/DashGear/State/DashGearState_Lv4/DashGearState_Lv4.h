@@ -61,8 +61,8 @@ public:
 	UDashGearState_Lv4();
 public:
 	void Initialize(class APlayerBase* Player,
-		class UPlayerGearComponent* GearComponent,
-		class UGearBase* Gear)				override;
+					class UPlayerGearComponent* GearComponent,
+					class UGearBase* Gear)	override;
 	void Execute(int32 CurrentGearLevel)	override;
 	void Update(float DeltaTime)			override;
 	void End()								override;
@@ -84,6 +84,8 @@ private:
 	void UpdateFinalDash(float DeltaTime, float ElapsedTime);
 
 
+	void InitializeGearDuration();
+
 	int32 GetCurrentSectionIndex(float InElapsedTime);
 
 	static const int32 kLv4Index = 3;
@@ -91,6 +93,10 @@ private:
 	/** ギアスキル開始時プレイヤーのTransform */
 	FTransform StartPlayerTransform;
 	FRotator StartControlRotation;
+
+
+	UPROPERTY()
+	float StartTargetArmLength;
 
 	/** ロボットコントローラークラス */
 	UPROPERTY()
@@ -112,6 +118,4 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	TArray<FDashGearState_Lv4_CameraData> CameraData;
 
-	UPROPERTY()
-	float StartTargetArmLength;
 };

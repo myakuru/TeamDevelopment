@@ -20,16 +20,25 @@ public:
 public:
 
 	/**
-	 * @brief 更新
+	 * @brief 更新処理
 	 * @param DeltaTime デルタタイム
-	 * @param InSkeletalMesh スケルタルメッシュ
-	 * @param InSnapshot スナップショット
+	 * @param InTransform 残像のトランフォーム
+	 * @param InSkeletalMesh 残像のスケルタルメッシュ
+	 * @param InSnapshot 残像のポーズ
 	 */
 	void Update(float DeltaTime,
 				const FTransform& InTransform,
 				class USkeletalMesh* InSkeletalMesh,
 				const FPoseSnapshot& InSnapshot);
 
+	/**
+	 * @brief 更新処理
+	 * @param DeltaTime デルタタイム
+	 * @param InTransform 残像のトランフォーム
+	 * @param InSkeletalMesh 残像のスケルタルメッシュ
+	 * @param InAnimation 残像のアニメーションアセット
+	 * @param InPoseTime 停止したいアニメーション閾値
+	 */
 	void Update(float DeltaTime,
 				const FTransform& InTransform,
 				class USkeletalMesh* InSkeletalMesh,
@@ -42,46 +51,59 @@ public:
 	void AllDestroy();
 
 	/** Getter */
-	inline bool CanAddTrailPoint() const { return bCanAddTrailPoint; }
+	inline bool EnableSpawn() const { return bEnableSpawn; }
 
 	/** Setter */
-	inline void SetCanAddTrailPoint(bool bInCanAddTrailPoint) { bCanAddTrailPoint = bInCanAddTrailPoint; }
+	inline void SetEnableSpawn(bool bInEnableSpawn) { bEnableSpawn = bInEnableSpawn; }
 
 private:
 
 	/**
-	 * @brief 残像ポイントの追加処理
-	 * @param InAnimPoseTime アニメーションを停止して描画する際のアニメーション時間閾値
+	 * @brief 更新共通処理
+	 * @param DeltaTime デルタタイム
+	 * @param InTransform 残像のトランフォーム
+	 * @param InSkeletalMesh 残像のスケルタルメッシュ
+	 * @param InitializeFunc ゴーストアクター初期化メソッド
 	 */
+	void UpdateInternal(float DeltaTime,
+						const FTransform& InTransform,
+						USkeletalMesh* InSkeletalMesh,
+						TFunction<void(AGhostActor*)> InitializeFunc);
 
+	/**
+	 * @brief 残像の追加処理
+	 * @param InTransform 残像のトランフォーム
+	 * @param InitializeFunc ゴーストアクター初期化メソッド
+	 */
 	void AddAfterimageTrail(const FTransform& InTransform,
-							class USkeletalMesh* InSkeletalMesh,
-							const FPoseSnapshot& InSnapshot);
+							TFunction<void(AGhostActor*)> InitializeFunc);
 
-	void AddAfterimageTrail(const FTransform& InTransform,
-							class USkeletalMesh* InSkeletalMesh,
-							class UAnimationAsset* InAnimation,
-							float InPoseTime);
+	/**
+	 * @brief 最大保持数を超えた残像を削除
+	 * 古い残像から順にDestroyする
+	 */
+	void DestroyOverflowTrail();
 
-	/** ポイント追加してよいか */
-	bool bCanAddTrailPoint;
 
-	/** 追加ポイントのデータ配列 */
+	/** 残像をスポーンするかどうか */
+	bool bEnableSpawn;
+
+	/** 残像をまとめる配列 */
 	UPROPERTY()
-	TArray<AGhostActor*> TrailPointDataArray;
+	TArray<AGhostActor*> GhostActors;
 
 	/** 残像追加時間管理 */
 	float TrailAddTimer;
 
 	/** 残像の追加間隔 */
 	UPROPERTY(EditAnywhere, Category = "Params")
-	float TrailAddInterval;
+	float SpawnInterval;
 
 	/** 残像の最大長さ */
 	UPROPERTY(EditAnywhere, Category = "Params")
 	int32 TrailMaxLength;
 
-	/** 追加し、描画するゴーストアクタークラス */
+	/** このクラスで制御する残像クラス */
 	UPROPERTY(EditAnywhere, Category = "Class")
 	TSubclassOf<AGhostActor> GhostClass;
 };
