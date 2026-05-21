@@ -18,6 +18,7 @@ protected:
 	void BeginPlay() override;
 public:	
 
+	/** アニメーションを停止して描画する際のアニメーション時間閾値 */
 
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					const FPoseSnapshot& InSnapshot);

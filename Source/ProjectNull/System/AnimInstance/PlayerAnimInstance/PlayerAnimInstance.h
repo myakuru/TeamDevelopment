@@ -14,8 +14,9 @@ public:
 public:
 
 	void NativeUpdateAnimation(float DeltaSeconds) override;
-
-	inline FPoseSnapshot& GetPlayerPoseSnapshot() { return PlayerPoseSnapshot; }
+	
+	/** Getter */
+	FPoseSnapshot& GetPlayerPoseSnapshot();
 
 	/** 戦闘構え状態か */
 	UPROPERTY(BlueprintReadOnly)
@@ -23,8 +24,14 @@ public:
 
 private:
 
+	/**
+	 * @brief 現在のポーズをプレイヤーのポーズへ保存
+	 */
 	void SavePoseSnapshot();
 
+	/**
+	 * @brief プレイヤーのポーズ（FPoseSnapshot）を格納する
+	 */
 	UPROPERTY()
 	FPoseSnapshot PlayerPoseSnapshot;
 };

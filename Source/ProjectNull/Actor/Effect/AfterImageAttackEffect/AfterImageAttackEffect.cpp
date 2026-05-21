@@ -4,91 +4,102 @@
 #include <ProjectNull/Actor/GhostActor/GhostActor.h>
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 
-UAfterImageAttackEffect::UAfterImageAttackEffect()
+UAfterImageAttackEffect::UAfterImageAttackEffect():
+	AfterImageDataArray(TArray<FAfterImageAttackData>()),
+	SkeletalMesh(nullptr),
+	AnimationAsset(nullptr),
+	GhostClass(nullptr),
+	StartTransfrom(FTransform())
 {
 
 }
-
 
 void UAfterImageAttackEffect::Initialize()
 {
-
 }
 
-void UAfterImageAttackEffect::Start()
+void UAfterImageAttackEffect::Start(const FTransform& Transform)
 {
-
+	StartTransfrom = Transform;
 }
 
-void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime, const FTransform& PlayerTransform)
+void UAfterImageAttackEffect::Update(float DeltaTime, float ElapsedTime)
 {
 
-	for (auto& Data : AfterImageDataArray) {
-
-		if (Data.TimeThreshold > ElapsedTime) { continue; }
-		// 経過時間から閾値を引いてこの区間だけの時間を算出する
-		const float Time = ElapsedTime - Data.TimeThreshold;
-		if (Time > Data.MoveTime) { 
-			if (!Data.ModelAfterimageTrailEffect)
-			{
-				continue;
-			}
-
-			Data.ModelAfterimageTrailEffect->SetCanAddTrailPoint(false);
-			continue; 
+	for (auto& Data : AfterImageDataArray) 
+	{
+		// 制御時間外なら非表示にし、更新を行わない
+		if(!Data.IsWithinTimeRange(ElapsedTime))
+		{
+			Data.SetCanAddTrailPoint(false);
+			continue;
 		}
 
-
-		if (!Data.bSpawn) {
-			Data.bSpawn = true;
-
-			if (!Data.ModelAfterimageTrailEffect)
-			{
-				continue;
-			}
-		
-			Data.ModelAfterimageTrailEffect->SetCanAddTrailPoint(true);
-		}
-
-		if (Data.ModelAfterimageTrailEffect) {
-
-			const FVector PlayerLocation = StartTransfrom.GetLocation();
-			const FMatrix PlayerMatrix = StartTransfrom.ToMatrixWithScale();
-
-			const FVector Forward = PlayerMatrix.GetUnitAxis(EAxis::X);
-			const FVector Right = PlayerMatrix.GetUnitAxis(EAxis::Y);
-			const FVector Up = PlayerMatrix.GetUnitAxis(EAxis::Z);
-			const FVector Offset = Data.CalcLocationOffset(Time / Data.MoveTime);
-			UE_LOG(LogTemp, Warning, TEXT("hi time %.2f"), Offset.X);
-
-			const FVector ResultLocation = PlayerLocation
-				+ Forward * Offset.X
-				+ Right * Offset.Y
-				+ Up * Offset.Z;
-
-			//FVector MoveDir = (ResultLocation - Data.Transform.GetLocation()).GetSafeNormal();
-			FVector MoveDir = Data.CalcMoveDir();
-			FVector ResultDir = { Forward * MoveDir.X + Right * MoveDir.Y + Up * MoveDir.Z };
-			Data.Transform.SetLocation(ResultLocation);
-			Data.Transform.SetRotation((ResultDir.Rotation() + Data.RotationOffset).Quaternion());
-			Data.Transform.SetScale3D(Data.Scale);
-
-			Data.ModelAfterimageTrailEffect->Update(DeltaTime, Data.Transform,SkeletalMesh,AnimationAsset,Data.PoseTime);
-		}
-
+		// データの更新
+		UpdateAfterimageAttackData(DeltaTime, ElapsedTime, Data);
 	}
 }
 
 float UAfterImageAttackEffect::GetMaxTime()
 {
-	float MaxTime = 0.0f;
+	float MaxTime = 0.f;
 
-	for (auto& Data : AfterImageDataArray) {
-		if (Data.TimeThreshold + Data.MoveTime > MaxTime)
+	for (auto& Data : AfterImageDataArray) 
+	{
+		// 時間閾値 + 移動時間 を計算し制御終了時間の最大値を求める
+		if (Data.TimeThreshold + Data.MoveTime > MaxTime) 
 		{
 			MaxTime = Data.TimeThreshold + Data.MoveTime;
 		}
 	}
 
 	return MaxTime;
+}
+
+void UAfterImageAttackEffect::UpdateAfterimageAttackData(float DeltaTime, float ElapsedTime, FAfterImageAttackData& Data)
+{
+	// ポイントを追加
+	Data.SetCanAddTrailPoint(true);
+
+	// 開始時のトランフォーム情報から行列と座標を取得する
+	const FVector Location	= StartTransfrom.GetLocation();
+	const FMatrix Matrix	= StartTransfrom.ToMatrixWithScale();
+
+	// 行列から各軸ベクトルを取得する
+	const FVector Forward	= Matrix.GetUnitAxis(EAxis::X);
+	const FVector Right		= Matrix.GetUnitAxis(EAxis::Y);
+	const FVector Up		= Matrix.GetUnitAxis(EAxis::Z);
+
+	// オフセット座標の計算
+	const FVector Offset	= Data.CalcLocationOffset(Data.GetCurrentTime(ElapsedTime) / Data.MoveTime);
+
+	// 開始時のトランフォーム情報とオフセットトランフォーム情報を考慮を計算
+	const FVector ResultLocation = Location
+		+ Forward * Offset.X
+		+ Right * Offset.Y
+		+ Up * Offset.Z;
+
+	const FVector MoveDir	= Data.CalcMoveDir();
+	const FVector ResultDir = { Forward * MoveDir.X + Right * MoveDir.Y + Up * MoveDir.Z };
+
+	// 計算計算をトランフォーム情報に適用させる
+	Data.Transform.SetLocation(ResultLocation);
+	Data.Transform.SetRotation((ResultDir.Rotation() + Data.RotationOffset).Quaternion());
+	Data.Transform.SetScale3D(Data.Scale);
+
+	if (!Data.ModelAfterimageTrailEffect) { return; }
+
+	Data.ModelAfterimageTrailEffect->Update(DeltaTime, Data.Transform, SkeletalMesh, AnimationAsset, Data.PoseTime);
+}
+
+void FAfterImageAttackData::SetCanAddTrailPoint(bool bInCanAddTrailPoint) const
+{
+	// フラグ変更可能なときのみ実行できる
+	if (!ModelAfterimageTrailEffect
+		|| ModelAfterimageTrailEffect->CanAddTrailPoint() == bInCanAddTrailPoint)
+	{
+		return;
+	}
+
+	ModelAfterimageTrailEffect->SetCanAddTrailPoint(bInCanAddTrailPoint);
 }

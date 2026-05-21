@@ -25,7 +25,7 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 
 	if (!AfterImageAttackEffect) { return; }
 	AfterImageAttackEffect->Initialize();
-	AfterImageAttackEffect->StartTransfrom = Player->GetTransform();
+	AfterImageAttackEffect->Start(Player->GetTransform());
 
 	auto* Camera = OwnerPlayer->GetSpringArmComponent();
 	if (!Camera) { return; }
@@ -71,7 +71,7 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 
 	UpdateCombatStance(ElapsedTime);
 
-	AfterImageAttackEffect->Update(DeltaTime, ElapsedTime,OwnerPlayer->GetActorTransform());
+	AfterImageAttackEffect->Update(DeltaTime, ElapsedTime);
 
 	UpdateCamera(DeltaTime);
 

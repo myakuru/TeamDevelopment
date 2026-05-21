@@ -9,9 +9,6 @@ UModelAfterimageTrailEffect::UModelAfterimageTrailEffect():
 	TrailAddTimer(0.0f),
 	TrailAddInterval(1.0f),
 	TrailMaxLength(1),
-	AnimPoseTime(0.0f),
-	SkeletalMesh(nullptr),
-	AnimationAsset(nullptr),
 	GhostClass(nullptr)
 {
 }
@@ -19,6 +16,7 @@ UModelAfterimageTrailEffect::UModelAfterimageTrailEffect():
 void UModelAfterimageTrailEffect::Update(float DeltaTime, const FTransform& InTransform, USkeletalMesh* InSkeletalMesh, const FPoseSnapshot& InSnapshot)
 {
 	if (!InSkeletalMesh) { return; }
+
 	if (!bCanAddTrailPoint) {
 		if (TrailAddTimer != 0.0f) { TrailAddTimer = 0.0f; }
 		return;

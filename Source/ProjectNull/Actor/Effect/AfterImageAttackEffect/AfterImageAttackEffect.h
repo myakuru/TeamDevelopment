@@ -5,9 +5,15 @@
 #include "UObject/Object.h"
 #include "AfterImageAttackEffect.generated.h"
 
+/** アクターオブジェクトの残像表現クラス */
 class AGhostActor;
+
+/** アニメーションアセットクラス */
 class UAnimationAsset;
+
+/** モデル残像エフェクトクラス */
 class UModelAfterimageTrailEffect;
+
 
 /** 残像攻撃データ */
 USTRUCT(BlueprintType)
@@ -23,29 +29,67 @@ public:
 		Scale(FVector::OneVector),
 		RotationOffset(FRotator::ZeroRotator),
 		Transform(FTransform()),
-		MoveTime(0.0f),
-		TimeThreshold(0.0f),
-		LifeTime(0.0f),
-		PoseTime(0.0f),
-		OpacityDecayRate(1.0f)
+		MoveTime(0.f),
+		TimeThreshold(0.f),
+		LifeTime(0.f),
+		OpacityDecayRate(1.f),
+		PoseTime(0.f)
 	{
 	}
 
 public:
 
+	/**
+	 * @brief 制御時間内かどうか
+	 * @param ElapsedTime 経過時間
+	 * @return 制御時間内ならtrue 制御時間外ならfalse
+	 */
+	inline bool IsWithinTimeRange(float ElapsedTime) const
+	{
+		return (ElapsedTime >= TimeThreshold)
+			&& (GetCurrentTime(ElapsedTime) <= MoveTime);
+	}
+
+	/**
+	 * @brief 現在の経過時間取得
+	 * @param ElapsedTime 経過時間
+	 * @return 現在の経過時間
+	 */
+	inline float GetCurrentTime(float ElapsedTime) const
+	{
+		return ElapsedTime - TimeThreshold;
+	}
+
+	/**
+	 * @brief 座標オフセット計算(LerpAlphaに基づいて補間) 直線移動を行う
+	 * @param LerpAlpha 補間値
+	 * @return 計算結果
+	 */
 	inline FVector CalcLocationOffset(float LerpAlpha) const {	
 		return FMath::Lerp(StartLocationOffset, EndLocationOffset, LerpAlpha);
 	}
 
+	/**
+	 * @brief 移動方向を計算
+	 * @return 計算結果
+	 */
 	inline FVector CalcMoveDir() const {	
 		return (EndLocationOffset - StartLocationOffset).GetSafeNormal();
 	}
+
+	/**
+	 * @brief 
+	 * @param bInCanAddTrailPoint 
+	 */
+	void SetCanAddTrailPoint(bool bInCanAddTrailPoint) const;
+	
 
 	/** モデル残像エフェクトクラス */
 	UPROPERTY(EditAnywhere,Instanced)
 	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;
 
-	/** スポーンしているか */
+	/** スポーンしているか 
+		Runtime値 */
 	bool bSpawn;
 
 	/** 移動する際の開始座標(オフセット) */
@@ -68,23 +112,28 @@ public:
 	UPROPERTY()
 	FTransform Transform;
 
+	/** 残像が始点から終点まで移動する時間 */
 	UPROPERTY(EditAnywhere)
 	float MoveTime;
 
+	/** 残像を制御し始める時間閾値 */
 	UPROPERTY(EditAnywhere)
 	float TimeThreshold;
 
+	/** 残像の寿命時間 */
 	UPROPERTY(EditAnywhere)
 	float LifeTime;
 
+	/** 残像の透明度減少量 */
 	UPROPERTY(EditAnywhere)
 	float OpacityDecayRate;
 	
+	/** アニメーションアセットの停止時間閾値) */
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	float PoseTime;
-
 };
 
+/** 残像攻撃の振る舞いを管理するエフェクトクラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UAfterImageAttackEffect final : public UObject
 {
@@ -96,30 +145,51 @@ public:
 	/** 初期化 */
 	void Initialize();
 
+	/**
+	 * @brief 開始処理(開始のフレームだけ呼ばれる)
+	 */
+	void Start(const FTransform& Transform);
 
-	void Start();
-
+	/**
+	 * @brief 更新処理
+	 * @param DeltaTime デルタタイム
+	 * @param ElapsedTime 経過時間
+	 */
 	void Update(float DeltaTime,
-				float ElapsedTime,
-				const FTransform& PlayerTransform);
+				float ElapsedTime);
 
-
+	/**
+	 * @brief 経過時間に対しての残像制御終了最大値
+	 * @return 計算結果
+	 */
 	float GetMaxTime();
 
-	/** 残像攻撃データ */
+private:
+
+	/**
+	 * @brief 残像の構造体データ更新
+	 * @param DeltaTime デルタタイム
+	 * @param ElapsedTime 経過時間
+	 * @param Data 残像の構造体データ
+	 */
+	void UpdateAfterimageAttackData(float DeltaTime, float ElapsedTime, FAfterImageAttackData& Data);
+
+	/** 残像攻撃データ配列 */
 	UPROPERTY(EditAnywhere)
 	TArray<FAfterImageAttackData> AfterImageDataArray;
 
-	/** スケルタルメッシュ */
+	/** 残像のスケルタルメッシュ */
 	UPROPERTY(EditAnywhere, Category = "Asset")
 	USkeletalMesh* SkeletalMesh;
 
-	/** アニメーション */
+	/** 残像アニメーション */
 	UPROPERTY(EditAnywhere, Category = "Asset")
 	UAnimationAsset* AnimationAsset;
 
+	/** このクラスで制御する残像クラス */
 	UPROPERTY(EditAnywhere, Category = "Ghost")
 	TSubclassOf<AGhostActor> GhostClass;
-	FTransform StartTransfrom;
 
+	/** 攻撃開始時に基準とするトランフォーム情報 */
+	FTransform StartTransfrom;
 };

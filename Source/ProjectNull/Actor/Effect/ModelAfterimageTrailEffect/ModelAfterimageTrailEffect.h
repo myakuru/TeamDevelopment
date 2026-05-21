@@ -9,7 +9,8 @@
 * アクターオブジェクトの残像表現クラス */
 class AGhostActor;
 
-/** モデル残像エフェクトクラス */
+/** モデル残像エフェクトクラス
+	残像を連続的に描画するエフェクトクラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UModelAfterimageTrailEffect : public UObject
 {
@@ -40,6 +41,10 @@ public:
 	 */
 	void AllDestroy();
 
+	/** Getter */
+	inline bool CanAddTrailPoint() const { return bCanAddTrailPoint; }
+
+	/** Setter */
 	inline void SetCanAddTrailPoint(bool bInCanAddTrailPoint) { bCanAddTrailPoint = bInCanAddTrailPoint; }
 
 private:
@@ -76,19 +81,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Params")
 	int32 TrailMaxLength;
 
-	/** スケルタルメッシュ */
-	UPROPERTY(EditAnywhere, Category = "Asset")
-	TObjectPtr<USkeletalMesh> SkeletalMesh;
-
-	/** アニメーション */
-	UPROPERTY(EditAnywhere, Category = "Asset")
-	TObjectPtr<UAnimationAsset> AnimationAsset;
-
 	/** 追加し、描画するゴーストアクタークラス */
 	UPROPERTY(EditAnywhere, Category = "Class")
 	TSubclassOf<AGhostActor> GhostClass;
-
-	/** アニメーションを停止して描画する際のアニメーション時間閾値 */
-	UPROPERTY(EditAnywhere)
-	float AnimPoseTime;
 };

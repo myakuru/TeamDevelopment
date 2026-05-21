@@ -2,13 +2,9 @@
 
 #include "Camera/CameraComponent.h"
 #include <GameFramework/SpringArmComponent.h>
-
-#include "Animation/AnimSingleNodeInstance.h"
-#include "Animation/AnimationAsset.h"
-#include "Components/SkeletalMeshComponent.h"
+#include <GameFramework/CharacterMovementComponent.h>
 
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
-#include <GameFramework/CharacterMovementComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
@@ -21,17 +17,19 @@
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 
 
-APlayerBase::APlayerBase()
-	:	SpringArmComponent(nullptr),
+APlayerBase::APlayerBase():
+		SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
+		GearComponent(nullptr),
 		AutoAttack(nullptr),
-		GearComponent(nullptr)
+		MaterialCollectionUpdater(nullptr),
+		SuperGameInstance(nullptr)
 {
 	// ================================================================
 	// プレイヤーの初期化
 	// ================================================================
-	PrimaryActorTick.bCanEverTick = true;
-	bUseControllerRotationYaw = false;
+	PrimaryActorTick.bCanEverTick	= true;
+	bUseControllerRotationYaw		= false;
 
 	// ================================================================
 	// スプリングアームの初期化
@@ -77,12 +75,6 @@ void APlayerBase::BeginPlay()
 	// ================================================================
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Initialize(this); }
 
-
-	/*RadialBlurMID = UMaterialInstanceDynamic::Create(RadialBlurMaterial, this);
-	if(CameraComponent) {
-		
-	}*/
-	
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -90,7 +82,6 @@ void APlayerBase::Tick(float DeltaTime)
 	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!EnemyManager) { return; }
 
-	
 	ACombatCharacterBase::Tick(DeltaTime);
 
 	// 自動攻撃の更新
@@ -98,7 +89,6 @@ void APlayerBase::Tick(float DeltaTime)
 
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
-
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

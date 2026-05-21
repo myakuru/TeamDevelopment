@@ -31,14 +31,16 @@ public:
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/**
+	 * @brief 移動処理
+	 * @param InputVector 入力値
+	 */
 	void Move(const FVector2d& InputVector);
 
+	/**
+	 * @brief ギアのレベルチェンジ処理
+	 */
 	void ChangeGear();
-	void CanChangeGear() const;
-
-	int32 GetCurrentGearLevel() const;
-	
-
 
 	/** Getter */
 	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
@@ -47,9 +49,14 @@ public:
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
+	int32									GetCurrentGearLevel() const;
 
 private:
 
+	/**
+	 * @brief プレイヤーが動けるかどうか
+	 * @return 動けるならtrue 動けないならfalse
+	 */
 	bool CanMove();
 
 
@@ -77,9 +84,4 @@ private:
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialInterface> RadialBlurMaterial;
-
-	UPROPERTY()
-	TObjectPtr<UMaterialInstanceDynamic> RadialBlurMID;
 };

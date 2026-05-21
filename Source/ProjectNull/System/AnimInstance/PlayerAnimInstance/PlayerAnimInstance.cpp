@@ -10,12 +10,15 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	UAnimInstance::NativeUpdateAnimation(DeltaSeconds);
 
+}
+
+FPoseSnapshot& UPlayerAnimInstance::GetPlayerPoseSnapshot()
+{
 	SavePoseSnapshot();
+	return PlayerPoseSnapshot;
 }
 
 void UPlayerAnimInstance::SavePoseSnapshot()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("hi ssss"));
-
 	SnapshotPose(PlayerPoseSnapshot);
 }
