@@ -217,6 +217,10 @@ public:
 
 	void CalculateInvincibilityTime(const FGearParameterData& Data);
 
+	/**
+	 * @brief レベルアップ処理
+	 */
+	void LevelUp();
 
 	inline void SetIsInvincible(bool SetFlg) { bIsInvincible = SetFlg; }
 
@@ -245,10 +249,7 @@ public:
 
 private:
 
-	/**
-	 * @brief レベルアップ処理
-	 */
-	void LevelUp();
+	
 
 	/**
 	 * @brief HPの更新処理

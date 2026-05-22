@@ -46,22 +46,26 @@ private:
 	/**
 	 * @brief カメラデータ更新処理
 	 * @param DeltaTime デルタタイム
+	 * @param ElapsedTime 経過時間
 	 */
-	void UpdateCameraData(float DeltaTime);
+	void UpdateCameraData(float DeltaTime, float InElapsedTime);
+
 
 	/**
 	 * @brief カメラの回転更新処理
 	 * @param DeltaTime デルタタイム
+	 * @param ElapsedTime 
 	 * @param DataIndex 更新したいデータインデックス
 	 */
-	void UpdateCameraRotation(float DeltaTime, int32 DataIndex);
+	void UpdateCameraRotation(float DeltaTime, float InElapsedTime, int32 DataIndex);
 
 	/**
 	 * @brief プレイヤーとカメラとの距離更新
 	 * @param DeltaTime デルタタイム
+	 * @param ElapsedTime 経過時間
 	 * @param DataIndex 更新したいデータインデックス
 	 */
-	void UpdateTargetArmLength(float DeltaTime, int32 DataIndex);
+	void UpdateTargetArmLength(float DeltaTime, float InElapsedTime, int32 DataIndex);
 
 
 	/**
@@ -79,6 +83,12 @@ private:
 	 */
 	int32 GetCurrentSectionIndex(float InElapsedTime);
 
+	/**
+	 * @brief その地点までの経過時間
+	 * @param InTargetIndex 計算する地点インデックス
+	 * @return 経過時間
+	 */
+	float GetElapsedTimeToIndex(int32 InTargetIndex);
 	
 	/** ロボットコントローラークラス */
 	UPROPERTY()
