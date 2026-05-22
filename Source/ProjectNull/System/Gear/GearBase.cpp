@@ -6,19 +6,36 @@
 
 
 UGearBase::UGearBase():
+	OwnerPlayer(nullptr),
+	OwnerGearComponent(nullptr),
+	GearStates(TArray<UGearStateBase*>()),
+	GearStatuses(TArray<FGearStatus>()),
+	CurrentGearState(nullptr),
 	ExecutedGearLevel(1),
-	ElapsedTime(0.0f),
 	bCanExecute(true),
+	ElapsedTime(0.f),
+	Duration(0.f),
 	bIsActive(false),
-	bBlocksMovement(false)
+	bBlocksMovement(false),
+	DurationTimerHandle(FTimerHandle())
 {
 
 }
 
-void UGearBase::Initialize(APlayerBase* Player, UPlayerGearComponent* GearComponent)
+void UGearBase::Initialize(
+	APlayerBase* Player,
+	UPlayerGearComponent* GearComponent)
 {
 	OwnerPlayer			= Player;
 	OwnerGearComponent	= GearComponent;
+
+	for (auto* State : GearStates)
+	{
+		if (!State) { continue; }
+
+		State->Initialize(Player, GearComponent, this);
+	}
+
 }
 
 void UGearBase::Execute(int32 CurrentGearLevel)
@@ -29,59 +46,59 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 	bCanExecute			= false;
 	ExecutedGearLevel	= CurrentGearLevel;
 
+	// 発動したいギアの状態クラス配列のインデックス取得
+	const int32	StateIndex = ExecutedGearLevel - 1;
 
-	const int32		stateIndex		= ExecutedGearLevel - 1;
-	UGearStateBase* currentState	= GearStates.IsValidIndex(stateIndex) ? GearStates[stateIndex] : nullptr;
-	float			coolTime		= 0.0f;
+	// 発動したいギアの状態クラスを
+	// 現在のギアの状態クラスとする
+	CurrentGearState = GearStates.IsValidIndex(StateIndex) ? GearStates[StateIndex] : nullptr;
 
-	if (!currentState) { return; }
+	if (!CurrentGearState)						{ return; }
+	if (!GearStatuses.IsValidIndex(StateIndex)) { return; }
 
-	if (GearStatuses.IsValidIndex(stateIndex))
-	{
-		coolTime = GearStatuses[stateIndex].CoolTime;
-	}
+	// 発動時間の更新
+	Duration = GearStatuses[StateIndex].Duration;
 
+	// ギアのクールタイムをセットし、クールタイム終了時にリセット処理を呼ぶ
 	GetWorld()->GetTimerManager().SetTimer(
 		DurationTimerHandle,
 		this,
-		&UGearBase::ResetParams,
-		coolTime,
+		&UGearBase::Reset,
+		GearStatuses[StateIndex].CoolTime,
 		false);
 
-	
-	currentState->Initialize(OwnerPlayer, OwnerGearComponent, this);
-	currentState->Execute(CurrentGearLevel);
-
+	// 状態クラス実行処理
+	CurrentGearState->Execute(CurrentGearLevel);
 }
 
 void UGearBase::Update(float DeltaTime)
 {
-	if (!bIsActive) { return; }
+	if (!bIsActive)			{ return; }
+	if (!CurrentGearState)	{ return; }
 
+	// 経過時間更新
 	ElapsedTime += DeltaTime;
 
-	const int32		StateIndex		= ExecutedGearLevel - 1;
-	UGearStateBase* CurrentState	= GearStates.IsValidIndex(StateIndex) ? GearStates[StateIndex] : nullptr;
-	float			duration		= 0.0f;
-
-	if (!CurrentState) { return; }
-
-	CurrentState->Update(DeltaTime);
+	// 状態クラスの更新
+	CurrentGearState->Update(DeltaTime);
 	
-	if (GearStatuses.IsValidIndex(StateIndex))
+	// 発動時間が終了したら
+	// 状態クラスの終了処理を呼び出し、更新を行わない
+	if (ElapsedTime >= Duration)
 	{
-		duration = GearStatuses[StateIndex].Duration;
-	}
-
-	if (ElapsedTime >= duration)
-	{
-		CurrentState->End();
+		CurrentGearState->End();
 		bIsActive	= false;
 		ElapsedTime = 0.0f;
 	}
 }
 
-void UGearBase::ResetParams()
+void UGearBase::SetGearDuration(float InDuration, int32 Index)
+{
+	if (!GearStatuses.IsValidIndex(Index)) { return; }
+	GearStatuses[Index].Duration = InDuration;
+}
+
+void UGearBase::Reset()
 {
 	bCanExecute = true;
 }

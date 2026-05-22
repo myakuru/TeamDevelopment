@@ -28,7 +28,23 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 {
 	UDashGearStateBase::Initialize(Player, GearComponent, Gear);
 
-	if (!Player || !Gear) { return; }
+	// ギア発動時間初期化
+	InitializeGearDuration();
+
+	// ================================================================
+	// 残像攻撃エフェクトクラスの初期化
+	// ================================================================
+	if (!AfterImageAttackEffect)	{ return; }
+	AfterImageAttackEffect->Initialize();
+
+	if (!Player)					{ return; }
+	// ロボットコントローラーの取得
+	RobotController = Cast<ARobotController>(Player->GetController());
+}
+
+void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
+{
+	if (!OwnerPlayer || !RobotController) { return; }
 
 	auto* Camera = OwnerPlayer->GetSpringArmComponent();
 	if (!Camera) { return; }
@@ -39,27 +55,13 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 	// ================================================================
 	// ダッシュギアのレベル4状態クラスの初期化
 	// ================================================================
-	StartPlayerTransform = Player->GetTransform();
+	StartPlayerTransform = OwnerPlayer->GetTransform();
 	StartTargetArmLength = Camera->TargetArmLength;
 	StartControlRotation = Controller->GetControlRotation();
 
-	// ================================================================
-	// 残像攻撃エフェクトクラスの初期化
-	// ================================================================
+	// 残像攻撃クラスの実行
 	if (!AfterImageAttackEffect) { return; }
-	AfterImageAttackEffect->Initialize();
-	AfterImageAttackEffect->Start(Player->GetTransform());
-
-	// ギア発動時間初期化
-	InitializeGearDuration();
-
-	// ロボットコントローラーの取得
-	RobotController = Cast<ARobotController>(OwnerPlayer->GetController());
-}
-
-void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
-{
-	if (!OwnerPlayer || !RobotController) { return; }
+	AfterImageAttackEffect->Start(OwnerPlayer->GetTransform());
 
 	auto* PlayerAnimInstance = OwnerPlayer->GetPlayerAnimInstance();
 	if (!PlayerAnimInstance) { return; }
@@ -124,6 +126,7 @@ void UDashGearState_Lv4::UpdateCameraData(float DeltaTime)
 {
 	if (!OwnerGear) { return; }
 
+	// 
 	const int32 ResultIndex = GetCurrentSectionIndex(OwnerGear->GetElapsedTime());
 
 	UpdateCameraRotation(DeltaTime, ResultIndex);

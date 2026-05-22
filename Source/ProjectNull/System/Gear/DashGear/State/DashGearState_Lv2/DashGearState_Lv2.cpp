@@ -11,12 +11,12 @@ UDashGearState_Lv2::UDashGearState_Lv2():
 void UDashGearState_Lv2::Initialize(APlayerBase* Player, UPlayerGearComponent* GearComponent, UGearBase* Gear)
 {
 	UGearStateBase::Initialize(Player, GearComponent, Gear);
-	ElapsedTime = 0.0f;
 }
 
 void UDashGearState_Lv2::Execute(int32 CurrentGearLevel)
 {
 	UGearStateBase::Execute(CurrentGearLevel);
+	ElapsedTime = 0.0f;
 }
 
 void UDashGearState_Lv2::Update(float DeltaTime)
