@@ -27,7 +27,7 @@ EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& 
 	SetKnockBackData();
 
 	// 敵同士の当たり判定を一時的に消す
-	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_EngineTraceChannel1, ECollisionResponse::ECR_Ignore);
+	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 
 	return EStateTreeRunStatus::Running;
 }
@@ -54,7 +54,7 @@ void USTT_EnemyKnockBack::ExitState(FStateTreeExecutionContext& a_Context, const
 	OwnerEnemy->NotifyChengedStateEnum(EEnemyState::None);
 
 	// 敵同士の当たり判定を戻す
-	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_EngineTraceChannel1, ECollisionResponse::ECR_Block);
+	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
 }
 
 void USTT_EnemyKnockBack::SetKnockBackData()

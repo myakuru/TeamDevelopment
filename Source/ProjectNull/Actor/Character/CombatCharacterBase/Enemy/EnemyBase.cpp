@@ -35,14 +35,16 @@ AEnemyBase::AEnemyBase()
 	// カプセル形状コリジョンの生成・プリセット設定
 	{
 		CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("CapsuleCollision");
-		CapsuleComponent->InitCapsuleSize(34.f, 88.f);
-		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
-		CapsuleComponent->CanCharacterStepUpOn = ECB_No;
-		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
-		CapsuleComponent->SetCanEverAffectNavigation(false);
-		CapsuleComponent->bDynamicObstacle = true;
+		CapsuleComponent->InitCapsuleSize(34.f, 88.f);									// カプセルサイズ
+		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);	// Pawn用のCollision一括設定
+		CapsuleComponent->CanCharacterStepUpOn = ECB_No;								// 他キャラが上に立てるか
+		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);							// 物理ボリューム(水中判定etc)を受けるか
+		CapsuleComponent->SetCanEverAffectNavigation(false);							// NavMesh更新対象化
+		CapsuleComponent->bDynamicObstacle = true;										// 動的障害物か
 		RootComponent = CapsuleComponent;
 	}
+	
+
 	StateTreeComponent		= CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
 }
 
@@ -62,6 +64,15 @@ void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Chann
 	CapsuleComponent->SetCollisionResponseToChannel(Channel, NewResponse);
 }
 
+void AEnemyBase::OnEnterSlope()
+{
+	/* 備忘録 */
+	// 坂道の範囲内に入った場合
+	// １．フラグを立てる
+	// ２．移動処理内で坂道移動処理を実行
+	// ３．判定処理をタイマーに格納して毎フレーム計算を回避
+}
+
 void AEnemyBase::BeginPlay()
 {
 	AActor::BeginPlay();
@@ -73,12 +84,6 @@ void AEnemyBase::BeginPlay()
 	// 敵が生成された際に敵管理クラス経由でリストへ登録する
 	if (EnemyManager) {
 		EnemyManager->RegisterEnemy(this);
-	}
-
-	// カプセルコリジョンをRootにセット
-	if (CapsuleComponent)
-	{
-		RootComponent = CapsuleComponent;
 	}
 
 	// コンポーネントに自身の参照を渡す
@@ -319,17 +324,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	// 敵が生成された際に敵管理クラス経由でリストへ登録する
 	if (EnemyManager) {
 		EnemyManager->RegisterEnemy(this);
-	}
-
-	// コリジョンプリセット設定
-	if (CapsuleComponent)
-	{
-		CapsuleComponent->InitCapsuleSize(34.f, 88.f);
-		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
-		CapsuleComponent->CanCharacterStepUpOn = ECB_No;
-		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
-		CapsuleComponent->SetCanEverAffectNavigation(false);
-		CapsuleComponent->bDynamicObstacle = true;
 	}
 
 	// コンポーネントに自身の参照を渡す

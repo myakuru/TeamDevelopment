@@ -121,4 +121,6 @@ public:
 	/**	ステートタグ */
 	UPROPERTY(EditAnywhere, Category = "StateTag")
 	EEnemyState StateTag = EEnemyState::None;
+
+	
 };

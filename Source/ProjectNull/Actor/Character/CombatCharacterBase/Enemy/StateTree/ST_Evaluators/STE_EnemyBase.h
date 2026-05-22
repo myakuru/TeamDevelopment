@@ -95,12 +95,32 @@ private:
 	FVector MoveDir = FVector::ZeroVector;
 
 	/** ターゲットとの距離の二乗値 */
-	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
 	float TargetDistanceSqr = 0.0f;
 	
 	/** ノックバック時の重さ */
-	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
 	float KnockBackWeight = 0.0f;
+
+	/**	移動速度 */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float MoveSpeed = 0.0f;
+
+	/**	回転速度 */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float RotateSpeed = 0.0f;
+
+	/**	歩くことのできる斜面角度 */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float WalkableFloorAngle = 0.0f;
+
+	/**	超える事の出来る段差の最大の高さ */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float MaxStepHeight = 0.0f;
+
+	/**	カプセルの高さ半径(高さ補正で使う) */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float CapsuleHalfHeight = 0.0f;
 
 	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))

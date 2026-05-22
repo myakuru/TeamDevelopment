@@ -60,7 +60,7 @@ void AEnemyISMManager::ReleaseIndex(int32 Index)
 	FTransform Hidden;
 	Hidden.SetScale3D(FVector::ZeroVector);
 	ISM->UpdateInstanceTransform(Index, Hidden, true, false);
-
+	
 	FreeIndices.Add(Index);
 
 	// 描画を更新してインスタンスの削除を反映させる

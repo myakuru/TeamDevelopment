@@ -5,6 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
+#include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
 #include "EnemyBase.generated.h"
@@ -52,7 +53,7 @@ class UEnemyRuntimeData;
 ///	重くなる可能性があるためActorを継承する可能性大
 /// </summary>
 UCLASS()
-class PROJECTNULL_API AEnemyBase : public AActor
+class PROJECTNULL_API AEnemyBase : public AActor, public IEnemyInterface
 {
 	GENERATED_BODY()
 	
@@ -278,6 +279,13 @@ public:
 	/** 敵が死んださいに経験値を出す*/
 	virtual void SpawnDeathExperience();
 
+protected:
+
+	/**
+	 * @brief 坂道範囲内に入った時の通知処理
+	 */
+	virtual void OnEnterSlope()override;
+
 public:
 
 	// アニメーションEnum
@@ -299,8 +307,6 @@ public:
 
 	/** AnimToTexture用：アニメーションの現在の再生時間*/
 	float GetAnimTime() const { return AnimTime; }
-	/** PrevAnimToTexture用：アニメーションの前フレームの再生時間*/
-	float GetPrevAnimTime() const { return PrevTime; }
 	float GetBeginAnimTime() const { return PrevAnimTime; }
 	/** AnimToTexture用：再生中のアニメーションのインデックス*/
 	int32 GetAnimIndex() const { return AnimIndex; }
