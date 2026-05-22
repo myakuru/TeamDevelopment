@@ -7,6 +7,10 @@
 #include <ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.h>
 #include "Components/Image.h"
 #include "Components/CanvasPanel.h"
+#include <ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h>
+#include "Input/Events.h"
+#include "Input/Reply.h"
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 void UPlayerExpUpgradeWidget::NativeConstruct()
 {
@@ -14,13 +18,24 @@ void UPlayerExpUpgradeWidget::NativeConstruct()
 
 	GameInstance = Cast<USuperGameInstance>(GetGameInstance());
 
+	PlayerRuntimeData = GameInstance ? GameInstance->GetPlayerRuntimeData() : nullptr;
+
 	SetVisibility(ESlateVisibility::Hidden);
 	SetIsEnabled(false);
 
-	if (GameInstance)
+	bIsUpgradeWidgetOpen = false;
+}
+
+UDataTable* UPlayerExpUpgradeWidget::GetExpUpgradeTable()
+{
+	if (CachedExpUpgradeTable) return CachedExpUpgradeTable;
+
+	CachedExpUpgradeTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ExpUpgrade"));
+	if (!CachedExpUpgradeTable)
 	{
-		PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+		UE_LOG(LogTemp, Warning, TEXT("DT_ExpUpgrade がロードできません"));
 	}
+	return CachedExpUpgradeTable;
 }
 
 void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -44,6 +59,81 @@ void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDe
 	BackgroundImageFadeIn();
 }
 
+void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
+{
+	UDataTable* Table = GetExpUpgradeTable();
+	if (!Table) return;
+
+	// キャッシュされたテーブルをロード（既にあるならそのまま）
+	if (!CachedExpUpgradeTable)
+	{
+		CachedExpUpgradeTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ExpUpgrade"));
+		if (!CachedExpUpgradeTable)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DT_ExpUpgrade がロードできません"));
+			return;
+		}
+	}
+
+	// 行名を取得してランダムに3つ選択
+	TArray<FName> AllRowNames = CachedExpUpgradeTable->GetRowNames();
+	if (AllRowNames.Num() < 3) return;
+
+	TArray<FName> SelectedRowNames;
+
+	for (int32 i = 0; i < 3; ++i)
+	{
+		int32 index = FMath::RandRange(0, AllRowNames.Num() - 1);
+		SelectedRowNames.Add(AllRowNames[index]);
+		AllRowNames.RemoveAt(index);
+	}
+
+	// 有効な選択肢を詰める
+	struct FValidUpgradeInfo
+	{
+		FName RowName;
+		FText Description;
+		int32 CurrentLevel;
+	};
+	TArray<FValidUpgradeInfo> ValidUpgrades;
+
+	for (const FName& RowName : SelectedRowNames)
+	{
+		const FExpUpgradeRow* RowData = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(RowName, TEXT(""));
+		if (!RowData) continue;
+
+		int32 CurrentLevel = PlayerRuntimeData->GetUpgradeLevel(RowName);
+
+		if (RowData->UpgradeTexts.IsValidIndex(CurrentLevel))
+		{
+			FValidUpgradeInfo Info;
+			Info.RowName = RowName;
+			Info.Description = RowData->UpgradeTexts[CurrentLevel];
+			Info.CurrentLevel = CurrentLevel;
+			ValidUpgrades.Add(Info);
+		}
+	}
+
+	// すべてのWidgetを初期状態では非表示にしておく
+	UpgradeWidget_0->SetVisibility(ESlateVisibility::Hidden);
+	UpgradeWidget_1->SetVisibility(ESlateVisibility::Hidden);
+	UpgradeWidget_2->SetVisibility(ESlateVisibility::Hidden);
+
+	for (int32 i = 0; i < ValidUpgrades.Num() && i < Widgets.Num(); ++i)
+	{
+		Widgets[i]->SetDescriptionText(ValidUpgrades[i].Description);
+		Widgets[i]->SetUpgradeRowName(ValidUpgrades[i].RowName);
+		Widgets[i]->SetVisibility(ESlateVisibility::Visible);
+		bIsUpgradeWidgetFilledArray[i] = true;
+	}
+
+	// 残りのWidgetは非表示のまま（すでにHidden設定済み）
+	for (int32 i = ValidUpgrades.Num(); i < Widgets.Num(); ++i)
+	{
+		bIsUpgradeWidgetFilledArray[i] = false;
+	}
+}
+
 void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
 {
 	if (!bIsUpgradeWidgetUse) return;
@@ -51,20 +141,7 @@ void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
 	// UI表示させる
 	OpenWidget();
 
-	if (UpgradeWidget_0)
-	{
-		UpgradeWidget_0->ChoicesExpUpgrade();
-	}
-
-	if (UpgradeWidget_1)
-	{
-		UpgradeWidget_1->ChoicesExpUpgrade();
-	}
-
-	if (UpgradeWidget_2)
-	{
-		UpgradeWidget_2->ChoicesExpUpgrade();
-	}
+	ChoicesExpUpgrade();
 }
 
 FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -74,10 +151,20 @@ FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Mouse Button Down!"));
 
-		if (UpgradeWidget_0->IsMouseOver() || UpgradeWidget_1->IsMouseOver() || UpgradeWidget_2->IsMouseOver())
+		if (UpgradeWidget_0->IsMouseOver())
 		{
-			CloseWidget();
+			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_0->GetUpgradeRowName());
 		}
+		else if (UpgradeWidget_1->IsMouseOver())
+		{
+			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_1->GetUpgradeRowName());
+		}
+		else if (UpgradeWidget_2->IsMouseOver())
+		{
+			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_2->GetUpgradeRowName());
+		}
+
+		CloseWidget();
 
 		// イベントをこのウィジェットで処理したことを返す
 		return FReply::Handled();
@@ -135,7 +222,7 @@ void UPlayerExpUpgradeWidget::BackgroundImageFadeIn()
 	{
 		// フェードインのアルファ値を更新
 		BackgroundFadeInAlpha += GetWorld()->GetDeltaSeconds() * BackgroundFadeInDuration;
-		BackgroundFadeInAlpha = FMath::Clamp(BackgroundFadeInAlpha, 0.0f, 0.5f);
+		BackgroundFadeInAlpha = FMath::Clamp(BackgroundFadeInAlpha, 0.0f, BackgroundFadeInAlphaMax);
 
 		BackgroundImage->SetColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, BackgroundFadeInAlpha));
 	}
@@ -143,7 +230,7 @@ void UPlayerExpUpgradeWidget::BackgroundImageFadeIn()
 
 void UPlayerExpUpgradeWidget::InitUpgradeWidget()
 {
-	if (BackgroundFadeInAlpha >= 0.5f)
+	if (BackgroundFadeInAlpha >= BackgroundFadeInAlphaMax)
 	{
 		BackgroundFadeInAlpha = 0.0f;
 	}

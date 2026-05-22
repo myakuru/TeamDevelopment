@@ -32,19 +32,35 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
+	UE_LOG(LogTemp, Warning,
+		TEXT("EnemyID:%d | AnimIndex:%d | NextAnimIndex:%d | BlendAlpha:%.3f | AnimTime:%.3f | Flg:%d"),
+		ISMInstanceIndex, AnimIndex, NextAnimIndex, AnimBlendWeight, AnimTime, AnimChangeFlg ? 1 : 0
+	);
+
 	PrevAnimTime = AnimTime;
-	
 	AnimTime += DeltaTime;
 
-	if (AnimTime >= 5.0f)
+	if (AnimChangeFlg)
 	{
-		AnimIndex = 1;
+		AnimBlendWeight += DeltaTime / BlendSpeed;
+		NextAnimTime += DeltaTime;
+		// ブレンド完了したら切り替える（最初ではなく最後）
+		if (AnimBlendWeight >= 1.0f)
+		{
+			AnimBlendWeight = 0.0f;
+			AnimChangeFlg = false;
+
+			// ここで初めてアニメ切り替え
+			AnimIndex = NextAnimIndex;
+			AnimTime = NextAnimTime;	// 1回だけリセット
+			NextAnimTime = 0.0f;
+		}
 	}
 
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
 
-	EnemyRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
+	//EnemyRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
 
 	if (EnemyStatus.StateTag==EEnemyState::KnockBack)
 	{

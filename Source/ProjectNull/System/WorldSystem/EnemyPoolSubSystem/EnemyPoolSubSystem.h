@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class AEnemyBase;
 class UEnemyDataAsset;
@@ -8,18 +8,18 @@ class UEnemyPoolConfig;
 #include "EnemyPoolSubsystem.generated.h"
 
 /**
-* ƒf[ƒ^ƒAƒZƒbƒg1‚Â‚É‚Â‚«1‚Â‚Ìƒv[ƒ‹
+* ãƒ‡ãƒ¼ã‚¿ã‚¢ã‚»ãƒƒãƒˆ1ã¤ã«ã¤ã1ã¤ã®ãƒ—ãƒ¼ãƒ«
 */
 USTRUCT()
 struct FEnemyPool
 {
 	GENERATED_BODY()
 
-	/** ‘Ò‹@’†‚ÌActor*/
+	/** å¾…æ©Ÿä¸­ã®Actor*/
 	UPROPERTY()
 	TArray<TObjectPtr<AEnemyBase>> Inactive;
 
-	/** ‰Ò“­’†‚ÌActor*/
+	/** ç¨¼åƒä¸­ã®Actor*/
 	UPROPERTY()
 	TArray<TObjectPtr<AEnemyBase>> Active;
 };
@@ -27,8 +27,8 @@ struct FEnemyPool
 
 
 /**
-* “G‚ÌƒIƒuƒWƒFƒNƒgƒv[ƒ‹‚ğŠÇ—‚·‚éWorldSubSystem
-* GetWorld->GetSubSystem<UEnemyPoolSubSystem>()‚Å‚Ç‚±‚©‚ç‚Å‚àƒAƒNƒZƒX‰Â
+* æ•µã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒ—ãƒ¼ãƒ«ã‚’ç®¡ç†ã™ã‚‹WorldSubSystem
+* GetWorld->GetSubSystem<UEnemyPoolSubSystem>()ã§ã©ã“ã‹ã‚‰ã§ã‚‚ã‚¢ã‚¯ã‚»ã‚¹å¯
 */
 UCLASS()
 class PROJECTNULL_API UEnemyPoolSubSystem : public UWorldSubsystem
@@ -38,8 +38,8 @@ class PROJECTNULL_API UEnemyPoolSubSystem : public UWorldSubsystem
 public:
 
 	/**
-	* ‹N“®‚ÉPool‚ğ–‘Oì¬‚·‚é
-	* EnemySpawner‚ÌBeginPlay‚ÅŒÄ‚Ô
+	* èµ·å‹•æ™‚ã«Poolã‚’äº‹å‰ä½œæˆã™ã‚‹
+	* EnemySpawnerã®BeginPlayã§å‘¼ã¶
 	*/
 
 	/**
@@ -49,14 +49,14 @@ public:
 	void WarmUp(UEnemyPoolConfig* InData);
 
 	/**
-	* Pool‚©‚ç“G‚ğæ‚èo‚µ‚ÄActivate‚·‚é
-	* EnemySpawner‚ÌSpawnEnemy“à‚ÅŒÄ‚Ô
+	* Poolã‹ã‚‰æ•µã‚’å–ã‚Šå‡ºã—ã¦Activateã™ã‚‹
+	* EnemySpawnerã®SpawnEnemyå†…ã§å‘¼ã¶
 	*/
 	AEnemyBase* Spawn(UEnemyPoolConfig* InData, const FVector& Location);
 
 	/**
-	* “G‚ğPool‚É•Ô‹p‚·‚é
-	* FEnemyStateDead::OnUpdate‚©‚çŒÄ‚Ô
+	* æ•µã‚’Poolã«è¿”å´ã™ã‚‹
+	* FEnemyStateDead::OnUpdateã‹ã‚‰å‘¼ã¶
 	*/
 	void Return(AEnemyBase* Enemy);
 
@@ -64,12 +64,14 @@ private:
 
 	AEnemyBase* CreateNewEnemy(UEnemyPoolConfig* InData);
 
-	/** DataAsset‚ÌPrimaryAssetId‚ğƒL[‚ÉPoolŠÇ—*/
+	/*TObjectPtr<UEnemyPoolConfig> EnemyConfig;*/
+
+	/** DataAssetã®PrimaryAssetIdã‚’ã‚­ãƒ¼ã«Poolç®¡ç†*/
 	UPROPERTY()
 	TMap<FPrimaryAssetId, FEnemyPool> Pools;
 
-	/** •Ô‹p‚É‚Ç‚ÌPool‚©‹tˆø‚«‚·‚éƒ}ƒbƒv*/
+	/** è¿”å´æ™‚ã«ã©ã®Poolã‹é€†å¼•ãã™ã‚‹ãƒãƒƒãƒ—*/
 	UPROPERTY()
-	TMap<AEnemyBase*, UEnemyPoolConfig*> EnemyToConfig;
+	TMap<TObjectPtr<AEnemyBase>, UEnemyPoolConfig*> EnemyToConfig;
 
 };

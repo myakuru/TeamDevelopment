@@ -2,8 +2,9 @@
 
 #include "Camera/CameraComponent.h"
 #include <GameFramework/SpringArmComponent.h>
-#include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
+
+#include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
@@ -11,20 +12,24 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
+#include <ProjectNull/System/Material/PlayerMaterialCollectionUpdater/PlayerMaterialCollectionUpdater.h>
+#include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 
 
-APlayerBase::APlayerBase()
-	:	SpringArmComponent(nullptr),
+APlayerBase::APlayerBase():
+		SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
+		GearComponent(nullptr),
 		AutoAttack(nullptr),
-		GearComponent(nullptr)
+		MaterialCollectionUpdater(nullptr),
+		SuperGameInstance(nullptr)
 {
 	// ================================================================
 	// プレイヤーの初期化
 	// ================================================================
-
-	PrimaryActorTick.bCanEverTick = true;
-	bUseControllerRotationYaw = false;
+	PrimaryActorTick.bCanEverTick	= true;
+	bUseControllerRotationYaw		= false;
 
 	// ================================================================
 	// スプリングアームの初期化
@@ -42,37 +47,48 @@ APlayerBase::APlayerBase()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->bUsePawnControlRotation = false;
 
+	// ================================================================
+	// ギアコンポーネントの初期化
+	// ================================================================
 	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
+
+	// Material Parameter Collectionの更新処理クラスの生成
+	MaterialCollectionUpdater = NewObject<UPlayerMaterialCollectionUpdater>();
 }
 
 void APlayerBase::BeginPlay()
 {
 	ACombatCharacterBase::BeginPlay();
 
-	Instance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	// ================================================================
+	// ゲーム全体で共有されるデータや機能を管理するクラスの初期化
+	// ================================================================
+	SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
 
-	if (AutoAttack) {
-		AutoAttack->Initialize(this);
-	}
+	// ================================================================
+	// 自動攻撃の初期化
+	// ================================================================
+	if (AutoAttack) { AutoAttack->Initialize(this); }
 
-	UpdateHUDHP();
+	// ================================================================
+	// Material Parameter Collectionの更新処理クラスの初期化
+	// ================================================================
+	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Initialize(this); }
+
 }
 
 void APlayerBase::Tick(float DeltaTime)
 {
-	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!enemyManager) { return; }
+	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+	if (!EnemyManager) { return; }
 
-	
 	ACombatCharacterBase::Tick(DeltaTime);
 
-	if (AutoAttack) {
-		AutoAttack->Update(DeltaTime,nullptr,enemyManager);
-	}
+	// 自動攻撃の更新
+	if (AutoAttack) { AutoAttack->Update(DeltaTime,nullptr, EnemyManager); }
 
-	if (ARobotController* RobotController = Cast<ARobotController>(GetController())) {
-		HUDWidget = RobotController->GetPlayerHUD();
-	}
+	// Material Parameter Collectionの更新処理クラスの更新
+	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -85,10 +101,9 @@ void APlayerBase::Move(const FVector2d& InputVector)
 {
 	if (!CanMove()) { return; }
 
-	const FRotator YawRotation(0.0f, GetControlRotation().Yaw, 0.0f);
-
-	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	const FRotator	YawRotation = { 0.f, GetControlRotation().Yaw, 0.f };
+	const FVector	Forward		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector	Right		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 	AddMovementInput(Forward, InputVector.Y);
 	AddMovementInput(Right, InputVector.X);
@@ -106,6 +121,22 @@ int32 APlayerBase::GetCurrentGearLevel() const
 	return GearComponent->GetCurrentGearLevel();
 }
 
+UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
+{
+	if (!GetMesh() || !GetMesh()->GetAnimInstance()) { return nullptr; }
+	return Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+}
+
+FPoseSnapshot& APlayerBase::GetPlayerPoseSnapshot()
+{
+	FPoseSnapshot PoseSnapshot;
+	if (!GetMesh() || !GetMesh()->GetAnimInstance()
+		|| !Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance())) { return PoseSnapshot; }
+
+	auto* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	return PlayerAnimInstance->GetPlayerPoseSnapshot();
+}
+
 bool APlayerBase::CanMove()
 {
 	if(GearComponent && GearComponent->IsMovementBlockedByGear()) {
@@ -115,9 +146,3 @@ bool APlayerBase::CanMove()
 	return true;
 }
 
-void APlayerBase::UpdateHUDHP()
-{
-	if (HUDWidget) {
-		//HUDWidget->SetPlayerHp(CombatStats.HP.Current, CombatStats.HP.Max);
-	}
-}

@@ -109,7 +109,7 @@ void AEnemyISMManager::UnregisterEnemy(AEnemyBase* Enemy)
 {
 	if(!IsValid(Enemy))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[EnemyISMManager] UnregisterEnemy: Enemy is invalid"));
+		//UE_LOG(LogTemp, Warning, TEXT("[EnemyISMManager] UnregisterEnemy: Enemy is invalid"));
 		return;
 	}
 
@@ -132,15 +132,32 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 		if (!IsValid(Enemy) || Enemy->ISMInstanceIndex == INDEX_NONE) { continue; }
 
 		const int AnimIndex = Enemy->GetAnimIndex();
+		const int NextAnimIndex = Enemy->GetNextAnimIndex();
+		const FAnimData& AnimData = AnimDataAsset->Animations[AnimIndex];
+		const FAnimData& NextAnimData = AnimDataAsset->Animations[NextAnimIndex];
 
 		// SampleRate = 30fps、NumFrames はアニメーションのフレーム総数
 		const float SampleRate = 30.0f;
-		const float NumFrames = AnimDataAsset->Animations[AnimIndex].NumFrames; // AnimToTextureベイク時のフレーム数に合わせる
-
+		const float NumFrames = AnimDataAsset->Animations[AnimIndex].NumFrames - AnimData.StartTime; // AnimToTextureベイク時のフレーム数に合わせる
 		// AnimTimeからフレーム番号を計算する
-		const float CurrentFrame = FMath::Fmod(Enemy->GetAnimTime() * SampleRate, NumFrames);
+		// 前フレームと今フレームでループをまたいだか判定
+		const float PrevRawFrame = Enemy->GetBeginAnimTime() * SampleRate;
+		const float CurrRawFrame = Enemy->GetAnimTime() * SampleRate;
+		const float CurrentFrame = FMath::Fmod(CurrRawFrame, NumFrames);
 		const float PrevFrame = FMath::Fmod(Enemy->GetBeginAnimTime() * SampleRate, NumFrames);
-		const FAnimData& AnimData = AnimDataAsset->Animations[AnimIndex];
+
+		// Channel 6 : 次アニメのフレーム番号
+		//const float NextFrameStart = NextAnimData.StartTime + Enemy->GetNextAnimTime() * SampleRate;
+		const float NextNumFrames = NextAnimData.NumFrames - NextAnimData.StartTime;
+		const float NextFrame = FMath::Fmod(Enemy->GetNextAnimTime() * SampleRate, NextNumFrames);
+
+		if ((int)(PrevRawFrame / NumFrames) < (int)(CurrRawFrame / NumFrames))
+		{
+			// 0なら１，１なら０にするだけ
+			Enemy->AnimChangeFlg = true;
+			int32 TargetAnim = (AnimIndex == 1) ? 0 : 1;
+			Enemy->SetNextAnimIndex(TargetAnim);
+		}
 
 		// ActorのTransformをISMに反映
 		// bMarkRenderStateDirtyをfalseにして最後にまとめてDirtyを立てる
@@ -151,19 +168,26 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 			false	// MarkRenderStateDirtyをfalseにしてレンダリング状態の更新を遅延させる
 		);
 
-		UE_LOG(LogTemp, Warning, TEXT("CurrentFrame: %f"), CurrentFrame);
-
 		// AnimToTextureのパラメータをマテリアルに渡す
 		// Channel 0 : CurrentFrame - アニメーションの現在の再生時間
 		// Channel 1 : PrevFrame - 前フレームのアニメーション
-		// Channel 2 : AnimIndex - 現在再生中のアニメーションのインデックス（どのアニメーションを再生するか）
-		// Channel 3 : StartTime - 次のアニメーションの始まる時間（マテリアルノードで前のアニメーションのNumFramesに加算して、次のアニメーションの始まりを指定）
+		// Channel 2 : AnimIndex - 現在再生中のアニメーションのインデックス
+		//						  （どのアニメーションを再生するか）
+		// Channel 3 : StartTime - 次のアニメーションの始まる時間
+		//						  （マテリアルノードで前のアニメーションのNumFramesに加算して、次のアニメーションの始まりを指定）
 		// Channel 4 : NumFrames - そのアニメーションまでの時間の総合フレーム
+		// アニメーションブレンド用
+		// Channel 5 : Flg - アニメーションブレンドフラグ
+		// Channel 6 : 次のアニメーションの開始時間
+		// Channel 7 : アニメーションブレンドの進行割合
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 0, CurrentFrame);
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 1, PrevFrame);
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 2, AnimIndex);
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 3, AnimData.StartTime);
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 4, AnimData.NumFrames);
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 5, static_cast<float>(Enemy->AnimChangeFlg));
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 6, NextFrame);
+		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 7, Enemy->GetAnimBlendWeight());
 	}
 
 	if (Enemies.Num() > 0)

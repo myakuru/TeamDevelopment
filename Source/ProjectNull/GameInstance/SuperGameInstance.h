@@ -5,6 +5,7 @@
 #include "SuperGameInstance.generated.h"
 
 class UMySaveGame;
+class UStageDataAsset;
 class UWeaponManager;
 class UMapActorManager;
 class UPlayerParameterData;
@@ -28,6 +29,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SaveGameData();
 
+	/** ゲームデータを取得する */
+	inline UMySaveGame* GetCurrentSaveData() const { return CurrentSaveData; }
+
+	/** ステージデータを取得する */
+	inline TObjectPtr<UStageDataAsset> GetStageDataAsset() const { return StageDataAsset; }
+
+	/** 最高スコアか判定し、保存する */
+	inline void SetStageScore(int32 inStageIndex, int32 inScore);
+
 	/** パラメーターを取得する */
 	inline TObjectPtr<UPlayerParameterData> GetPlayerParameterData() const { return PlayerParameterData; }
 	inline TObjectPtr<UPlayerRuntimeData> GetPlayerRuntimeData() const { return PlayerRuntimeData; }
@@ -37,6 +47,10 @@ protected:
 
 	UPROPERTY()
 	UMySaveGame* CurrentSaveData;
+
+	/** ステージデータの参照 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UStageDataAsset> StageDataAsset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UDataTable* WeaponDataTable;

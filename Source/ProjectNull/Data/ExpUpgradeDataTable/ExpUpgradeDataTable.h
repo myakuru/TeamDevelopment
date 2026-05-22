@@ -14,9 +14,11 @@ struct PROJECTNULL_API FExpUpgradeRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
+	/** 各レベルの表示テキスト（Index == レベル） */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText UpgradeText;
+	TArray<FText> UpgradeTexts;
 
+	/** ユーザー向け表示名 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ImageRotation;
+	FText DisplayName;
 };

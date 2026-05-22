@@ -94,6 +94,14 @@ public:
 	float Final;
 };
 
+struct FUpgradeState
+{
+	FName UpgradeId;
+
+	int32 Level = 0;
+
+};
+
 /** ギア関連Runtimeデータ構造体 */
 USTRUCT(BlueprintType)
 struct FGearRuntimeData
@@ -177,6 +185,7 @@ struct FExperienceParameterData;
 /** ギアパラメータ構造体 */
 struct FGearParameterData;
 
+struct FUpgradeState;
 
 /** プレイヤーのRuntimeデータクラス */
 UCLASS(Blueprintable, EditInlineNew)
@@ -228,6 +237,11 @@ public:
 
 
 	TObjectPtr<ARobotController> RobotController;
+
+	/** Widget側で呼び出す */
+	void UpdateUpgradeStates(FName Id);
+
+	int32 GetUpgradeLevel(FName Id) const;
 
 private:
 
@@ -281,10 +295,19 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Gear")
 	FGearRuntimeData Gear;
 
+	TArray<FUpgradeState> UpgradeStates;
+
+	UPROPERTY()
+	UDataTable* CachedExpUpgradeTable = nullptr;
+
 	/** レベル */
 	int32 Level;
 
 	/** 無敵状態かどうか */
 	bool bIsInvincible;
+
+	/** 行名 -> 現在の強化レベル（配列インデックス） */
+	UPROPERTY()
+	TMap<FName, int32> UpgradeLevels;
 
 };

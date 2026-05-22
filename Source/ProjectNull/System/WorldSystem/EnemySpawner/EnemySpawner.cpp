@@ -78,7 +78,7 @@ void AEnemySpawner::SpawnEnemy()
 	// 出現対象が存在しなかったら実行しない
 	//if (!EnemyClass) { return; }
 
-	UE_LOG(LogTemp, Warning, TEXT("SpawnWave called"));
+	//UE_LOG(LogTemp, Warning, TEXT("SpawnWave called"));
 
 	if (!CurrentWaveData)
 	{
@@ -151,6 +151,7 @@ void AEnemySpawner::SpawnEnemy()
 					}
 					break;
 				}
+				break;
 			}
 		}
 	}

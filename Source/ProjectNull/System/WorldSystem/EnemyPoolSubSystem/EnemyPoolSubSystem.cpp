@@ -29,6 +29,8 @@ void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
         return;
     }
 
+	UE_LOG(LogTemp, Log, TEXT("Enemy Pool Name %s"), *InPoolConfig->EnemyClass->GetName());
+
     // Poolを新規作成してPoolNum体分Actorを生成する
     FEnemyPool& Pool = Pools.FindOrAdd(Key);
 
@@ -49,7 +51,7 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
 {
     if (!InPoolConfig) { return nullptr; }
 
-    UE_LOG(LogTemp, Warning, TEXT("Spawn In"));
+    //UE_LOG(LogTemp, Warning, TEXT("Spawn In"));
 
     // EnemyDataが未設定の場合はSpawnしない
     // ここがnullだとActivate内のcheckでクラッシュするため事前にはじく
@@ -87,7 +89,7 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
     // InConfig->EnemyDataはこの時点でnullチェック済みなので安全
     Enemy->Activate(Location, InPoolConfig->EnemyData);
 
-    UE_LOG(LogTemp, Warning, TEXT("Spawn Out"));
+    //UE_LOG(LogTemp, Warning, TEXT("Spawn Out"));
 
     // ActiveリストにAddして稼働中として管理する
     Pool->Active.Add(Enemy);
@@ -98,7 +100,7 @@ void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
 {
     if (!Enemy) { return; }
 
-    UE_LOG(LogTemp, Warning, TEXT("Return In"));
+   // UE_LOG(LogTemp, Warning, TEXT("Return In"));
 
     // どのPoolConfigのActorかを逆引きする
     UEnemyPoolConfig** DataPtr = EnemyToConfig.Find(Enemy);
@@ -113,7 +115,7 @@ void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
     Enemy->Deactivate();
     Pool->Inactive.Add(Enemy);
 
-    UE_LOG(LogTemp, Warning, TEXT("Return Out"));
+    //UE_LOG(LogTemp, Warning, TEXT("Return Out"));
 }
 
 AEnemyBase* UEnemyPoolSubSystem::CreateNewEnemy(UEnemyPoolConfig* InData)

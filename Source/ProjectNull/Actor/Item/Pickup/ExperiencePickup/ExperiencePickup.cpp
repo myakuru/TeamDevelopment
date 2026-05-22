@@ -1,4 +1,4 @@
-#include "ExperiencePickup.h"
+ï»¿#include "ExperiencePickup.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 
 AExperiencePickup::AExperiencePickup()
@@ -10,14 +10,14 @@ void AExperiencePickup::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	UE_LOG(LogTemp, Warning, TEXT("ExperienceUpdate"));
+	//UE_LOG(LogTemp, Warning, TEXT("ExperienceUpdate"));
 
 	const FVector MyLocation = GetActorLocation();
 	const FVector PlayerLocation = Player->GetActorLocation();
 	
 	const float DistanceSq = FVector::DistSquared(MyLocation, PlayerLocation);
 
-	/** –¢’Ç”ö‚È‚ç‹ß‚Ã‚¢‚½‚Æ‚«‚¾‚¯ŠJn*/
+	/** æœªè¿½å°¾ãªã‚‰è¿‘ã¥ã„ãŸã¨ãã ã‘é–‹å§‹*/
 	if (!ExperienceParam.bChasing)
 	{
 		if (DistanceSq <= ExperienceParam.DetectRange * ExperienceParam.DetectRange)
@@ -30,7 +30,7 @@ void AExperiencePickup::OnUpdate(APawn* Player, float DeltaTime)
 		}
 	}
 
-	/** æ“¾*/
+	/** å–å¾—*/
 	if (DistanceSq <= ExperienceParam.PickupRange * ExperienceParam.PickupRange)
 	{
 		Pickup(Player);
@@ -42,25 +42,25 @@ void AExperiencePickup::OnUpdate(APawn* Player, float DeltaTime)
 
 void AExperiencePickup::MoveToPlayer(const FVector& PlayerLocation, float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Experience MoveToPlayer"));
+	//UE_LOG(LogTemp, Warning, TEXT("Experience MoveToPlayer"));
 
-	/** •ûŒü‚ğ‹‚ß‚é*/
+	/** æ–¹å‘ã‚’æ±‚ã‚ã‚‹*/
 	ExperienceParam.MoveDir = PlayerLocation - GetActorLocation();
 	ExperienceParam.MoveDir.Normalize();
 
-	/** ÀÛ‚É“®‚¢‚½‹——£*/
+	/** å®Ÿéš›ã«å‹•ã„ãŸè·é›¢*/
 	FVector MoveDistance = ExperienceParam.MoveDir* ExperienceParam.MoveSpeed * DeltaTime;
 	FVector NextPos = GetActorLocation() + MoveDistance;
 
-	/** XV‚µ‚½À•W‚ğƒZƒbƒg*/
+	/** æ›´æ–°ã—ãŸåº§æ¨™ã‚’ã‚»ãƒƒãƒˆ*/
 	SetActorLocation(NextPos, true);
 }
 
 void AExperiencePickup::Pickup(APawn* Player)
 {
-	/** Player‚ğƒLƒƒƒXƒg‚µ‚Ä‰ÁZ*/
+	/** Playerã‚’ã‚­ãƒ£ã‚¹ãƒˆã—ã¦åŠ ç®—*/
 
-	/** Manager‚ÌƒŠƒXƒg‚©‚çíœ*/
+	/** Managerã®ãƒªã‚¹ãƒˆã‹ã‚‰å‰Šé™¤*/
 	if (UItemManagerSubsystem* ItemSubsystem = 
 		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
 	{

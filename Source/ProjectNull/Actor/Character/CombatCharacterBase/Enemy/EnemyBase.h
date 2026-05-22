@@ -56,7 +56,7 @@ UCLASS()
 class PROJECTNULL_API AEnemyBase : public AActor, public IEnemyInterface
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	AEnemyBase();
@@ -69,7 +69,7 @@ public:
 
 	/** Poolに返却するときに呼ぶ*/
 	virtual void Deactivate();
-	
+
 	//~ Begin Setter
 
 	/**
@@ -79,7 +79,7 @@ public:
 	 * @param EnemyWeight 敵の重さ
 	 */
 	virtual void SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight);
-	
+
 	/**
 	 * @brief 敵（自身) がダメージを受ける処理
 	 * @param AttackPower 攻撃力
@@ -90,14 +90,14 @@ public:
 	 * @brief 移動方向のセット
 	 * @param MoveDir 移動方向
 	 */
-	virtual void SetMoveDir(const FVector& a_MoveDir)	{ EnemyStatus.MoveDir = a_MoveDir; }
+	virtual void SetMoveDir(const FVector& a_MoveDir) { EnemyStatus.MoveDir = a_MoveDir; }
 
 	/**
 	 * @brief ターゲットとの距離の二乗値セット
 	 * @param DistSqr 距離の二乗値
 	 */
-	virtual void SetTargetDistanceSqr(float a_DistSqr)	{ EnemyStatus.TargetDistanceSqr = a_DistSqr; }
-	
+	virtual void SetTargetDistanceSqr(float a_DistSqr) { EnemyStatus.TargetDistanceSqr = a_DistSqr; }
+
 	/**
 	 * @brief ステートEnumを切り替える処理
 	 * @param a_targetState 切り替え先ステートEnum
@@ -123,7 +123,7 @@ public:
 	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse);
 
 	//~ End Setter
-	
+
 
 	//~ Begin Getter
 
@@ -133,7 +133,7 @@ public:
 	/** EnemyRuntimeへのアクセス、デリゲートへの登録を行う */
 	inline UEnemyRuntimeData* GetEnemyRuntimeData() const
 	{
-		return EnemyRuntimeData; 
+		return EnemyRuntimeData;
 	}
 
 	/** エネミーマネージャーのゲッター*/
@@ -145,7 +145,7 @@ public:
 	/** エネミーマネージャーのゲッター*/
 	/*AEnemyGruntManager* GetEnemyGruntManager() const
 	{
-		return 
+		return
 	}*/
 
 	TSubclassOf<AEnemyISMManager> GetISMManagerClass() const
@@ -186,10 +186,12 @@ public:
 		a_currentBit &= ~static_cast<uint8>(a_targetBit);
 	}
 
+	bool GetAliveFlg() { return EnemyStatus.IsAlive; }
+
 	//~ End Getter
 
 protected:
-	
+
 	virtual void BeginPlay() override;
 
 	/**
@@ -251,7 +253,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UEnemyDataAsset> EnemyDataAsset;
 
-public:	
+public:
 	virtual void Tick(float DeltaTime) override {}
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) {}
@@ -306,13 +308,23 @@ public:
 	int32 ISMInstanceIndex = INDEX_NONE;
 
 	/** AnimToTexture用：アニメーションの現在の再生時間*/
-	float GetAnimTime() const { return AnimTime; }
-	float GetBeginAnimTime() const { return PrevAnimTime; }
+	float GetAnimTime() const			{ return AnimTime; }
+	float GetBeginAnimTime() const		{ return PrevAnimTime; }
 	/** AnimToTexture用：再生中のアニメーションのインデックス*/
-	int32 GetAnimIndex() const { return AnimIndex; }
-	float GetAnimNumFrames() const { return AnimNumFrames; }
+	int32 GetAnimIndex() const			{ return AnimIndex; }
+	float GetAnimNumFrames() const		{ return AnimNumFrames; }
+	int32 GetNextAnimIndex() const		{ return NextAnimIndex; }
+	float GetNextAnimTime() const		{ return NextAnimTime; }
+	float GetAnimBlendWeight() const	{ return AnimBlendWeight; }
+
+	void SetAnimIndex()					{ AnimIndex = NextAnimIndex; }
+	void SetNextAnimIndex(int32 Index)	{ NextAnimIndex = Index; }
+
+	bool AnimChangeFlg = false;
 
 protected:
+
+	void AnimationReset();
 
 	/**
 	 * どのISMManagerに登録するかを指定するためのクラス
@@ -320,13 +332,30 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SetupISM")
 	TSubclassOf<AEnemyISMManager> ISMManagerClass;
 
+
+	/**	アニメーション情報*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
 	float AnimTime = 0.0f;
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
 	float PrevAnimTime = 0.0f;
 
-	int AnimIndex = 0;
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	int32 AnimIndex = 1;
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	int32 NextAnimIndex = 0;
 
-	UPROPERTY(EditAnywhere, Category = "SetupISM")
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float NextAnimTime = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
 	float AnimNumFrames = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float AnimBlendWeight = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float BlendSpeed = 1.2f;
+	/***/
 
 private:
 
@@ -351,14 +380,4 @@ private:
 
 	/** データアセットからデータを構造体に移す処理*/
 	void SetEnemyStatusData(UEnemyDataAsset* InData);
-
-	///**
-	// * ISMComponentのインスタンスのインデックス
-	// * 敵管理クラスのISMComponentに登録した際に割り当てられるインデックス
-	// */
-	//UPROPERTY()
-	//int32 ISMInstanceIndex = INDEX_NONE;
-
-	/** 敵のメッシュ*/
-	//TObjectPtr<UStaticMesh> ISMMesh;	// 敵管理クラスのISMComponentに登録された際に割り当てられるメッシュ
 };

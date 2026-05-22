@@ -16,17 +16,18 @@ void UStageButtonWidget::NativeConstruct()
 
 void UStageButtonWidget::OnClickedStageButton()
 {
-	if (!OnClicked.IsBound())return;
+	if (!OnClicked.IsBound() || !bUnlocked)return;
 	OnClicked.Broadcast(StageIndex);
 }
 
 void UStageButtonWidget::OnHoveredStageButton()
 {
-	if (!OnHovered.IsBound())return;
+	if (!OnHovered.IsBound() || !bUnlocked)return;
 	OnHovered.Broadcast(StageIndex);
 }
 
-void UStageButtonWidget::Setup(int32 InStageIndex)
+void UStageButtonWidget::Setup(int32 InStageIndex,bool bInUnlocked)
 {
-	StageIndex = InStageIndex;
+	StageIndex	= InStageIndex;
+	bUnlocked	= bInUnlocked;
 }

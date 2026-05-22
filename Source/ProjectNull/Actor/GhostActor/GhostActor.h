@@ -6,7 +6,7 @@
 #include "GhostActor.generated.h"
 
 /** ゴーストアクタークラス
-* アクターオブジェクトの残像表現 */
+* アクターオブジェクトの残像表現クラス */
 UCLASS()
 class PROJECTNULL_API AGhostActor final : public AActor
 {
@@ -22,23 +22,70 @@ public:
 
 	/**
 	 * @brief 初期化処理
-	 * @param SkeletalMesh 残像表現するスケルタルメッシュ
-	 * @param Animation アニメーション
-	 * @param PoseTime 固定するアニメーションを地点時間
+	 * @param SkeletalMesh スケルタルメッシュ
+	 * @param InSnapshot ポーズ
+	 */
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					const FPoseSnapshot& InSnapshot);
+
+	/**
+	 * @brief 初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 * @param InSnapshot ポーズ
+	 * @param InLifeTime 寿命時間
+	 * @param InOpacityDecayRate 透明度減少量
+	 */
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					const FPoseSnapshot& InSnapshot,
+					float InLifeTime,
+					float InOpacityDecayRate);
+
+	/**
+	 * @brief 初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 * @param Animation アニメーションアセット
+	 * @param InPoseTime アニメーションを停止して描画する際のアニメーション時間閾値
 	 */
 	void Initialize(class USkeletalMesh* SkeletalMesh,
 					class UAnimationAsset* Animation,
-					float PoseTime,
-					float InLifeTime);
+					float InPoseTime);
+
+	/**
+	 * @brief 初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 * @param Animation アニメーションアセット
+	 * @param InPoseTime アニメーションを停止して描画する際のアニメーション時間閾値
+	 * @param InLifeTime 寿命時間
+	 * @param InOpacityDecayRate 透明度減少量
+	 */
+	void Initialize(class USkeletalMesh* SkeletalMesh,
+					class UAnimationAsset* Animation,
+					float InPoseTime,
+					float InLifeTime,
+					float InOpacityDecayRate);
 
 private:
 
+	/**
+	 * @brief 共通初期化処理
+	 * @param SkeletalMesh スケルタルメッシュ
+	 */
+	void InitializeInternal(class USkeletalMesh* SkeletalMesh);
+
+	/** ルートコンポーネント */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> Root;
+
+	/** 残像表示用スケルタルメッシュ */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> Mesh;
 
-	UPROPERTY(EditAnywhere, Category = "Ghost")
+	/** 残像描画時に使用するベースマテリアル */
+	UPROPERTY(EditAnywhere, Category = "Material")
 	TObjectPtr<UMaterialInterface> GhostMaterial;
 
+	/** 残像描画用動的マテリアルインスタンス
+		フェード値や色変更などを実行時に制御するために使用 */
 	UPROPERTY()
 	TArray<TObjectPtr<UMaterialInstanceDynamic>> DynamicMaterials;
 
@@ -46,27 +93,33 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 TranslucencySortPriority;
 
-	/** 描画時間 */
+	/** 寿命時間 */
 	UPROPERTY(EditAnywhere)
 	float LifeTime;
 
-	UPROPERTY(EditAnywhere)
-	float OpacityDecayRate;
-
-	float Opacity;
-
 	/** 時間管理用 */
 	float CurrentTime;
+
+	/** 透明度減少量 */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float OpacityDecayRate;
+
+	/** 透明度 */
+	float Opacity;
 
 	/** 開始時の不透明度 */
 	UPROPERTY(EditAnywhere, Category = "Material")
 	float StartOpacity;
 
-	/** 縁の色 */
+	/** リムライトの色 */
 	UPROPERTY(EditAnywhere, Category = "Material")
-	FLinearColor StartColor;
+	FLinearColor StartRimColor;
 
-	/** ベース色 */
+	/** リムライトの鮮明さ */
 	UPROPERTY(EditAnywhere, Category = "Material")
-	FLinearColor StartBaseColor;
+	float RimSharpness;
+
+	/** リムライトの強さ */
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float RimStrength;
 };

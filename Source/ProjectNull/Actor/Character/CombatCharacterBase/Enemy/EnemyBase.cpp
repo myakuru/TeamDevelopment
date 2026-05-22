@@ -78,13 +78,13 @@ void AEnemyBase::BeginPlay()
 	AActor::BeginPlay();
 
 	// 敵管理クラスの情報取得
-	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+	//EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 
 
 	// 敵が生成された際に敵管理クラス経由でリストへ登録する
-	if (EnemyManager) {
-		EnemyManager->RegisterEnemy(this);
-	}
+	//if (EnemyManager) {
+		//EnemyManager->RegisterEnemy(this);
+	//}
 
 	// コンポーネントに自身の参照を渡す
 	{
@@ -345,8 +345,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 #if WITH_EDITOR
 	SetFolderPath(TEXT("Pool/Active"));
 #endif
-
-	UE_LOG(LogTemp, Warning, TEXT("EnemyBase Activate"));
+	
+	//UE_LOG(LogTemp, Warning, TEXT("EnemyBase Activate"));
 }
 
 void AEnemyBase::Deactivate()
@@ -368,6 +368,10 @@ void AEnemyBase::Deactivate()
 
 	EnemyStatus.StateTag = EEnemyState::None;
 	if (!EnemyManager) { return; }
+
+	EnemyStatus.IsAlive = false;
+
+	AnimationReset();
 
 	/** ISMManagerから解除*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
@@ -427,4 +431,18 @@ void AEnemyBase::SpawnDeathExperience()
 			Size
 		);
 	}
+}
+
+void AEnemyBase::AnimationReset()
+{
+	AnimTime = 0.0f;
+	PrevAnimTime = 0.0f;
+
+	AnimIndex = 1;
+	NextAnimIndex = 0;
+	NextAnimTime = 0.0f;
+
+	AnimNumFrames = 0.0f;
+
+	AnimBlendWeight = 0.0f;
 }

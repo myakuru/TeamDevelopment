@@ -28,7 +28,7 @@ void UFloatingWeaponStandState::Update(float DeltaTime)
 {
 	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
 
-	UE_LOG(LogTemp, Warning, TEXT("StandState"));
+	//UE_LOG(LogTemp, Warning, TEXT("StandState"));
 
 	UpdateTransitionTime(DeltaTime);
 

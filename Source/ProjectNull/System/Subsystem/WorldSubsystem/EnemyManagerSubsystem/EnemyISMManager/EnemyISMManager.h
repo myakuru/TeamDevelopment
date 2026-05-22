@@ -48,7 +48,7 @@ protected:
 	* マテリアル側のNumCustomDataFloatsと合わせる必要がある
 	*/
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	int32 NumCustomDataFloats = 5;
+	int32 NumCustomDataFloats = 8;
 
 private:
 

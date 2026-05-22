@@ -6,6 +6,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include"StageProgressData.h"
 #include "MySaveGame.generated.h"
 
 /**
@@ -27,6 +28,9 @@ public:
 	UPROPERTY()
 	FWeaponSaveData m_WeaponData;
 
+	/** ステージのクリア状況 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStageProgressData>StageProgressList;
 
 	/** マップの破壊するアクターのID */
 	UPROPERTY()

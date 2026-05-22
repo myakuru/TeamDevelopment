@@ -9,6 +9,8 @@
 class UTextBlock;
 class UImage;
 class UExpUpgradeWidget0;
+class UPlayerRuntimeData;
+struct FExpUpgradeRow;
 
 /**
  * データーテーブルから取得したテキストをUIにするクラスのベースクラス
@@ -20,7 +22,6 @@ class PROJECTNULL_API UExpUpgradeWidgetBase : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
-	virtual void ChoicesExpUpgrade();
 
 	// マウスがウィジェットに入ったとき
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -34,6 +35,13 @@ public:
 	void ImageRotation();
 
 	void InitExpUpgradeWidget();
+
+	// 説明文をセットする
+	void SetDescriptionText(const FText& Description);
+
+	void SetUpgradeRowName(FName RowName) { UpgradeRowName = RowName; }
+
+	FName GetUpgradeRowName() const { return UpgradeRowName; }
 
 protected:
 	/** テキストを表示するためのウィジェット */
@@ -60,7 +68,27 @@ protected:
 	FVector2D UiScale = { 0.0f,0.0f };
 
 private:
-	int32 GetRandomTextId();
 
 	bool bIsMouseOver = false;
+
+	/** プレイヤー側で保持する各行ごとの現在レベル（デフォルトは 0） */
+	TMap<FName, int32> PlayerUpgradeLevels;
+
+	/** すでに表示した行を記録するセット（同じ行を複数回表示しないようにするため） */
+	TSet<FName> ShownUpgradeRows;
+
+	/** DataTable をキャッシュしておく（毎回ロードしない） */
+	UPROPERTY()
+	UDataTable* CachedExpUpgradeTable = nullptr;
+
+	/** 現在表示中の行名（ChoicesExpUpgrade でセット） */
+	FName SelectedRowName = NAME_None;
+
+	/** 現在表示中の行データへのポインタ（DataTable の行をキャッシュ） */
+	const FExpUpgradeRow* SelectedRowData = nullptr;
+
+	/** DataTable のロード（内部でキャッシュ） */
+	UDataTable* GetExpUpgradeTable();
+
+	FName UpgradeRowName = NAME_None;
 };
