@@ -12,46 +12,6 @@ class ARobotController;
 class UAfterImageAttackEffect;
 
 
-/** ダッシュギア4レベルのカメラデータ */
-USTRUCT(BlueprintType)
-struct FDashGearState_Lv4_CameraData
-{
-	GENERATED_BODY()
-public:
-
-	FDashGearState_Lv4_CameraData() :
-		Time(0.0f),
-		TargetArmLength(0.0f),
-		ArmLengthLerpSpeed(1.0f),
-		TargetRotator(FRotator()),
-		RotatorLerpSpeed(1.0f)
-	{
-	}
-
-public:
-
-	/** 区間時間 */
-	UPROPERTY(EditAnywhere)
-	float Time;
-
-	/** カメラとプレイヤーの距離 */
-	UPROPERTY(EditAnywhere)
-	float TargetArmLength;
-
-	/** カメラとプレイヤーの距離補間速度 */
-	UPROPERTY(EditAnywhere)
-	float ArmLengthLerpSpeed;
-
-	/** 目指すべきカメラ回転 */
-	UPROPERTY(EditAnywhere)
-	FRotator TargetRotator;
-
-	/** 回転補間速度 */
-	UPROPERTY(EditAnywhere)
-	float RotatorLerpSpeed;
-};
-
-
 /** ダッシュギアのレベル4状態クラス */
 UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UDashGearState_Lv4 final : public UDashGearStateBase
@@ -67,37 +27,59 @@ public:
 	void Update(float DeltaTime)			override;
 	void End()								override;
 
+	/** ギアレベル4の配列インデックス */
+	static const int32 kLv4Index = 3;
+
 private:
 
 	/**
+	 * @brief ギア発動時間初期化
+	 */
+	void InitializeGearDuration();
+
+	/**
 	 * @brief 戦闘構え状態を更新
-	 * @param ElapsedTime 
+	 * @param ElapsedTime 経過時間
 	 */
 	void UpdateCombatStance(float ElapsedTime);
 
-	void UpdateCamera(float DeltaTime);
+	/**
+	 * @brief カメラデータ更新処理
+	 * @param DeltaTime デルタタイム
+	 */
+	void UpdateCameraData(float DeltaTime);
 
+	/**
+	 * @brief カメラの回転更新処理
+	 * @param DeltaTime デルタタイム
+	 * @param DataIndex 更新したいデータインデックス
+	 */
 	void UpdateCameraRotation(float DeltaTime, int32 DataIndex);
 
+	/**
+	 * @brief プレイヤーとカメラとの距離更新
+	 * @param DeltaTime デルタタイム
+	 * @param DataIndex 更新したいデータインデックス
+	 */
 	void UpdateTargetArmLength(float DeltaTime, int32 DataIndex);
 
+
+	/**
+	 * @brief 最終ダッシュの更新処理
+	 * @param DeltaTime デルタタイム
+	 * @param ElapsedTime 経過時間
+	 */
 	void UpdateFinalDash(float DeltaTime, float ElapsedTime);
 
-
-	void InitializeGearDuration();
-
+	
+	/**
+	 * @brief 経過時間に基づいて、どの区間かどうか調べ、インデックスを返す
+	 * @param InElapsedTime 経過時間
+	 * @return 区間インデックス
+	 */
 	int32 GetCurrentSectionIndex(float InElapsedTime);
 
-	static const int32 kLv4Index = 3;
-
-	/** ギアスキル開始時プレイヤーのTransform */
-	FTransform StartPlayerTransform;
-	FRotator StartControlRotation;
-
-
-	UPROPERTY()
-	float StartTargetArmLength;
-
+	
 	/** ロボットコントローラークラス */
 	UPROPERTY()
 	TObjectPtr<ARobotController> RobotController;
@@ -116,6 +98,16 @@ private:
 
 	/** カメラデータをまとめる配列 */
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	TArray<FDashGearState_Lv4_CameraData> CameraData;
+	TArray<FCameraSequenceData> CameraData;
+
+	/** ギアスキル開始時プレイヤーのTransform */
+	FTransform StartPlayerTransform;
+
+	/** ギアスキル開始時カメラ回転 */
+	FRotator StartControlRotation;
+
+	/** ギアスキル開始時カメラ距離 */
+	UPROPERTY()
+	float StartTargetArmLength;
 
 };

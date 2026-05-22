@@ -46,3 +46,43 @@ public:
 	}
 
 };
+
+
+/** 演出カメラデータ */
+USTRUCT(BlueprintType)
+struct FCameraSequenceData
+{
+	GENERATED_BODY()
+public:
+
+	FCameraSequenceData() :
+		Time(0.0f),
+		TargetArmLength(0.0f),
+		ArmLengthLerpSpeed(1.0f),
+		TargetRotator(FRotator()),
+		RotatorLerpSpeed(1.0f)
+	{
+	}
+
+public:
+
+	/** 区間時間 */
+	UPROPERTY(EditAnywhere)
+	float Time;
+
+	/** カメラとプレイヤーの距離 */
+	UPROPERTY(EditAnywhere)
+	float TargetArmLength;
+
+	/** カメラとプレイヤーの距離補間速度 */
+	UPROPERTY(EditAnywhere)
+	float ArmLengthLerpSpeed;
+
+	/** 目指すべきカメラ回転 */
+	UPROPERTY(EditAnywhere)
+	FRotator TargetRotator;
+
+	/** 回転補間速度 */
+	UPROPERTY(EditAnywhere)
+	float RotatorLerpSpeed;
+};
