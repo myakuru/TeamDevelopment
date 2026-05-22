@@ -59,7 +59,7 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	StartTargetArmLength = Camera->TargetArmLength;
 	StartControlRotation = Controller->GetControlRotation();
 
-	
+	// 残像攻撃クラスの実行
 	if (!AfterImageAttackEffect) { return; }
 	AfterImageAttackEffect->Start(OwnerPlayer->GetTransform());
 
@@ -126,6 +126,7 @@ void UDashGearState_Lv4::UpdateCameraData(float DeltaTime)
 {
 	if (!OwnerGear) { return; }
 
+	// 
 	const int32 ResultIndex = GetCurrentSectionIndex(OwnerGear->GetElapsedTime());
 
 	UpdateCameraRotation(DeltaTime, ResultIndex);
