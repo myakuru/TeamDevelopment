@@ -58,7 +58,10 @@ void UEnemyManagerSubsystem::UpdateEnemies(float DeltaTime)
 	{
 		if (Enemy) 
 		{
-			Enemy->OnUpdate(PPlayerPawn, DeltaTime);
+			if (Enemy->GetAliveFlg())
+			{
+				Enemy->OnUpdate(PPlayerPawn, DeltaTime);
+			}
 		}
 	}
 

@@ -3,7 +3,7 @@
 
 void FPickupItemManager::Update(APawn* Player, float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Pickup Count: %d"), PickupItemList.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("Pickup Count: %d"), PickupItemList.Num());
 
 	/** 後ろから回すことで削除時のIndexずれを防ぐ*/
 	for (int32 i = PickupItemList.Num() - 1; i >= 0; --i)
@@ -19,7 +19,7 @@ void FPickupItemManager::Update(APawn* Player, float DeltaTime)
 			continue;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("PickupItem Update"));
+		//UE_LOG(LogTemp, Warning, TEXT("PickupItem Update"));
 		/** 各アイテムの更新処理*/
 		Item->OnUpdate(Player, DeltaTime);
 	}

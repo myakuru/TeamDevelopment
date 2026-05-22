@@ -10,7 +10,7 @@ void USTE_EnemyBase::TreeStart(FStateTreeExecutionContext& a_Context)
 
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 
-	UE_LOG(LogTemp, Warning, TEXT("GameGravity : %.2f"), GetWorld()->GetGravityZ());
+	//UE_LOG(LogTemp, Warning, TEXT("GameGravity : %.2f"), GetWorld()->GetGravityZ());
 
 	// デリゲートへの関数登録
 	RegisterDelegate();

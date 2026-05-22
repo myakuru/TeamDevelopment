@@ -26,7 +26,7 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 	
 	// 敵管理クラスの更新メソッドを呼ぶ（毎フレーム）
 	if (enemyManager) {
-		UE_LOG(LogTemp, Warning, TEXT("num %d"), enemyManager->GetEnemyNum());
+		//(LogTemp, Warning, TEXT("num %d"), enemyManager->GetEnemyNum());
 		enemyManager->UpdateEnemies(DeltaTime);
 	}
 

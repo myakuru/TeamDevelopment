@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class AEnemyBase;
 class UEnemyDataAsset;
@@ -7,24 +7,24 @@ class UEnemyDataAsset;
 #include "EnemyPoolConfig.generated.h"
 
 UCLASS(BlueprintType)
-class UEnemyPoolConfig : public UDataAsset
+class UEnemyPoolConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
 
-	/** ƒv[ƒ‹‚Å¶¬‚·‚éÛ‚É—˜—p‚·‚éƒNƒ‰ƒX*/
+	/** ãƒ—ãƒ¼ãƒ«ã§ç”Ÿæˆã™ã‚‹éš›ã«åˆ©ç”¨ã™ã‚‹ã‚¯ãƒ©ã‚¹*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pool")
 	TSubclassOf<AEnemyBase> EnemyClass;
 
 	/** 
-	* ƒv[ƒ‹‚Å‚ ‚ç‚©‚¶‚ßŠm•Û‚·‚é”
-	* ƒƒ‚ƒŠ‚ğg‚¢‚·‚¬‚È‚¢‚½‚ß‚ÉA”‚Í“K‹X’²®
+	* ãƒ—ãƒ¼ãƒ«ã§ã‚ã‚‰ã‹ã˜ã‚ç¢ºä¿ã™ã‚‹æ•°
+	* ãƒ¡ãƒ¢ãƒªã‚’ä½¿ã„ã™ããªã„ãŸã‚ã«ã€æ•°ã¯é©å®œèª¿æ•´
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pool")
 	int32 PoolSize = 50;
 
-	/** ¶¬‚·‚é‚Æ‚«‚Ég—p‚·‚éƒGƒlƒ~[‚Ìƒf[ƒ^*/
+	/** ç”Ÿæˆã™ã‚‹ã¨ãã«ä½¿ç”¨ã™ã‚‹ã‚¨ãƒãƒŸãƒ¼ã®ãƒ‡ãƒ¼ã‚¿*/
 	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pool")
 	TSubclassOf<UEnemyDataAsset> EnemyData;*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pool")
