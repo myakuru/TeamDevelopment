@@ -8,11 +8,24 @@
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h>
+#include <ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h>
 
-UPlayerRuntimeData::UPlayerRuntimeData():
+UPlayerRuntimeData::UPlayerRuntimeData() :
 	Owner(nullptr),
 	Level(1)
 {
+	CachedExpUpgradeTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ExpUpgrade"));
+	if (!CachedExpUpgradeTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DT_ExpUpgrade がロードできません"));
+	}
+
+	// 要素数分の初期化
+	for (const FName& RowName : CachedExpUpgradeTable->GetRowNames())
+	{
+		UpgradeStates.Add({ RowName, 0 });
+	}
+
 }
 
 void UPlayerRuntimeData::Initialize()
@@ -129,4 +142,28 @@ void UPlayerRuntimeData::UpdateStatus()
 	CalculateExperience(ParameterData->GetExperienceData());
 	CalculateFinalSpeed(ParameterData->GetSpeedData(), Owner->GetCurrentGearLevel());
 	ApplyMovementSpeed();
+}
+
+void UPlayerRuntimeData::UpdateUpgradeStates(FName Id)
+{
+	for(auto& UpgradeState : UpgradeStates)
+	{
+		if (UpgradeState.UpgradeId == Id)
+		{
+			UpgradeState.Level++;
+			break;
+		}
+	}
+}
+
+int32 UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
+{
+	for(const auto& UpgradeState : UpgradeStates)
+	{
+		if (UpgradeState.UpgradeId == Id)
+		{
+			return UpgradeState.Level;
+		}
+	}
+	return 0;
 }
