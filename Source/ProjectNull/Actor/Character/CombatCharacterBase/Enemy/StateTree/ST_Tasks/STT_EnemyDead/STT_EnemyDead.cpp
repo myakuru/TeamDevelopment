@@ -29,13 +29,13 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	//// 死亡アニメーションの再生やエフェクトの発生を行う
 	OwnerEnemy->SetEnemyState(EEnemyState::Dead);
 	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
-	if (auto EnemyManager = OwnerEnemy->GetEnemyManagerSubsystem()) {
+	/*if (auto EnemyManager = OwnerEnemy->GetEnemyManagerSubsystem()) {
 		EnemyManager->RemoveEnemy(OwnerEnemy);
 		if (auto* ISMManager = EnemyManager->GetISMManager(OwnerEnemy->GetISMManagerClass()))
 		{
 			ISMManager->UnregisterEnemy(OwnerEnemy);
 		}
-	}
+	}*/
 
 	// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
 	if (auto GameProgress = OwnerEnemy->GetGameProgressSubsystem()) {

@@ -295,6 +295,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 
+	AnimationReset();
+
 	EnemyStatus.StateTag = EEnemyState::None;
 	EnemyRuntimeData->ChangedEnemyState(EEnemyState::None);
 
@@ -338,7 +340,9 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	/** ISMManagerへの自己登録*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ISMIndex:%d"), ISMInstanceIndex);
 		ISMManager->RegisterEnemy(this);
+		UE_LOG(LogTemp, Warning, TEXT("ISMIndex:%d"), ISMInstanceIndex);
 	}
 
 #if WITH_EDITOR
@@ -376,7 +380,10 @@ void AEnemyBase::Deactivate()
 	/** ISMManagerから解除*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ISMIndex:%d"), ISMInstanceIndex);
 		ISMManager->UnregisterEnemy(this);
+		UE_LOG(LogTemp, Warning, TEXT("EnemyDead"));
+		UE_LOG(LogTemp, Warning, TEXT("ISMIndex:%d"), ISMInstanceIndex);
 	}
 }
 

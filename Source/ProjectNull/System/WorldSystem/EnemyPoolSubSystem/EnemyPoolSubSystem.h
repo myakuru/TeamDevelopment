@@ -60,6 +60,8 @@ public:
 	*/
 	void Return(AEnemyBase* Enemy);
 
+	bool IsPoolFull(UEnemyPoolConfig* InData) const;
+
 private:
 
 	AEnemyBase* CreateNewEnemy(UEnemyPoolConfig* InData);

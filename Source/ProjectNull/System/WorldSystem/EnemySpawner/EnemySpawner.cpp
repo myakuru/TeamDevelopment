@@ -140,6 +140,12 @@ void AEnemySpawner::SpawnEnemy()
 						// プール経由でスポーンする
 						if (Unit.PoolConfig && poolSubSystem)
 						{
+							if (poolSubSystem->IsPoolFull(Unit.PoolConfig))
+							{
+								UE_LOG(LogTemp, Warning, TEXT("[Spawner] Pool is full. Skip spawn: %s"), *Unit.PoolConfig->GetName());
+								continue;
+							}
+
 							poolSubSystem->Spawn(Unit.PoolConfig, SpawnLocation);
 						}
 						else if (Unit.EnemyClass)
