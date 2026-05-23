@@ -70,9 +70,6 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UExpUpgradeWidgetBase> UpgradeWidget_2;
 
-	// 有効な選択肢の数だけWidgetを表示し、データを設定
-	TArray<UExpUpgradeWidgetBase*> Widgets = { UpgradeWidget_0, UpgradeWidget_1, UpgradeWidget_2 };
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrade")
 	bool bIsUpgradeWidgetUse = false;
 
@@ -98,7 +95,7 @@ protected:
 	UPROPERTY()
 	UDataTable* CachedExpUpgradeTable = nullptr;
 
-	TArray<bool> bIsUpgradeWidgetFilledArray = { false, false, false };
+	bool bIsUpgradeWidgetFilledArray = true;
 
 	bool bIsUpgradeWidgetOpen = false;
 
