@@ -153,6 +153,7 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 
 		if ((int)(PrevRawFrame / NumFrames) < (int)(CurrRawFrame / NumFrames))
 		{
+			if (Enemy->AnimChangeFlg) { continue; }
 			// 0なら１，１なら０にするだけ
 			Enemy->AnimChangeFlg = true;
 			int32 TargetAnim = (AnimIndex == 1) ? 0 : 1;
@@ -188,6 +189,10 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 5, static_cast<float>(Enemy->AnimChangeFlg));
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 6, NextFrame);
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 7, Enemy->GetAnimBlendWeight());
+		UE_LOG(LogTemp, Warning,
+			TEXT("CurrentFrame:%.3f | PrevFrame:%.3f | AnimIndex:%d | StartTime:%.3f | NumFrames:%.3f | Flg:%d | NextFrame:%.3f | Weight:%.3f"),
+			CurrentFrame, PrevFrame, AnimIndex, AnimData.StartTime, AnimData.NumFrames, Enemy->AnimChangeFlg, NextFrame, Enemy->GetAnimBlendWeight()
+		);
 	}
 
 	if (Enemies.Num() > 0)

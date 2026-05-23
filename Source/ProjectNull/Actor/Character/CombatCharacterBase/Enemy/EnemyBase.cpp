@@ -446,3 +446,10 @@ void AEnemyBase::AnimationReset()
 
 	AnimBlendWeight = 0.0f;
 }
+
+float AEnemyBase::GetCapsuleHalfHeight()const
+{
+	if (!CapsuleComponent) { return 0.0f; }
+
+	return CapsuleComponent->GetScaledCapsuleHalfHeight();
+}

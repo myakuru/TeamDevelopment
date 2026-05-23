@@ -65,11 +65,11 @@ private:
 
 private:
 
-	/** @brief 持ち主のアドレス*/
+	/** 持ち主のアドレス */
 	UPROPERTY()
 	TObjectPtr<AEnemyBase> OwnerEnemy = nullptr;
 
-	/** @brief 移動ベクトル*/
+	/** 移動ベクトル */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	FVector MoveDir = FVector::ZeroVector;
 
@@ -79,7 +79,7 @@ private:
 
 	/**	回転速度 */
 	UPROPERTY(EditAnywhere, Category = "Input")
-	float RotSpeed = 5.0f;
+	float RotationInterpSpeed = 5.0f;
 
 	/**	歩くことのできる床の角度 */
 	UPROPERTY(EditAnywhere, Category = "Input")

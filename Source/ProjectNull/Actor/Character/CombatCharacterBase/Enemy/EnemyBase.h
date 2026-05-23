@@ -130,6 +130,21 @@ public:
 	/** ノックバック時の重さを取得 */
 	float GetKnockBackWeight()const { return EnemyStatus.KnockBackWeight; }
 
+	/** 移動スピードを取得 */
+	float GetMoveSpeed()const { return EnemyStatus.MoveSpeed; }
+
+	/** 回転補間スピード */
+	float GetRotationInterpSpeed()const { return EnemyStatus.RotationInterpSpeed; }
+
+	/** 上ることが可能な斜面の角度 */
+	float GetWalkableFloorAngle()const { return EnemyStatus.WalkableFloorAngle; }
+
+	/** 超える事の出来る段差の最大の高さ */
+	float GetMaxStepHeight()const { return EnemyStatus.MaxStepHeight; }
+
+	/** カプセルの高さの半径(座標補正に使う) */
+	float GetCapsuleHalfHeight()const;
+
 	/** EnemyRuntimeへのアクセス、デリゲートへの登録を行う */
 	inline UEnemyRuntimeData* GetEnemyRuntimeData() const
 	{

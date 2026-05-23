@@ -57,9 +57,21 @@ struct FEnemyStatus
 
 public:
 
+	// スケーリング計算用ヒットポイント
+	UPROPERTY(EditAnywhere)
+	FStatScaling HPScaling;
+
+	// スケーリング計算用攻撃力
+	UPROPERTY(EditAnywhere)
+	FStatScaling AttackScaling;
+
 	// 移動方向
 	UPROPERTY(EditAnywhere)
 	FVector MoveDir = FVector::ZeroVector;
+
+	// ノックバック方向
+	UPROPERTY()
+	FVector KNockBackVelocity = FVector::ZeroVector;
 
 	// 移動速度
 	UPROPERTY(EditAnywhere)
@@ -69,28 +81,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	float	RotationInterpSpeed = 5.0f;
 
-	// 最終的なヒットポイント
+	/**	歩くことのできる地面の角度 */
 	UPROPERTY(EditAnywhere)
-	int32	FinalHP = 100;
+	float WalkableFloorAngle = 0.0f;
 
-	// スケーリング計算用ヒットポイント
+	/**	超える事の出来る段差の高さ */
 	UPROPERTY(EditAnywhere)
-	FStatScaling HPScaling;
-
-	// 最終的な攻撃力
-	UPROPERTY(EditAnywhere)
-	int32	FinalAttack = 1;
-
-	// スケーリング計算用攻撃力
-	UPROPERTY(EditAnywhere)
-	FStatScaling AttackScaling;
+	float MaxStepHeight = 0.0f;
 
 	// エネミーの重量
 	UPROPERTY(EditAnywhere)
 	float	KnockBackWeight = 1.0f;
-
-	// ノックバック方向
-	FVector KNockBackVelocity = FVector::ZeroVector;
 
 	// 経験値
 	UPROPERTY(EditAnywhere)
@@ -101,26 +102,34 @@ public:
 	float GearEnergy = 0;
 
 	// ターゲットとの簡易距離
+	UPROPERTY()
 	float TargetDistanceSqr = 0.0f;
 
 	// 攻撃可能距離
 	UPROPERTY(EditAnywhere)
 	float AttackDistance = 20.0f;
 
-	/** 生存フラグ*/
-	bool IsAlive = true;
+	// パーティクルのサイズ
+	UPROPERTY(EditAnywhere, Category = "Experience")
+	float ExpSize = 1.0f;
 
 	// 死んだときのパーティクルの色
 	UPROPERTY(EditAnywhere, Category = "Experience")
 	FLinearColor ExpColor = FLinearColor::Blue;
 
-	// パーティクルのサイズ
-	UPROPERTY(EditAnywhere, Category = "Experience")
-	float ExpSize = 1.0f;
+	// 最終的なヒットポイント
+	UPROPERTY(EditAnywhere)
+	int32	FinalHP = 100;
+
+	// 最終的な攻撃力
+	UPROPERTY(EditAnywhere)
+	int32	FinalAttack = 1;
 
 	/**	ステートタグ */
 	UPROPERTY(EditAnywhere, Category = "StateTag")
 	EEnemyState StateTag = EEnemyState::None;
-
 	
+	/** 生存フラグ*/
+	UPROPERTY()
+	bool IsAlive = true;
 };
