@@ -123,6 +123,18 @@ void UPlayerGearComponent::OnInvincibilityStart()
 
 void UPlayerGearComponent::OnInvincibilityEnd()
 {
+	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
+		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData())
+	{
+		return;
+	}
+
+
+	if (CurrentGearLevel == kMaxGearLevel) {
+		CurrentGearLevel = 1;
+		OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()->LevelUp();
+	}
+
 	SetIsInvincible(false);
 }
 

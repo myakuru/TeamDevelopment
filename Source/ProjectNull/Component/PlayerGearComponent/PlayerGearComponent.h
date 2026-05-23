@@ -21,6 +21,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	/** 最大ギアレベル */
+	static constexpr int32 kMaxGearLevel = 4;
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool IsMovementBlockedByGear() const;

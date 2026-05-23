@@ -33,8 +33,8 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 	if (!Player) { return; }
 
 	UE_LOG(LogTemp, Warning,
-		TEXT("EnemyID:%d | AnimIndex:%d | NextAnimIndex:%d | BlendAlpha:%.3f | AnimTime:%.3f | Flg:%d"),
-		ISMInstanceIndex, AnimIndex, NextAnimIndex, AnimBlendWeight, AnimTime, AnimChangeFlg ? 1 : 0
+		TEXT("EnemyID:%d | AnimIndex:%d | NextAnimIndex:%d | BlendWeight:%.3f | AnimTime:%.3f | NextAnimTime:%.3f | PrevAnimTime:%.3f | Flg:%d"),
+		ISMInstanceIndex, AnimIndex, NextAnimIndex, AnimBlendWeight, AnimTime, PrevAnimTime, NextAnimTime, AnimChangeFlg ? 1 : 0
 	);
 
 	PrevAnimTime = AnimTime;

@@ -36,6 +36,7 @@ void UEnemyManagerSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 void UEnemyManagerSubsystem::RegisterEnemy(AEnemyBase* Enemy)
 {
 	if (!Enemy) { return; }
+	if (EnemyGruntList.Contains(Enemy)) { return; }
 
 	EnemyGruntList.Add(Enemy);
 }

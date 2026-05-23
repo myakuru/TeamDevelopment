@@ -40,6 +40,12 @@ void UPlayerRuntimeData::Initialize()
 		Owner = PlayerBase;
 	}
 
+
+	if (!RobotController)
+	{
+		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
+	}
+
 	// プレイヤーのパラメータデータ取得
 	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
 
@@ -52,7 +58,7 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 	Experience.Add(Amount);
 	
 	// 経験値によるレベルアップ
-	if (Experience.Current >= Experience.ExperienceToNextLevel)
+	while (Experience.Current >= Experience.ExperienceToNextLevel)
 	{
 		Experience.Current -= Experience.ExperienceToNextLevel;
 
@@ -91,10 +97,6 @@ void UPlayerRuntimeData::LevelUp()
 
 	UpdateStatus();
 
-	if (!RobotController)
-	{
-		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
-	}
 
 	RobotController->OpenPlayerExpUpgradeWidget();
 

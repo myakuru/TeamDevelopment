@@ -46,24 +46,29 @@ private:
 	/**
 	 * @brief カメラデータ更新処理
 	 * @param DeltaTime デルタタイム
+	 * @param ElapsedTime 経過時間
 	 */
-	void UpdateCameraData(float DeltaTime);
+	void UpdateCameraData(float DeltaTime, float InElapsedTime);
 
 	/**
 	 * @brief カメラの回転更新処理
-	 * @param DeltaTime デルタタイム
 	 * @param DataIndex 更新したいデータインデックス
+	 * @param InLerpAlpha 補間値
 	 */
-	void UpdateCameraRotation(float DeltaTime, int32 DataIndex);
+	void UpdateCameraRotation(
+		int32 DataIndex,
+		float InLerpAlpha);
 
 	/**
 	 * @brief プレイヤーとカメラとの距離更新
-	 * @param DeltaTime デルタタイム
 	 * @param DataIndex 更新したいデータインデックス
+	 * @param InLerpAlpha 補間値
 	 */
-	void UpdateTargetArmLength(float DeltaTime, int32 DataIndex);
+	void UpdateTargetArmLength(
+		int32 DataIndex,
+		float InLerpAlpha);
 
-
+	
 	/**
 	 * @brief 最終ダッシュの更新処理
 	 * @param DeltaTime デルタタイム
@@ -71,7 +76,13 @@ private:
 	 */
 	void UpdateFinalDash(float DeltaTime, float ElapsedTime);
 
-	
+	/**
+	 * @brief 前区間の有効なカメラデータ取得
+	 * @param DataIndex データインデックス
+	 * @return カメラデータ
+	 */
+	const FCameraSequenceData* GetPreviousValidCameraData(int32 DataIndex) const;
+
 	/**
 	 * @brief 経過時間に基づいて、どの区間かどうか調べ、インデックスを返す
 	 * @param InElapsedTime 経過時間
@@ -79,6 +90,12 @@ private:
 	 */
 	int32 GetCurrentSectionIndex(float InElapsedTime);
 
+	/**
+	 * @brief 区間内での開始時間
+	 * @param InTargetIndex 計算する地点インデックス
+	 * @return 経過時間
+	 */
+	float GetElapsedTimeToIndex(int32 InTargetIndex);
 	
 	/** ロボットコントローラークラス */
 	UPROPERTY()
