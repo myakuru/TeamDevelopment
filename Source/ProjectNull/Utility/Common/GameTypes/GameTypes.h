@@ -56,11 +56,10 @@ struct FCameraSequenceData
 public:
 
 	FCameraSequenceData() :
-		Time(0.0f),
-		TargetArmLength(0.0f),
-		ArmLengthLerpSpeed(1.0f),
-		TargetRotator(FRotator()),
-		RotatorLerpSpeed(1.0f)
+		Time(0.f),
+		TargetArmLength(0.f),
+		TargetRotator(FRotator::ZeroRotator),
+		bPause(false)
 	{
 	}
 
@@ -74,15 +73,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	float TargetArmLength;
 
-	/** カメラとプレイヤーの距離補間速度 */
-	UPROPERTY(EditAnywhere)
-	float ArmLengthLerpSpeed;
-
 	/** 目指すべきカメラ回転 */
 	UPROPERTY(EditAnywhere)
 	FRotator TargetRotator;
 
-	/** 回転補間速度 */
+	/** 停止するかどうか */
 	UPROPERTY(EditAnywhere)
-	float RotatorLerpSpeed;
+	bool bPause;
 };

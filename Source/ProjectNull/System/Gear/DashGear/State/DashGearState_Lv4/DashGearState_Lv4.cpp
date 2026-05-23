@@ -87,7 +87,7 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 	AfterImageAttackEffect->Update(DeltaTime, ElapsedTime);
 
 	// カメラデータの更新
-	UpdateCameraData(DeltaTime);
+	UpdateCameraData(DeltaTime,ElapsedTime);
 
 	// 最終ダッシュの更新処理
 	UpdateFinalDash(DeltaTime,ElapsedTime);
@@ -122,60 +122,105 @@ void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 	OwnerPlayer->GetMesh()->SetHiddenInGame(true);
 }
 
-void UDashGearState_Lv4::UpdateCameraData(float DeltaTime)
+void UDashGearState_Lv4::UpdateCameraData(
+	float DeltaTime,
+	float InElapsedTime)
 {
 	if (!OwnerGear) { return; }
 
-	// 
-	const int32 ResultIndex = GetCurrentSectionIndex(OwnerGear->GetElapsedTime());
+	// 現在の区間インデックス取得
+	const int32 CurrentIndex = GetCurrentSectionIndex(InElapsedTime);
 
-	UpdateCameraRotation(DeltaTime, ResultIndex);
+	if (!CameraData.IsValidIndex(CurrentIndex)) { return; }
 
-	UpdateTargetArmLength(DeltaTime, ResultIndex);
+	// 現在のカメラデータ取得
+	const FCameraSequenceData& CurrentData = CameraData[CurrentIndex];
+
+	// 区間内での開始時間
+	const float SectionStartTime = GetElapsedTimeToIndex(CurrentIndex);
+
+	// 補間値を求める
+	const float LerpAlpha = FMath::Clamp(
+		(InElapsedTime - SectionStartTime) / CurrentData.Time,
+		0.f,
+		1.f);
+
+	// カメラの回転更新処理
+	UpdateCameraRotation(CurrentIndex, LerpAlpha);
+
+	// プレイヤーとカメラとの距離更新
+	UpdateTargetArmLength(CurrentIndex, LerpAlpha);
 }
 
-void UDashGearState_Lv4::UpdateCameraRotation(float DeltaTime, int32 DataIndex)
+void UDashGearState_Lv4::UpdateCameraRotation(
+	int32 DataIndex,
+	float InLerpAlpha)
 {
-	if (!RobotController)						{ return; }
-	if (!CameraData.IsValidIndex(DataIndex))	{ return; }
+	if (!RobotController) { return; }
+	if (!CameraData.IsValidIndex(DataIndex)) { return; }
 
-	// 演出カメラ構造体からデータを取得
-	FRotator		TargetRotator			= CameraData[DataIndex].TargetRotator;
-	const float		TargetRotatorLerpSpeed	= CameraData[DataIndex].RotatorLerpSpeed;
+	const FCameraSequenceData& Data = CameraData[DataIndex];
 
-	// カメラのYaw回転を考慮して計算
-	TargetRotator.Yaw						= CameraData[DataIndex].TargetRotator.Yaw + StartControlRotation.Yaw;
+	if (Data.bPause) { return; }
+
+	// ギアスキル発動開始時のプレイヤーYaw回転
+	const float BaseYaw = StartPlayerTransform.GetRotation().Rotator().Yaw;
+
+	// 区間開始の回転
+	FRotator StartRotator = StartControlRotation;
+
+	// 前区間のカメラデータ取得
+	if (const FCameraSequenceData* PrevData = GetPreviousValidCameraData(DataIndex))
+	{
+		StartRotator = PrevData->TargetRotator;
+	}
+
+	// 開始時のプレイヤーYaw回転を考慮して計算
+	StartRotator.Yaw += BaseYaw;
+
+	// 目指すべき回転
+	FRotator TargetRotator = Data.TargetRotator;
+
+	// 開始時のプレイヤーYaw回転を考慮して計算
+	TargetRotator.Yaw += BaseYaw;
 
 	// 補間処理
-	const FRotator Rotator = FMath::RInterpTo(	RobotController->GetControlRotation(),
-												TargetRotator,
-												DeltaTime,
-												TargetRotatorLerpSpeed);
+	const FQuat ResultQuat = FQuat::Slerp(
+		StartRotator.Quaternion(),
+		TargetRotator.Quaternion(),
+		InLerpAlpha);
 
-	// 計算結果を更新
-	RobotController->SetControlRotation(Rotator);
+	// カメラの回転更新
+	RobotController->SetControlRotation(ResultQuat.Rotator());
 }
 
-void UDashGearState_Lv4::UpdateTargetArmLength(float DeltaTime, int32 DataIndex)
+void UDashGearState_Lv4::UpdateTargetArmLength(
+	int32 DataIndex,
+	float InLerpAlpha)
 {
 	auto* SpringArm = OwnerPlayer->GetSpringArmComponent();
-	if (!SpringArm)								{ return; }
-	if (!CameraData.IsValidIndex(DataIndex))	{ return; }
 
-	// 現在のプレイヤーとカメラ距離
-	const float CurrentArmLength	= SpringArm->TargetArmLength;
+	if (!SpringArm) { return; }
+	if (!CameraData.IsValidIndex(DataIndex)) { return; }
 
-	// 演出カメラ構造体からデータを取得
-	const float TargetArmLength		= CameraData[DataIndex].TargetArmLength;
-	const float ArmLengthLerpSpeed	= CameraData[DataIndex].ArmLengthLerpSpeed;
+	const FCameraSequenceData& Data = CameraData[DataIndex];
+
+	if (Data.bPause) { return; }
+
+	// 区間開始のカメラとプレイヤーの距離
+	float StartArmLength = StartTargetArmLength;
+
+	// 前区間のカメラデータ取得
+	if (const FCameraSequenceData* PrevData = GetPreviousValidCameraData(DataIndex))
+	{
+		StartArmLength = PrevData->TargetArmLength;
+	}
 
 	// 補間処理
-	const float ResultArmLength = FMath::FInterpTo(	CurrentArmLength,
-													TargetArmLength,
-													DeltaTime,
-													ArmLengthLerpSpeed);
-	// 計算結果を更新
-	SpringArm->TargetArmLength = ResultArmLength;
+	SpringArm->TargetArmLength = FMath::Lerp(
+		StartArmLength,
+		Data.TargetArmLength,
+		InLerpAlpha);
 }
 
 void UDashGearState_Lv4::UpdateFinalDash(float DeltaTime, float ElapsedTime)
@@ -187,6 +232,28 @@ void UDashGearState_Lv4::UpdateFinalDash(float DeltaTime, float ElapsedTime)
 
 	// ダッシュ処理
 	Dash();
+}
+
+const FCameraSequenceData* UDashGearState_Lv4::GetPreviousValidCameraData(int32 DataIndex) const
+{
+	if (!CameraData.IsValidIndex(DataIndex - 1))
+	{
+		return nullptr;
+	}
+
+	const FCameraSequenceData& PrevData = CameraData[DataIndex - 1];
+
+	if (!PrevData.bPause)
+	{
+		return &PrevData;
+	}
+
+	if (!CameraData.IsValidIndex(DataIndex - 2))
+	{
+		return nullptr;
+	}
+
+	return &CameraData[DataIndex - 2];
 }
 
 void UDashGearState_Lv4::InitializeGearDuration()
@@ -217,6 +284,22 @@ int32 UDashGearState_Lv4::GetCurrentSectionIndex(float InElapsedTime)
 		}
 	}
 
-	return 0;
+	return - 1;
 }
 
+float UDashGearState_Lv4::GetElapsedTimeToIndex(int32 InTargetIndex)
+{
+	float ResultTime = 0.f;
+
+	// TargetIndex以前の区間時間を加算して区間内での開始時間を返す
+	for (int32 DataIndex = 0; DataIndex < CameraData.Num(); ++DataIndex)
+	{
+		if (DataIndex == InTargetIndex) { return ResultTime; }
+
+		ResultTime += CameraData[DataIndex].Time;
+	}
+
+	return ResultTime;
+}
+
+ 
