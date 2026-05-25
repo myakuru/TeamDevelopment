@@ -32,7 +32,10 @@ void UPlayerMaterialCollectionUpdater::UpdateMapMaterialCollection(float DeltaTi
 		GetWorld(),
 		MapMaterialCollection,
 		TEXT("Position"),
-		FLinearColor(PlayerLocation.X, PlayerLocation.Y, PlayerLocation.Z, 1.0f)
-	);
+		FLinearColor(
+			PlayerLocation.X,
+			PlayerLocation.Y,
+			PlayerLocation.Z,
+			1.0f));
 
 }

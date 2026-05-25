@@ -29,7 +29,7 @@ void UGearBase::Initialize(
 	OwnerPlayer			= Player;
 	OwnerGearComponent	= GearComponent;
 
-	for (auto* State : GearStates)
+	for (auto& State : GearStates)
 	{
 		if (!State) { continue; }
 
