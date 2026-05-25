@@ -103,7 +103,7 @@ private:
 
 	/** ギアの状態配列 */
 	UPROPERTY(EditAnywhere, Instanced)
-	TArray<UGearStateBase*> GearStates;
+	TArray<TObjectPtr<UGearStateBase>> GearStates;
 
 	/** ギアのステータス配列 */
 	UPROPERTY(EditAnywhere)

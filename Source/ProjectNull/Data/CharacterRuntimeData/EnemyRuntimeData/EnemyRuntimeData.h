@@ -53,6 +53,9 @@ public:
 	//~ End Setter
 
 	//~ Start Getter
+
+	/** プレイヤーとの距離を返す*/
+	float GetTargetDistanceSqr() { return TargetDistanceSqr; }
 	
 	/**
 	 * EnemyBaseを弄れないので一旦コメント化

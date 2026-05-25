@@ -1,8 +1,10 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "../DashGearStateBase.h"
+
+#include <ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h>
 #include <ProjectNull/Utility/Common/GameTypes/GameTypes.h>
+
 #include "DashGearState_Lv4.generated.h"
 
 /** ロボットコントローラークラス */
@@ -20,9 +22,12 @@ class PROJECTNULL_API UDashGearState_Lv4 final : public UDashGearStateBase
 public:
 	UDashGearState_Lv4();
 public:
-	void Initialize(class APlayerBase* Player,
-					class UPlayerGearComponent* GearComponent,
-					class UGearBase* Gear)	override;
+
+	void Initialize(
+		class APlayerBase* InPlayer,
+		class UPlayerGearComponent* InGearComponent,
+		class UGearBase* InOwner)			override;
+
 	void Execute(int32 CurrentGearLevel)	override;
 	void Update(float DeltaTime)			override;
 	void End()								override;

@@ -154,6 +154,12 @@ void UPlayerGearComponent::UpdateCollisionByInvincibility()
 	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
 	const float InvincibilityCollisionRadiusSquared = ParameterData->GetGearData().InvincibilityCollisionRadiusSquared;
 	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+
+	const FRotator	YawRotation = { 0.f, OwnerPlayer->GetControlRotation().Yaw, 0.f };
+	const FVector	Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+	OwnerPlayer->AddMovementInput(Forward);
+
 	if (!EnemyManager) { return; }
 
 	for (const auto& Enemy : EnemyManager->GetEnemyList())

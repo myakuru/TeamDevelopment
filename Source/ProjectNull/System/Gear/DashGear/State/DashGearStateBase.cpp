@@ -26,20 +26,20 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 
 void UDashGearStateBase::Update(float DeltaTime)
 {
-	if (!OwnerGear || !OwnerPlayer) { return; }
+	if (!Owner || !Player) { return; }
 
 	Dash();
 }
 
 void UDashGearStateBase::Dash()
 {
-	if (!OwnerPlayer) { return; }
+	if (!Player) { return; }
 
-	const FVector Dir = OwnerPlayer->GetActorForwardVector();
-	OwnerPlayer->LaunchCharacter(Dir * DashSpeed, true, true);
+	const FVector Dir = Player->GetActorForwardVector();
+	Player->LaunchCharacter(Dir * DashSpeed, true, true);
 
-	if (OwnerGear) {
-		OwnerGear->SetBlocksMovement(true);
+	if (Owner) {
+		Owner->SetBlocksMovement(true);
 	}
 
 	UpdateDashAttack();
@@ -48,13 +48,13 @@ void UDashGearStateBase::Dash()
 void UDashGearStateBase::PlayDashEffect()
 {
 	UNiagaraComponent* NiagaraComp = nullptr;
-	if (!OwnerPlayer) { return; }
+	if (!Player) { return; }
 
 	if (DashEffect)
 	{
 		NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
 			DashEffect,
-			OwnerPlayer->GetRootComponent(),
+			Player->GetRootComponent(),
 			NAME_None,
 			FVector::ZeroVector,
 			FRotator::ZeroRotator,
@@ -86,9 +86,9 @@ void UDashGearStateBase::PlayDashEffect()
 
 void UDashGearStateBase::UpdateDashAttack()
 {
-	if (!OwnerPlayer) { return; }
+	if (!Player) { return; }
 
-	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
+	const FVector PlayerLocation = Player->GetActorLocation();
 
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (!enemyManager) { return; }
@@ -108,7 +108,7 @@ void UDashGearStateBase::UpdateDashAttack()
 
 	DrawDebugSphere(
 		GetWorld(),
-		OwnerPlayer->GetActorLocation(),
+		Player->GetActorLocation(),
 		FMath::Sqrt(DashAttackRangeSquared),
 		16,
 		FColor::Green,

@@ -152,7 +152,7 @@ public:
 	}
 
 	/** 現在のギアエネルギー */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gear")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gear")
 	float GearEnergy;
 
 	/** ギアチェンジに必要エネルギー */

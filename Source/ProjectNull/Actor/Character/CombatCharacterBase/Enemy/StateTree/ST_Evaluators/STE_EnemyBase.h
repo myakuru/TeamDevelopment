@@ -41,6 +41,11 @@ public:
 	virtual void TreeStop(FStateTreeExecutionContext& a_Context)						override;
 
 	/**
+	 * @brief 固定パラメーターの登録
+	 */
+	virtual void RegisterFixedParams();
+
+	/**
 	 * @brief デリゲートへの関数登録
 	 */
 	virtual void RegisterDelegate();
@@ -90,8 +95,32 @@ private:
 	FVector MoveDir = FVector::ZeroVector;
 
 	/** ターゲットとの距離の二乗値 */
-	UPROPERTY(VisibleAnywhere,Category="Output", meta = (AllowPrivateAccess = "true"))
-	float TargetDistanceSqr = 0.0f;
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float TargetDistanceSqr = 0.f;
+	
+	/** ノックバック時の重さ */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float KnockBackWeight = 0.f;
+
+	/**	移動速度 */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float MoveSpeed = 600.f;
+
+	/**	回転速度 */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float RotateInterpSpeed = 5.f;
+
+	/**	歩くことのできる斜面角度 */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float WalkableFloorAngle = 45.f;
+
+	/**	超える事の出来る段差の最大の高さ */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float MaxStepHeight = 5.f;
+
+	/**	カプセルの高さ半径(高さ補正で使う) */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	float CapsuleHalfHeight = 88.f;
 
 	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))

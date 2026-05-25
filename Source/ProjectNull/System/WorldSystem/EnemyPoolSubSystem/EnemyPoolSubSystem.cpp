@@ -99,7 +99,10 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
 void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
 {
     if (!Enemy) { return; }
-
+	UE_LOG(LogTemp, Warning,
+		TEXT("Return Enemy:%s Alive:%d"),
+		*Enemy->GetName(),
+		Enemy->GetAliveFlg() ? 1 : 0);
    // UE_LOG(LogTemp, Warning, TEXT("Return In"));
 
     // どのPoolConfigのActorかを逆引きする
@@ -110,12 +113,26 @@ void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
     FEnemyPool* Pool = Pools.Find(Key);
     if (!Pool) { return; }
 
+	// すでにInactiveなら二重返却
+	if (Pool->Inactive.Contains(Enemy))
+	{
+		UE_LOG(LogTemp, Error,
+			TEXT("[EnemyPool] Duplicate Return : %s"),
+			*Enemy->GetName());
+
+		return;
+	}
+
     // ActiveからInactiveに移してDeactivateする
     Pool->Active.Remove(Enemy);
     Enemy->Deactivate();
     Pool->Inactive.Add(Enemy);
 
     //UE_LOG(LogTemp, Warning, TEXT("Return Out"));
+	UE_LOG(LogTemp, Warning,
+		TEXT("[EnemyPool] Return | Active:%d | Inactive:%d"),
+		Pool->Active.Num(),
+		Pool->Inactive.Num());
 }
 
 AEnemyBase* UEnemyPoolSubSystem::CreateNewEnemy(UEnemyPoolConfig* InData)
@@ -132,4 +149,36 @@ AEnemyBase* UEnemyPoolSubSystem::CreateNewEnemy(UEnemyPoolConfig* InData)
 
     return GetWorld()->SpawnActor<AEnemyBase>(
         InData->EnemyClass, HoldPos, FRotator::ZeroRotator, Params);
+}
+
+// プールの最大値確認
+bool UEnemyPoolSubSystem::IsPoolFull(UEnemyPoolConfig* InPoolConfig) const
+{
+	if (!InPoolConfig)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[EnemyPool] IsPoolFull: PoolConfig is null"));
+		return true;
+	}
+
+	const FPrimaryAssetId Key = InPoolConfig->GetPrimaryAssetId();
+	const FEnemyPool* Pool = Pools.Find(Key);
+
+	if (!Pool)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[EnemyPool] IsPoolFull: Pool not found: %s"), *InPoolConfig->GetName());
+		return true;
+	}
+
+	const int32 ActiveNum = Pool->Active.Num();
+	const int32 InactiveNum = Pool->Inactive.Num();
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[EnemyPool] %s | Active:%d | Inactive:%d | PoolFull:%s"),
+		*InPoolConfig->GetName(),
+		ActiveNum,
+		InactiveNum,
+		InactiveNum <= 0 ? TEXT("true") : TEXT("false")
+	);
+
+	return InactiveNum <= 0;
 }

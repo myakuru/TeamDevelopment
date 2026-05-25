@@ -4,7 +4,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StateTreeComponent.h"
 #include <ProjectNull/Utility/StateMachine/StateMachine.h>
-#include <ProjectNull/Actor/Item/Pickup/ExperiencePickup/ExperiencePickup.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
@@ -35,25 +34,42 @@ AEnemyBase::AEnemyBase()
 	// カプセル形状コリジョンの生成・プリセット設定
 	{
 		CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("CapsuleCollision");
-		CapsuleComponent->InitCapsuleSize(34.f, 88.f);
-		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
-		CapsuleComponent->CanCharacterStepUpOn = ECB_No;
-		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
-		CapsuleComponent->SetCanEverAffectNavigation(false);
-		CapsuleComponent->bDynamicObstacle = true;
+		CapsuleComponent->InitCapsuleSize(34.f, 88.f);									// カプセルサイズ
+		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);	// Pawn用のCollision一括設定
+		CapsuleComponent->CanCharacterStepUpOn = ECB_No;								// 他キャラが上に立てるか
+		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);							// 物理ボリューム(水中判定etc)を受けるか
+		CapsuleComponent->SetCanEverAffectNavigation(false);							// NavMesh更新対象化
+		CapsuleComponent->bDynamicObstacle = true;										// 動的障害物か
 		RootComponent = CapsuleComponent;
 	}
+	
 
 	StateTreeComponent		= CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
 }
 
 AEnemyBase::~AEnemyBase() = default;
 
-void AEnemyBase::NotifyChengedStateEnum(EEnemyState a_TargetState)
+void AEnemyBase::NotifyChangedStateEnum(EEnemyState a_TargetState)
 {
 	if (!EnemyRuntimeData) { return; }
 
 	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
+}
+
+void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse)
+{
+	if (!CapsuleComponent) { return; }
+
+	CapsuleComponent->SetCollisionResponseToChannel(Channel, NewResponse);
+}
+
+void AEnemyBase::OnEnterSlope()
+{
+	/* 備忘録 */
+	// 坂道の範囲内に入った場合
+	// １．フラグを立てる
+	// ２．移動処理内で坂道移動処理を実行
+	// ３．判定処理をタイマーに格納して毎フレーム計算を回避
 }
 
 void AEnemyBase::BeginPlay()
@@ -68,12 +84,6 @@ void AEnemyBase::BeginPlay()
 	//if (EnemyManager) {
 		//EnemyManager->RegisterEnemy(this);
 	//}
-
-	// カプセルコリジョンをRootにセット
-	if (CapsuleComponent)
-	{
-		RootComponent = CapsuleComponent;
-	}
 
 	// コンポーネントに自身の参照を渡す
 	{
@@ -295,6 +305,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 
+	AnimationReset();
+
 	EnemyStatus.StateTag = EEnemyState::None;
 	EnemyRuntimeData->ChangedEnemyState(EEnemyState::None);
 
@@ -315,16 +327,6 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 		EnemyManager->RegisterEnemy(this);
 	}
 
-	// コリジョンプリセット設定
-	if (CapsuleComponent)
-	{
-		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		CapsuleComponent->SetCollisionObjectType(ECC_Pawn);
-		CapsuleComponent->SetCollisionResponseToAllChannels(ECR_Block);
-		CapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		CapsuleComponent->SetGenerateOverlapEvents(true);
-	}
-
 	// コンポーネントに自身の参照を渡す
 	{
 		if (EnemyAttackComponent)EnemyAttackComponent->SetOwnerEnemy(this);
@@ -338,7 +340,9 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	/** ISMManagerへの自己登録*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ISMIndex:%d"), ISMInstanceIndex);
 		ISMManager->RegisterEnemy(this);
+		UE_LOG(LogTemp, Warning, TEXT("ISMIndex:%d"), ISMInstanceIndex);
 	}
 
 #if WITH_EDITOR
@@ -366,7 +370,6 @@ void AEnemyBase::Deactivate()
 	}
 
 	EnemyStatus.StateTag = EEnemyState::None;
-
 	if (!EnemyManager) { return; }
 
 	EnemyStatus.IsAlive = false;
@@ -376,7 +379,10 @@ void AEnemyBase::Deactivate()
 	/** ISMManagerから解除*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ISMIndex:%d"), ISMInstanceIndex);
 		ISMManager->UnregisterEnemy(this);
+		UE_LOG(LogTemp, Warning, TEXT("EnemyDead"));
+		UE_LOG(LogTemp, Warning, TEXT("ISMIndex:%d"), ISMInstanceIndex);
 	}
 }
 
@@ -445,4 +451,11 @@ void AEnemyBase::AnimationReset()
 	AnimNumFrames = 0.0f;
 
 	AnimBlendWeight = 0.0f;
+}
+
+float AEnemyBase::GetCapsuleHalfHeight()const
+{
+	if (!CapsuleComponent) { return 0.0f; }
+
+	return CapsuleComponent->GetScaledCapsuleHalfHeight();
 }

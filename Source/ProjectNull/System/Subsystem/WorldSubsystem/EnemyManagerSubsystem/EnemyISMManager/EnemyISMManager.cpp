@@ -86,23 +86,40 @@ void AEnemyISMManager::RegisterEnemy(AEnemyBase* Enemy)
 		Enemy->ISMInstanceIndex = INDEX_NONE;
 	}
 
+	FTransform AdjustTransform = Enemy->GetActorTransform();
+	// 90度回転させる
+	FRotator Rotation = AdjustTransform.GetRotation().Rotator();
+	Rotation.Yaw -= 90.0f;
+	AdjustTransform.SetRotation(Rotation.Quaternion());
+
+	FVector Location = AdjustTransform.GetLocation();
+	Location.Z -= 90.0f;
+	AdjustTransform.SetLocation(Location);
+
 
 	// 空いているインデックスを確保してEnemyに持たせる
 	// Enemy自身がインデックスを知っているのでマイフレームのFindが不要になる
 	int32 Index = AllocateIndex();
 	Enemy->ISMInstanceIndex = Index;
 	
-	// 敵の位置をインスタンスに反映
 	ISM->UpdateInstanceTransform(
 		Index,
-		Enemy->GetActorTransform(),
+		AdjustTransform,
 		true,
-		true	// MarkRenderStateDirtyをtrueにして即座にレンダリング状態を更新する（これでちらちらしない）
+		false	// MarkRenderStateDirtyをfalseにしてレンダリング状態の更新を遅延させる
 	);
 
-	Enemies.Add(Enemy);
+	const int AnimIndex = Enemy->GetAnimIndex();
+	const FAnimData& AnimData = AnimDataAsset->Animations[AnimIndex];
+	ISM->SetCustomDataValue(Index, 0, 0.0f);
+	ISM->SetCustomDataValue(Index, 2, AnimIndex);
+	ISM->SetCustomDataValue(Index, 3, AnimData.StartTime);
+	ISM->SetCustomDataValue(Index, 4, AnimData.NumFrames);
+	ISM->SetCustomDataValue(Index, 5, 0.0f);
+	ISM->SetCustomDataValue(Index, 6, AnimData.StartTime);
+	ISM->SetCustomDataValue(Index, 7, 0.0f);
 
-	//return Index;
+	Enemies.Add(Enemy);
 }
 
 void AEnemyISMManager::UnregisterEnemy(AEnemyBase* Enemy)
@@ -129,6 +146,7 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 {
 	for (AEnemyBase* Enemy : Enemies)
 	{
+
 		if (!IsValid(Enemy) || Enemy->ISMInstanceIndex == INDEX_NONE) { continue; }
 
 		const int AnimIndex = Enemy->GetAnimIndex();
@@ -148,7 +166,7 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 
 		// Channel 6 : 次アニメのフレーム番号
 		//const float NextFrameStart = NextAnimData.StartTime + Enemy->GetNextAnimTime() * SampleRate;
-		const float NextNumFrames = NextAnimData.NumFrames - NextAnimData.StartTime;
+		const float NextNumFrames = NextAnimData.NumFrames/* - NextAnimData.StartTime*/;
 		const float NextFrame = FMath::Fmod(Enemy->GetNextAnimTime() * SampleRate, NextNumFrames);
 
 		if ((int)(PrevRawFrame / NumFrames) < (int)(CurrRawFrame / NumFrames))
@@ -159,11 +177,22 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 			Enemy->SetNextAnimIndex(TargetAnim);
 		}
 
+		// オフセット適用
+		FTransform AdjustTransform = Enemy->GetActorTransform();
+		// 90度回転させる
+		FRotator Rotation = AdjustTransform.GetRotation().Rotator();
+		Rotation.Yaw -= 90.0f;
+		AdjustTransform.SetRotation(Rotation.Quaternion());
+
+		FVector Location = AdjustTransform.GetLocation();
+		Location.Z -= 90.0f;
+		AdjustTransform.SetLocation(Location);
+
 		// ActorのTransformをISMに反映
 		// bMarkRenderStateDirtyをfalseにして最後にまとめてDirtyを立てる
 		ISM->UpdateInstanceTransform(
 			Enemy->ISMInstanceIndex,
-			Enemy->GetActorTransform(),
+			AdjustTransform,
 			true,
 			false	// MarkRenderStateDirtyをfalseにしてレンダリング状態の更新を遅延させる
 		);
@@ -188,6 +217,14 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 5, static_cast<float>(Enemy->AnimChangeFlg));
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 6, NextFrame);
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 7, Enemy->GetAnimBlendWeight());
+
+		/*UE_LOG(LogTemp, Warning,
+			TEXT("CurrentFrame:%.3f | PrevFrame:%.3f | AnimDataStartTime:%.3f | AnimDataNumFrames:%.3f | NextFrame:%.3f"),
+			CurrentFrame, PrevFrame, AnimData.StartTime, AnimData.NumFrames, NextFrame);
+		UE_LOG(LogTemp, Warning,
+			TEXT("X:%.3f | Y:%.3f | Z:%.3f"),
+			Enemy->GetActorLocation().X, Enemy->GetActorLocation().Y, Enemy->GetActorLocation().Z);
+		UE_LOG(LogTemp, Warning,TEXT("ISMIndex:%d"), Enemy->ISMInstanceIndex);*/
 	}
 
 	if (Enemies.Num() > 0)

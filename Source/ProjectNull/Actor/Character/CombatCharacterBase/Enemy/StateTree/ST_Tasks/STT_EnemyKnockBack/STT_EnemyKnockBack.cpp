@@ -26,6 +26,9 @@ EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& 
 	// ノックバックに必要な情報を取得・設定
 	SetKnockBackData();
 
+	// 敵同士の当たり判定を一時的に消す
+	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+
 	return EStateTreeRunStatus::Running;
 }
 
@@ -48,7 +51,10 @@ void USTT_EnemyKnockBack::ExitState(FStateTreeExecutionContext& a_Context, const
 	if (!OwnerEnemy) { return; }
 
 	// ステートタイプを切り替え
-	OwnerEnemy->NotifyChengedStateEnum(EEnemyState::None);
+	OwnerEnemy->NotifyChangedStateEnum(EEnemyState::None);
+
+	// 敵同士の当たり判定を戻す
+	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
 }
 
 void USTT_EnemyKnockBack::SetKnockBackData()
@@ -98,19 +104,8 @@ bool USTT_EnemyKnockBack::MoveToKnockBack(const float a_DeltaTime)
 	// どこかに当たったら停止
 	FHitResult HitResult;
 	OwnerEnemy->SetActorLocation(NextLocation, true, &HitResult);
-	if (HitResult.bBlockingHit)
+	if (HitResult.GetComponent()->GetCollisionObjectType() == ECC_WorldStatic)
 	{
-		TObjectPtr<AActor> HitActor = HitResult.GetActor();
-
-		if (HitActor)
-		{
-			// プレイヤー or エネミーなら無視
-			if (HitActor->IsA(ACharacter::StaticClass()) ||
-				HitActor->IsA(AEnemyBase::StaticClass()))
-			{
-				return false;
-			}
-		}
 		return true;
 	}
 

@@ -13,7 +13,7 @@ UCLASS()
 class PROJECTNULL_API USTT_EnemyKnockBack : public UStateTreeTaskBlueprintBase
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	USTT_EnemyKnockBack(const FObjectInitializer& a_ObjInit);
@@ -54,11 +54,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	FVector MoveDir = FVector::ZeroVector;
 
+	/**	敵の重量 */
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	float	EnemyWeight = 1.0f;
+
 	/**	受けた攻撃力 */
 	UPROPERTY()
 	float	ReceivedAttackPower = 0.0f;
-
-	/**	敵の重量 */
-	UPROPERTY(VisibleAnywhere, Category = "Input")
-	float	EnemyWeight	= 1.0f;
 };

@@ -5,6 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
+#include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
 #include "EnemyBase.generated.h"
@@ -52,7 +53,7 @@ class UEnemyRuntimeData;
 ///	重くなる可能性があるためActorを継承する可能性大
 /// </summary>
 UCLASS()
-class PROJECTNULL_API AEnemyBase : public AActor
+class PROJECTNULL_API AEnemyBase : public AActor, public IEnemyInterface
 {
 	GENERATED_BODY()
 
@@ -108,22 +109,54 @@ public:
 	*/
 	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
 
+	/** アニメーションのインデックスを設定*/
+	void SetAnimIndex()						{ AnimIndex = NextAnimIndex; }
+	/** 次のアニメーションのインデックスの設定*/
+	void SetNextAnimIndex(int32 Index)		{ NextAnimIndex = Index; }
+	/** Updateのインターバルを設定*/
+	void SetUpdateInterval(int32 Interval)	{ UpdateInterval = Interval; }
+
+	/**
+	 * @brief 外部からステートEnum変更を通知
+	 * @param a_TargetState 変更先ステート
+	 */
+	virtual void NotifyChangedStateEnum(EEnemyState a_TargetState);
+
+	/**
+	 * @brief 所持する当たり判定チャンネルのレスポンス設定を変更
+	 * @param Channel 変更対象チャンネル(WorldStatic,Pawn,etc..)
+	 * @param NewResponse レスポンスタイプ(Block・Overlap・Ignore)
+	 */
+	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse);
+
 	//~ End Setter
 
 
 	//~ Begin Getter
+
+	/** ノックバック時の重さを取得 */
+	float GetKnockBackWeight()const { return EnemyStatus.KnockBackWeight; }
+
+	/** 移動スピードを取得 */
+	float GetMoveSpeed()const { return EnemyStatus.MoveSpeed; }
+
+	/** 回転補間スピード */
+	float GetRotationInterpSpeed()const { return EnemyStatus.RotationInterpSpeed; }
+
+	/** 上ることが可能な斜面の角度 */
+	float GetWalkableFloorAngle()const { return EnemyStatus.WalkableFloorAngle; }
+
+	/** 超える事の出来る段差の最大の高さ */
+	float GetMaxStepHeight()const { return EnemyStatus.MaxStepHeight; }
+
+	/** カプセルの高さの半径(座標補正に使う) */
+	float GetCapsuleHalfHeight()const;
 
 	/** EnemyRuntimeへのアクセス、デリゲートへの登録を行う */
 	inline UEnemyRuntimeData* GetEnemyRuntimeData() const
 	{
 		return EnemyRuntimeData;
 	}
-
-	/**
-	 * @brief 外部からステートEnum変更を通知
-	 * @param a_TargetState 変更先ステート
-	 */
-	virtual void NotifyChengedStateEnum(EEnemyState a_TargetState);
 
 	/** エネミーマネージャーのゲッター*/
 	UEnemyManagerSubsystem* GetEnemyManagerSubsystem() const
@@ -142,6 +175,9 @@ public:
 		return ISMManagerClass;
 	}
 
+	/** ターゲットとの距離を返す*/
+	float GetTargetDistanceSqr()const { return EnemyStatus.TargetDistanceSqr; }
+
 	/** 敵の種類ごとにメッシュを返す*/
 	virtual UStaticMesh* GetEnemyMesh() const PURE_VIRTUAL(AEnemyBase::GetEnemyMesh, return nullptr;);
 
@@ -150,6 +186,17 @@ public:
 	{
 		return GameProgress;
 	}
+
+	/** AnimToTexture用：アニメーションの現在の再生時間*/
+	float GetAnimTime()			const { return AnimTime; }
+	float GetBeginAnimTime()	const { return PrevAnimTime; }
+	/** AnimToTexture用：再生中のアニメーションのインデックス*/
+	int32 GetAnimIndex()		const { return AnimIndex; }
+	float GetAnimNumFrames()	const { return AnimNumFrames; }
+	int32 GetNextAnimIndex()	const { return NextAnimIndex; }
+	float GetNextAnimTime()		const { return NextAnimTime; }
+	float GetAnimBlendWeight()	const { return AnimBlendWeight; }
+	int32 GetUpdateInterval()	const { return UpdateInterval; }
 
 	/**
 	 * @brief 汎用的なEnumビット(uint8型)上昇処理
@@ -270,6 +317,13 @@ public:
 	/** 敵が死んださいに経験値を出す*/
 	virtual void SpawnDeathExperience();
 
+protected:
+
+	/**
+	 * @brief 坂道範囲内に入った時の通知処理
+	 */
+	virtual void OnEnterSlope()override;
+
 public:
 
 	// アニメーションEnum
@@ -288,19 +342,6 @@ public:
 
 	/** ISMのどのインスタンスに対応するかを示すインデックス*/
 	int32 ISMInstanceIndex = INDEX_NONE;
-
-	/** AnimToTexture用：アニメーションの現在の再生時間*/
-	float GetAnimTime() const			{ return AnimTime; }
-	float GetBeginAnimTime() const		{ return PrevAnimTime; }
-	/** AnimToTexture用：再生中のアニメーションのインデックス*/
-	int32 GetAnimIndex() const			{ return AnimIndex; }
-	float GetAnimNumFrames() const		{ return AnimNumFrames; }
-	int32 GetNextAnimIndex() const		{ return NextAnimIndex; }
-	float GetNextAnimTime() const		{ return NextAnimTime; }
-	float GetAnimBlendWeight() const	{ return AnimBlendWeight; }
-
-	void SetAnimIndex()					{ AnimIndex = NextAnimIndex; }
-	void SetNextAnimIndex(int32 Index)	{ NextAnimIndex = Index; }
 
 	bool AnimChangeFlg = false;
 
@@ -362,4 +403,7 @@ private:
 
 	/** データアセットからデータを構造体に移す処理*/
 	void SetEnemyStatusData(UEnemyDataAsset* InData);
+
+	/** Updateのインターバルに利用する変数*/
+	int32 UpdateInterval = 1;
 };
