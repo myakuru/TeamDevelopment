@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "../DashGearStateBase.h"
+
+#include <ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h>
+
 #include "DashGearState_Lv1.generated.h"
 
 /** ダッシュギアのレベル1状態クラス */

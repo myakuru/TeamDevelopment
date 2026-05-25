@@ -1,16 +1,16 @@
 ﻿
 #include "DashGearState_Lv2.h"
 
-#include "ProjectNull/System/Gear/GearBase.h"
+#include <ProjectNull/System/Gear/GearBase.h>
 
 UDashGearState_Lv2::UDashGearState_Lv2():
-	ElapsedTime(0.0f)
+	ElapsedTime(0.f)
 {
 }
 
-void UDashGearState_Lv2::Initialize(APlayerBase* Player, UPlayerGearComponent* GearComponent, UGearBase* Gear)
+void UDashGearState_Lv2::Initialize(APlayerBase* InPlayer, UPlayerGearComponent* InGearComponent, UGearBase* InOwner)
 {
-	UGearStateBase::Initialize(Player, GearComponent, Gear);
+	UGearStateBase::Initialize(InPlayer, InGearComponent, InOwner);
 }
 
 void UDashGearState_Lv2::Execute(int32 CurrentGearLevel)
@@ -21,7 +21,7 @@ void UDashGearState_Lv2::Execute(int32 CurrentGearLevel)
 
 void UDashGearState_Lv2::Update(float DeltaTime)
 {
-	if (!OwnerGear) { return; }
+	if (!Owner) { return; }
 
 	ElapsedTime += DeltaTime;
 
@@ -48,6 +48,6 @@ void UDashGearState_Lv2::Update(float DeltaTime)
 
 	bPrevShouldDash = bShouldDash;
 
-	OwnerGear->SetBlocksMovement(bBlocksMovement);
+	Owner->SetBlocksMovement(bBlocksMovement);
 
 }

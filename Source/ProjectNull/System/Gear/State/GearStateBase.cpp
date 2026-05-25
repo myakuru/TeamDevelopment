@@ -1,15 +1,20 @@
 ﻿
 #include "GearStateBase.h"
 
-
-UGearStateBase::UGearStateBase()
+UGearStateBase::UGearStateBase():
+	Player(nullptr),
+	GearComponent(nullptr),
+	Owner(nullptr)
 {
 	
 }
 
-void UGearStateBase::Initialize(APlayerBase* Player, UPlayerGearComponent* GearComponent, UGearBase* Gear)
+void UGearStateBase::Initialize(
+	APlayerBase* InPlayer,
+	UPlayerGearComponent* InGearComponent,
+	UGearBase* InOwner)
 {
-	OwnerPlayer = Player;
-	OwnerGearComponent = GearComponent;
-	OwnerGear = Gear;
+	Player			= InPlayer;
+	GearComponent	= InGearComponent;
+	Owner			= InOwner;
 }
