@@ -2,8 +2,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameFramework/Actor.h"
+
 #include "ProjectileBase.generated.h"
+
 
 UCLASS()
 class PROJECTNULL_API AProjectileBase : public AActor
@@ -19,4 +22,18 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+private:
+
+	/** ルートコンポーネント */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> Root;
+
+	/** 残像表示用スケルタルメッシュ */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USkeletalMeshComponent> Mesh;
+
+	UPROPERTY(EditAnywhere)
+	float Speed;
+
+	
 };
