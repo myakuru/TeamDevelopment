@@ -146,6 +146,7 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 {
 	for (AEnemyBase* Enemy : Enemies)
 	{
+
 		if (!IsValid(Enemy) || Enemy->ISMInstanceIndex == INDEX_NONE) { continue; }
 
 		const int AnimIndex = Enemy->GetAnimIndex();
@@ -217,13 +218,13 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 6, NextFrame);
 		ISM->SetCustomDataValue(Enemy->ISMInstanceIndex, 7, Enemy->GetAnimBlendWeight());
 
-		UE_LOG(LogTemp, Warning,
+		/*UE_LOG(LogTemp, Warning,
 			TEXT("CurrentFrame:%.3f | PrevFrame:%.3f | AnimDataStartTime:%.3f | AnimDataNumFrames:%.3f | NextFrame:%.3f"),
 			CurrentFrame, PrevFrame, AnimData.StartTime, AnimData.NumFrames, NextFrame);
 		UE_LOG(LogTemp, Warning,
 			TEXT("X:%.3f | Y:%.3f | Z:%.3f"),
 			Enemy->GetActorLocation().X, Enemy->GetActorLocation().Y, Enemy->GetActorLocation().Z);
-		UE_LOG(LogTemp, Warning,TEXT("ISMIndex:%d"), Enemy->ISMInstanceIndex);
+		UE_LOG(LogTemp, Warning,TEXT("ISMIndex:%d"), Enemy->ISMInstanceIndex);*/
 	}
 
 	if (Enemies.Num() > 0)

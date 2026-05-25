@@ -108,6 +108,13 @@ public:
 	*/
 	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
 
+	/** アニメーションのインデックスを設定*/
+	void SetAnimIndex()						{ AnimIndex = NextAnimIndex; }
+	/** 次のアニメーションのインデックスの設定*/
+	void SetNextAnimIndex(int32 Index)		{ NextAnimIndex = Index; }
+	/** Updateのインターバルを設定*/
+	void SetUpdateInterval(int32 Interval)	{ UpdateInterval = Interval; }
+
 	//~ End Setter
 
 
@@ -142,6 +149,9 @@ public:
 		return ISMManagerClass;
 	}
 
+	/** ターゲットとの距離を返す*/
+	float GetTargetDistanceSqr()const { return EnemyStatus.TargetDistanceSqr; }
+
 	/** 敵の種類ごとにメッシュを返す*/
 	virtual UStaticMesh* GetEnemyMesh() const PURE_VIRTUAL(AEnemyBase::GetEnemyMesh, return nullptr;);
 
@@ -150,6 +160,17 @@ public:
 	{
 		return GameProgress;
 	}
+
+	/** AnimToTexture用：アニメーションの現在の再生時間*/
+	float GetAnimTime()			const { return AnimTime; }
+	float GetBeginAnimTime()	const { return PrevAnimTime; }
+	/** AnimToTexture用：再生中のアニメーションのインデックス*/
+	int32 GetAnimIndex()		const { return AnimIndex; }
+	float GetAnimNumFrames()	const { return AnimNumFrames; }
+	int32 GetNextAnimIndex()	const { return NextAnimIndex; }
+	float GetNextAnimTime()		const { return NextAnimTime; }
+	float GetAnimBlendWeight()	const { return AnimBlendWeight; }
+	int32 GetUpdateInterval()	const { return UpdateInterval; }
 
 	/**
 	 * @brief 汎用的なEnumビット(uint8型)上昇処理
@@ -289,19 +310,6 @@ public:
 	/** ISMのどのインスタンスに対応するかを示すインデックス*/
 	int32 ISMInstanceIndex = INDEX_NONE;
 
-	/** AnimToTexture用：アニメーションの現在の再生時間*/
-	float GetAnimTime() const			{ return AnimTime; }
-	float GetBeginAnimTime() const		{ return PrevAnimTime; }
-	/** AnimToTexture用：再生中のアニメーションのインデックス*/
-	int32 GetAnimIndex() const			{ return AnimIndex; }
-	float GetAnimNumFrames() const		{ return AnimNumFrames; }
-	int32 GetNextAnimIndex() const		{ return NextAnimIndex; }
-	float GetNextAnimTime() const		{ return NextAnimTime; }
-	float GetAnimBlendWeight() const	{ return AnimBlendWeight; }
-
-	void SetAnimIndex()					{ AnimIndex = NextAnimIndex; }
-	void SetNextAnimIndex(int32 Index)	{ NextAnimIndex = Index; }
-
 	bool AnimChangeFlg = false;
 
 protected:
@@ -362,4 +370,7 @@ private:
 
 	/** データアセットからデータを構造体に移す処理*/
 	void SetEnemyStatusData(UEnemyDataAsset* InData);
+
+	/** Updateのインターバルに利用する変数*/
+	int32 UpdateInterval = 1;
 };

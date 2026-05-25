@@ -12,6 +12,7 @@ class AEnemyBase;
 class AEnemyISMManager;
 
 class UEnemyISMManagerConfig;
+class UEnemyManagerConfig;
 
 /// <summary>
 /// 敵管理クラス
@@ -68,6 +69,16 @@ public:
 
 private:
 
+	/**
+	* 距離を算出する
+	*/
+	float CalcDistance(const FVector& EnemyPos, const FVector& PlayerPos);
+
+	/**
+	* 計算回数を算出する
+	*/
+	int32 CalcInterval(float Distance);
+
 	/// <summary>
 	/// 敵をまとめるリスト
 	/// </summary>
@@ -86,4 +97,11 @@ private:
 	UPROPERTY()
 	TSoftObjectPtr<UEnemyISMManagerConfig> ISMManagerConfig;
 
+	UPROPERTY()
+	TObjectPtr<UEnemyManagerConfig> ManagerConfig;
+
+	/**
+	* フレーム数（Updateの回数を指定するときに使う）
+	*/
+	int32 FrameCount = 0;
 };
