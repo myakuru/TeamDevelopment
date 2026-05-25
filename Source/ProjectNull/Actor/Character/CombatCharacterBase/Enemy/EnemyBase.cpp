@@ -4,7 +4,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StateTreeComponent.h"
 #include <ProjectNull/Utility/StateMachine/StateMachine.h>
-#include <ProjectNull/Actor/Item/Pickup/ExperiencePickup/ExperiencePickup.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
