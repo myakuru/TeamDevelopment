@@ -95,6 +95,7 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 		FText Description;
 		int32 CurrentLevel;
 	};
+	// 説明文の数
 	TArray<FValidUpgradeInfo> ValidUpgrades;
 
 	for (const FName& RowName : SelectedRowNames)
@@ -104,6 +105,7 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 
 		int32 CurrentLevel = PlayerRuntimeData->GetUpgradeLevel(RowName);
 
+		// 現在のレベルに対応する説明文があるかチェック
 		if (RowData->UpgradeTexts.IsValidIndex(CurrentLevel))
 		{
 			FValidUpgradeInfo Info;
@@ -113,6 +115,8 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 			ValidUpgrades.Add(Info);
 		}
 	}
+
+	TArray<UExpUpgradeWidgetBase*> Widgets = { UpgradeWidget_0, UpgradeWidget_1, UpgradeWidget_2 };
 
 	// すべてのWidgetを初期状態では非表示にしておく
 	UpgradeWidget_0->SetVisibility(ESlateVisibility::Hidden);
@@ -124,19 +128,29 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 		Widgets[i]->SetDescriptionText(ValidUpgrades[i].Description);
 		Widgets[i]->SetUpgradeRowName(ValidUpgrades[i].RowName);
 		Widgets[i]->SetVisibility(ESlateVisibility::Visible);
-		bIsUpgradeWidgetFilledArray[i] = true;
 	}
 
-	// 残りのWidgetは非表示のまま（すでにHidden設定済み）
-	for (int32 i = ValidUpgrades.Num(); i < Widgets.Num(); ++i)
+	UE_LOG(LogTemp, Warning, TEXT("ValidUpgrades.Num(): %d"), ValidUpgrades.Num());
+
+	if (ValidUpgrades.Num() <= 1)
 	{
-		bIsUpgradeWidgetFilledArray[i] = false;
+		bIsUpgradeWidgetFilledArray = false;
 	}
+	else
+	{
+		bIsUpgradeWidgetFilledArray = true;
+	}
+
 }
 
 void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
 {
 	if (!bIsUpgradeWidgetUse) return;
+
+	if(!bIsUpgradeWidgetFilledArray)
+	{
+		return;
+	}
 
 	// UI表示させる
 	OpenWidget();
