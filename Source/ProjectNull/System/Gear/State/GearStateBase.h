@@ -2,7 +2,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "UObject/Object.h"
+#include <ProjectNull/Utility/Common/GameTypes/GameTypes.h>
+
 #include "GearStateBase.generated.h"
 
 /** プレイヤーの中間基底クラス */
@@ -60,6 +63,15 @@ public:
 
 protected:
 
+
+	void SaveCameraStatus(APlayerBase* InPlayer);
+
+	// StartControlRotationへ補間する 
+
+	void InterpToStartControlRotation(const FQuat& InCurrentQuaternion,float InLerpAlpha);
+	void InterpToStartTargetArmLength(float InCurrentTargetArmLength,float InLerpAlpha);
+	
+
 	/** プレイヤーの中間基底クラス */
 	UPROPERTY()
 	TObjectPtr<APlayerBase> Player;
@@ -72,4 +84,20 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UGearBase> Owner;
 
+
+	/** ギアスキル開始時カメラ回転 */
+	FRotator StartControlRotation;
+
+	/** ギアスキル開始時カメラ距離 */
+	UPROPERTY()
+	float StartTargetArmLength;
+
+	/** カメラを元に戻すまでの時間 */
+	UPROPERTY(EditAnywhere)
+	float CameraRestoreDuration;
+	
+	/** カメラ復帰処理の経過時間 */
+	UPROPERTY(EditAnywhere)
+	float CameraRestoreElapsedTime;
+	
 };

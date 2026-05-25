@@ -18,9 +18,7 @@ UDashGearState_Lv4::UDashGearState_Lv4():
 	StanceTime(FThresholdRange()),
 	DashTime(FThresholdRange()),
 	CameraData(TArray<FCameraSequenceData>()),
-	StartPlayerTransform(FTransform()),
-	StartControlRotation(FRotator::ZeroRotator),
-	StartTargetArmLength(0.f)
+	StartPlayerTransform(FTransform())
 {
 }
 
@@ -59,8 +57,7 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	// ダッシュギアのレベル4状態クラスの初期化
 	// ================================================================
 	StartPlayerTransform = Player->GetTransform();
-	StartTargetArmLength = Camera->TargetArmLength;
-	StartControlRotation = Controller->GetControlRotation();
+	SaveCameraStatus(Player);
 
 	// 残像攻撃クラスの実行
 	if (!AfterImageAttackEffect) { return; }

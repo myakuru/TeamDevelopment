@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 
 #include <ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h>
-#include <ProjectNull/Utility/Common/GameTypes/GameTypes.h>
 
 #include "DashGearState_Lv4.generated.h"
 
@@ -124,12 +123,5 @@ private:
 
 	/** ギアスキル開始時プレイヤーのTransform */
 	FTransform StartPlayerTransform;
-
-	/** ギアスキル開始時カメラ回転 */
-	FRotator StartControlRotation;
-
-	/** ギアスキル開始時カメラ距離 */
-	UPROPERTY()
-	float StartTargetArmLength;
 
 };

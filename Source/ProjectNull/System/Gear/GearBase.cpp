@@ -92,6 +92,12 @@ void UGearBase::Update(float DeltaTime)
 	}
 }
 
+float UGearBase::GetGearDuration(int32 Index) const
+{
+	if (!GearStatuses.IsValidIndex(Index)) { return 0.f; }
+	return GearStatuses[Index].Duration;
+}
+
 void UGearBase::SetGearDuration(float InDuration, int32 Index)
 {
 	if (!GearStatuses.IsValidIndex(Index)) { return; }
