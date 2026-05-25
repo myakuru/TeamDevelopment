@@ -49,7 +49,7 @@ AEnemyBase::AEnemyBase()
 
 AEnemyBase::~AEnemyBase() = default;
 
-void AEnemyBase::NotifyChengedStateEnum(EEnemyState a_TargetState)
+void AEnemyBase::NotifyChangedStateEnum(EEnemyState a_TargetState)
 {
 	if (!EnemyRuntimeData) { return; }
 

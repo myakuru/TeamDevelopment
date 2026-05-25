@@ -116,6 +116,19 @@ public:
 	/** Updateのインターバルを設定*/
 	void SetUpdateInterval(int32 Interval)	{ UpdateInterval = Interval; }
 
+	/**
+	 * @brief 外部からステートEnum変更を通知
+	 * @param a_TargetState 変更先ステート
+	 */
+	virtual void NotifyChangedStateEnum(EEnemyState a_TargetState);
+
+	/**
+	 * @brief 所持する当たり判定チャンネルのレスポンス設定を変更
+	 * @param Channel 変更対象チャンネル(WorldStatic,Pawn,etc..)
+	 * @param NewResponse レスポンスタイプ(Block・Overlap・Ignore)
+	 */
+	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse);
+
 	//~ End Setter
 
 

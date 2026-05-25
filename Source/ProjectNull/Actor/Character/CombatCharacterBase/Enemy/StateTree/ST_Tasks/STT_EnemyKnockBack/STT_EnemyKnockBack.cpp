@@ -51,7 +51,7 @@ void USTT_EnemyKnockBack::ExitState(FStateTreeExecutionContext& a_Context, const
 	if (!OwnerEnemy) { return; }
 
 	// ステートタイプを切り替え
-	OwnerEnemy->NotifyChengedStateEnum(EEnemyState::None);
+	OwnerEnemy->NotifyChangedStateEnum(EEnemyState::None);
 
 	// 敵同士の当たり判定を戻す
 	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
