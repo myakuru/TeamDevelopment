@@ -17,6 +17,13 @@ void USTE_EnemyBase::TreeStart(FStateTreeExecutionContext& a_Context)
 	RegisterFixedParams();
 }
 
+void USTE_EnemyBase::Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)
+{
+	if (!OwnerEnemy) { return; }
+
+	Super::Tick(a_Context, a_DeltaTime);
+}
+
 void USTE_EnemyBase::TreeStop(FStateTreeExecutionContext& a_Context)
 {
 	Super::TreeStop(a_Context);
@@ -28,13 +35,21 @@ void USTE_EnemyBase::RegisterFixedParams()
 
 	// ノックバックの時の重さ
 	KnockBackWeight = OwnerEnemy->GetKnockBackWeight();
-}
 
-void USTE_EnemyBase::Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)
-{
-	if (!OwnerEnemy) { return; }
+	// 移動速度
+	MoveSpeed = OwnerEnemy->GetMoveSpeed();
 
-	Super::Tick(a_Context, a_DeltaTime);
+	// 回転補間速度
+	RotateInterpSpeed = OwnerEnemy->GetRotationInterpSpeed();
+
+	// 歩くことのできる斜面の角度
+	WalkableFloorAngle = OwnerEnemy->GetWalkableFloorAngle();
+
+	// 超える事の出来る段差の最大の高さ
+	MaxStepHeight = OwnerEnemy->GetMaxStepHeight();
+
+	// カプセルの半径分の高さ
+	CapsuleHalfHeight = OwnerEnemy->GetCapsuleHalfHeight();
 }
 
 void USTE_EnemyBase::RegisterDelegate()

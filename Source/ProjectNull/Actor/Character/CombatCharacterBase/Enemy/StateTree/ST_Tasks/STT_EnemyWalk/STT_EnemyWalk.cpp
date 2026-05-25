@@ -5,6 +5,9 @@
 USTT_EnemyWalk::USTT_EnemyWalk(const FObjectInitializer& a_ObjInit)
 	: Super(a_ObjInit)
 	, MoveDir(FVector::ZeroVector)
+	, AfterGroundNormal(FVector::ZeroVector)
+	, GravityVelocity(FVector::ZeroVector)
+	, isGround(false)
 {
 	// Tick処理有効化	
 	bShouldCallTick = true;
@@ -16,6 +19,7 @@ EStateTreeRunStatus USTT_EnemyWalk::EnterState(FStateTreeExecutionContext& a_Con
 
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 
+	// パラメータの初期化
 	InitializeWalkParams();
 
 	return EStateTreeRunStatus::Running;
@@ -37,25 +41,16 @@ void USTT_EnemyWalk::ExitState(FStateTreeExecutionContext& a_Context, const FSta
 	Super::ExitState(a_Context, a_Transition);
 }
 
-void USTT_EnemyWalk::InitializeWalkParams()
-{
-
-}
-
 void USTT_EnemyWalk::Move(const float a_DeltaTime)
 {
 	if (!OwnerEnemy) { return; }
-
-	// 仮でマジックナンバーにしてるがゲッターを別途用意
-	static float _RotSpeed = 5.0f;
-	static float _MoveSpeed = 300.0f;
 
 	// 回転角度補間
 	FRotator calcResultRot = CalculateRotationToMoveDir(
 		OwnerEnemy->GetActorRotation(),
 		MoveDir.Rotation(),
 		a_DeltaTime,
-		_RotSpeed
+		RotationInterpSpeed
 	);
 	// Yaw起点でしか回転しない
 	calcResultRot.Roll = calcResultRot.Pitch = 0;
@@ -70,47 +65,42 @@ void USTT_EnemyWalk::Move(const float a_DeltaTime)
 		GravityVelocity = FVector::ZeroVector;
 	}
 
-	MoveDir.Z = 0;
-	FVector _delta = MoveDir * _MoveSpeed * a_DeltaTime;
-	_delta = FVector::VectorPlaneProject(_delta, AfterGroundNormal);
-	_delta += GravityVelocity * a_DeltaTime;
+	FVector _cacheMoveVec = MoveDir * MoveSpeed * a_DeltaTime;
+	_cacheMoveVec.Z = 0;												// Z成分は考慮しない
+	_cacheMoveVec 
+		= FVector::VectorPlaneProject(_cacheMoveVec, AfterGroundNormal);// 前に触れた地面の斜面に沿わせる
+	_cacheMoveVec += GravityVelocity * a_DeltaTime;						// 重力適応	
+
 	FHitResult _hit;
 	OwnerEnemy->AddActorWorldOffset(
-		_delta,
+		_cacheMoveVec,
 		true,
 		&_hit);
 
+	// Hitしているか
 	if (_hit.bBlockingHit)
 	{
-		isGround = false;
-		const float _walkableAngle = FMath::Cos(FMath::DegreesToRadians(45.f));
-		const float _heightDiff = _hit.ImpactPoint.Z - (OwnerEnemy->GetActorLocation().Z-88.0f/*カプセルの高さ半径分*/);
-
-		// 上向き法線が無くて、段差の高さが一定以下なら段差を乗り越える
-		if ((FMath::IsNearlyZero(_hit.ImpactNormal.Z)) &&
-			_heightDiff <= 100.f)
+		// コリジョンチャネルが「WorldStatic」(マップオブジェクト類)なら座標補正を行う
+		if (_hit.GetComponent() &&
+			_hit.GetComponent()->GetCollisionObjectType() == ECollisionChannel::ECC_WorldStatic)
 		{
-			isGround = true;
-			OwnerEnemy->AddActorWorldOffset(FVector(0, 0, _heightDiff));
+			isGround = false;
+			const float _heightDiff
+				= _hit.ImpactPoint.Z - (OwnerEnemy->GetActorLocation().Z - CapsuleHalfHeight);
 
-			// 衝突して使われなかった分の移動量を算出
-			FVector _remaining = _delta * (1.0f - _hit.Time);
-
-			// 進行ベクトルの内、衝突ベクトルだけ除去して補正
-			OwnerEnemy->AddActorWorldOffset(_remaining);
-			UE_LOG(LogTemp, Warning, TEXT("Diff : %f"), _heightDiff);
-			DrawDebugPoint(GetWorld(), _hit.ImpactPoint, 5.0f, FColor::Red, false, 2.f);
-		}
-		else if (_hit.ImpactNormal.Z >= _walkableAngle)
-		{
-			isGround = true;
-			AfterGroundNormal = _hit.ImpactNormal;
-			// 衝突して使われなかった分の移動量を算出
-			FVector _remaining = _delta * (1.0f - _hit.Time);
-
-			// 進行ベクトルの内、衝突ベクトルだけ除去して補正
-			FVector _adjust = FVector::VectorPlaneProject(_remaining, _hit.ImpactNormal);
-			OwnerEnemy->AddActorWorldOffset(_adjust);
+			// 上向き法線が無くて、段差の高さが一定以下なら段差を乗り越える
+			if ((FMath::IsNearlyZero(_hit.ImpactNormal.Z)) &&
+				_heightDiff <= MaxStepHeight)
+			{
+				// 段差移動
+				MoveStep(_hit, _cacheMoveVec, _heightDiff);
+			}
+			// 上向き法線が一定以上なら坂道とみなす
+			else if (_hit.ImpactNormal.Z >= FMath::Cos(WarkableFloorAngle))
+			{
+				// 坂道処理
+				MoveSlope(_hit);
+			}
 		}
 	}
 	else
@@ -119,14 +109,24 @@ void USTT_EnemyWalk::Move(const float a_DeltaTime)
 	}
 }
 
-void USTT_EnemyWalk::MoveSlope()
+void USTT_EnemyWalk::MoveSlope(const FHitResult& a_HitResult)
 {
-	
+	isGround = true;
+	AfterGroundNormal = a_HitResult.ImpactNormal;
 }
 
-FVector USTT_EnemyWalk::CalculateNextActorLocation(const FVector& a_CurrentLocation, const FVector& a_MoveDir, float a_MoveSpeed, float a_DeltaTime)
+void USTT_EnemyWalk::MoveStep(const FHitResult& a_HitResult, const FVector& a_MoveVec, const float a_HeightDiff)
 {
-	return a_CurrentLocation + a_MoveDir * a_MoveSpeed * a_DeltaTime;
+	if (!OwnerEnemy) { return; }
+
+	isGround = true;
+	OwnerEnemy->AddActorWorldOffset(
+		FVector(0, 0, a_HeightDiff) + CaluculateRemainingMoveDir(a_MoveVec, a_HitResult.Time));
+}
+
+FVector USTT_EnemyWalk::CaluculateRemainingMoveDir(const FVector& a_DeltaMoveDir, const float a_HitTime)
+{
+	return a_DeltaMoveDir * (1.0f - a_HitTime);
 }
 
 FRotator USTT_EnemyWalk::CalculateRotationToMoveDir(const FRotator& a_CurrentRot, const FRotator& a_TargetRot, float a_DeltaTime, float a_RotSpeed)
@@ -136,4 +136,10 @@ FRotator USTT_EnemyWalk::CalculateRotationToMoveDir(const FRotator& a_CurrentRot
 						a_TargetRot,
 						a_DeltaTime,
 						a_RotSpeed);
+}
+
+void USTT_EnemyWalk::InitializeWalkParams()
+{
+	// ラジアン角に補正
+	WarkableFloorAngle = FMath::DegreesToRadians(WarkableFloorAngle);
 }
