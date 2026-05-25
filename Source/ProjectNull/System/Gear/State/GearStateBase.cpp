@@ -35,20 +35,41 @@ void UGearStateBase::SaveCameraStatus(APlayerBase* InPlayer)
 	StartControlRotation = InPlayer->GetController()->GetControlRotation();
 }
 
-void UGearStateBase::InterpToStartControlRotation(const FQuat& InCurrentQuaternion, float InLerpAlpha)
+void UGearStateBase::UpdateCameraRestoreInterpolation(float DeltaTime)
 {
-	if (!Player || !Player->GetController()) { return; }
+	if (!Owner) { return; }
 
 	CameraRestoreElapsedTime = Owner->GetElapsedTime() - (Owner->GetGearDuration(3) - CameraRestoreDuration);
+
+	if (CameraRestoreElapsedTime < 0.0f) { return; }
+
+
 	float LerpAlpha = CameraRestoreElapsedTime / CameraRestoreDuration;
 	LerpAlpha = FMath::Clamp(LerpAlpha, 0.f, 1.f);
 
-	const FQuat ResultQuaternion = FQuat::Slerp(InCurrentQuaternion, StartControlRotation.Quaternion(), LerpAlpha);
+	InterpToStartControlRotation(RestoreStartControlRotation.Quaternion(), LerpAlpha);
+	InterpToStartTargetArmLength(RestoreStartTargetArmLength, LerpAlpha);
+}
+
+void UGearStateBase::InterpToStartControlRotation(
+	const FQuat& InCurrentQuaternion,
+	float InLerpAlpha)
+{
+	if (!Player || !Player->GetController()) { return; }
+
+
+	const FQuat ResultQuaternion = FQuat::Slerp(
+		InCurrentQuaternion,
+		StartControlRotation.Quaternion(),
+		InLerpAlpha);
+
 	Player->GetController()->SetControlRotation(ResultQuaternion.Rotator());
 
 }
 
-void UGearStateBase::InterpToStartTargetArmLength(float InCurrentTargetArmLength, float InLerpAlpha)
+void UGearStateBase::InterpToStartTargetArmLength(
+	float InCurrentTargetArmLength,
+	float InLerpAlpha)
 {
 	if (!Player || !Player->GetSpringArmComponent()) { return; }
 

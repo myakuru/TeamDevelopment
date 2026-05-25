@@ -20,7 +20,7 @@ AProjectileBase::AProjectileBase()
 	// ================================================================
 	// 飛び道具移動専用コンポーネントの初期化
 	// ================================================================
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+	//ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 }
 
 void AProjectileBase::BeginPlay()

@@ -26,9 +26,7 @@ class PROJECTNULL_API UGearStateBase : public UObject
 	GENERATED_BODY()
 	
 public:
-
 	UGearStateBase();
-
 public:
 
 	/**
@@ -66,11 +64,12 @@ protected:
 
 	void SaveCameraStatus(APlayerBase* InPlayer);
 
-	// StartControlRotationへ補間する 
-
-	void InterpToStartControlRotation(const FQuat& InCurrentQuaternion,float InLerpAlpha);
-	void InterpToStartTargetArmLength(float InCurrentTargetArmLength,float InLerpAlpha);
 	
+	void UpdateCameraRestoreInterpolation(float DeltaTime);
+
+	// カメラ復帰補間を更新
+
+	// StartControlRotationへ補間する 
 
 	/** プレイヤーの中間基底クラス */
 	UPROPERTY()
@@ -92,12 +91,34 @@ protected:
 	UPROPERTY()
 	float StartTargetArmLength;
 
-	/** カメラを元に戻すまでの時間 */
-	UPROPERTY(EditAnywhere)
-	float CameraRestoreDuration;
-	
+
+
+	FRotator RestoreStartControlRotation;
+
+	float RestoreStartTargetArmLength;
+
 	/** カメラ復帰処理の経過時間 */
 	UPROPERTY(EditAnywhere)
 	float CameraRestoreElapsedTime;
+
+	/** カメラを元に戻すまでの時間 */
+	UPROPERTY(EditAnywhere)
+	float CameraRestoreDuration;
+
+private:
+
+
+	void InterpToStartControlRotation(
+		const FQuat& InCurrentQuaternion,
+		float InLerpAlpha);
+
+
+	void InterpToStartTargetArmLength(
+		float InCurrentTargetArmLength,
+		float InLerpAlpha);
+
+
+
 	
+
 };

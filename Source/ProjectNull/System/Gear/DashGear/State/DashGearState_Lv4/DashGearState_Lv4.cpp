@@ -59,6 +59,20 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	StartPlayerTransform = Player->GetTransform();
 	SaveCameraStatus(Player);
 
+	int32 MaxIndex = CameraData.Num() - 1;
+
+	if (!CameraData.IsValidIndex(MaxIndex)) { return; }
+	
+	auto& Data = CameraData[MaxIndex];
+
+	RestoreStartTargetArmLength = Data.TargetArmLength;
+
+	// ギアスキル発動開始時のプレイヤーYaw回転
+	const float BaseYaw = StartPlayerTransform.GetRotation().Rotator().Yaw;
+
+	RestoreStartControlRotation = Data.TargetRotator;
+	RestoreStartControlRotation.Yaw += BaseYaw;
+
 	// 残像攻撃クラスの実行
 	if (!AfterImageAttackEffect) { return; }
 	AfterImageAttackEffect->Start(Player->GetTransform());
@@ -86,11 +100,17 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 	// 残像エフェクトクラスの更新
 	AfterImageAttackEffect->Update(DeltaTime, ElapsedTime);
 
+	UpdateCameraRestoreInterpolation(DeltaTime);
+
+
 	// カメラデータの更新
 	UpdateCameraData(DeltaTime,ElapsedTime);
 
 	// 最終ダッシュの更新処理
 	UpdateFinalDash(DeltaTime,ElapsedTime);
+	 
+
+
 }
 
 void UDashGearState_Lv4::End()
@@ -119,7 +139,7 @@ void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 	if (!Player || !Player->GetMesh() || !RobotController)	{ return; }
 
 	// 構え状態なら解除処理を行わない
-	if (StanceTime.IsWithinRange(ElapsedTime))							{ return; }
+	if (StanceTime.IsWithinRange(ElapsedTime))	{ return; }
 
 	// プレイヤーのアニメーションインスタンス取得
 	auto* PlayerAnimInstance = Player->GetPlayerAnimInstance();
@@ -137,6 +157,9 @@ void UDashGearState_Lv4::UpdateCameraData(
 	float InElapsedTime)
 {
 	if (!Owner) { return; }
+
+	if (CameraRestoreElapsedTime >= 0.0f) { return; }
+
 
 	// 現在の区間インデックス取得
 	const int32 CurrentIndex = GetCurrentSectionIndex(InElapsedTime);
@@ -276,6 +299,8 @@ void UDashGearState_Lv4::InitializeGearDuration()
 	for (auto& Data : CameraData) {
 		TotalDuration += Data.Time;
 	}
+
+	TotalDuration += CameraRestoreDuration;
 
 	// ギア発動時間を更新
 	Owner->SetGearDuration(TotalDuration, kLv4Index);
