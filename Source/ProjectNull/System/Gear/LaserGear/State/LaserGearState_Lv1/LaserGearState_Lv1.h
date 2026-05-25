@@ -9,8 +9,10 @@
 
 /** レーザーギアの1レベル状態クラス */
 UCLASS(Blueprintable, EditInlineNew)
-class PROJECTNULL_API ULaserGearState_Lv1 : public ULaserGearStateBase
+class PROJECTNULL_API ULaserGearState_Lv1 final : public ULaserGearStateBase
 {
 	GENERATED_BODY()
-	
+public:
+	ULaserGearState_Lv1();
+public:
 };
