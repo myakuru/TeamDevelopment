@@ -7,9 +7,20 @@
 
 #include "ProjectileBase.generated.h"
 
+/** ルートコンポーネント */
+class USceneComponent;
+
+/** スフィアコリジョンコンポーネント */
+class USphereComponent;
+
+/** スタティックメッシュ */
+class UStaticMeshComponent;
+
+/** 飛び道具移動専用コンポーネント */
 class UProjectileMovementComponent;
 
-UCLASS()
+/** 発射物の中間基底クラス */
+UCLASS(Blueprintable)
 class PROJECTNULL_API AProjectileBase : public AActor
 {
 	GENERATED_BODY()
@@ -29,16 +40,15 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
 
-	/** 残像表示用スケルタルメッシュ */
+	/** スフィアコリジョンコンポーネント */
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USkeletalMeshComponent> Mesh;
+	TObjectPtr<USphereComponent> SphereCollision;
+
+	/** スタティックメッシュ */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
 	/** 飛び道具移動専用コンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
-
-	UPROPERTY(EditAnywhere)
-	float Speed;
-
-	
 };

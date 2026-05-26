@@ -31,7 +31,7 @@ public:
 	void Update(float DeltaTime)			override;
 	void End()								override;
 
-	const int32 GetGearLevelIndex() const	override { return kLv4Index; }
+	inline const int32 GetGearLevelIndex() const	override { return kLv4Index; }
 
 private:
 
