@@ -13,6 +13,19 @@ class UGearBase;
  */
 
 USTRUCT(BlueprintType)
+struct FMaterialRequirement
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName MaterialID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Count = 1;
+
+};
+
+USTRUCT(BlueprintType)
 struct FWeaponData : public FTableRowBase
 {
     GENERATED_BODY()
@@ -20,11 +33,14 @@ struct FWeaponData : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FName WeaponID;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	FName DecomposeMaterialID;
-
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FText DisplayName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName DecomposeMaterialID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FMaterialRequirement> RequiredMaterialIDs;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UTexture2D* Icon = nullptr;
