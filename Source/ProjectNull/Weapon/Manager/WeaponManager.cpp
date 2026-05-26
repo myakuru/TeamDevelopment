@@ -137,6 +137,11 @@ void UWeaponManager::SetEquippedWeapon(int32 a_Index, const FWeaponInstance& a_W
 {
 	if (!m_EquippedWeaponIDs.IsValidIndex(a_Index))return;
 
+	for (int i = 0; i < m_EquippedWeaponIDs.Num();i++) {
+		if (m_EquippedWeaponIDs[i] == a_Weapon.UniqueId) {
+			m_EquippedWeaponIDs[i] = INDEX_NONE;
+		}
+	}
 	m_EquippedWeaponIDs[a_Index] = a_Weapon.UniqueId;
 
 }
