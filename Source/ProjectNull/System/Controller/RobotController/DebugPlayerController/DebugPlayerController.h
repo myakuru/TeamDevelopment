@@ -20,27 +20,18 @@ private:
 
 	virtual void BeginPlay()			override;
 	virtual void SetupInputComponent()	override;
-	virtual void GearExecute01(const FInputActionValue& GearActionValue01) override;
 
-	// �f�o�b�O���[�h�̐؂�ւ��֐�
 	void ChangeDebugMode(const FInputActionValue& ActionValue);
 
-	/// <summary>
-	/// ������ւ̈ړ����͏����֐�
-	/// </summary>
-	/// <param name="ActionValue">���͒l</param>
 	void MoveUp(const FInputActionValue& ActionValue);
 
 
-	// ������ւ̈ړ����̓A�N�V����
 	UPROPERTY(EditAnywhere, Category = "DebugInput")
 	TObjectPtr<UInputAction> MoveUpAction;
 
-	// �f�o�b�O���[�h�؂�ւ����̓A�N�V����
 	UPROPERTY(EditAnywhere, Category = "DebugInput")
 	TObjectPtr<UInputAction> ChangeDebugModeAction;
 
-	// �f�o�b�O���[�h���ǂ����̃t���O
 	bool bIsDebugMode;
 
 	UPROPERTY(EditAnywhere)

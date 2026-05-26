@@ -27,14 +27,13 @@ public:
 	inline UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHud; }
 
 	/** Setter */
-	inline void SetCanReceiveInput(bool InbCanReceiveInput) { bCanReceiveInput = InbCanReceiveInput;}
+	inline void SetCanReceiveInput(bool bInCanReceiveInput) { bCanReceiveInput = bInCanReceiveInput;}
 
 protected:
 
 	virtual void BeginPlay()			override;
 	virtual void SetupInputComponent()	override;
 
-	virtual void GearExecute01(const FInputActionValue& GearActionValue01);
 
 
 private:
@@ -49,6 +48,11 @@ private:
 	void ChangeGear(const FInputActionValue& ActionValue);
 
 	void InitializeUI();
+
+
+	void GearExecute(
+		const FInputActionValue& ActionValue,
+		int32 ExecuteIndex);
 
 
 	/** 入力受付可能か */
@@ -74,7 +78,7 @@ private:
 	TObjectPtr<UInputAction> ChangeGearAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> GearAction01;
+	TArray<TObjectPtr<UInputAction>> GearActions;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UPlayerHUDWidget> PlayerHUDClass;
