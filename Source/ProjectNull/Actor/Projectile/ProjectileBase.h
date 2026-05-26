@@ -34,6 +34,8 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	inline UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
 private:
 
 	/** ルートコンポーネント */

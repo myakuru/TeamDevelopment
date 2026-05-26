@@ -81,3 +81,28 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bPause;
 };
+
+USTRUCT(BlueprintType)
+struct FEnemyDistanceData
+{
+	GENERATED_BODY()
+public:
+	FEnemyDistanceData() :
+		Enemy(nullptr),
+		DistanceSq(0.f),
+		ToEnemyVector(FVector::ZeroVector)
+	{
+	}
+public:
+
+	/** 敵の中間基底クラス */
+	UPROPERTY()
+	TWeakObjectPtr<class AEnemyBase> Enemy;
+
+	/** 対象からの距離Sq */
+	float DistanceSq;
+
+	/** 対象からの距離Sq */
+	FVector ToEnemyVector;
+
+};
