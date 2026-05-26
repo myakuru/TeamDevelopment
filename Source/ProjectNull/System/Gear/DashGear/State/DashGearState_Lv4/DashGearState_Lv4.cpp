@@ -107,8 +107,8 @@ void UDashGearState_Lv4::End()
 	if (!Controller) { return; }
 
 	// 元のカメラデータを反映させる
-	Camera->TargetArmLength = StartTargetArmLength;
-	Controller->SetControlRotation(StartControlRotation);
+	//Camera->TargetArmLength = StartTargetArmLength;
+	//Controller->SetControlRotation(StartControlRotation);
 
 	// 入力を有効化
 	RobotController->SetCanReceiveInput(true);
