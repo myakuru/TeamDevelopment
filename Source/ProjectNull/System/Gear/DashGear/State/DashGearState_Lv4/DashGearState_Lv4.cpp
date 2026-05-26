@@ -96,6 +96,16 @@ void UDashGearState_Lv4::End()
 {
 	if (!Player || !RobotController) { return; }
 
+	auto* Camera = Player->GetSpringArmComponent();
+	if (!Camera) { return; }
+
+	auto* Controller = Player->GetController();
+	if (!Controller) { return; }
+
+	// 元のカメラデータを反映させる
+	//Camera->TargetArmLength = StartTargetArmLength;
+	//Controller->SetControlRotation(StartControlRotation);
+
 	// 入力を有効化
 	RobotController->SetCanReceiveInput(true);
 
