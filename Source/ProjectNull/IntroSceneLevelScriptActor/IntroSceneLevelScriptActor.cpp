@@ -18,6 +18,17 @@ void AIntroSceneLevelScriptActor::BeginPlay()
 void AIntroSceneLevelScriptActor::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	SetPlayerCameraLocationAndRotation();
+}
+
+void AIntroSceneLevelScriptActor::SetPlayerCameraLocationAndRotation()
+{
+	FRotator Current = SpringArmComponent->GetRelativeRotation();
+
+	SpringArmComponent->SetRelativeRotation(
+		FRotator(Current.Pitch, Current.Yaw, Current.Roll + GetWorld()->DeltaTimeSeconds * 10.f)
+	);
 }
 
 void AIntroSceneLevelScriptActor::PlayerIntroSceneStart()
@@ -29,9 +40,5 @@ void AIntroSceneLevelScriptActor::PlayerIntroSceneStart()
 	if (Player)
 	{
 		SpringArmComponent = Player->GetSpringArmComponent();
-		CameraComponent = Player->GetCameraComponent();
-
-		SpringArmComponent->SetRelativeLocation(RelativeLocation);
-		CameraComponent->AddLocalRotation(LocalRotation);
 	}
 }
