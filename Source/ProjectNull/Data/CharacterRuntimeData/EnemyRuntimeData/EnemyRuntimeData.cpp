@@ -3,7 +3,7 @@
 UEnemyRuntimeData::UEnemyRuntimeData()
 	:	MoveDir(FVector::ZeroVector)
 	,	TargetDistanceSqr(0.0f)
-	,	StateEnum(EEnemyState::None)
+	,	StateEnum(EEnemyState::Idle)
 	,	IsAlive(true)
 {
 }

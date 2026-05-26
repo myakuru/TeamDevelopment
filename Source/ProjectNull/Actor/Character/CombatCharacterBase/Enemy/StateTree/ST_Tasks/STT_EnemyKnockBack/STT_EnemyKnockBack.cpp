@@ -51,7 +51,7 @@ void USTT_EnemyKnockBack::ExitState(FStateTreeExecutionContext& a_Context, const
 	if (!OwnerEnemy) { return; }
 
 	// ステートタイプを切り替え
-	OwnerEnemy->NotifyChangedStateEnum(EEnemyState::None);
+	OwnerEnemy->NotifyChangedStateEnum(EEnemyState::Idle);
 
 	// 敵同士の当たり判定を戻す
 	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
@@ -104,7 +104,8 @@ bool USTT_EnemyKnockBack::MoveToKnockBack(const float a_DeltaTime)
 	// どこかに当たったら停止
 	FHitResult HitResult;
 	OwnerEnemy->SetActorLocation(NextLocation, true, &HitResult);
-	if (HitResult.GetComponent()->GetCollisionObjectType() == ECC_WorldStatic)
+	if (HitResult.GetComponent() &&
+		HitResult.GetComponent()->GetCollisionObjectType() == ECC_WorldStatic)
 	{
 		return true;
 	}

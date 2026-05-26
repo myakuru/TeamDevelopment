@@ -7,12 +7,11 @@
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
-	None		UMETA(DisplayName = "None"),
-	Spawn		UMETA(DisplayName = "生成"),
-	Chase		UMETA(DisplayName = "追跡"),
+	Idle		UMETA(DisplayName = "棒立ち"),
+	Walk		UMETA(DisplayName = "移動"),
 	Attack		UMETA(DisplayName = "攻撃"),
-	Dead		UMETA(DisplayName = "死亡"),
-	KnockBack	UMETA(DisplayName = "ノックバック"),
+	Hit			UMETA(DisplayName = "被弾"),
+	Death		UMETA(DisplayName = "死亡"),
 };
 
 /// <summary>
@@ -127,7 +126,7 @@ public:
 
 	/**	ステートタグ */
 	UPROPERTY(EditAnywhere, Category = "StateTag")
-	EEnemyState StateTag = EEnemyState::None;
+	EEnemyState StateTag = EEnemyState::Idle;
 	
 	/** 生存フラグ*/
 	UPROPERTY()

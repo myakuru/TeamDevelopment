@@ -25,6 +25,10 @@ public:
 
 private:
 
+	void OnDeath();
+
+private:
+
 	/** @brief 持ち主のアドレス*/
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<AEnemyBase> OwnerEnemy = nullptr;

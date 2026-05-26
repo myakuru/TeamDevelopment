@@ -18,7 +18,7 @@ public:
 
 	// AnimBPから参照する変数
 	UPROPERTY(BlueprintReadOnly, Category = "State")
-	EEnemyState CurrentState = EEnemyState::Spawn;
+	EEnemyState CurrentState = EEnemyState::Idle;
 
 private:
 

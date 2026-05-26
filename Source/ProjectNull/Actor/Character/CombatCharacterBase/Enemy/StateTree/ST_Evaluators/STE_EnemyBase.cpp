@@ -35,7 +35,7 @@ void USTE_EnemyBase::RegisterFixedParams()
 
 	// ノックバックの時の重さ
 	KnockBackWeight = OwnerEnemy->GetKnockBackWeight();
-
+	
 	// 移動速度
 	MoveSpeed = OwnerEnemy->GetMoveSpeed();
 

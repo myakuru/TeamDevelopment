@@ -26,54 +26,24 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
-	//// 死亡アニメーションの再生やエフェクトの発生を行う
-	OwnerEnemy->SetEnemyState(EEnemyState::Dead);
-	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
-	/*if (auto EnemyManager = OwnerEnemy->GetEnemyManagerSubsystem()) {
-		EnemyManager->RemoveEnemy(OwnerEnemy);
-		if (auto* ISMManager = EnemyManager->GetISMManager(OwnerEnemy->GetISMManagerClass()))
-		{
-			ISMManager->UnregisterEnemy(OwnerEnemy);
-		}
-	}*/
-
-	// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
-	if (auto GameProgress = OwnerEnemy->GetGameProgressSubsystem()) {
-		GameProgress->AddKillCount();
-	}
-
-	//OwnerEnemy->SpawnDeathEffect();
-
-	//OwnerEnemy->SpawnDeathExperience();
-
-	OwnerEnemy->OnDeath();
-
-	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
-	/*if (USuperGameInstance* GameInstance =
-		GetWorld()->GetGameInstance<USuperGameInstance>())
-	{
-		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
-		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
-	}*/
-
-	// PoolSubSystemに返却する
-	// Return()の中でDeactivate()が呼ばれて非表示・Tick停止でPool待機に戻る
-	if (UEnemyPoolSubSystem* PoolSubSystem =
-		GetWorld()->GetSubsystem<UEnemyPoolSubSystem>())
-	{
-		PoolSubSystem->Return(OwnerEnemy);
-	}
-
-	return EStateTreeRunStatus();
+	return EStateTreeRunStatus::Running;
 }
 
 EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)
 {
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
-	return EStateTreeRunStatus::Running;
+
+	Super::Tick(a_Context, a_DeltaTime);
+
+	return EStateTreeRunStatus::Succeeded;
 }
 
 void USTT_EnemyDead::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
+	if (!OwnerEnemy) { return; }
+
 	Super::ExitState(a_Context, a_Transition);
+
+	// 死亡処理の実行
+	OwnerEnemy->FinalizeDeath();
 }

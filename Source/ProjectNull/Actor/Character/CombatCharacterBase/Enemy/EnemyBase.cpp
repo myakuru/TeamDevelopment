@@ -133,7 +133,7 @@ void AEnemyBase::UpdateParams()
 
 void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight)
 {
-	if (EnemyStatus.StateTag == EEnemyState::KnockBack)return;
+	if (EnemyStatus.StateTag == EEnemyState::Hit)return;
 	// 吹き飛ばしに使う数値を決める
 	int KnockBackPowerLevel = AttackPower - EnemyWeight;
 	if (KnockBackPowerLevel < 0)
@@ -164,7 +164,7 @@ void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPow
 	LanchDir.Normalize();
 
 	EnemyStatus.KNockBackVelocity	= LanchDir * KnockBackData->LaunchSpeed;
-	SetEnemyState(EEnemyState::KnockBack);
+	SetEnemyState(EEnemyState::Hit);
 	//EnemyStatus.CanAttack			= false;
 }
 
@@ -179,6 +179,7 @@ void AEnemyBase::SetTakeDamaged(int32 AttackPower)
 {
 	// 簡易的に渡された値分,FinalHPを減算
 	EnemyStatus.FinalHP -= AttackPower;
+	OnHit();
 
 	if (EnemyStatus.FinalHP <= 0)
 	{
@@ -190,43 +191,42 @@ void AEnemyBase::SetTakeDamaged(int32 AttackPower)
 
 void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime)
 {
-	FVector CurrentLocation = GetActorLocation();
+	//FVector CurrentLocation = GetActorLocation();
 
-	// 重力（仮）
-	const float Gravity = -980.0f;
+	//// 重力（仮）
+	//const float Gravity = -980.0f;
 
-	// 重力を速度に加算
-	EnemyStatus.KNockBackVelocity.Z += Gravity * DeltaTime;
+	//// 重力を速度に加算
+	//EnemyStatus.KNockBackVelocity.Z += Gravity * DeltaTime;
 
-	// 位置更新
-	FVector NextLocation = CurrentLocation + EnemyStatus.KNockBackVelocity * DeltaTime;
+	//// 位置更新
+	//FVector NextLocation = CurrentLocation + EnemyStatus.KNockBackVelocity * DeltaTime;
 
-	FHitResult HitResult;
-	SetActorLocation(NextLocation, true, &HitResult);
+	//FHitResult HitResult;
+	//SetActorLocation(NextLocation, true, &HitResult);
 
-	// どこかに当たったら停止
-	if (HitResult.bBlockingHit)
-	{
-		AActor* HitActor = HitResult.GetActor();
+	//// どこかに当たったら停止
+	//if (HitResult.bBlockingHit)
+	//{
+	//	AActor* HitActor = HitResult.GetActor();
 
-		if (HitActor)
-		{
-			// プレイヤー or エネミーなら無視
-			if (HitActor->IsA(ACharacter::StaticClass()) ||
-				HitActor->IsA(AEnemyBase::StaticClass()))
-			{
-				return; // 停止しない
-			}
-		}
+	//	if (HitActor)
+	//	{
+	//		// プレイヤー or エネミーなら無視
+	//		if (HitActor->IsA(ACharacter::StaticClass()) ||
+	//			HitActor->IsA(AEnemyBase::StaticClass()))
+	//		{
+	//			return; // 停止しない
+	//		}
+	//	}
 
-		EnemyStatus.StateTag = EEnemyState::None;
-		EnemyStatus.KNockBackVelocity = FVector::ZeroVector;
-	}
+	//	EnemyStatus.StateTag = EEnemyState::Idle;
+	//	EnemyStatus.KNockBackVelocity = FVector::ZeroVector;
+	//}
 }
 
-void AEnemyBase::OnDeath()
+void AEnemyBase::FinalizeDeath()
 {
-	SetEnemyState(EEnemyState::KnockBack);
 	// 敵が死んだ際に敵管理クラス経由でリストから自身を削除する
 	if (EnemyManager) {
 		EnemyManager->RemoveEnemy(this);
@@ -237,9 +237,11 @@ void AEnemyBase::OnDeath()
 		GameProgress->AddKillCount();
 	}
 
-	//SpawnDeathEffect();
+	{
+		//SpawnDeathEffect();
 
-	//SpawnDeathExperience();
+		//SpawnDeathExperience();
+	}
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
 	if (USuperGameInstance* GameInstance =
@@ -248,7 +250,7 @@ void AEnemyBase::OnDeath()
 		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
 		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
-	
+
 	// PoolSubSystemに返却する
 	// Return()の中でDeactivate()が呼ばれて非表示・Tick停止でPool待機に戻る
 	if (UEnemyPoolSubSystem* PoolSubSystem =
@@ -266,11 +268,11 @@ void AEnemyBase::CheckCanAttack()
 	// プレイヤーとの距離が攻撃可能距離内か
 	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
 	{
-		EnemyStatus.StateTag = EEnemyState::Attack;
+		//EnemyStatus.StateTag = EEnemyState::Attack;
 	}
 	else
 	{
-		EnemyStatus.StateTag = EEnemyState::None;
+		//EnemyStatus.StateTag = EEnemyState::Idle;
 	}
 }
 
@@ -307,8 +309,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 
 	AnimationReset();
 
-	EnemyStatus.StateTag = EEnemyState::None;
-	EnemyRuntimeData->ChangedEnemyState(EEnemyState::None);
+	EnemyStatus.StateTag = EEnemyState::Idle;
+	EnemyRuntimeData->ChangedEnemyState(EEnemyState::Idle);
 
 	EnemyStatus.IsAlive = true;
 
@@ -369,7 +371,7 @@ void AEnemyBase::Deactivate()
 		StateTreeComponent->StopLogic(TEXT("Deactivate"));
 	}
 
-	EnemyStatus.StateTag = EEnemyState::None;
+	EnemyStatus.StateTag = EEnemyState::Idle;
 	if (!EnemyManager) { return; }
 
 	EnemyStatus.IsAlive = false;
@@ -459,3 +461,4 @@ float AEnemyBase::GetCapsuleHalfHeight()const
 
 	return CapsuleComponent->GetScaledCapsuleHalfHeight();
 }
+

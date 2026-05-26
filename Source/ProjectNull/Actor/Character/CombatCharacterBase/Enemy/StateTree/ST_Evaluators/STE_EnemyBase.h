@@ -124,7 +124,7 @@ private:
 
 	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
-	EEnemyState EnemyState = EEnemyState::None;
+	EEnemyState EnemyState = EEnemyState::Idle;
 
 	/** 死亡判定フラグ*/
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))

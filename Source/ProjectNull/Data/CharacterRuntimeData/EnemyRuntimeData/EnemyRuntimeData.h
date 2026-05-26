@@ -94,7 +94,7 @@ private:
 
 	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
-	EEnemyState StateEnum = EEnemyState::None;
+	EEnemyState StateEnum = EEnemyState::Idle;
 
 	/** 死亡判定*/
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")

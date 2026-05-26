@@ -304,7 +304,17 @@ public:
 	/// <summary>
 	/// 自身が死んだ際の処理
 	/// </summary>
-	virtual void OnDeath();
+	virtual void OnDeath(){ SetEnemyState(EEnemyState::Death); }
+
+	/**
+	 * @brief 被弾時にステートを切り替える
+	 */
+	virtual void OnHit(){ SetEnemyState(EEnemyState::Hit); }
+
+	/**
+	 * @brief 死亡を確定させる処理(StateTree側から呼ぶ)
+	 */
+	virtual void FinalizeDeath();
 
 	/// <summary>
 	/// 攻撃可能かを決める処理
