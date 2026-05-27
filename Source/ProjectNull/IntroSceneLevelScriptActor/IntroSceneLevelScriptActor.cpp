@@ -31,7 +31,7 @@ void AIntroSceneLevelScriptActor::PlayerIntroSceneStart()
 		SpringArmComponent = Player->GetSpringArmComponent();
 		CameraComponent = Player->GetCameraComponent();
 
-		SpringArmComponent->SetRelativeLocation(FVector(-300.0f, 0.0f, 300.0f));
-		CameraComponent->AddLocalRotation(FRotator(-180.0f, 0.0f, 0.0f));
+		SpringArmComponent->SetRelativeLocation(RelativeLocation);
+		CameraComponent->AddLocalRotation(LocalRotation);
 	}
 }

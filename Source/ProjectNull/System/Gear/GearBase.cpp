@@ -29,7 +29,7 @@ void UGearBase::Initialize(
 	OwnerPlayer			= Player;
 	OwnerGearComponent	= GearComponent;
 
-	for (auto* State : GearStates)
+	for (auto& State : GearStates)
 	{
 		if (!State) { continue; }
 
@@ -90,6 +90,12 @@ void UGearBase::Update(float DeltaTime)
 		bIsActive	= false;
 		ElapsedTime = 0.0f;
 	}
+}
+
+float UGearBase::GetGearDuration(int32 Index) const
+{
+	if (!GearStatuses.IsValidIndex(Index)) { return 0.f; }
+	return GearStatuses[Index].Duration;
 }
 
 void UGearBase::SetGearDuration(float InDuration, int32 Index)

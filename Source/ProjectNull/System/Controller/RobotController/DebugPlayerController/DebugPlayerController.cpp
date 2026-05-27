@@ -69,8 +69,3 @@ void ADebugPlayerController::MoveUp(const FInputActionValue& ActionValue)
 	}
 }
 
-void ADebugPlayerController::GearExecute01(const FInputActionValue& GearActionValue01)
-{
-	if (bIsDebugMode) { return; }
-	ARobotController::GearExecute01(GearActionValue01);
-}

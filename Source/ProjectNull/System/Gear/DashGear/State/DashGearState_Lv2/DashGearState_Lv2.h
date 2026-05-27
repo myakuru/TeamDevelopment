@@ -2,8 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "../DashGearStateBase.h"
-#include "../../../../../Utility/Common/GameTypes/GameTypes.h"
+#include <ProjectNull/Utility/Common/GameTypes/GameTypes.h>
+#include <ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h>
 
 #include "DashGearState_Lv2.generated.h"
 
@@ -19,22 +19,23 @@ public:
 
 public:
 
-	void Initialize(class APlayerBase* Player, class UPlayerGearComponent* GearComponent, class UGearBase* Gear)	override;
-	void Execute(int32 CurrentGearLevel)																			override;
-	void Update(float DeltaTime)																					override;
+	void Initialize(
+		class APlayerBase* InPlayer,
+		class UPlayerGearComponent* InGearComponent,
+		class UGearBase* InOwner)			override;
+
+	void Execute(int32 CurrentGearLevel)	override;
+	void Update(float DeltaTime)			override;
 
 
 private:
 
-	// 1��ڃ_�b�V����臒l�͈�
 	UPROPERTY(EditAnywhere)
 	FThresholdRange FirstDashThresholdRange;
 
-	// 2��ڃ_�b�V����臒l�͈�
 	UPROPERTY(EditAnywhere)
 	FThresholdRange SecondDashThresholdRange;
 
-	// �o�ߎ���
 	float ElapsedTime;
 
 };

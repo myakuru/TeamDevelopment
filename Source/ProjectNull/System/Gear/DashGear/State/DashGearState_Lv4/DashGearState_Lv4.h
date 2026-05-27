@@ -1,8 +1,9 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "../DashGearStateBase.h"
-#include <ProjectNull/Utility/Common/GameTypes/GameTypes.h>
+
+#include <ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h>
+
 #include "DashGearState_Lv4.generated.h"
 
 /** ロボットコントローラークラス */
@@ -20,15 +21,17 @@ class PROJECTNULL_API UDashGearState_Lv4 final : public UDashGearStateBase
 public:
 	UDashGearState_Lv4();
 public:
-	void Initialize(class APlayerBase* Player,
-					class UPlayerGearComponent* GearComponent,
-					class UGearBase* Gear)	override;
+
+	void Initialize(
+		class APlayerBase* InPlayer,
+		class UPlayerGearComponent* InGearComponent,
+		class UGearBase* InOwner)			override;
+
 	void Execute(int32 CurrentGearLevel)	override;
 	void Update(float DeltaTime)			override;
 	void End()								override;
 
-	/** ギアレベル4の配列インデックス */
-	static const int32 kLv4Index = 3;
+	inline const int32 GetGearLevelIndex() const	override { return kLv4Index; }
 
 private:
 
@@ -36,6 +39,11 @@ private:
 	 * @brief ギア発動時間初期化
 	 */
 	void InitializeGearDuration();
+
+	/**
+	 * @brief 復元する際の開始データ初期化
+	 */
+	void InitializeRestoreStartData();
 
 	/**
 	 * @brief 戦闘構え状態を更新
@@ -74,7 +82,9 @@ private:
 	 * @param DeltaTime デルタタイム
 	 * @param ElapsedTime 経過時間
 	 */
-	void UpdateFinalDash(float DeltaTime, float ElapsedTime);
+	void UpdateFinalDash(
+		float DeltaTime,
+		float ElapsedTime);
 
 	/**
 	 * @brief 前区間の有効なカメラデータ取得
@@ -119,12 +129,5 @@ private:
 
 	/** ギアスキル開始時プレイヤーのTransform */
 	FTransform StartPlayerTransform;
-
-	/** ギアスキル開始時カメラ回転 */
-	FRotator StartControlRotation;
-
-	/** ギアスキル開始時カメラ距離 */
-	UPROPERTY()
-	float StartTargetArmLength;
 
 };

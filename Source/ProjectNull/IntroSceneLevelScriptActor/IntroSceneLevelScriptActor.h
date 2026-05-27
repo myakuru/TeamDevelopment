@@ -18,6 +18,17 @@ class PROJECTNULL_API AIntroSceneLevelScriptActor : public ALevelScriptActor
 {
 	GENERATED_BODY()
 
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IntroScene")
+	FVector PlayerStartLocation = { 0.0f, 0.0f, 10000.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IntroScene")
+	FVector RelativeLocation = { 0.0f, 0.0f, 0.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IntroScene")
+	FRotator LocalRotation = { 0.0f, 0.0f, 0.0f };
+
 private:
 
 	void BeginPlay() override;

@@ -9,6 +9,7 @@
 /**
  * 
  */
+
 USTRUCT(BlueprintType)
 struct FWeaponMaterialData : public FTableRowBase
 {

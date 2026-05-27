@@ -18,15 +18,16 @@ UDashGearState_Lv4::UDashGearState_Lv4():
 	StanceTime(FThresholdRange()),
 	DashTime(FThresholdRange()),
 	CameraData(TArray<FCameraSequenceData>()),
-	StartPlayerTransform(FTransform()),
-	StartControlRotation(FRotator::ZeroRotator),
-	StartTargetArmLength(0.f)
+	StartPlayerTransform(FTransform())
 {
 }
 
-void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* GearComponent, UGearBase* Gear)
+void UDashGearState_Lv4::Initialize(
+	APlayerBase* InPlayer,
+	UPlayerGearComponent* InGearComponent,
+	UGearBase* InOwner)
 {
-	UDashGearStateBase::Initialize(Player, GearComponent, Gear);
+	UDashGearStateBase::Initialize(InPlayer, InGearComponent, InOwner);
 
 	// ギア発動時間初期化
 	InitializeGearDuration();
@@ -34,36 +35,34 @@ void UDashGearState_Lv4::Initialize(APlayerBase* Player, UPlayerGearComponent* G
 	// ================================================================
 	// 残像攻撃エフェクトクラスの初期化
 	// ================================================================
-	if (!AfterImageAttackEffect)	{ return; }
+	if (!AfterImageAttackEffect) { return; }
 	AfterImageAttackEffect->Initialize();
 
-	if (!Player)					{ return; }
+	if (!Player) { return; }
 	// ロボットコントローラーの取得
 	RobotController = Cast<ARobotController>(Player->GetController());
 }
 
 void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 {
-	if (!OwnerPlayer || !RobotController) { return; }
-
-	auto* Camera = OwnerPlayer->GetSpringArmComponent();
-	if (!Camera) { return; }
-
-	auto* Controller = OwnerPlayer->GetController();
-	if (!Controller) { return; }
+	if (!Player || !RobotController) { return; }
 
 	// ================================================================
 	// ダッシュギアのレベル4状態クラスの初期化
 	// ================================================================
-	StartPlayerTransform = OwnerPlayer->GetTransform();
-	StartTargetArmLength = Camera->TargetArmLength;
-	StartControlRotation = Controller->GetControlRotation();
+	StartPlayerTransform = Player->GetTransform();
+
+	// ギアスキル発動前のカメラステータスを保存
+	SaveCameraStatus();
+
+	// 復元する際の開始データ初期化
+	InitializeRestoreStartData();
 
 	// 残像攻撃クラスの実行
 	if (!AfterImageAttackEffect) { return; }
-	AfterImageAttackEffect->Start(OwnerPlayer->GetTransform());
+	AfterImageAttackEffect->Start(Player->GetTransform());
 
-	auto* PlayerAnimInstance = OwnerPlayer->GetPlayerAnimInstance();
+	auto* PlayerAnimInstance = Player->GetPlayerAnimInstance();
 	if (!PlayerAnimInstance) { return; }
 
 	// アニメーションを構え状態にする
@@ -75,10 +74,10 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 
 void UDashGearState_Lv4::Update(float DeltaTime)
 {
-	if (!OwnerPlayer || !OwnerGear || !AfterImageAttackEffect) { return; }
+	if (!Player || !Owner || !AfterImageAttackEffect) { return; }
 
 	// 経過時間取得
-	const float ElapsedTime = OwnerGear->GetElapsedTime();
+	const float ElapsedTime = Owner->GetElapsedTime();
 
 	// 戦闘構え状態を更新
 	UpdateCombatStance(ElapsedTime);
@@ -90,43 +89,57 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 	UpdateCameraData(DeltaTime,ElapsedTime);
 
 	// 最終ダッシュの更新処理
-	UpdateFinalDash(DeltaTime,ElapsedTime);
+	UpdateFinalDash(DeltaTime,ElapsedTime);	 
 }
 
 void UDashGearState_Lv4::End()
 {
-	if (!OwnerPlayer || !RobotController) { return; }
+	if (!Player || !RobotController) { return; }
+
+	auto* Camera = Player->GetSpringArmComponent();
+	if (!Camera) { return; }
+
+	auto* Controller = Player->GetController();
+	if (!Controller) { return; }
+
+	// 元のカメラデータを反映させる
+	//Camera->TargetArmLength = StartTargetArmLength;
+	//Controller->SetControlRotation(StartControlRotation);
 
 	// 入力を有効化
 	RobotController->SetCanReceiveInput(true);
 
 	// プレイヤーのスケルタルメッシュ描画有効化
-	OwnerPlayer->GetMesh()->SetHiddenInGame(false);
+	Player->GetMesh()->SetHiddenInGame(false);
 }
 
 void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 {	
-	if (!OwnerPlayer || !OwnerPlayer->GetMesh() || !RobotController)	{ return; }
+	if (!Player || !Player->GetMesh() || !RobotController)	{ return; }
 
 	// 構え状態なら解除処理を行わない
-	if (StanceTime.IsWithinRange(ElapsedTime))							{ return; }
+	if (StanceTime.IsWithinRange(ElapsedTime))	{ return; }
 
 	// プレイヤーのアニメーションインスタンス取得
-	auto* PlayerAnimInstance = OwnerPlayer->GetPlayerAnimInstance();
+	auto* PlayerAnimInstance = Player->GetPlayerAnimInstance();
 	if (!PlayerAnimInstance) { return; }
 
 	// 構え状態を解除
 	PlayerAnimInstance->bIsCombatStance = false;
 
 	// プレイヤーのスケルタルメッシュ描画無効化
-	OwnerPlayer->GetMesh()->SetHiddenInGame(true);
+	Player->GetMesh()->SetHiddenInGame(true);
 }
 
 void UDashGearState_Lv4::UpdateCameraData(
 	float DeltaTime,
 	float InElapsedTime)
 {
-	if (!OwnerGear) { return; }
+	// カメラ復帰処理更新
+	UpdateCameraRestoreInterpolation(DeltaTime);
+
+	// 復元補間中は処理を行わない
+	if (GetCameraRestoreElapsedTime() >= 0.0f) { return; }
 
 	// 現在の区間インデックス取得
 	const int32 CurrentIndex = GetCurrentSectionIndex(InElapsedTime);
@@ -198,7 +211,7 @@ void UDashGearState_Lv4::UpdateTargetArmLength(
 	int32 DataIndex,
 	float InLerpAlpha)
 {
-	auto* SpringArm = OwnerPlayer->GetSpringArmComponent();
+	auto* SpringArm = Player->GetSpringArmComponent();
 
 	if (!SpringArm) { return; }
 	if (!CameraData.IsValidIndex(DataIndex)) { return; }
@@ -225,10 +238,10 @@ void UDashGearState_Lv4::UpdateTargetArmLength(
 
 void UDashGearState_Lv4::UpdateFinalDash(float DeltaTime, float ElapsedTime)
 {
-	if (!DashTime.IsWithinRange(ElapsedTime) || !OwnerPlayer || !OwnerPlayer->GetMesh()) { return; }
+	if (!DashTime.IsWithinRange(ElapsedTime) || !Player || !Player->GetMesh()) { return; }
 
 	// プレイヤースケルタルメッシュの描画無効にする
-	OwnerPlayer->GetMesh()->SetHiddenInGame(false);
+	Player->GetMesh()->SetHiddenInGame(false);
 
 	// ダッシュ処理
 	Dash();
@@ -258,7 +271,7 @@ const FCameraSequenceData* UDashGearState_Lv4::GetPreviousValidCameraData(int32 
 
 void UDashGearState_Lv4::InitializeGearDuration()
 {
-	if (!OwnerGear) { return; }
+	if (!Owner) { return; }
 
 	float TotalDuration = 0.f;
 
@@ -267,8 +280,30 @@ void UDashGearState_Lv4::InitializeGearDuration()
 		TotalDuration += Data.Time;
 	}
 
+	TotalDuration += GetCameraRestoreDuration();
+
 	// ギア発動時間を更新
-	OwnerGear->SetGearDuration(TotalDuration, kLv4Index);
+	Owner->SetGearDuration(TotalDuration, kLv4Index);
+}
+
+void UDashGearState_Lv4::InitializeRestoreStartData()
+{
+	// 最後の要素番号を取り出す
+	const int32 MaxIndex = CameraData.Num() - 1;
+
+	if (!CameraData.IsValidIndex(MaxIndex)) { return; }
+
+	const auto& Data = CameraData[MaxIndex];
+
+	// ギアスキル発動開始時のプレイヤーYaw回転
+	const float BaseYaw = StartPlayerTransform.GetRotation().Rotator().Yaw;
+
+	// 最後の要素データを取得
+	RestoreStartTargetArmLength = Data.TargetArmLength;
+	RestoreStartControlRotation = Data.TargetRotator;
+
+	// オフセット考慮して計算
+	RestoreStartControlRotation.Yaw += BaseYaw;
 }
 
 int32 UDashGearState_Lv4::GetCurrentSectionIndex(float InElapsedTime)

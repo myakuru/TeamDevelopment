@@ -78,6 +78,8 @@ public:
 	inline bool IsActive()				const		{ return bIsActive; }
 	inline bool IsMovementBlocked()		const		{ return bBlocksMovement; }
 
+	float GetGearDuration(int32 Index) const;
+
 	/** Setter */
 	inline void SetBlocksMovement(bool bInBlocksMovement)	{ bBlocksMovement = bInBlocksMovement; }
 	inline void SetCanExecute(bool bInCanExecute)			{ bCanExecute = bInCanExecute; }
@@ -103,7 +105,7 @@ private:
 
 	/** ギアの状態配列 */
 	UPROPERTY(EditAnywhere, Instanced)
-	TArray<UGearStateBase*> GearStates;
+	TArray<TObjectPtr<UGearStateBase>> GearStates;
 
 	/** ギアのステータス配列 */
 	UPROPERTY(EditAnywhere)
