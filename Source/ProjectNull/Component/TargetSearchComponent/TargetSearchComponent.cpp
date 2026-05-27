@@ -5,7 +5,8 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 
-UTargetSearchComponent::UTargetSearchComponent()
+UTargetSearchComponent::UTargetSearchComponent():
+	EnemyManager(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -25,20 +26,21 @@ void UTargetSearchComponent::TickComponent(
 	ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::TickComponent(
+		DeltaTime,
+		TickType,
+		ThisTickFunction);
 }
 
-TArray<FEnemyDistanceData> UTargetSearchComponent::FindEnemiesSortedByDistance(float Range)
+TArray<FEnemyDistanceData> UTargetSearchComponent::FindEnemiesSortedByDistance(float InFindDistSq)
 {
 	TArray<FEnemyDistanceData> Result;
 
 	if (!EnemyManager || !GetOwner()) { return Result; }
 
+
 	// 座標取得
 	const FVector Location = GetOwner()->GetActorLocation();
-
-	// 範囲Sqを計算
-	const float RangeSq = FMath::Square(Range);
 
 	for (const auto& Enemy : EnemyManager->GetEnemyList())
 	{
@@ -53,7 +55,7 @@ TArray<FEnemyDistanceData> UTargetSearchComponent::FindEnemiesSortedByDistance(f
 				EnemyLocation);
 
 		// 範囲外だったらリストに追加しない
-		if (DistSq > RangeSq) { continue; }
+		if (DistSq > InFindDistSq) { continue; }
 
 		// 敵の距離データに格納する
 		FEnemyDistanceData Data;

@@ -29,10 +29,11 @@ public:
 		FActorComponentTickFunction* ThisTickFunction) override;
 
 	/** 距離順の敵一覧を取得 */
-	TArray<FEnemyDistanceData> FindEnemiesSortedByDistance(float Range);
+	TArray<FEnemyDistanceData> FindEnemiesSortedByDistance(float InFindDistSq);
 
 private:
 
 	UPROPERTY()
 	TObjectPtr<UEnemyManagerSubsystem> EnemyManager;
+
 };
