@@ -60,11 +60,9 @@ public:
 	virtual void End() { return; }
 
 	/** Getter */
-	inline float GetCameraRestoreDuration() const		{ return CameraRestoreDuration; }
-	inline float GetCameraRestoreElapsedTime() const	{ return CameraRestoreElapsedTime; }
-
-
-	virtual const int32 GetGearLevelIndex() const { return kLv1Index; }
+	inline float GetCameraRestoreDuration() const			{ return CameraRestoreDuration; }
+	inline float GetCameraRestoreElapsedTime() const		{ return CameraRestoreElapsedTime; }
+	inline virtual const int32 GetGearLevelIndex() const	{ return kLv1Index; }
 
 	/** ギアレベルの配列インデックス */
 	static const int32 kLv1Index = 0;

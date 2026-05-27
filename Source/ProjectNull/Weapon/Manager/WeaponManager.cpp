@@ -18,7 +18,7 @@ void UWeaponManager::SaveToData(UMySaveGame* a_SaveGame)
 {
     if (!a_SaveGame)return;
 
-	a_SaveGame->m_WeaponData.NextUniqueID = m_NextWeaponID;
+	a_SaveGame->m_WeaponData.NextWeaponUniqueID = m_NextWeaponID;
 
     a_SaveGame->m_WeaponData.Weapons.Empty();
     for (const FWeaponInstance& Weapon : m_Weapons) {
@@ -27,13 +27,20 @@ void UWeaponManager::SaveToData(UMySaveGame* a_SaveGame)
 
 	a_SaveGame->m_WeaponData.EquippedWeaponIDs = m_EquippedWeaponIDs;
 
+	a_SaveGame->m_WeaponData.NextMaterialUniqueID = m_NextMaterialID;
+
+	a_SaveGame->m_WeaponData.Materials.Empty();
+	for (const FWeaponMaterialInstance& Material : m_Materials) {
+		a_SaveGame->m_WeaponData.Materials.Add(Material);
+	}
+
 }
 
 void UWeaponManager::LoadFromSaveData(UMySaveGame* a_SaveGame)
 {
     if (!a_SaveGame)return;
 
-	m_NextWeaponID = a_SaveGame->m_WeaponData.NextUniqueID;
+	m_NextWeaponID = a_SaveGame->m_WeaponData.NextWeaponUniqueID;
 
     m_Weapons.Empty();
 	m_Weapons = a_SaveGame->m_WeaponData.Weapons;
@@ -43,11 +50,21 @@ void UWeaponManager::LoadFromSaveData(UMySaveGame* a_SaveGame)
 		m_EquippedWeaponIDs = a_SaveGame->m_WeaponData.EquippedWeaponIDs;
 	}
 
+	m_NextMaterialID = a_SaveGame->m_WeaponData.NextMaterialUniqueID;
+
+	m_Materials.Empty();
+	m_Materials = a_SaveGame->m_WeaponData.Materials;
+
 }
 
 const TArray<FWeaponInstance>& UWeaponManager::GetWeapons() const
 {
 	return m_Weapons;
+}
+
+const TArray<FWeaponMaterialInstance>& UWeaponManager::GetMaterials() const
+{
+	return m_Materials;
 }
 
 void UWeaponManager::AddWeapon(const FWeaponInstance& a_NewWeapon)
@@ -57,11 +74,43 @@ void UWeaponManager::AddWeapon(const FWeaponInstance& a_NewWeapon)
 	m_NextWeaponID++;
 }
 
+void UWeaponManager::RemoveWeapon(int64 a_TargetUniqueID)
+{
+	const int32 index = m_Weapons.IndexOfByPredicate
+	(
+		[a_TargetUniqueID](const FWeaponInstance& Weapon)
+		{
+			return Weapon.UniqueId == a_TargetUniqueID;
+		}
+	);
+
+	if (index != INDEX_NONE) {
+		m_Weapons.RemoveAt(index);
+	}
+
+}
+
 void UWeaponManager::AddWeaponMaterial(const FWeaponMaterialInstance& a_NewMaterial)
 {
 	m_Materials.Add(a_NewMaterial);
 	m_Materials.Last().UniqueId = m_NextMaterialID;
 	m_NextMaterialID++;
+}
+
+void UWeaponManager::RemoveWeaponMaterial(int64 a_TargetUniqueID)
+{
+	const int32 index = m_Materials.IndexOfByPredicate
+	(
+		[a_TargetUniqueID](const FWeaponMaterialInstance& Material)
+		{
+			return Material.UniqueId == a_TargetUniqueID;
+		}
+	);
+
+	if (index != INDEX_NONE) {
+		m_Materials.RemoveAt(index);
+	}
+
 }
 
 bool UWeaponManager::GetWeaponMaster(FName a_WeaponId, FWeaponData& a_OutData) const
@@ -88,6 +137,11 @@ void UWeaponManager::SetEquippedWeapon(int32 a_Index, const FWeaponInstance& a_W
 {
 	if (!m_EquippedWeaponIDs.IsValidIndex(a_Index))return;
 
+	for (int i = 0; i < m_EquippedWeaponIDs.Num();i++) {
+		if (m_EquippedWeaponIDs[i] == a_Weapon.UniqueId) {
+			m_EquippedWeaponIDs[i] = INDEX_NONE;
+		}
+	}
 	m_EquippedWeaponIDs[a_Index] = a_Weapon.UniqueId;
 
 }
@@ -104,4 +158,10 @@ bool UWeaponManager::GetEquippedWeapon(FWeaponInstance& a_EquippedWeapon, int32 
 	}
 
 	return false;
+}
+
+UDataTable* UWeaponManager::GetWeaponDataTable()
+{
+	if (m_WeaponDataTable) return m_WeaponDataTable;
+	else return nullptr;
 }
