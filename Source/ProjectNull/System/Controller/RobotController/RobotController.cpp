@@ -19,7 +19,7 @@ ARobotController::ARobotController():
 		LookAction(nullptr),
 		JumpAction(nullptr),
 		ChangeGearAction(nullptr),
-		GearAction01(nullptr),
+		GearActions(TArray<TObjectPtr<UInputAction>>()),
 		PlayerHud(nullptr)
 {
 	bReplicates = true;
@@ -48,14 +48,24 @@ void ARobotController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (!Cast<UEnhancedInputComponent>(InputComponent)) { return; }
 	auto* EnhacedInput = Cast<UEnhancedInputComponent>(InputComponent);
+	if (!EnhacedInput) { return; }
+
 	
 	EnhacedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARobotController::Move);
 	EnhacedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARobotController::Look);
 	EnhacedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ARobotController::Jump);
 	EnhacedInput->BindAction(ChangeGearAction, ETriggerEvent::Started, this, &ARobotController::ChangeGear);
-	EnhacedInput->BindAction(GearAction01, ETriggerEvent::Started, this, &ARobotController::GearExecute01);
+
+	for (int32 Index = 0; Index < GearActions.Num(); ++Index)
+	{
+		EnhacedInput->BindAction(
+			GearActions[Index],
+			ETriggerEvent::Started,
+			this,
+			&ARobotController::GearExecute,
+			Index);
+	}
 }
 
 void ARobotController::InitializeInputContext()
@@ -98,13 +108,6 @@ void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
 	PlayerBase->ChangeGear();
 }
 
-void ARobotController::GearExecute01(const FInputActionValue& GearActionValue01)
-{
-	if (!bCanReceiveInput) { return; }
-	if (!PlayerBase || !PlayerBase->GetGearComponent()) { return; }
-	PlayerBase->GetGearComponent()->ExecuteGear(0);
-}
-
 void ARobotController::InitializeUI()
 {
 	if (IsLocalController() && PlayerHUDClass && PlayerExpUpgradeWidgetClass)
@@ -119,4 +122,12 @@ void ARobotController::InitializeUI()
 		}
 	}
 }
+
+void ARobotController::GearExecute(const FInputActionValue& ActionValue, int32 ExecuteIndex)
+{
+	if (!bCanReceiveInput) { return; }
+	if (!PlayerBase || !PlayerBase->GetGearComponent()) { return; }
+	PlayerBase->GetGearComponent()->ExecuteGear(ExecuteIndex);
+}
+
 

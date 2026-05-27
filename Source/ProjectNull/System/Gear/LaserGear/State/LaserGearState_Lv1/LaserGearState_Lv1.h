@@ -7,10 +7,37 @@
 
 #include "LaserGearState_Lv1.generated.h"
 
+
+
 /** レーザーギアの1レベル状態クラス */
 UCLASS(Blueprintable, EditInlineNew)
-class PROJECTNULL_API ULaserGearState_Lv1 : public ULaserGearStateBase
+class PROJECTNULL_API ULaserGearState_Lv1 final : public ULaserGearStateBase
 {
 	GENERATED_BODY()
-	
+public:
+	ULaserGearState_Lv1();
+public:
+
+	void Initialize(
+		class APlayerBase* InPlayer,
+		class UPlayerGearComponent* InGearComponent,
+		class UGearBase* InOwner)			override;
+
+	void Execute(int32 CurrentGearLevel)	override;
+	void Update(float DeltaTime)			override;
+	void End()								override;
+
+	/** Getter */
+	inline const int32 GetGearLevelIndex() const	override { return kLv1Index; }
+
+private:
+
+	void ShotLaserBullet();
+
+	/** レーザー(発射物)クラス */
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AProjectileBase> LaserBulletClass;
+
+	UPROPERTY(EditAnywhere)
+	int32 LaserBulletNum;
 };

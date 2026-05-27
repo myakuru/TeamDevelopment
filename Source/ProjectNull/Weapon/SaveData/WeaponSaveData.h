@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include"../Instance/WeaponInstance.h"
+#include"../Instance/WeaponMaterialInstance.h"
 #include "WeaponSaveData.generated.h"
 
 /**
@@ -19,9 +20,15 @@ struct FWeaponSaveData
     TArray<FWeaponInstance> Weapons;
 
 	UPROPERTY()
-	int64 NextUniqueID = 0;
+	int64 NextWeaponUniqueID = 0;
 
 	UPROPERTY()
 	TArray<int64> EquippedWeaponIDs;
+
+	UPROPERTY()
+	TArray<FWeaponMaterialInstance> Materials;
+
+	UPROPERTY()
+	int64 NextMaterialUniqueID = 0;
 
 };

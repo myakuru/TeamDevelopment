@@ -12,7 +12,7 @@ void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
     if (!InPoolConfig->EnemyData)
     {
         UE_LOG(LogTemp, Error,
-            TEXT("[EnemyPool] WarmUp Failure"),
+            TEXT("EnemyPool WarmUp Failure"),
             *InPoolConfig->GetName());
         return;
     }
@@ -25,7 +25,7 @@ void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
     if (Pools.Contains(Key))
     {
         UE_LOG(LogTemp, Log,
-            TEXT("[EnemyPool] WarmUp Success"), *InPoolConfig->GetName());
+            TEXT("EnemyPool WarmUp Success"), *InPoolConfig->GetName());
         return;
     }
 
@@ -165,7 +165,7 @@ bool UEnemyPoolSubSystem::IsPoolFull(UEnemyPoolConfig* InPoolConfig) const
 
 	if (!Pool)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[EnemyPool] IsPoolFull: Pool not found: %s"), *InPoolConfig->GetName());
+		UE_LOG(LogTemp, Error, TEXT("EnemyPool IsPoolFull: Pool not found: %s"), *InPoolConfig->GetName());
 		return true;
 	}
 
@@ -173,7 +173,7 @@ bool UEnemyPoolSubSystem::IsPoolFull(UEnemyPoolConfig* InPoolConfig) const
 	const int32 InactiveNum = Pool->Inactive.Num();
 
 	UE_LOG(LogTemp, Warning,
-		TEXT("[EnemyPool] %s | Active:%d | Inactive:%d | PoolFull:%s"),
+		TEXT("EnemyPool %s | Active:%d | Inactive:%d | PoolFull:%s"),
 		*InPoolConfig->GetName(),
 		ActiveNum,
 		InactiveNum,

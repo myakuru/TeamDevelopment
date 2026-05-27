@@ -78,6 +78,8 @@ public:
 	inline bool IsActive()				const		{ return bIsActive; }
 	inline bool IsMovementBlocked()		const		{ return bBlocksMovement; }
 
+	float GetGearDuration(int32 Index) const;
+
 	/** Setter */
 	inline void SetBlocksMovement(bool bInBlocksMovement)	{ bBlocksMovement = bInBlocksMovement; }
 	inline void SetCanExecute(bool bInCanExecute)			{ bCanExecute = bInCanExecute; }

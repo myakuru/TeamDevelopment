@@ -18,6 +18,9 @@ class PROJECTNULL_API UEffectData : public UDataAsset
 
 public:
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FName EffectID;
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUEffectBase> EffectClass;
 
