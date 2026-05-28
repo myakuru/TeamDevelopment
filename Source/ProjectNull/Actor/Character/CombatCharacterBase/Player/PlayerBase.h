@@ -8,6 +8,10 @@ class USpringArmComponent;
 class UCameraComponent;
 class UPlayerAttackComponent;
 class UPlayerGearComponent;
+
+/** 対象検索コンポーネント */
+class UTargetSearchComponent;
+
 class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
@@ -46,6 +50,7 @@ public:
 	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
 	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
 	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
+	inline UTargetSearchComponent*			GetTargetSearchComponent() const	{ return TargetSearchComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
@@ -71,6 +76,10 @@ private:
 	/** ギアコンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "Gear")
 	TObjectPtr<UPlayerGearComponent> GearComponent;
+
+	/** 対象検索コンポーネント */
+	UPROPERTY(VisibleAnywhere, Category = "TargetSearch")
+	TObjectPtr<UTargetSearchComponent> TargetSearchComponent;
 
 	/** 自動攻撃クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")

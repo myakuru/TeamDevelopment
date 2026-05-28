@@ -32,12 +32,15 @@ public:
 
 private:
 
-	void ShotLaserBullet();
+	void ShotLaserBullet(
+		const FVector& SpawnLocation,
+		const FVector& DirVector);
 
-	/** レーザー(発射物)クラス */
+	
+	/** 敵をターゲットできる距離Sq */
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AProjectileBase> LaserBulletClass;
+	float TargetableDistSq;
 
 	UPROPERTY(EditAnywhere)
-	int32 LaserBulletNum;
+	FLaserBulletData BulletData;
 };
