@@ -32,8 +32,8 @@ public:
 
 private:
 
-
-	UPROPERTY(EditAnywhere)
-	FLaserBulletData BulletData;
+	/** レーザー(弾タイプ)の発射制御を行うクラス */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<ULaserBulletShooter> LaserBulletShooter;
 
 };

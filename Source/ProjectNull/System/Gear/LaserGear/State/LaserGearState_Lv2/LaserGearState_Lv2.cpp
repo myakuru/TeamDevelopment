@@ -33,7 +33,6 @@ void ULaserGearState_Lv2::Execute(int32 CurrentGearLevel)
 	ULaserGearStateBase::Execute(CurrentGearLevel);
 
 
-	ShotTargetedLaserBullets(BulletData);
 
 }
 

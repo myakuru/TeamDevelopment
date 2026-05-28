@@ -27,6 +27,4 @@ public:
 
 private:
 
-	UPROPERTY(EditAnywhere)
-	FLaserBulletData BulletData;
 };
