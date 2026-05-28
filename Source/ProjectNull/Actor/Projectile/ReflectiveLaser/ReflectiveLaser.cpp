@@ -26,13 +26,22 @@ void AReflectiveLaser::OnCollisionOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	AProjectileBase::OnCollisionOverlap(
-		OverlappedComponent,
-		OtherActor,
-		OtherComp,
-		OtherBodyIndex,
-		bFromSweep,
-		SweepResult);
+	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
+
+	ReflectionCount--;
+
+	if (ReflectionCount <= 0) 
+	{
+		Destroy();
+		return;
+	}
+
+	auto Enemy = Cast<AEnemyBase>(OtherActor);
+	if (!Enemy) { return; }
+
+	if (ReflectedEnemies.Contains(Enemy)) { return; }
+
+	ReflectedEnemies.Add(Enemy);
 
 
 	GetWorld()->GetTimerManager().SetTimer(

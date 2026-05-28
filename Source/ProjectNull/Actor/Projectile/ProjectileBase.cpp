@@ -22,11 +22,11 @@ AProjectileBase::AProjectileBase()
 	// スフィアコリジョンコンポーネントの初期化
 	// ================================================================
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
-	if (!SphereCollision) { return; }
+	//if (!SphereCollision) { return; }
 	//
-	//SetRootComponent(SphereCollision);
+	SetRootComponent(SphereCollision);
 
-	SphereCollision->SetupAttachment(Root);
+	//SphereCollision->SetupAttachment(Root);
 
 	SphereCollision->SetCollisionEnabled(
 		ECollisionEnabled::QueryAndPhysics);
@@ -63,6 +63,7 @@ AProjectileBase::AProjectileBase()
 
 void AProjectileBase::BeginPlay()
 {
+
 	Super::BeginPlay();
 
 	if (!SphereCollision) { return; }
@@ -76,6 +77,9 @@ void AProjectileBase::BeginPlay()
 	ProjectileMovement->OnProjectileStop.AddDynamic(
 		this,
 		&AProjectileBase::OnProjectileStop);
+
+	//UE_LOG(LogTemp, Display, TEXT("呼!"));
+
 }
 
 void AProjectileBase::Tick(float DeltaTime)
@@ -91,6 +95,7 @@ void AProjectileBase::OnCollisionOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Display, TEXT("当たった!"));
 	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
 
 	auto Enemy = Cast<AEnemyBase>(OtherActor);

@@ -7,6 +7,8 @@
 
 #include "ReflectiveLaser.generated.h"
 
+class AEnemyBase;
+
 /** 反射機能を持つレーザー(弾タイプ)クラス */
 UCLASS()
 class PROJECTNULL_API AReflectiveLaser final : public AProjectileBase
@@ -40,4 +42,8 @@ private:
 	/** 反射回数 */
 	UPROPERTY(EditAnywhere)
 	int32 ReflectionCount;
+
+	/** 既に反射した敵 */
+	UPROPERTY()
+	TSet<TWeakObjectPtr<AEnemyBase>> ReflectedEnemies;
 };

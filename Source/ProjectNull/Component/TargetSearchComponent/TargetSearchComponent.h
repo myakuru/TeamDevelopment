@@ -30,8 +30,15 @@ public:
 
 	/** 距離順の敵一覧を取得 */
 	TArray<FEnemyDistanceData> FindEnemiesSortedByDistance(float InFindDistSq);
+	TArray<FEnemyDistanceData> FindEnemiesSortedByDistance(
+		float InFindDistSq,
+		const FVector& Location);
 
 private:
+
+	TArray<FEnemyDistanceData> FindEnemiesSortedByDistanceInternal(
+		float InFindDistSq,
+		const FVector& Location);
 
 	UPROPERTY()
 	TObjectPtr<UEnemyManagerSubsystem> EnemyManager;

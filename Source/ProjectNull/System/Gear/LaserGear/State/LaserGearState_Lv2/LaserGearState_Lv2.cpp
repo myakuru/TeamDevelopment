@@ -32,16 +32,8 @@ void ULaserGearState_Lv2::Execute(int32 CurrentGearLevel)
 {
 	ULaserGearStateBase::Execute(CurrentGearLevel);
 
-	const auto TargetSearch = Player->GetTargetSearchComponent();
-	if (!TargetSearch) { return; }
 
-	const TArray<FEnemyDistanceData> Enemies
-		= TargetSearch->FindEnemiesSortedByDistance(200.f);
-
-	if (!Enemies.IsValidIndex(0)) { return; }
-
-
-	//Enemies[0].Enemy;
+	ShotTargetedLaserBullets(BulletData);
 
 }
 

@@ -28,19 +28,12 @@ public:
 	void End()								override;
 
 	/** Getter */
-	inline const int32 GetGearLevelIndex() const	override { return kLv1Index; }
+	inline const int32 GetGearLevelIndex() const override { return kLv1Index; }
 
 private:
 
-	void ShotLaserBullet(
-		const FVector& SpawnLocation,
-		const FVector& DirVector);
-
-	
-	/** 敵をターゲットできる距離Sq */
-	UPROPERTY(EditAnywhere)
-	float TargetableDistSq;
 
 	UPROPERTY(EditAnywhere)
 	FLaserBulletData BulletData;
+
 };
