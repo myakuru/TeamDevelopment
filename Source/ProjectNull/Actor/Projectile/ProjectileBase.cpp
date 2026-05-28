@@ -15,8 +15,8 @@ AProjectileBase::AProjectileBase()
 	// ================================================================
 	// ルートコンポーネントの初期化
 	// ================================================================
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	SetRootComponent(Root);
+	/*Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);*/
 
 	// ================================================================
 	// スフィアコリジョンコンポーネントの初期化
@@ -34,7 +34,7 @@ AProjectileBase::AProjectileBase()
 	SphereCollision->SetGenerateOverlapEvents(true);
 
 	SphereCollision->SetCollisionResponseToChannel(
-		ECC_Pawn,
+		ECC_GameTraceChannel1,
 		ECR_Overlap);
 
 	SphereCollision->SetCollisionResponseToChannel(
@@ -50,7 +50,7 @@ AProjectileBase::AProjectileBase()
 	// ================================================================
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	if (!StaticMesh) { return; }
-	StaticMesh->SetupAttachment(Root);
+	StaticMesh->SetupAttachment(SphereCollision);
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// ================================================================
@@ -58,7 +58,7 @@ AProjectileBase::AProjectileBase()
 	// ================================================================
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	if (!ProjectileMovement) { return; }
-	ProjectileMovement->UpdatedComponent = Root;
+	ProjectileMovement->UpdatedComponent = SphereCollision;
 }
 
 void AProjectileBase::BeginPlay()

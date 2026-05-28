@@ -41,7 +41,7 @@ void ULaserGearState_Lv2::Execute(int32 CurrentGearLevel)
 	if (!Enemies.IsValidIndex(0)) { return; }
 
 
-	Enemies[0].Enemy;
+	//Enemies[0].Enemy;
 
 }
 

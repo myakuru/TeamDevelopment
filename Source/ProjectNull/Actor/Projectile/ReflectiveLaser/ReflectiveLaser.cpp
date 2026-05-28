@@ -6,7 +6,15 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 
-AReflectiveLaser::AReflectiveLaser()
+AReflectiveLaser::AReflectiveLaser():
+	ReflectionInterval(0.f),
+	ReflectionCount(0)
+{
+}
+
+AReflectiveLaser::AReflectiveLaser(int32 InReflectionCount):
+	ReflectionInterval(0.f),
+	ReflectionCount(InReflectionCount)
 {
 }
 
@@ -47,9 +55,9 @@ void AReflectiveLaser::ReflectLaserBullet()
 		= TargetSearchComponent->FindEnemiesSortedByDistance(2000.f);
 	if (!DataArray.IsValidIndex(0)) { return; }
 
-	auto ProjectileMovement = GetProjectileMovement();
-	if (!ProjectileMovement) { return; }
+	auto CurrentProjectileMovementComp = GetProjectileMovement();
+	if (!CurrentProjectileMovementComp) { return; }
 
-	ProjectileMovement->Velocity = DataArray[0].ToEnemyVector * 2000.f;
+	CurrentProjectileMovementComp->Velocity = DataArray[0].ToEnemyVector * 2000.f;
 
 }

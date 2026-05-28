@@ -34,7 +34,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	virtual void OnCollisionOverlap(
+	void OnCollisionOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
