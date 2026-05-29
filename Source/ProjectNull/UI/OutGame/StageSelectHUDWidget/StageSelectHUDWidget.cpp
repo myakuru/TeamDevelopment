@@ -12,6 +12,8 @@
 #include <ProjectNull/SaveGame/MySaveGame.h>
 //ステージのデータアセット
 #include<ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
+//ステージマネージャー
+#include<ProjectNull/Stage/Manager/StageManager.h>
 //ステージボタンUI
 #include<ProjectNull/UI/OutGame/StageSelectHUDWidget/StageSelectHUDParts/StageButtonWidget.h>
 
@@ -85,6 +87,9 @@ void UStageSelectHUDWidget::OnClickedStageButton(int32 InStageIndex)
 	if (CurrentSelectedStageIndex != InStageIndex) {
 		CurrentSelectedStageIndex = ClampStageIndex(InStageIndex);
 	}
+
+	//StageManagerSubsystem：ステージ開始
+	GetWorld()->GetGameInstance<USuperGameInstance>()->GetStageManagerSubsystem()->StageStart(CurrentSelectedStageIndex);
 
 	UGameplayStatics::OpenLevel(this, FName(StageDataAsset->StageData[CurrentSelectedStageIndex].LevelName));
 }

@@ -1,6 +1,8 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-#include "GameTimerWidget.h"
+﻿#include "GameTimerWidget.h"
 #include "TimerManager.h"
+
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Stage/Manager/StageManager.h>
 
 void UGameTimerWidget::StartTimer(float Duration)
 {
@@ -18,6 +20,9 @@ void UGameTimerWidget::CountDownTimer()
 		// タイマーが0になった場合の処理
 		GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
 		TimerText = TEXT("Time's Up!");
+
+		//StageManagerSubsystem：ステージクリア
+		GetWorld()->GetGameInstance<USuperGameInstance>()->GetStageManagerSubsystem()->StageClear();
 	}
 	else
 	{
