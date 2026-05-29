@@ -10,6 +10,7 @@
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 USTT_EnemyDead::USTT_EnemyDead(const FObjectInitializer& a_ObjInit)
@@ -36,6 +37,13 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 	Super::Tick(a_Context, a_DeltaTime);
 
 	return EStateTreeRunStatus::Succeeded;
+	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
+	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return EStateTreeRunStatus::Running;
 }
 
 void USTT_EnemyDead::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)

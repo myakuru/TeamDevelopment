@@ -28,16 +28,12 @@ public:
 	void End()								override;
 
 	/** Getter */
-	inline const int32 GetGearLevelIndex() const	override { return kLv1Index; }
+	inline const int32 GetGearLevelIndex() const override { return kLv1Index; }
 
 private:
 
-	void ShotLaserBullet();
+	/** レーザー(弾タイプ)の発射制御を行うクラス */
+	UPROPERTY(EditAnywhere,Instanced)
+	TObjectPtr<ULaserBulletShooter> LaserBulletShooter;
 
-	/** レーザー(発射物)クラス */
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AProjectileBase> LaserBulletClass;
-
-	UPROPERTY(EditAnywhere)
-	int32 LaserBulletNum;
 };

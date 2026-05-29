@@ -8,11 +8,16 @@ class USpringArmComponent;
 class UCameraComponent;
 class UPlayerAttackComponent;
 class UPlayerGearComponent;
+
+/** 対象検索コンポーネント */
+class UTargetSearchComponent;
+
 class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
 class UPlayerAnimInstance;
 class UPlayerMaterialCollectionUpdater;
+class UCineCameraComponent;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
@@ -21,8 +26,6 @@ class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
 public:
 
 	APlayerBase();
-
-protected:
 
 	virtual void BeginPlay() override;
 
@@ -46,7 +49,9 @@ public:
 	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
 	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
 	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
+	inline UTargetSearchComponent*			GetTargetSearchComponent() const	{ return TargetSearchComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
+	inline UCineCameraComponent*			GetCineCameraComponent() const		{ return CineCameraComponent; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
@@ -68,9 +73,17 @@ private:
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	TObjectPtr<UCameraComponent> CameraComponent;
 
+	/** シネマティックカメラコンポーネント */
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	TObjectPtr<UCineCameraComponent> CineCameraComponent;
+
 	/** ギアコンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "Gear")
 	TObjectPtr<UPlayerGearComponent> GearComponent;
+
+	/** 対象検索コンポーネント */
+	UPROPERTY(VisibleAnywhere, Category = "TargetSearch")
+	TObjectPtr<UTargetSearchComponent> TargetSearchComponent;
 
 	/** 自動攻撃クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")

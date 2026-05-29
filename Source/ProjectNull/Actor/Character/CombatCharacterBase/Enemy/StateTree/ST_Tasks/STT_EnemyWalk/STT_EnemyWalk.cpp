@@ -1,6 +1,7 @@
 ﻿#include "STT_EnemyWalk.h"
 #include "StateTreeExecutionContext.h"
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 
 USTT_EnemyWalk::USTT_EnemyWalk(const FObjectInitializer& a_ObjInit)
 	: Super(a_ObjInit)
@@ -22,7 +23,12 @@ EStateTreeRunStatus USTT_EnemyWalk::EnterState(FStateTreeExecutionContext& a_Con
 	// パラメータの初期化
 	InitializeWalkParams();
 
-	UE_LOG(LogTemp, Warning, TEXT("Walk Start"));
+	// 前ステートの終了フラグをリセット
+	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
+	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
+	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(1, true, true);
+
+	OwnerEnemy->PlayAnimation(0, true);
 
 	return EStateTreeRunStatus::Running;
 }

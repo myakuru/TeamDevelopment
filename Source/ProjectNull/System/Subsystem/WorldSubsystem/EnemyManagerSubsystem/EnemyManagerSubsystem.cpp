@@ -6,6 +6,7 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManagerConfig.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerConfig.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 
 void UEnemyManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -53,7 +54,7 @@ void UEnemyManagerSubsystem::RegisterEnemy(AEnemyBase* Enemy)
 	if (PPlayerPawn)
 	{
 		float Dist = CalcDistance(Enemy->GetActorLocation(), PPlayerPawn->GetActorLocation());
-		Enemy->SetUpdateInterval(CalcInterval(Dist));
+		Enemy->GetEnemyRuntimeData()->ChangeUpdateInterval(CalcInterval(Dist));
 	}
 
 	EnemyGruntList.Add(Enemy);
@@ -90,7 +91,7 @@ void UEnemyManagerSubsystem::UpdateEnemies(float DeltaTime)
 			//float dist = CalcDistance(Enemy->GetActorLocation(), PlayerPos);
 			
 			// Updateの回数を割る数を求める
-			Enemy->SetUpdateInterval(CalcInterval(Enemy->GetTargetDistanceSqr()));
+			Enemy->GetEnemyRuntimeData()->ChangeUpdateInterval(CalcInterval(Enemy->GetTargetDistanceSqr()));
 		}
 	}
 
@@ -101,7 +102,7 @@ void UEnemyManagerSubsystem::UpdateEnemies(float DeltaTime)
 		{
 			if (Enemy->GetAliveFlg())
 			{
-				int32 Interval = Enemy->GetUpdateInterval();
+				int32 Interval = Enemy->GetEnemyRuntimeData()->GetUpdateInterval();
 				if (FrameCount % Interval != 0) { continue; }
 				Enemy->OnUpdate(PPlayerPawn, DeltaTime * Interval);
 			}

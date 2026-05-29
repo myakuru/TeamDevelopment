@@ -2,6 +2,7 @@
 #include "StateTreeExecutionContext.h"
 #include <ProjectNull\System\DataTable\KnockBackData\KnockBackData.h>
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 
 USTT_EnemyKnockBack::USTT_EnemyKnockBack(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
@@ -23,6 +24,13 @@ EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& 
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
+	// 前ステートの終了フラグをリセット
+	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
+	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
+	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(1, false, true);
+
+	OwnerEnemy->PlayAnimation(1, false);
+
 	// ノックバックに必要な情報を取得・設定
 	SetKnockBackData();
 	
@@ -37,6 +45,12 @@ EStateTreeRunStatus USTT_EnemyKnockBack::Tick(FStateTreeExecutionContext& a_Cont
 	Super::Tick(a_Context, a_DeltaTime);
 
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
+
+	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
+	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
 
 	// ノックバックが停止したらステート終了
 	if(MoveToKnockBack(a_DeltaTime)){ return EStateTreeRunStatus::Succeeded; }

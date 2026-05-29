@@ -29,6 +29,13 @@ public:
 
 	UEnemyRuntimeData();
 
+	void UpdateAnimation(float DeltaTime, float BlendSpeed);
+
+	/** アニメーションブレンド完了*/
+	void ComplateAnimBlend();
+
+	void AnimationReset();
+
 	//~ Begin Setter
 
 	/**
@@ -50,12 +57,47 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
 	void ChangedIsAlive(const bool a_IsAlive);
 
+	/** アニメーションのループフラグ変更*/
+	void ChangeAnimRoopFlg(bool Flg) { AnimRoopFlg = Flg; }
+
+	/** Updateのインターバルを設定*/
+	void ChangeUpdateInterval(int32 Interval) { UpdateInterval = Interval; }
+
+	/** アニメーションチェンジ開始フラグ（これがtrueになるとアニメーションブレンドに入る）*/
+	void SetAnimChangeFlg(bool Flg)				{ AnimChangeFlg = Flg; }
+
+	/** 次のアニメーションに使用するデータを設定*/
+	/*			次のアニメーションのインデックス, ループフラグ,アニメーションチェンジフラグ*/
+	void SetNextAnimData(int32 NextIndex, bool AnimRoopFlg, bool AnimChangeFlg);
+
+	void NotifyAnimFinished() { bAnimFinished = true; }
+	void ResetAnimFinished() { bAnimFinished = false; }
+
 	//~ End Setter
 
 	//~ Start Getter
 
 	/** プレイヤーとの距離を返す*/
 	float GetTargetDistanceSqr() { return TargetDistanceSqr; }
+
+	/** アニメーションのループフラグを返す*/
+	bool GetAnimRoopFlg()			{ return AnimRoopFlg; }
+
+	/** AnimToTexture用：アニメーションの現在の再生時間*/
+	float GetAnimTime()				const { return AnimTime; }
+	float GetBeginAnimTime()		const { return PrevAnimTime; }
+	/** AnimToTexture用：再生中のアニメーションのインデックス*/
+	int32 GetAnimIndex()			const { return AnimIndex; }
+	float GetAnimNumFrames()	const { return AnimNumFrames; }
+	int32 GetNextAnimIndex()		const { return NextAnimIndex; }
+	float GetNextAnimTime()		const { return NextAnimTime; }
+	float GetAnimBlendWeight()	const { return AnimBlendWeight; }
+	bool GetAnimChangeFlg()				 { return AnimChangeFlg; }
+
+	/** アニメーション終了フラグ（非ループアニメが１週したらtrueにする）*/
+	bool GetAnimFinished()			const { return bAnimFinished; }
+
+	int32 GetUpdateInterval()		const { return UpdateInterval; }
 	
 	/**
 	 * EnemyBaseを弄れないので一旦コメント化
@@ -99,4 +141,44 @@ private:
 	/** 死亡判定*/
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	bool	IsAlive = true;
+
+	/**	アニメーション情報*/
+	/** アニメーションループ判定*/
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	bool AnimRoopFlg = false;
+
+	/** アニメーションチェンジフラグ*/
+	bool AnimChangeFlg = false;
+
+	/** 進行アニメーション時間*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float AnimTime = 0.0f;
+	/** １つ前のアニメーション時間*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float PrevAnimTime = 0.0f;
+
+	/** 現在のアニメーション番号*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	int32 AnimIndex = 1;
+	/** 次のアニメーション番号*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	int32 NextAnimIndex = 0;
+
+	/** 次のアニメーションの開始時間*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float NextAnimTime = 0.0f;
+
+	/** アニメーションの総フレーム数*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float AnimNumFrames = 0.0f;
+
+	/** アニメーションブレンドの進行率*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float AnimBlendWeight = 0.0f;
+
+	/** アニメーション終了確認フラグ*/
+	bool bAnimFinished = false;
+
+	/** Updateのインターバルに利用する変数*/
+	int32 UpdateInterval = 1;
 };

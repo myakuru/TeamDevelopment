@@ -1,6 +1,8 @@
 ﻿
 #include "LaserGearStateBase.h"
 
-ULaserGearStateBase::ULaserGearStateBase()
+ULaserGearStateBase::ULaserGearStateBase():
+	bDrawDebugLine(false)
 {
 }
+

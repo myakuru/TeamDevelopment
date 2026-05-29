@@ -1,0 +1,36 @@
+#include "/Engine/Public/Platform.ush"
+
+// AnimUpdateで共通して使用するデータをまとめる
+
+//=============================================================
+// 定数
+//=============================================================
+
+/** Flagsのビット定義 */
+#define FLAG_LOOPING    (1u << 0)
+#define FLAG_BLENDING   (1u << 1)
+//#define FLAG_FINISHED   (1u << 2)
+
+//=============================================================
+// 構造体（C++側のFGPUAnimChangeRequestと完全一致させる）
+//=============================================================
+
+struct FAnimChangeRequest
+{
+    int NextAnimIndex; // 次のアニメインデックス
+    float BlendSpeed; // ブレンド速度
+    int bLooping; // ループフラグ
+    int InstanceIndex; // 対象インスタンス
+};
+
+struct FGPUAnimState
+{
+    float AnimTime;
+    float PrevAnimTime;
+    float NextAnimTime;
+    float BlendWeight;
+    int AnimIndex;
+    int NextAnimIndex;
+    int Flags;
+    float BlendSpeed;
+};

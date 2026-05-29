@@ -15,6 +15,7 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -307,10 +308,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 
-	AnimationReset();
-
-	EnemyStatus.StateTag = EEnemyState::Idle;
-	EnemyRuntimeData->ChangedEnemyState(EEnemyState::Idle);
+	EnemyStatus.StateTag = EEnemyState::None;
+	EnemyRuntimeData->ChangedEnemyState(EEnemyState::None);
 
 	EnemyStatus.IsAlive = true;
 
@@ -376,8 +375,6 @@ void AEnemyBase::Deactivate()
 
 	EnemyStatus.IsAlive = false;
 
-	AnimationReset();
-
 	/** ISMManagerから解除*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
 	{
@@ -441,20 +438,6 @@ void AEnemyBase::SpawnDeathExperience()
 	}
 }
 
-void AEnemyBase::AnimationReset()
-{
-	AnimTime = 0.0f;
-	PrevAnimTime = 0.0f;
-
-	AnimIndex = 1;
-	NextAnimIndex = 0;
-	NextAnimTime = 0.0f;
-
-	AnimNumFrames = 0.0f;
-
-	AnimBlendWeight = 0.0f;
-}
-
 float AEnemyBase::GetCapsuleHalfHeight()const
 {
 	if (!CapsuleComponent) { return 0.0f; }
@@ -462,3 +445,54 @@ float AEnemyBase::GetCapsuleHalfHeight()const
 	return CapsuleComponent->GetScaledCapsuleHalfHeight();
 }
 
+void AEnemyBase::PlayAnimation(int32 NextAnimIndex, bool bLoop)
+{
+	if (!EnemyManager)
+	{
+		UE_LOG(LogTemp, Error, TEXT("EnemyManager is null"));
+		return;
+	}
+
+	if (!ISMManagerClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ISMManagerClass is null"));
+		return;
+	}
+
+	AEnemyISMManager* ISMManager = EnemyManager->GetISMManager(ISMManagerClass);
+	if (!ISMManager)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ISMManager not found"));
+		return;
+	}
+
+	UEnemyAnimDataAsset* AnimData = ISMManager->GetAnimDataAsset();
+	if (!AnimData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AnimDataAsset is null"));
+		return;
+	}
+
+	if (!AnimData->Animations.IsValidIndex(NextAnimIndex))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invalid AnimIndex: %d / Num: %d"),
+			NextAnimIndex, AnimData->Animations.Num());
+		return;
+	}
+
+	if (!EnemyRuntimeData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("EnemyRuntimeData is null"));
+		return;
+	}
+
+	const float Duration = AnimData->Animations[NextAnimIndex].NumFrames / 30.0f;
+
+	EnemyRuntimeData->SetNextAnimData(NextAnimIndex, bLoop, true);
+	ISMManager->RequestAnimChange(ISMInstanceIndex, NextAnimIndex, bLoop, 1.2f);
+
+	if (!bLoop && GetWorld())
+	{
+		AnimFinishTime = GetWorld()->GetTimeSeconds() + Duration;
+	}
+}

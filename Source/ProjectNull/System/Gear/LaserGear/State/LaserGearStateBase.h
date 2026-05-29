@@ -7,8 +7,9 @@
 
 #include "LaserGearStateBase.generated.h"
 
-/** 発射物の中間基底クラス */
-class AProjectileBase;
+
+/** レーザー(弾タイプ)の発射制御を行うクラス */
+class ULaserBulletShooter;
 
 /** レーザーギアの状態中間基底クラス */
 UCLASS()
@@ -17,4 +18,12 @@ class PROJECTNULL_API ULaserGearStateBase : public UGearStateBase
 	GENERATED_BODY()
 public:
 	ULaserGearStateBase();
+
+private:
+
+protected:
+	
+	/** デバッグライン描画するかどうか */
+	UPROPERTY(EditAnywhere)
+	bool bDrawDebugLine;
 };

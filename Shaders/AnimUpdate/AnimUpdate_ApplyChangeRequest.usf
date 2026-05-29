@@ -1,0 +1,59 @@
+#include "AnimUpdate_Common.ush"
+
+StructuredBuffer<FAnimChangeRequest> ChangeRequestBuffer;
+RWStructuredBuffer<FGPUAnimState> GPUAnimStateBuffer;
+
+uint InstanceCount;
+uint ChangeRequestCount;
+
+//=============================================================
+// Pass 1: アニメ変更リクエストの適用
+// （MainCSの前にDispatchする）
+//=============================================================
+
+[numthreads(64, 1, 1)]
+void ApplyChangeRequestCS(uint3 id : SV_DispatchThreadID)
+{
+    uint reqIdx = id.x;
+    if (reqIdx >= ChangeRequestCount)
+    {
+        return;
+    }
+
+    FAnimChangeRequest req = ChangeRequestBuffer[reqIdx];
+    uint idx = (uint) req.InstanceIndex;
+    if (idx >= InstanceCount)
+    {
+        return;
+    }
+
+    FGPUAnimState AnimState = GPUAnimStateBuffer[idx];
+    uint flags = AnimState.Flags;
+
+    // ループフラグを更新
+    if (req.bLooping)
+    {
+        flags |= FLAG_LOOPING;
+    }
+    else
+    {
+        flags &= ~FLAG_LOOPING;
+    }
+
+    // ブレンド開始
+    flags |= FLAG_BLENDING;
+    //flags &= ~FLAG_FINISHED; // 終了フラグをリセット
+    
+    // NextAnimIndexとBlendSpeedを更新して書き戻す
+    //AnimStateBuffer[idx] = float4(
+    //   AnimState.AnimIndex, // AnimIndex（現状維持）
+    //    (float) req.NextAnimIndex, // 次のアニメ
+    //    (float) flags,
+    //    req.BlendSpeed
+    //);
+    GPUAnimStateBuffer[idx].AnimIndex = AnimState.AnimIndex;
+    GPUAnimStateBuffer[idx].NextAnimIndex = req.NextAnimIndex;
+    GPUAnimStateBuffer[idx].Flags = (int) flags;
+    GPUAnimStateBuffer[idx].BlendSpeed = req.BlendSpeed;
+    GPUAnimStateBuffer[idx].BlendWeight = 0.0f;
+}
