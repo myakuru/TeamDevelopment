@@ -148,12 +148,6 @@ void AEnemySpawner::SpawnEnemy()
 
 							poolSubSystem->Spawn(Unit.PoolConfig, SpawnLocation);
 						}
-						else if (Unit.EnemyClass)
-						{
-							// PoolConfig未設定の場合はSpawnActorにフォールバック
-							AActor* Ac = GetWorld()->SpawnActor<AActor>(
-								Unit.EnemyClass, SpawnLocation, FRotator::ZeroRotator);
-						}
 					}
 					break;
 				}
