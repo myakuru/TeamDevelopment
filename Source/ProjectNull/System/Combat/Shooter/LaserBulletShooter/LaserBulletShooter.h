@@ -2,12 +2,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "UObject/Object.h"
+
 #include "LaserBulletShooter.generated.h"
 
 
 /** 発射物の中間基底クラス */
 class AProjectileBase;
+
+/** プレイヤーの中間基底クラス */
+class APlayerBase;
 
 
 /** レーザー(弾タイプ)の発射制御を行うクラス */
@@ -19,28 +24,44 @@ public:
 	ULaserBulletShooter();
 public:
 
-	inline void InitVelocityArray(const FVector& Velocity)
-	{
-		StartVelocityArray.Init(Velocity, Num);
-	}
+	void Initialize(AActor* InOwner);
+
+	void ShotTargetedLaserBullets(const FVector& InStartLocation);
 
 
-	inline void SetOwner(AActor* InOwner) { Owner = InOwner; }
+	void Reset();
 
-	void ShotTargetedLaserBullets(const FVector& InSpawnLocation);
-
-	void Update(float DeltaTime);
+	/** Getter */
+	inline float GetTargetableDistSq() const { return TargetableDistSq; }
 
 private:
 
-	void ShotLaserBullet(const FVector& InSpawnLocation);
+	/**
+	 * @brief レーザー(弾タイプ)の発射処理
+	 */
+	void ShotLaserBullet();
 
+
+	inline void InitVelocityArray(const FVector& Velocity)
+	{
+		StartVelocityArray.Init(Velocity, BulletNum);
+	}
+
+
+	/** 持ち主のクラス */
 	UPROPERTY()
 	TObjectPtr<AActor> Owner;
 
+	/** プレイヤーの中間基底クラス */
+	UPROPERTY()
+	TObjectPtr<APlayerBase> Player;
+
 	/** レーザー(弾タイプ)クラス */
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AProjectileBase> Class;
+	TSubclassOf<AProjectileBase> ProjectileClass;
+
+	/** レーザー(弾タイプ)が発射される位置 */
+	FVector StartLocation;
 
 	/** 各レーザー開始加速度配列 */
 	TArray<FVector> StartVelocityArray;
@@ -51,11 +72,11 @@ private:
 
 	/** レーザー(弾タイプ)を発射する数 */
 	UPROPERTY(EditAnywhere)
-	int32 Num;
+	int32 BulletNum;
 
 	/** レーザー(弾タイプ)の速度 */
 	UPROPERTY(EditAnywhere)
-	float Speed;
+	float BulletSpeed;
 
 	/** 発射間隔 */
 	UPROPERTY(EditAnywhere)

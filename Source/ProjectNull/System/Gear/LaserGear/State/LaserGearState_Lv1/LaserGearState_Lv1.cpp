@@ -5,7 +5,6 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/System/Combat/Shooter/LaserBulletShooter/LaserBulletShooter.h>
 
-#include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 
 ULaserGearState_Lv1::ULaserGearState_Lv1()
 {
@@ -23,16 +22,18 @@ void ULaserGearState_Lv1::Initialize(
 		InOwner);
 
 	if (!LaserBulletShooter) { return; }
-	LaserBulletShooter->SetOwner(InPlayer);
+	LaserBulletShooter->Initialize(InPlayer);
 }
 
 void ULaserGearState_Lv1::Execute(int32 CurrentGearLevel)
 {
+	if (!Player) { return; }
+
 	ULaserGearStateBase::Execute(CurrentGearLevel);
 
 	if (!LaserBulletShooter) { return; }
 
-
+	LaserBulletShooter->ShotTargetedLaserBullets(Player->GetActorLocation());
 
 }
 
@@ -42,21 +43,19 @@ void ULaserGearState_Lv1::Update(float DeltaTime)
 
 	ULaserGearStateBase::Update(DeltaTime);
 
-	/*for (int32 Num = 0; Num < InBulletData.Num; ++Num)
-	{
-		ShotLaserBullet(InBulletData, SpawnLocation);
-	}*/
+	if (!LaserBulletShooter) { return; }
+
 
 	if (bDrawDebugLine)
 	{
-		/*DrawDebugSphere(
+		DrawDebugSphere(
 			GetWorld(),
 			Player->GetActorLocation(),
-			FMath::Sqrt(BulletData.TargetableDistSq),
+			FMath::Sqrt(LaserBulletShooter->GetTargetableDistSq()),
 			16,
 			FColor::Green,
 			false,
-			0.1f);*/
+			0.1f);
 	}
 
 
@@ -65,8 +64,8 @@ void ULaserGearState_Lv1::Update(float DeltaTime)
 void ULaserGearState_Lv1::End()
 {
 	ULaserGearStateBase::End();
-
-
+	if (!LaserBulletShooter) { return; }
+	LaserBulletShooter->Reset();
 }
 
 

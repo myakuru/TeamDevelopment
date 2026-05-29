@@ -33,7 +33,7 @@ public:
 private:
 
 	/** レーザー(弾タイプ)の発射制御を行うクラス */
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere,Instanced)
 	TObjectPtr<ULaserBulletShooter> LaserBulletShooter;
 
 };

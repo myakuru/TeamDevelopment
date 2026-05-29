@@ -37,13 +37,13 @@ AProjectileBase::AProjectileBase()
 		ECC_GameTraceChannel1,
 		ECR_Overlap);
 
-	SphereCollision->SetCollisionResponseToChannel(
+	/*SphereCollision->SetCollisionResponseToChannel(
 		ECC_WorldStatic,
 		ECR_Block);
 
 	SphereCollision->SetCollisionResponseToChannel(
 		ECC_WorldDynamic,
-		ECR_Block);
+		ECR_Block);*/
 
 	// ================================================================
 	// スケルタルメッシュの初期化

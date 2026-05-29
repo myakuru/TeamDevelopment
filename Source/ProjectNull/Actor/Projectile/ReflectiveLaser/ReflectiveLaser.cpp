@@ -4,6 +4,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 
 AReflectiveLaser::AReflectiveLaser():
@@ -62,11 +63,30 @@ void AReflectiveLaser::ReflectLaserBullet()
 
 	const TArray<FEnemyDistanceData> DataArray
 		= TargetSearchComponent->FindEnemiesSortedByDistance(2000.f);
-	if (!DataArray.IsValidIndex(0)) { return; }
+
+	if (DataArray.IsEmpty()) { 
+		Destroy();
+		return;
+	}
+
+	FVector ToEnemyVector = Player->GetActorForwardVector();
+
+
+	for (int32 Index = 0; Index < DataArray.Num(); ++Index)
+	{
+		// まだ反射していない敵ならば
+		if (!ReflectedEnemies.Contains(DataArray[Index].Enemy)) 
+		{ 
+			ToEnemyVector = DataArray[Index].ToEnemyVector;
+			break;
+		}
+	}
+
+	
 
 	auto CurrentProjectileMovementComp = GetProjectileMovement();
 	if (!CurrentProjectileMovementComp) { return; }
 
-	CurrentProjectileMovementComp->Velocity = DataArray[0].ToEnemyVector * 2000.f;
+	CurrentProjectileMovementComp->Velocity = ToEnemyVector * 2000.f;
 
 }
