@@ -13,6 +13,7 @@ class UAutoAttack;
 class USuperGameInstance;
 class UPlayerAnimInstance;
 class UPlayerMaterialCollectionUpdater;
+class UCineCameraComponent;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
@@ -21,8 +22,6 @@ class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
 public:
 
 	APlayerBase();
-
-protected:
 
 	virtual void BeginPlay() override;
 
@@ -47,6 +46,7 @@ public:
 	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
 	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
+	inline UCineCameraComponent*			GetCineCameraComponent() const		{ return CineCameraComponent; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
@@ -67,6 +67,10 @@ private:
 	/** カメラコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	TObjectPtr<UCameraComponent> CameraComponent;
+
+	/** シネマティックカメラコンポーネント */
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	TObjectPtr<UCineCameraComponent> CineCameraComponent;
 
 	/** ギアコンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "Gear")
