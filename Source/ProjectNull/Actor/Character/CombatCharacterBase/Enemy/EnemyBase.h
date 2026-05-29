@@ -99,12 +99,6 @@ public:
 	virtual void SetTargetDistanceSqr(float a_DistSqr) { EnemyStatus.TargetDistanceSqr = a_DistSqr; }
 
 	/**
-	 * @brief ステートEnumを切り替える処理
-	 * @param a_targetState 切り替え先ステートEnum
-	 */
-	virtual void SetEnemyState(EEnemyState a_TargetState);
-
-	/**
 	* @brief 生存状態をセット
 	*/
 	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
@@ -163,12 +157,6 @@ public:
 	{
 		return EnemyManager;
 	}
-
-	/** エネミーマネージャーのゲッター*/
-	/*AEnemyGruntManager* GetEnemyGruntManager() const
-	{
-		return
-	}*/
 
 	TSubclassOf<AEnemyISMManager> GetISMManagerClass() const
 	{
@@ -413,6 +401,12 @@ private:
 
 	/** データアセットからデータを構造体に移す処理*/
 	void SetEnemyStatusData(UEnemyDataAsset* InData);
+
+	/**
+	 * @brief ステートEnumを切り替える処理
+	 * @param a_targetState 切り替え先ステートEnum
+	 */
+	virtual void SetEnemyState(EEnemyState a_TargetState);
 
 	/** Updateのインターバルに利用する変数*/
 	int32 UpdateInterval = 1;

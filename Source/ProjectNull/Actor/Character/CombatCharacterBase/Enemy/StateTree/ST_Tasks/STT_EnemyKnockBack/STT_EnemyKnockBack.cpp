@@ -25,7 +25,7 @@ EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& 
 
 	// ノックバックに必要な情報を取得・設定
 	SetKnockBackData();
-
+	
 	// 敵同士の当たり判定を一時的に消す
 	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 

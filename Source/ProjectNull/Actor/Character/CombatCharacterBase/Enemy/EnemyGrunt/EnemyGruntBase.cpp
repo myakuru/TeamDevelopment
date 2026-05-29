@@ -16,6 +16,13 @@ void AEnemyGruntBase::BeginPlay()
 	AEnemyBase::BeginPlay();
 }
 
+void AEnemyGruntBase::TransitionIdleToWalk()
+{
+	if (EnemyStatus.StateTag != EEnemyState::Idle) { return; }
+
+	NotifyChangedStateEnum(EEnemyState::Walk);
+}
+
 // Called every frame
 void AEnemyGruntBase::Tick(float DeltaTime)
 {
@@ -31,11 +38,6 @@ void AEnemyGruntBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
-
-	/*UE_LOG(LogTemp, Warning,
-		TEXT("EnemyID:%d | AnimIndex:%d | NextAnimIndex:%d | BlendWeight:%.3f | AnimTime:%.3f | NextAnimTime:%.3f | PrevAnimTime:%.3f | Flg:%d"),
-		ISMInstanceIndex, AnimIndex, NextAnimIndex, AnimBlendWeight, AnimTime, PrevAnimTime, NextAnimTime, AnimChangeFlg ? 1 : 0
-	);*/
 
 	PrevAnimTime = AnimTime;
 	AnimTime += DeltaTime;
@@ -70,4 +72,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 
 	// 攻撃可能か判断
 	CheckCanAttack();
+	
+	// IdleステートからWalkステートへの切り替え処理
+	TransitionIdleToWalk();
 }

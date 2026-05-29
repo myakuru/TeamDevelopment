@@ -22,6 +22,8 @@ EStateTreeRunStatus USTT_EnemyWalk::EnterState(FStateTreeExecutionContext& a_Con
 	// パラメータの初期化
 	InitializeWalkParams();
 
+	UE_LOG(LogTemp, Warning, TEXT("Walk Start"));
+
 	return EStateTreeRunStatus::Running;
 }
 
@@ -43,6 +45,8 @@ void USTT_EnemyWalk::ExitState(FStateTreeExecutionContext& a_Context, const FSta
 
 void USTT_EnemyWalk::Move(const float a_DeltaTime)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(Enemy_Event_Walk);
+
 	if (!OwnerEnemy) { return; }
 
 	// 回転角度補間
@@ -87,19 +91,18 @@ void USTT_EnemyWalk::Move(const float a_DeltaTime)
 			isGround = false;
 			const float _heightDiff
 				= _hit.ImpactPoint.Z - (OwnerEnemy->GetActorLocation().Z - CapsuleHalfHeight);
-
-			// 上向き法線が無くて、段差の高さが一定以下なら段差を乗り越える
-			if ((FMath::IsNearlyZero(_hit.ImpactNormal.Z)) &&
-				_heightDiff <= MaxStepHeight)
-			{
-				// 段差移動
-				MoveStep(_hit, _cacheMoveVec, _heightDiff);
-			}
+			
 			// 上向き法線が一定以上なら坂道とみなす
-			else if (_hit.ImpactNormal.Z >= FMath::Cos(WarkableFloorAngle))
+			if (_hit.ImpactNormal.Z >= FMath::Cos(WarkableFloorAngle))
 			{
 				// 坂道処理
 				MoveSlope(_hit);
+			}
+			else
+			{
+				// 段差移動
+				isGround = true;
+				OwnerEnemy->AddActorWorldOffset((FVector::UpVector * (MoveSpeed) * a_DeltaTime));
 			}
 		}
 	}
@@ -120,8 +123,7 @@ void USTT_EnemyWalk::MoveStep(const FHitResult& a_HitResult, const FVector& a_Mo
 	if (!OwnerEnemy) { return; }
 
 	isGround = true;
-	OwnerEnemy->AddActorWorldOffset(
-		FVector(0, 0, a_HeightDiff) + CaluculateRemainingMoveDir(a_MoveVec, a_HitResult.Time));
+	OwnerEnemy->AddActorWorldOffset(CaluculateRemainingMoveDir(a_MoveVec, a_HitResult.Time),true);
 }
 
 FVector USTT_EnemyWalk::CaluculateRemainingMoveDir(const FVector& a_DeltaMoveDir, const float a_HitTime)

@@ -35,7 +35,7 @@ AEnemyBase::AEnemyBase()
 	{
 		CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("CapsuleCollision");
 		CapsuleComponent->InitCapsuleSize(34.f, 88.f);									// カプセルサイズ
-		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);	// Pawn用のCollision一括設定
+		//CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);	// Pawn用のCollision一括設定
 		CapsuleComponent->CanCharacterStepUpOn = ECB_No;								// 他キャラが上に立てるか
 		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);							// 物理ボリューム(水中判定etc)を受けるか
 		CapsuleComponent->SetCanEverAffectNavigation(false);							// NavMesh更新対象化
@@ -262,17 +262,17 @@ void AEnemyBase::FinalizeDeath()
 
 void AEnemyBase::CheckCanAttack()
 {
-	// ���ɍU���\�Ȃ珈����I��
-	//if (CanAttack()) { return; }
+	// 既に攻撃中なら処理を飛ばす
+	if (EnemyStatus.StateTag == EEnemyState::Attack) { return; }
 
 	// プレイヤーとの距離が攻撃可能距離内か
 	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
 	{
-		//EnemyStatus.StateTag = EEnemyState::Attack;
+		NotifyChangedStateEnum(EEnemyState::Attack);
 	}
 	else
 	{
-		//EnemyStatus.StateTag = EEnemyState::Idle;
+		NotifyChangedStateEnum(EEnemyState::Idle);
 	}
 }
 

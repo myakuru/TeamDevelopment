@@ -17,7 +17,13 @@ public:
 	AEnemyGruntBase();
 
 protected:
+	
 	virtual void BeginPlay() override;
+
+	/**
+	 * @brief IdleステートをWalkステートに切り変える
+	 */
+	virtual void TransitionIdleToWalk();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
