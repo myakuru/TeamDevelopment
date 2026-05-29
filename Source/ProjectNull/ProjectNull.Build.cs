@@ -19,7 +19,10 @@ public class ProjectNull : ModuleRules
 			"GameplayTags",
             "UMG",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"RenderCore",
+			"RHI",
+			"Renderer"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

@@ -1,0 +1,137 @@
+#include "AnimUpdate_Common.ush"
+
+//=============================================================
+// バインディング
+// AnimStateTextureのレイアウト:
+//   Width  = MaxInstances
+//   Height = 2行
+//   Row 0  : float4(AnimTime, PrevAnimTime, NextAnimTime, BlendWeight)
+//   Row 1  : float4(AnimIndex, NextAnimIndex, Flags, BlendSpeed)
+//
+// AnimInfoTextureのレイアウト:
+//   Width  = アニメーション数
+//   Height = 1行
+//   各テクセル : float4(StartFrame, NumFrames, 0, 0)
+//=============================================================
+
+RWTexture2D<float4> AnimStateTextureReadWrite;
+Texture2D<float4> AnimInfoTexture;
+RWStructuredBuffer<FGPUAnimState> GPUAnimStateBuffer;
+
+float DeltaTime;
+float SampleRate;
+uint InstanceCount;
+
+//=============================================================
+// ヘルパー関数
+//=============================================================
+
+/** アニメのフレーム総数を取得 */
+float GetNumFrames(int AnimIndex)
+{
+    return AnimInfoTexture[uint2(AnimIndex, 0)].y;
+}
+
+float GetStartFrames(int AnimIndex)
+{
+    return AnimInfoTexture[uint2(AnimIndex, 0)].x;
+}
+
+//=============================================================
+// Pass 2: アニメ状態の更新（毎フレーム）
+//=============================================================
+
+[numthreads(64, 1, 1)]
+void MainCS(uint3 id : SV_DispatchThreadID)
+{
+    uint idx = id.x;
+    if (idx >= InstanceCount)
+    {
+        return;
+    }
+
+    //----------------------------------------------------------
+    // テクスチャから現在の状態を読む
+    //----------------------------------------------------------
+    FGPUAnimState AnimState = GPUAnimStateBuffer[idx];
+    //float AnimTime = row0.x;
+    //float PrevAnimTime = row0.y;
+    //float NextAnimTime = row0.z;
+    //float BlendWeight = row0.w;
+
+    //float4 row1 = MidTextureRead[uint2(idx, 1)];
+    //int AnimIndex = (int) row1.x;
+    //int NextAnimIndex = (int) row1.y;
+    //uint Flags = (uint) row1.z;
+    //float BlendSpeed = row1.w;
+
+    bool bLooping = (AnimState.Flags & FLAG_LOOPING) != 0;
+     float bBlending = (AnimState.Flags & FLAG_BLENDING) != 0 ? 1.0f : 0.0f;
+    float CurrentFrame = 0.0;
+    float PrevFrame = 0.0;
+
+    //----------------------------------------------------------
+    // アニメ時間の更新
+    //----------------------------------------------------------
+    AnimState.PrevAnimTime = AnimState.AnimTime;
+
+    if (!bBlending)
+    {
+        AnimState.AnimTime += DeltaTime;
+
+        // ループ終了検知
+        float NumFrames = GetNumFrames(AnimState.AnimIndex);
+        float PrevRaw = AnimState.PrevAnimTime * SampleRate;
+        float CurrRaw = AnimState.AnimTime * SampleRate;
+        CurrentFrame = fmod(CurrRaw, NumFrames);
+        PrevFrame = fmod(PrevRaw, NumFrames);
+
+        bool bLoopedOver = (int) (PrevRaw / NumFrames) < (int) (CurrRaw / NumFrames);
+
+        if (bLoopedOver && !bLooping)
+        {
+            // 非ループアニメが1周した → 終了フラグを立ててブレンド待機
+            //Flags |= FLAG_FINISHED;
+            AnimState.Flags |= FLAG_BLENDING;
+            bBlending = true;
+        }
+    }
+    else
+    {
+        // ブレンド中
+        AnimState.NextAnimTime += DeltaTime;
+        AnimState.BlendWeight += DeltaTime / AnimState.BlendSpeed;
+        
+        float NumFrames = GetNumFrames(AnimState.AnimIndex);
+        float PrevRaw = AnimState.PrevAnimTime * SampleRate;
+        float CurrRaw = AnimState.AnimTime * SampleRate;
+        CurrentFrame = fmod(CurrRaw, NumFrames);
+        PrevFrame = fmod(PrevRaw, NumFrames);
+        
+        if (AnimState.BlendWeight >= 1.0f)
+        {
+            // ブレンド完了・アニメ切り替え
+            float NextLoopDuration = GetNumFrames(AnimState.NextAnimIndex) / SampleRate;
+            AnimState.BlendWeight = 0.0f;
+            AnimState.AnimIndex = AnimState.NextAnimIndex;
+            AnimState.AnimTime = fmod(AnimState.NextAnimTime, NextLoopDuration);
+            AnimState.NextAnimTime = 0.0f;
+            AnimState.Flags &= ~FLAG_BLENDING;
+            //Flags &= ~FLAG_FINISHED;
+            bBlending = false;
+        }
+    }
+
+    GPUAnimStateBuffer[idx] = AnimState;
+    
+    //----------------------------------------------------------
+    // テクスチャに書き戻す
+    //----------------------------------------------------------
+    float StartFrame = GetStartFrames(AnimState.AnimIndex);
+    float NumFrames = GetNumFrames(AnimState.AnimIndex);
+    float NextStartFrame = GetStartFrames(AnimState.NextAnimIndex);
+    float NextNumFrames = GetNumFrames(AnimState.NextAnimIndex);
+    
+    AnimStateTextureReadWrite[uint2(idx, 0)] = float4(CurrentFrame, PrevFrame, AnimState.AnimIndex, GetStartFrames(AnimState.AnimIndex));
+    AnimStateTextureReadWrite[uint2(idx, 1)] = float4(NumFrames, bBlending, NextStartFrame, AnimState.BlendWeight);
+}

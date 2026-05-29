@@ -3,6 +3,7 @@
 #include "StateTreeExecutionContext.h"
 #include <ProjectNull\System\Combat\Attack\AttackBase.h>
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 
 USTT_EnemyAttack::USTT_EnemyAttack(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
@@ -26,6 +27,13 @@ EStateTreeRunStatus USTT_EnemyAttack::EnterState(FStateTreeExecutionContext& a_C
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy)	{ return EStateTreeRunStatus::Failed; }
 
+	// 前ステートの終了フラグをリセット
+	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
+	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
+	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(1, true, true);
+
+	OwnerEnemy->PlayAnimation(1, false);
+
 	// ターゲット(プレイヤー)をセット
 	TargetActor = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!TargetActor)	{ return EStateTreeRunStatus::Failed; }
@@ -39,6 +47,12 @@ EStateTreeRunStatus USTT_EnemyAttack::Tick(FStateTreeExecutionContext& a_Context
 
 	// 無効ならステート終了
 	if (Attack->IsActive())
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
+	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
 	{
 		return EStateTreeRunStatus::Succeeded;
 	}

@@ -128,6 +128,10 @@ public:
 	/**	ステートタグ */
 	UPROPERTY(EditAnywhere, Category = "StateTag")
 	EEnemyState StateTag = EEnemyState::None;
+
+	/** アニメーションブレンドにかける時間*/
+	UPROPERTY(EditAnywhere, Category = "AnimBlend")
+	float BlendSpeed = 1.2f;
 	
 	/** 生存フラグ*/
 	UPROPERTY()
