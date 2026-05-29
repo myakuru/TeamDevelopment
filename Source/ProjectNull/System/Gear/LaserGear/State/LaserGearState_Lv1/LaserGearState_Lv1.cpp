@@ -1,12 +1,12 @@
 ﻿
 #include "LaserGearState_Lv1.h"
 
-#include <ProjectNull/Actor/Projectile/ProjectileBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/System/Combat/Shooter/LaserBulletShooter/LaserBulletShooter.h>
 
-ULaserGearState_Lv1::ULaserGearState_Lv1():
-	LaserBulletClass(nullptr),
-	LaserBulletNum(1)
+
+ULaserGearState_Lv1::ULaserGearState_Lv1()
 {
 
 }
@@ -16,49 +16,56 @@ void ULaserGearState_Lv1::Initialize(
 	UPlayerGearComponent* InGearComponent,
 	UGearBase* InOwner)
 {
-	ULaserGearStateBase::Initialize(InPlayer, InGearComponent, InOwner);
+	ULaserGearStateBase::Initialize(
+		InPlayer,
+		InGearComponent,
+		InOwner);
 
-	
+	if (!LaserBulletShooter) { return; }
+	LaserBulletShooter->Initialize(InPlayer);
 }
 
 void ULaserGearState_Lv1::Execute(int32 CurrentGearLevel)
 {
+	if (!Player) { return; }
+
 	ULaserGearStateBase::Execute(CurrentGearLevel);
 
-	for (int32 Num = 0; Num < LaserBulletNum; ++Num) 
-	{
-		ShotLaserBullet();
-	}
+	if (!LaserBulletShooter) { return; }
+
+	LaserBulletShooter->ShotTargetedLaserBullets(Player->GetActorLocation());
+
 }
 
 void ULaserGearState_Lv1::Update(float DeltaTime)
 {
+	if (!Player) { return; }
+
 	ULaserGearStateBase::Update(DeltaTime);
+
+	if (!LaserBulletShooter) { return; }
+
+
+	if (bDrawDebugLine)
+	{
+		DrawDebugSphere(
+			GetWorld(),
+			Player->GetActorLocation(),
+			FMath::Sqrt(LaserBulletShooter->GetTargetableDistSq()),
+			16,
+			FColor::Green,
+			false,
+			0.1f);
+	}
+
 
 }
 
 void ULaserGearState_Lv1::End()
 {
 	ULaserGearStateBase::End();
-
-
+	if (!LaserBulletShooter) { return; }
+	LaserBulletShooter->Reset();
 }
 
-void ULaserGearState_Lv1::ShotLaserBullet()
-{
-	if (!Player) { return; }
 
-	const FVector SpawnLocation = Player->GetActorLocation();
-	const FRotator SpawnRotation = Player->GetActorRotation();
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = Player;
-	SpawnParams.Instigator = Player->GetInstigator();
-
-	
-	GetWorld()->SpawnActor<AProjectileBase>(
-			LaserBulletClass,
-			SpawnLocation,
-			SpawnRotation,
-			SpawnParams);
-}

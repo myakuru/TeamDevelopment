@@ -5,6 +5,9 @@
 #include <GameFramework/CharacterMovementComponent.h>
 
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
+#include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
+
+
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
@@ -21,6 +24,7 @@ APlayerBase::APlayerBase():
 		SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
 		GearComponent(nullptr),
+		TargetSearchComponent(nullptr),
 		AutoAttack(nullptr),
 		MaterialCollectionUpdater(nullptr),
 		SuperGameInstance(nullptr)
@@ -51,6 +55,11 @@ APlayerBase::APlayerBase():
 	// ギアコンポーネントの初期化
 	// ================================================================
 	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
+
+	// ================================================================
+	// 対象検索コンポーネントの初期化
+	// ================================================================
+	TargetSearchComponent = CreateDefaultSubobject<UTargetSearchComponent>("TargetSearch");
 
 	// Material Parameter Collectionの更新処理クラスの生成
 	MaterialCollectionUpdater = NewObject<UPlayerMaterialCollectionUpdater>();
@@ -139,7 +148,8 @@ FPoseSnapshot& APlayerBase::GetPlayerPoseSnapshot()
 
 bool APlayerBase::CanMove()
 {
-	if(GearComponent && GearComponent->IsMovementBlockedByGear()) {
+	if(GearComponent && GearComponent->IsMovementBlockedByGear())
+	{
 		return false;
 	}
 

@@ -19,6 +19,7 @@ class UStaticMeshComponent;
 /** 飛び道具移動専用コンポーネント */
 class UProjectileMovementComponent;
 
+
 /** 発射物の中間基底クラス */
 UCLASS(Blueprintable)
 class PROJECTNULL_API AProjectileBase : public AActor
@@ -29,13 +30,39 @@ public:
 	AProjectileBase();
 
 protected:
+
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnCollisionOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnProjectileStop(const FHitResult& Hit);
+
+	/** 持ち主のアクタークラス */
+	UPROPERTY()
+	TObjectPtr<AActor> OwnerActor;
+
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	/** Getter */
+	inline UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
+	/** Setter */
+	inline void SetOwnerActor(AActor* InOwnerActor) { OwnerActor = InOwnerActor; }
+
 private:
 
+
+	
 	/** ルートコンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
