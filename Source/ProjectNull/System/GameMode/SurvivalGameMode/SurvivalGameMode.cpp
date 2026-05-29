@@ -1,11 +1,16 @@
 ﻿
 #include "SurvivalGameMode.h"
 
+#include "EngineUtils.h" 
+#include "CineCameraActor.h"
+#include "CineCameraComponent.h"
+#include "LevelSequenceActor.h"
+#include "LevelSequencePlayer.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
-// HpWidgetクラスのインクルード
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
-
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
 ASurvivalGameMode::ASurvivalGameMode()
 {
@@ -15,6 +20,52 @@ ASurvivalGameMode::ASurvivalGameMode()
 void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// PlayerController の初期化を待って次フレームで再生
+	GetWorldTimerManager().SetTimerForNextTick
+	(
+		this, &ASurvivalGameMode::PlayOpeningCutscene
+	);
+}
+
+void ASurvivalGameMode::PlayOpeningCutscene()
+{
+	// シーケンスが未設定ならそのままゲーム開始
+	if (!OpeningSequence) return;
+
+	// 入力をブロック
+	if (ARobotController* RC = Cast<ARobotController>(GetWorld()->GetFirstPlayerController()))
+	{
+		RC->SetCanReceiveInput(false);
+	}
+
+	ALevelSequenceActor* OutActor = nullptr;
+
+	// レベルシーケンスを再生
+	FMovieSceneSequencePlaybackSettings Settings;
+	SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer
+	(
+		GetWorld(), OpeningSequence, Settings, OutActor
+	);
+
+	if (SequencePlayer)
+	{
+		// 再生終了時に OnOpeningCutsceneFinished を呼ぶ
+		SequencePlayer->OnFinished.AddDynamic
+		(
+			this, &ASurvivalGameMode::OnOpeningCutsceneFinished
+		);
+		SequencePlayer->Play();
+	}
+}
+
+void ASurvivalGameMode::OnOpeningCutsceneFinished()
+{
+	// 入力を解放してゲーム開始
+	if (ARobotController* RC = Cast<ARobotController>(GetWorld()->GetFirstPlayerController()))
+	{
+		RC->SetCanReceiveInput(true);
+	}
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)
