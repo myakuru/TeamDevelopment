@@ -47,7 +47,7 @@ void ULaserBulletShooter::ShotTargetedLaserBullets(const FVector& InStartLocatio
 	GetWorld()->GetTimerManager().SetTimer(
 		ShotIntervalTimerHandle,
 		this,
-		&ULaserBulletShooter::ShotLaserBullet,
+		&ULaserBulletShooter::ShotLaserBulletAndIncrementCount,
 		ShotInterval,
 		true);
 
@@ -66,17 +66,20 @@ void ULaserBulletShooter::ShotTargetedLaserBullets(const FVector& InStartLocatio
 	}
 
 	ShotLaserBullet();
+}
 
+void ULaserBulletShooter::ShotLaserBulletAndIncrementCount()
+{
+	//※インデックスで判定、命名の修正
+	if (ShotCount + 1 >= BulletNum) { return; }
+	ShotCount++;
 
+	UE_LOG(LogTemp, Display, TEXT("Add処理 cnt %d"), ShotCount);
+	ShotLaserBullet();
 }
 
 void ULaserBulletShooter::ShotLaserBullet()
 {
-	if (ShotCount >= BulletNum) { return; }
-
-	ShotCount++;
-	UE_LOG(LogTemp, Display, TEXT("Add処理 cnt %d"), ShotCount);
-
 	auto LaserBullet = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass);
 
 	if (!LaserBullet) { return; }

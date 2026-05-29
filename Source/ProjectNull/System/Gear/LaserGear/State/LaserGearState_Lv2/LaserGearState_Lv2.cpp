@@ -10,6 +10,7 @@
 
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 
+#include <ProjectNull/System/Combat/Shooter/LaserBulletShooter/LaserBulletShooter.h>
 
 ULaserGearState_Lv2::ULaserGearState_Lv2()
 {
@@ -25,15 +26,19 @@ void ULaserGearState_Lv2::Initialize(
 		InGearComponent,
 		InOwner);
 
-	
+	if (!ReflectiveLaserBulletShooter) { return; }
+	ReflectiveLaserBulletShooter->Initialize(InPlayer);
 }
 
 void ULaserGearState_Lv2::Execute(int32 CurrentGearLevel)
 {
+	if (!Player) { return; }
+
 	ULaserGearStateBase::Execute(CurrentGearLevel);
 
+	if (!ReflectiveLaserBulletShooter) { return; }
 
-
+	ReflectiveLaserBulletShooter->ShotTargetedLaserBullets(Player->GetActorLocation());
 }
 
 void ULaserGearState_Lv2::Update(float DeltaTime)
@@ -47,5 +52,6 @@ void ULaserGearState_Lv2::Update(float DeltaTime)
 void ULaserGearState_Lv2::End()
 {
 	ULaserGearStateBase::End();
-
+	if (!ReflectiveLaserBulletShooter) { return; }
+	ReflectiveLaserBulletShooter->Reset();
 }

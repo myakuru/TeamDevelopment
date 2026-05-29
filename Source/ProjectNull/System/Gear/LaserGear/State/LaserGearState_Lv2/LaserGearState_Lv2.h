@@ -27,4 +27,7 @@ public:
 
 private:
 
+	/** 反射レーザー(弾タイプ)の発射制御を行うクラス */
+	UPROPERTY(EditAnywhere, Instanced)
+	TObjectPtr<ULaserBulletShooter> ReflectiveLaserBulletShooter;
 };

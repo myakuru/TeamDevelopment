@@ -9,7 +9,7 @@
 class APlayerBase;
 
 /** プレイヤークラスからMaterial Parameter Collectionへの更新処理クラス */
-UCLASS()
+UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UPlayerMaterialCollectionUpdater : public UObject
 {
 	GENERATED_BODY()

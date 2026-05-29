@@ -9,33 +9,31 @@
 
 AReflectiveLaser::AReflectiveLaser():
 	ReflectionInterval(0.f),
+	FindDistSq(0.f),
 	ReflectionCount(0)
 {
 }
 
 AReflectiveLaser::AReflectiveLaser(int32 InReflectionCount):
 	ReflectionInterval(0.f),
+	FindDistSq(0.f),
 	ReflectionCount(InReflectionCount)
 {
 }
 
-void AReflectiveLaser::OnCollisionOverlap(
-	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
+void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 {
 	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
 
-	ReflectionCount--;
 
-	if (ReflectionCount <= 0) 
+	if (ReflectionCount <= 0)
 	{
 		Destroy();
 		return;
 	}
+
+	ReflectionCount--;
+	UE_LOG(LogTemp, Display, TEXT("ReflectionCount %d"), ReflectionCount);
 
 	auto Enemy = Cast<AEnemyBase>(OtherActor);
 	if (!Enemy) { return; }
@@ -44,16 +42,30 @@ void AReflectiveLaser::OnCollisionOverlap(
 
 	ReflectedEnemies.Add(Enemy);
 
+	FVector FindLocation = OwnerActor->GetActorLocation();
+
+	FindLocation = Enemy->GetActorLocation();
+
+	FTimerDelegate TimerDelegate;
+
+	TimerDelegate.BindLambda([this, FindLocation]()
+		{
+			ReflectLaserBullet(FindLocation);
+		});
+
+	auto CurrentProjectileMovementComp = GetProjectileMovement();
+	if (!CurrentProjectileMovementComp) { return; }
+
+	//CurrentProjectileMovementComp->Velocity = FVector::ZeroVector;
 
 	GetWorld()->GetTimerManager().SetTimer(
 		ReflectionIntervalTimerHandle,
-		this,
-		&AReflectiveLaser::ReflectLaserBullet,
+		TimerDelegate,
 		ReflectionInterval,
 		false);
 }
 
-void AReflectiveLaser::ReflectLaserBullet()
+void AReflectiveLaser::ReflectLaserBullet(const FVector& FindLocation)
 {
 	auto Player = Cast<APlayerBase>(OwnerActor);
 	if (!Player) { return; }
@@ -62,9 +74,9 @@ void AReflectiveLaser::ReflectLaserBullet()
 	if (!TargetSearchComponent) { return; }
 
 	const TArray<FEnemyDistanceData> DataArray
-		= TargetSearchComponent->FindEnemiesSortedByDistance(2000.f);
+		= TargetSearchComponent->FindEnemiesSortedByDistance(FindDistSq, FindLocation);
 
-	if (DataArray.IsEmpty()) { 
+	if (DataArray.IsEmpty()) {
 		Destroy();
 		return;
 	}
@@ -75,18 +87,16 @@ void AReflectiveLaser::ReflectLaserBullet()
 	for (int32 Index = 0; Index < DataArray.Num(); ++Index)
 	{
 		// まだ反射していない敵ならば
-		if (!ReflectedEnemies.Contains(DataArray[Index].Enemy)) 
-		{ 
+		if (!ReflectedEnemies.Contains(DataArray[Index].Enemy))
+		{
 			ToEnemyVector = DataArray[Index].ToEnemyVector;
 			break;
 		}
 	}
 
-	
-
 	auto CurrentProjectileMovementComp = GetProjectileMovement();
 	if (!CurrentProjectileMovementComp) { return; }
-
+	SetActorLocation(FindLocation);
 	CurrentProjectileMovementComp->Velocity = ToEnemyVector * 2000.f;
-
 }
+

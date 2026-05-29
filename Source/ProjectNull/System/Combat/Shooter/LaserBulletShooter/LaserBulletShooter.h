@@ -36,6 +36,9 @@ public:
 
 private:
 
+
+	void ShotLaserBulletAndIncrementCount();
+
 	/**
 	 * @brief レーザー(弾タイプ)の発射処理
 	 */

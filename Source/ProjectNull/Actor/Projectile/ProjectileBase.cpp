@@ -82,20 +82,8 @@ void AProjectileBase::BeginPlay()
 
 }
 
-void AProjectileBase::Tick(float DeltaTime)
+void AProjectileBase::HandleCollision(AActor* OtherActor)
 {
-	Super::Tick(DeltaTime);
-}
-
-void AProjectileBase::OnCollisionOverlap(
-	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
-{
-	UE_LOG(LogTemp, Display, TEXT("当たった!"));
 	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
 
 	auto Enemy = Cast<AEnemyBase>(OtherActor);
@@ -109,6 +97,22 @@ void AProjectileBase::OnCollisionOverlap(
 	Enemy->SetTakeDamaged();
 
 	Destroy();
+}
+
+void AProjectileBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void AProjectileBase::OnCollisionOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	HandleCollision(OtherActor);
 }
 
 void AProjectileBase::OnProjectileStop(const FHitResult& Hit)
