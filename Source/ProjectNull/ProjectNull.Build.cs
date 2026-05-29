@@ -22,7 +22,7 @@ public class ProjectNull : ModuleRules
 			"SlateCore",
 			"RenderCore",
 			"RHI",
-			"Renderer"
+			"Renderer",
 			"LevelSequence",
 			"MovieScene",
 			"CinematicCamera"
