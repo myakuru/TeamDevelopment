@@ -1,9 +1,11 @@
 ﻿#include "PlayerBase.h"
 
 #include "Camera/CameraComponent.h"
+#include "CineCameraComponent.h"
 #include <GameFramework/SpringArmComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
+#include "Kismet/GameplayStatics.h"
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 
@@ -23,6 +25,7 @@
 APlayerBase::APlayerBase():
 		SpringArmComponent(nullptr),
 		CameraComponent(nullptr),
+		CineCameraComponent(nullptr),
 		GearComponent(nullptr),
 		TargetSearchComponent(nullptr),
 		AutoAttack(nullptr),
@@ -50,6 +53,15 @@ APlayerBase::APlayerBase():
 	if (!CameraComponent) { return; }
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->bUsePawnControlRotation = false;
+
+	// ================================================================
+	// シネマティックカメラコンポーネントの初期化
+	// ================================================================
+	CineCameraComponent = CreateDefaultSubobject<UCineCameraComponent>("CineCamera");
+	CineCameraComponent->SetupAttachment(SpringArmComponent);
+	CineCameraComponent->Deactivate();
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
 	// ================================================================
 	// ギアコンポーネントの初期化
@@ -155,4 +167,5 @@ bool APlayerBase::CanMove()
 
 	return true;
 }
+
 

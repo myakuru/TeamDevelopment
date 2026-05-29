@@ -19,7 +19,10 @@ public class ProjectNull : ModuleRules
 			"GameplayTags",
             "UMG",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"LevelSequence",
+			"MovieScene",
+			"CinematicCamera"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
