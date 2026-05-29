@@ -109,13 +109,6 @@ public:
 	*/
 	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
 
-	/** アニメーションのインデックスを設定*/
-	void SetAnimIndex()						{ AnimIndex = NextAnimIndex; }
-	/** 次のアニメーションのインデックスの設定*/
-	void SetNextAnimIndex(int32 Index)		{ NextAnimIndex = Index; }
-	/** Updateのインターバルを設定*/
-	void SetUpdateInterval(int32 Interval)	{ UpdateInterval = Interval; }
-
 	/**
 	 * @brief 外部からステートEnum変更を通知
 	 * @param a_TargetState 変更先ステート
@@ -186,17 +179,6 @@ public:
 	{
 		return GameProgress;
 	}
-
-	/** AnimToTexture用：アニメーションの現在の再生時間*/
-	float GetAnimTime()			const { return AnimTime; }
-	float GetBeginAnimTime()	const { return PrevAnimTime; }
-	/** AnimToTexture用：再生中のアニメーションのインデックス*/
-	int32 GetAnimIndex()		const { return AnimIndex; }
-	float GetAnimNumFrames()	const { return AnimNumFrames; }
-	int32 GetNextAnimIndex()	const { return NextAnimIndex; }
-	float GetNextAnimTime()		const { return NextAnimTime; }
-	float GetAnimBlendWeight()	const { return AnimBlendWeight; }
-	int32 GetUpdateInterval()	const { return UpdateInterval; }
 
 	/**
 	 * @brief 汎用的なEnumビット(uint8型)上昇処理
@@ -317,12 +299,17 @@ public:
 	/** 敵が死んださいに経験値を出す*/
 	virtual void SpawnDeathExperience();
 
+	/** アニメーションの変更*/
+	virtual void PlayAnimation(int32 NextAnimIndex, bool bLoop);
+
 protected:
 
 	/**
 	 * @brief 坂道範囲内に入った時の通知処理
 	 */
 	virtual void OnEnterSlope()override;
+
+	float AnimFinishTime = 0.0f;
 
 public:
 
@@ -343,42 +330,13 @@ public:
 	/** ISMのどのインスタンスに対応するかを示すインデックス*/
 	int32 ISMInstanceIndex = INDEX_NONE;
 
-	bool AnimChangeFlg = false;
-
 protected:
-
-	void AnimationReset();
 
 	/**
 	 * どのISMManagerに登録するかを指定するためのクラス
 	 */
 	UPROPERTY(EditDefaultsOnly, Category = "SetupISM")
 	TSubclassOf<AEnemyISMManager> ISMManagerClass;
-
-
-	/**	アニメーション情報*/
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float AnimTime = 0.0f;
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float PrevAnimTime = 0.0f;
-
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	int32 AnimIndex = 1;
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	int32 NextAnimIndex = 0;
-
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float NextAnimTime = 0.0f;
-
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float AnimNumFrames = 0.0f;
-
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float AnimBlendWeight = 0.0f;
-
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float BlendSpeed = 1.2f;
-	/***/
 
 private:
 
@@ -403,7 +361,4 @@ private:
 
 	/** データアセットからデータを構造体に移す処理*/
 	void SetEnemyStatusData(UEnemyDataAsset* InData);
-
-	/** Updateのインターバルに利用する変数*/
-	int32 UpdateInterval = 1;
 };

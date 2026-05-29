@@ -1,11 +1,14 @@
 ﻿#pragma once
 
+#include "AnimUpdateShader.h"
 #include "EnemyISMManager.generated.h"
 
 class AEnemyBase;
 class UStaticMesh;
 class UInstancedStaticMeshComponent;
 class UEnemyAnimDataAsset;
+class UTextureRenderTarget2D;
+class UTexture2D;
 
 struct FAnimData;
 
@@ -18,8 +21,9 @@ public:
 
 	AEnemyISMManager();
 
-	void UpdateEnemies(float DeltaTime);
+	void DebugReadbackAnimStateRT();
 
+	void UpdateEnemies(float DeltaTime);
 	// ------------------------------------------------------------------
 	// 敵の登録・解除
 	// ------------------------------------------------------------------
@@ -32,6 +36,17 @@ public:
 	// EndPlayのタイミングでEnemyから呼ばれる
 	void UnregisterEnemy(AEnemyBase* Enemy);
 
+	/**
+	 * @brief アニメ変更リクエストをキューに積む
+	 * @param InstanceIndex  対象インスタンスのインデックス
+	 * @param NextAnimIndex  次のアニメのインデックス
+	 * @param bLooping       ループするか
+	 * @param BlendSpeed     ブレンド速度
+	 */
+	void RequestAnimChange(int32 InstanceIndex, int32 NextAnimIndex, bool bLooping, float BlendSpeed = 0.3f);
+
+	TObjectPtr<UEnemyAnimDataAsset> GetAnimDataAsset() { return AnimDataAsset; }
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -43,12 +58,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	TObjectPtr<UEnemyAnimDataAsset> AnimDataAsset;
 
+	/** 最大インスタンス数（テクスチャサイズに影響する） */
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	int32 MaxInstances = 1024;
+
 	/** 
 	* AnimToTextureのCustomDataチャンネル数
 	* マテリアル側のNumCustomDataFloatsと合わせる必要がある
 	*/
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	int32 NumCustomDataFloats = 8;
+	int32 NumCustomDataFloats = 2;
 
 private:
 
@@ -61,6 +80,27 @@ private:
 	/** 同一メッシュのドローコールをまとめるISMコンポーネント*/
 	UPROPERTY(VisibleAnywhere, Category = "ISM")
 	TObjectPtr<UInstancedStaticMeshComponent> ISM;
+
+	//----------------------------------------------------------
+	// アニメーション状態テクスチャ（CS↔Materialの橋渡し）
+	//
+	// Width  = MaxInstances
+	// Height = 2行
+	// Row 0  : float4(AnimTime, PrevAnimTime, NextAnimTime, BlendWeight)
+	// Row 1  : float4(AnimIndex, NextAnimIndex, Flags, BlendSpeed)
+	//----------------------------------------------------------
+	UPROPERTY()
+	TObjectPtr<UTextureRenderTarget2D> AnimStateRT;
+
+	//----------------------------------------------------------
+	// アニメ情報テクスチャ（AnimDataAssetから作成、静的）
+	//
+	// Width  = アニメーション数
+	// Height = 1行
+	// 各テクセル : float4(StartFrame, NumFrames, 0, 0)
+	//----------------------------------------------------------
+	UPROPERTY()
+	TObjectPtr<UTexture2D> AnimInfoTexture;
 
 	/** FreeList（インデックス管理用）*/
 
@@ -79,6 +119,23 @@ private:
 	UPROPERTY()
 	TSet<TObjectPtr<AEnemyBase>> Enemies;
 
+	//----------------------------------------------------------
+	// アニメ変更リクエスト（CPUが積んでGPUが消費する）
+	//----------------------------------------------------------
+	TArray<FGPUAnimChangeRequest> PendingChangeRequests;
+
+	/**
+	* CSMainでのアニメーション更新でのみ使うデータ
+	*/
+	TRefCountPtr<FRDGPooledBuffer> AnimStatePoolBuffer;
+
+	//----------------------------------------------------------
+	// 内部処理
+	//----------------------------------------------------------
+	void InitAnimStateTexture();
+	void InitAnimInfoTexture();
+	void InitAnimBuffer();
+	void DispatchAnimUpdate(float DeltaTime);
 
 	/** 内部処理*/
 	

@@ -37,25 +37,12 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 		ISMInstanceIndex, AnimIndex, NextAnimIndex, AnimBlendWeight, AnimTime, PrevAnimTime, NextAnimTime, AnimChangeFlg ? 1 : 0
 	);*/
 
-	PrevAnimTime = AnimTime;
-	AnimTime += DeltaTime;
-
-	if (AnimChangeFlg)
+	/*if (GetWorld()->GetTimeSeconds() >= AnimFinishTime && EnemyRuntimeData->GetAnimRoopFlg())
 	{
-		AnimBlendWeight += DeltaTime / BlendSpeed;
-		NextAnimTime += DeltaTime;
-		// ブレンド完了したら切り替える（最初ではなく最後）
-		if (AnimBlendWeight >= 1.0f)
-		{
-			AnimBlendWeight = 0.0f;
-			AnimChangeFlg = false;
+		PlayAnimation(0,true);
+	}*/
 
-			// ここで初めてアニメ切り替え
-			AnimIndex = NextAnimIndex;
-			AnimTime = NextAnimTime;	// 1回だけリセット
-			NextAnimTime = 0.0f;
-		}
-	}
+	//EnemyRuntimeData->UpdateAnimation(DeltaTime, EnemyStatus.BlendSpeed);
 
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();

@@ -20,6 +20,9 @@ public class ProjectNull : ModuleRules
             "UMG",
 			"Slate",
 			"SlateCore",
+			"RenderCore",
+			"RHI",
+			"Renderer"
 			"LevelSequence",
 			"MovieScene",
 			"CinematicCamera"
