@@ -2,6 +2,7 @@
 #include "ReflectiveLaser.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/SphereComponent.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
@@ -21,6 +22,13 @@ AReflectiveLaser::AReflectiveLaser(int32 InReflectionCount):
 {
 }
 
+void AReflectiveLaser::Tick(float DeltaTime)
+{
+	AProjectileBase::Tick(DeltaTime);
+
+	//UpdateSphereCollision();
+}
+
 void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 {
 	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
@@ -33,7 +41,7 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 	}
 
 	ReflectionCount--;
-	UE_LOG(LogTemp, Display, TEXT("ReflectionCount %d"), ReflectionCount);
+	//UE_LOG(LogTemp, Display, TEXT("ReflectionCount %d"), ReflectionCount);
 
 	auto Enemy = Cast<AEnemyBase>(OtherActor);
 	if (!Enemy) { return; }
@@ -42,9 +50,7 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 
 	ReflectedEnemies.Add(Enemy);
 
-	FVector FindLocation = OwnerActor->GetActorLocation();
-
-	FindLocation = Enemy->GetActorLocation();
+	FVector FindLocation = Enemy->GetActorLocation();
 
 	FTimerDelegate TimerDelegate;
 
@@ -56,8 +62,8 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 	auto CurrentProjectileMovementComp = GetProjectileMovement();
 	if (!CurrentProjectileMovementComp) { return; }
 
-	//CurrentProjectileMovementComp->Velocity = FVector::ZeroVector;
-
+	CurrentProjectileMovementComp->Velocity = FVector::ZeroVector;
+	SetActorLocation(FindLocation);
 	GetWorld()->GetTimerManager().SetTimer(
 		ReflectionIntervalTimerHandle,
 		TimerDelegate,
@@ -83,6 +89,7 @@ void AReflectiveLaser::ReflectLaserBullet(const FVector& FindLocation)
 
 	FVector ToEnemyVector = Player->GetActorForwardVector();
 
+	bool bEnd = true;
 
 	for (int32 Index = 0; Index < DataArray.Num(); ++Index)
 	{
@@ -90,13 +97,53 @@ void AReflectiveLaser::ReflectLaserBullet(const FVector& FindLocation)
 		if (!ReflectedEnemies.Contains(DataArray[Index].Enemy))
 		{
 			ToEnemyVector = DataArray[Index].ToEnemyVector;
+			TargetActor = DataArray[Index].Enemy;
+			bEnd = false;
 			break;
 		}
 	}
 
+	if (bEnd) {
+		Destroy();
+		return;
+	}
+
+	if (auto Target = TargetActor.Get()) {
+		TargetLocation = Target->GetActorLocation();
+	}
+
 	auto CurrentProjectileMovementComp = GetProjectileMovement();
 	if (!CurrentProjectileMovementComp) { return; }
-	SetActorLocation(FindLocation);
+	//SetActorLocation(FindLocation);
 	CurrentProjectileMovementComp->Velocity = ToEnemyVector * 2000.f;
+
+}
+
+void AReflectiveLaser::UpdateSphereCollision()
+{
+
+	auto Target = TargetActor.Get();
+	if (!Target) { return; }
+
+	auto ProjectileMovementComp = GetProjectileMovement();
+	if (!ProjectileMovementComp) { return; }
+	FVector TargetActorLocation = Target->GetActorLocation();
+
+	FVector TargetToVector = TargetLocation - TargetActorLocation;
+
+	// 次フレームでこりじょんがすり抜けるかどうか
+	if (TargetToVector.Size() >= ProjectileMovementComp->Velocity.Size()) { return; }
+
+	auto Sphere = GetSphereCollision();
+	if (!Sphere) { return; }
+
+	const float RangeSq = FMath::Square(Sphere->GetUnscaledSphereRadius());
+
+	if (TargetToVector.SizeSquared() <= RangeSq)
+	{
+		ProjectileMovementComp->Velocity = TargetToVector;
+		SetActorLocation(TargetLocation);
+
+	}
 }
 

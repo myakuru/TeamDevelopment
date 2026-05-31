@@ -19,7 +19,7 @@ public:
 	AReflectiveLaser(int32 InReflectionCount);
 public:
 
-	
+	virtual void Tick(float DeltaTime) override;
 
 private:
 
@@ -27,6 +27,8 @@ private:
 
 	/** レーザーを反射する */
 	void ReflectLaserBullet(const FVector& FindLocation);
+
+	void UpdateSphereCollision();
 
 	/** 反射インターバル管理タイマー */
 	FTimerHandle ReflectionIntervalTimerHandle;
@@ -47,5 +49,7 @@ private:
 	UPROPERTY()
 	TSet<TWeakObjectPtr<AEnemyBase>> ReflectedEnemies;
 
-	
+	bool bEnable;
+
+
 };

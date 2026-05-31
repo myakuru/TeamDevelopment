@@ -11,22 +11,19 @@
 
 AProjectileBase::AProjectileBase()
 {
-	PrimaryActorTick.bCanEverTick = false;
-	// ================================================================
-	// ルートコンポーネントの初期化
-	// ================================================================
-	/*Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	SetRootComponent(Root);*/
-
+	PrimaryActorTick.bCanEverTick = true;
+	
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
 	// ================================================================
 	// スフィアコリジョンコンポーネントの初期化
 	// ================================================================
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
-	//if (!SphereCollision) { return; }
-	//
-	SetRootComponent(SphereCollision);
+	if (!SphereCollision) { return; }
 
-	//SphereCollision->SetupAttachment(Root);
+	//SetRootComponent(SphereCollision);
+
+	SphereCollision->SetupAttachment(Root);
 
 	SphereCollision->SetCollisionEnabled(
 		ECollisionEnabled::QueryAndPhysics);
@@ -50,7 +47,7 @@ AProjectileBase::AProjectileBase()
 	// ================================================================
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	if (!StaticMesh) { return; }
-	StaticMesh->SetupAttachment(SphereCollision);
+	StaticMesh->SetupAttachment(Root);
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// ================================================================
@@ -58,7 +55,7 @@ AProjectileBase::AProjectileBase()
 	// ================================================================
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	if (!ProjectileMovement) { return; }
-	ProjectileMovement->UpdatedComponent = SphereCollision;
+	ProjectileMovement->UpdatedComponent = Root;
 }
 
 void AProjectileBase::BeginPlay()
@@ -102,6 +99,7 @@ void AProjectileBase::HandleCollision(AActor* OtherActor)
 void AProjectileBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 void AProjectileBase::OnCollisionOverlap(
