@@ -8,18 +8,19 @@
 #include "CrossLaserAttack.generated.h"
 
 
-class UBoxComponent;
+class ACrossLaserbeam;
 
 /**
  * 
  */
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UCrossLaserAttack final : public UAttackBase
 {
 	GENERATED_BODY()
 public:
 	UCrossLaserAttack();
 public:
+	void Initialize(class AActor* Owner) override;
 	void Execute()override;
 	void Update(
 		float DeltaTime,
@@ -30,6 +31,12 @@ public:
 
 private:
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<ACrossLaserbeam> CrossLaserbeam;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACrossLaserbeam> CrossLaserbeamClass;
+
 	/** 現在の角度 */
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
@@ -38,6 +45,4 @@ private:
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
-	UPROPERTY(EditAnywhere,Instanced)
-	TArray<TObjectPtr<UBoxComponent>> LaserBoxes;
 };

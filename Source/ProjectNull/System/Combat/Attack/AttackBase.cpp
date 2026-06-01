@@ -25,7 +25,9 @@ void UAttackBase::Initialize(AActor* Owner)
 		FAttachmentTransformRules::KeepRelativeTransform);
 }
 
-void UAttackBase::AttackJudge(AActor* Player, UEnemyManagerSubsystem* EnemyManager)
+void UAttackBase::AttackJudge(
+	AActor* Player,
+	UEnemyManagerSubsystem* EnemyManager)
 {
 	if (Player)
 	{

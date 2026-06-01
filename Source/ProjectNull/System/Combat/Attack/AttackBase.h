@@ -65,7 +65,7 @@ protected:
 	TObjectPtr<AActor> OwnerActor;
 	
 	/** アタッチ用のルート(位置・回転管理) */
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> RootComponent;
 
 	/**	攻撃可能フラグ */
