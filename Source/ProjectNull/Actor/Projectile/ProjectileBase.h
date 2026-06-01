@@ -20,8 +20,6 @@ class UStaticMeshComponent;
 class UProjectileMovementComponent;
 
 
-class AEnemyBase;
-
 /** 発射物の中間基底クラス */
 UCLASS(Blueprintable)
 class PROJECTNULL_API AProjectileBase : public AActor
@@ -35,17 +33,12 @@ protected:
 
 	virtual void BeginPlay() override;
 
+
 	virtual void HandleCollision(AActor* OtherActor);
 
-	
 	/** 持ち主のアクタークラス */
 	UPROPERTY()
 	TObjectPtr<AActor> OwnerActor;
-
-	FVector TargetLocation;
-	
-	UPROPERTY()
-	TWeakObjectPtr<AEnemyBase> TargetActor;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -57,8 +50,6 @@ public:
 
 	/** Setter */
 	inline void SetOwnerActor(AActor* InOwnerActor) { OwnerActor = InOwnerActor; }
-	inline void SetTargetActor(TWeakObjectPtr<AEnemyBase> InTargetActor) { TargetActor = InTargetActor; }
-	inline void SetTargetLocation(const FVector& InTargetLocation) { TargetLocation = InTargetLocation; }
 
 private:
 
@@ -90,6 +81,4 @@ private:
 	/** 飛び道具移動専用コンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
-
-	
 };

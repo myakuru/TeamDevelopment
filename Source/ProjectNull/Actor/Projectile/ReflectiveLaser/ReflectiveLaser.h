@@ -7,6 +7,8 @@
 
 #include "ReflectiveLaser.generated.h"
 
+
+/** 敵の中間基底クラス */
 class AEnemyBase;
 
 /** 反射機能を持つレーザー(弾タイプ)クラス */
@@ -19,8 +21,6 @@ public:
 	AReflectiveLaser(int32 InReflectionCount);
 public:
 
-	virtual void Tick(float DeltaTime) override;
-
 private:
 
 	void HandleCollision(AActor* OtherActor) override;
@@ -28,10 +28,9 @@ private:
 	/** レーザーを反射する */
 	void ReflectLaserBullet(const FVector& FindLocation);
 
-	void UpdateSphereCollision();
-
-	/** 反射インターバル管理タイマー */
-	FTimerHandle ReflectionIntervalTimerHandle;
+	/** レーザー(弾タイプ)の速度 */
+	UPROPERTY(EditAnywhere)
+	float BulletSpeed;
 
 	/** 反射までのインターバル */
 	UPROPERTY(EditAnywhere)
@@ -49,7 +48,6 @@ private:
 	UPROPERTY()
 	TSet<TWeakObjectPtr<AEnemyBase>> ReflectedEnemies;
 
-	bool bEnable;
-
-
+	/** 反射インターバル管理タイマー */
+	FTimerHandle ReflectionIntervalTimerHandle;
 };

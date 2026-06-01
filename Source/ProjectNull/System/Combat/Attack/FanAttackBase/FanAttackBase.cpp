@@ -5,18 +5,18 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
-UFanAttackBase::UFanAttackBase()
-	: bRotate(false)
-	, Duration(1.0f)
-	, ElapsedTime(0.0f)
-	, RotationSpeed(1000.0f)
-	, Radius(300.0f)
-	, ConeAngle(30.0f)
-	, bPrevActive(false)
-	, CurrentAngle(0.0f)
-	, KnockbackPower(2.0f)
-	, StartAngle(0.0f),
-	bIsDrawDebugLine(false)
+UFanAttackBase::UFanAttackBase():
+		bRotate(false),
+		Duration(1.0f),
+		ElapsedTime(0.0f),
+		RotationSpeed(1000.0f),
+		Radius(300.0f),
+		ConeAngle(30.0f),
+		bPrevActive(false),
+		CurrentAngle(0.0f),
+		KnockbackPower(2.0f),
+		StartAngle(0.0f),
+		bIsDrawDebugLine(false)
 {
 }
 

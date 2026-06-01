@@ -9,30 +9,33 @@
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 
 AReflectiveLaser::AReflectiveLaser():
+	BulletSpeed(0.f),
 	ReflectionInterval(0.f),
 	FindDistSq(0.f),
-	ReflectionCount(0)
+	ReflectionCount(0),
+	ReflectedEnemies(TSet<TWeakObjectPtr<AEnemyBase>>()),
+	ReflectionIntervalTimerHandle(FTimerHandle())
 {
 }
 
 AReflectiveLaser::AReflectiveLaser(int32 InReflectionCount):
+	BulletSpeed(0.f),
 	ReflectionInterval(0.f),
 	FindDistSq(0.f),
-	ReflectionCount(InReflectionCount)
+	ReflectionCount(InReflectionCount),
+	ReflectedEnemies(TSet<TWeakObjectPtr<AEnemyBase>>()),
+	ReflectionIntervalTimerHandle(FTimerHandle())
 {
-}
-
-void AReflectiveLaser::Tick(float DeltaTime)
-{
-	AProjectileBase::Tick(DeltaTime);
-
-	//UpdateSphereCollision();
 }
 
 void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 {
 	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
 
+	auto Enemy = Cast<AEnemyBase>(OtherActor);
+	if (!Enemy) { return; }
+
+	if (ReflectedEnemies.Contains(Enemy)) { return; }
 
 	if (ReflectionCount <= 0)
 	{
@@ -43,27 +46,24 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 	ReflectionCount--;
 	//UE_LOG(LogTemp, Display, TEXT("ReflectionCount %d"), ReflectionCount);
 
-	auto Enemy = Cast<AEnemyBase>(OtherActor);
-	if (!Enemy) { return; }
-
-	if (ReflectedEnemies.Contains(Enemy)) { return; }
-
 	ReflectedEnemies.Add(Enemy);
 
-	FVector FindLocation = Enemy->GetActorLocation();
+	const FVector TargetLocation = Enemy->GetActorLocation();
 
 	FTimerDelegate TimerDelegate;
 
-	TimerDelegate.BindLambda([this, FindLocation]()
+	TimerDelegate.BindLambda([this, TargetLocation]()
 		{
-			ReflectLaserBullet(FindLocation);
+			ReflectLaserBullet(TargetLocation);
 		});
 
 	auto CurrentProjectileMovementComp = GetProjectileMovement();
 	if (!CurrentProjectileMovementComp) { return; }
 
 	CurrentProjectileMovementComp->Velocity = FVector::ZeroVector;
-	SetActorLocation(FindLocation);
+
+	SetActorLocation(TargetLocation);
+
 	GetWorld()->GetTimerManager().SetTimer(
 		ReflectionIntervalTimerHandle,
 		TimerDelegate,
@@ -76,13 +76,14 @@ void AReflectiveLaser::ReflectLaserBullet(const FVector& FindLocation)
 	auto Player = Cast<APlayerBase>(OwnerActor);
 	if (!Player) { return; }
 
-	auto TargetSearchComponent = Player->GetTargetSearchComponent();
-	if (!TargetSearchComponent) { return; }
+	auto TargetSearchComp = Player->GetTargetSearchComponent();
+	if (!TargetSearchComp) { return; }
 
 	const TArray<FEnemyDistanceData> DataArray
-		= TargetSearchComponent->FindEnemiesSortedByDistance(FindDistSq, FindLocation);
+		= TargetSearchComp->FindEnemiesSortedByDistance(FindDistSq, FindLocation);
 
-	if (DataArray.IsEmpty()) {
+	if (DataArray.IsEmpty()) 
+	{
 		Destroy();
 		return;
 	}
@@ -97,7 +98,6 @@ void AReflectiveLaser::ReflectLaserBullet(const FVector& FindLocation)
 		if (!ReflectedEnemies.Contains(DataArray[Index].Enemy))
 		{
 			ToEnemyVector = DataArray[Index].ToEnemyVector;
-			TargetActor = DataArray[Index].Enemy;
 			bEnd = false;
 			break;
 		}
@@ -108,42 +108,10 @@ void AReflectiveLaser::ReflectLaserBullet(const FVector& FindLocation)
 		return;
 	}
 
-	if (auto Target = TargetActor.Get()) {
-		TargetLocation = Target->GetActorLocation();
-	}
-
 	auto CurrentProjectileMovementComp = GetProjectileMovement();
 	if (!CurrentProjectileMovementComp) { return; }
-	//SetActorLocation(FindLocation);
-	CurrentProjectileMovementComp->Velocity = ToEnemyVector * 2000.f;
 
+	CurrentProjectileMovementComp->Velocity = ToEnemyVector * BulletSpeed;
 }
 
-void AReflectiveLaser::UpdateSphereCollision()
-{
-
-	auto Target = TargetActor.Get();
-	if (!Target) { return; }
-
-	auto ProjectileMovementComp = GetProjectileMovement();
-	if (!ProjectileMovementComp) { return; }
-	FVector TargetActorLocation = Target->GetActorLocation();
-
-	FVector TargetToVector = TargetLocation - TargetActorLocation;
-
-	// 次フレームでこりじょんがすり抜けるかどうか
-	if (TargetToVector.Size() >= ProjectileMovementComp->Velocity.Size()) { return; }
-
-	auto Sphere = GetSphereCollision();
-	if (!Sphere) { return; }
-
-	const float RangeSq = FMath::Square(Sphere->GetUnscaledSphereRadius());
-
-	if (TargetToVector.SizeSquared() <= RangeSq)
-	{
-		ProjectileMovementComp->Velocity = TargetToVector;
-		SetActorLocation(TargetLocation);
-
-	}
-}
 

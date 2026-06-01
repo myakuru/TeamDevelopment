@@ -110,7 +110,6 @@ void ULaserBulletShooter::ShotLaserBullet()
 		StartVelocity = (Target->GetActorLocation() - Location).GetSafeNormal();
 	}
 
-	LaserBullet->SetTargetLocation(TargetLocation);
 
 	auto ProjectileMovement = LaserBullet->GetProjectileMovement();
 

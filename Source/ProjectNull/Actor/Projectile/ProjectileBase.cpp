@@ -8,20 +8,18 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
 
-
 AProjectileBase::AProjectileBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
+
 	// ================================================================
 	// スフィアコリジョンコンポーネントの初期化
 	// ================================================================
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	if (!SphereCollision) { return; }
-
-	//SetRootComponent(SphereCollision);
 
 	SphereCollision->SetupAttachment(Root);
 
