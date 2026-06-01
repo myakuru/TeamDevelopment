@@ -14,7 +14,8 @@
 				"UMG",
 				"StateTreeModule",
 				"GameplayStateTreeModule",
-				"StateTreeEditorModule"
+				"StateTreeEditorModule",
+				"CinematicCamera"
 			]
 		}
 	],
