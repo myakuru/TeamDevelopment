@@ -15,6 +15,7 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
+#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -36,6 +37,7 @@ AEnemyBase::AEnemyBase()
 		CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("CapsuleCollision");
 		CapsuleComponent->InitCapsuleSize(34.f, 88.f);									// カプセルサイズ
 		CapsuleComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);	// Pawn用のCollision一括設定
+		CapsuleComponent->SetCollisionResponseToChannel(PLAYER_ATTACK_OVERLAP,ECR_Overlap);
 		CapsuleComponent->CanCharacterStepUpOn = ECB_No;								// 他キャラが上に立てるか
 		CapsuleComponent->SetShouldUpdatePhysicsVolume(true);							// 物理ボリューム(水中判定etc)を受けるか
 		CapsuleComponent->SetCanEverAffectNavigation(false);							// NavMesh更新対象化
