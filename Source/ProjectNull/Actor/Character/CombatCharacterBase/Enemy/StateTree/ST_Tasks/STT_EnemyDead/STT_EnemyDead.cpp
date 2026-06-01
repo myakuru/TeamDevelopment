@@ -36,7 +36,6 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 
 	Super::Tick(a_Context, a_DeltaTime);
 
-	return EStateTreeRunStatus::Succeeded;
 	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
 	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
 	{

@@ -39,7 +39,7 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	PrevAnimTime = AnimTime;
+	/*PrevAnimTime = AnimTime;
 	AnimTime += DeltaTime;
 
 	if (AnimChangeFlg)

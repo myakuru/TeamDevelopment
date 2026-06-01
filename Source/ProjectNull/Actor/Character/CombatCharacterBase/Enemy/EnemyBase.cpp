@@ -308,8 +308,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 
-	EnemyStatus.StateTag = EEnemyState::None;
-	EnemyRuntimeData->ChangedEnemyState(EEnemyState::None);
+	EnemyStatus.StateTag = EEnemyState::Idle;
+	EnemyRuntimeData->ChangedEnemyState(EEnemyState::Idle);
 
 	EnemyStatus.IsAlive = true;
 

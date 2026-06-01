@@ -104,6 +104,12 @@ public:
 	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
 
 	/**
+	 * @brief 状態タイプをセット
+	 * @param a_State 変更先ステート
+	 */
+	virtual void SetEnemyState(EEnemyState a_TargetState);
+
+	/**
 	 * @brief 外部からステートEnum変更を通知
 	 * @param a_TargetState 変更先ステート
 	 */
