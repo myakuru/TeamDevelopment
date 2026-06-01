@@ -14,6 +14,9 @@ class AProjectileBase;
 /** プレイヤーの中間基底クラス */
 class APlayerBase;
 
+/** 敵の中間基底クラス */
+class AEnemyBase;
+
 
 /** レーザー(弾タイプ)の発射制御を行うクラス */
 UCLASS(Blueprintable, EditInlineNew)
@@ -35,6 +38,9 @@ public:
 	inline float GetTargetableDistSq() const { return TargetableDistSq; }
 
 private:
+
+
+	void ShotLaserBulletAndIncrementCount();
 
 	/**
 	 * @brief レーザー(弾タイプ)の発射処理
@@ -65,6 +71,9 @@ private:
 
 	/** 各レーザー開始加速度配列 */
 	TArray<FVector> StartVelocityArray;
+
+	/** 各レーザー配列 */
+	TArray<TWeakObjectPtr<AEnemyBase>> TargetArray;
 
 	/** 敵をターゲットできる距離Sq */
 	UPROPERTY(EditAnywhere)

@@ -33,6 +33,26 @@ protected:
 
 	virtual void BeginPlay() override;
 
+
+	virtual void HandleCollision(AActor* OtherActor);
+
+	/** 持ち主のアクタークラス */
+	UPROPERTY()
+	TObjectPtr<AActor> OwnerActor;
+
+public:	
+	virtual void Tick(float DeltaTime) override;
+
+	/** Getter */
+	inline USphereComponent*				GetSphereCollision() const		{ return SphereCollision; }
+	inline UStaticMeshComponent*			GetStaticMeshComponent() const	{ return StaticMesh; }
+	inline UProjectileMovementComponent*	GetProjectileMovement() const	{ return ProjectileMovement; }
+
+	/** Setter */
+	inline void SetOwnerActor(AActor* InOwnerActor) { OwnerActor = InOwnerActor; }
+
+private:
+
 	UFUNCTION()
 	void OnCollisionOverlap(
 		UPrimitiveComponent* OverlappedComponent,
@@ -44,23 +64,6 @@ protected:
 
 	UFUNCTION()
 	void OnProjectileStop(const FHitResult& Hit);
-
-	/** 持ち主のアクタークラス */
-	UPROPERTY()
-	TObjectPtr<AActor> OwnerActor;
-
-
-public:	
-	virtual void Tick(float DeltaTime) override;
-
-	/** Getter */
-	inline UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
-
-	/** Setter */
-	inline void SetOwnerActor(AActor* InOwnerActor) { OwnerActor = InOwnerActor; }
-
-private:
-
 
 	
 	/** ルートコンポーネント */

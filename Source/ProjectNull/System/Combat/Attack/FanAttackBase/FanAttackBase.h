@@ -1,137 +1,124 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+
 #include "../AttackBase.h"
+
 #include "FanAttackBase.generated.h"
 
-/**
- * 扇状攻撃コンポーネントの基底クラス
- */
+/** 扇状攻撃基底クラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFanAttackBase : public UAttackBase
 {
 	GENERATED_BODY()
-	
 public:
-
 	UFanAttackBase();
-
 public:
 
-	/// <summary>
-	/// 開始の際の初期化
-	/// </summary>
+	/**
+	 * @brief 開始の際の初期化
+	 */
 	virtual void Start();
 
-	/// <summary>
-	/// �U���̎��s
-	/// </summary>
 	virtual void Execute()override;
 	
-	virtual void Update(float DeltaTime, AActor* Player = nullptr, UEnemyManagerSubsystem* EnemyManager = nullptr)override;
+	virtual void Update(
+		float DeltaTime,
+		AActor* Player = nullptr,
+		UEnemyManagerSubsystem* EnemyManager = nullptr)override;
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	/// <param name="DeltaTime">デルタタイム</param>
-	/// <returns>更新結果</returns>
+	/**
+	 * @brief 更新処理
+	 * @param DeltaTime デルタタイム
+	 * @return 更新結果
+	 */
 	virtual bool UpdateAttack(float DeltaTime);
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
 	bool CanDeactivate();
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
 	bool IsActiveFirstFrame();
 
-	/// <summary>
-	/// 
-	/// </summary>
 	void UpdatePrevActiveFlg();
 
-	/// <summary>
-	/// 攻撃範囲内にターゲットがいるかどうかの判定
-	/// </summary>
-	/// <param name="Target			">ターゲット	</param>
-	/// <returns>ターゲットが攻撃範囲内かどうか</returns>
+	/**
+	 * @brief 攻撃範囲内にターゲットがいるかどうかの判定
+	 * @param Target ターゲット
+	 * @return ターゲットが攻撃範囲内かどうか
+	 */
 	virtual bool IsTargetInRange(AActor* Target) override;
 
-	/// <summary>
-	/// 攻撃方向の計算
-	/// </summary>
-	/// <param name="forwardVector">前方方向</param>
-	/// <returns>計算結果</returns>
+	/**
+	 * @brief 攻撃方向の計算
+	 * @param forwardVector 前方方向
+	 * @return 計算結果
+	 */
 	virtual FVector CalcAttackDir(const FVector& forwardVector) const override;
 	FVector CalcAttackDir(const FVector& forwardVector,float Angle) const;
 
-	/// <summary>
-	/// 半径の二乗を取得
-	/// </summary>
-	/// <returns>半径の二乗</returns>
+	/**
+	 * @brief 半径の二乗を取得
+	 * @return 半径の二乗
+	 */
 	inline float GetRadiusSquared() const { return Radius * Radius; }
 
-	/// <summary>
-	/// 扇角のcos値
-	/// </summary>
-	/// <returns>扇角のcos値</returns>
+	/**
+	 * @brief 扇角のcos値
+	 * @return 扇角のcos値
+	 */
 	inline float GetConeCosine() const { return FMath::Cos(FMath::DegreesToRadians(ConeAngle)); }
 
 protected:
 
-	/// <summary>
-	/// 敵リストに対する攻撃判定
-	/// </summary>
-	/// <param name="EnemyManager">敵管理クラスのアドレス</param>
+	/**
+	 * @brief 敵リストに対する攻撃判定
+	 * @param EnemyManager 敵管理クラスのアドレス
+	 */
 	virtual void AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager) override;
 
-	/// <summary>
-	/// プレイヤーに対する攻撃判定
-	/// </summary>
-	/// <param name="Player">プレイヤークラスのアドレス</param>
+	
+	/**
+	 * @brief プレイヤーに対する攻撃判定
+	 * @param Player プレイヤークラス
+	 */
 	virtual void AttackJudgePlayer(AActor* Player) override;
 
 public:
 
-	// 攻撃の持続時間（秒）
+	/** 攻撃の持続時間(秒) */
 	UPROPERTY(EditAnywhere)
 	float Duration;
 
-	// 経過時間
+	/** 経過時間 */
 	float ElapsedTime;
 
-	// 回転するかどうか
+	/** 回転するかどうか */
 	UPROPERTY(EditAnywhere)
 	bool bRotate;
 
-	// 回転速度（度/秒）
+	/** 回転速度(度/秒) */
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
-	// 攻撃半径
+	/** 攻撃半径 */
 	UPROPERTY(EditAnywhere)
 	float Radius;
 
-	// 扇の広さ（角度）
+	/** 扇の広さ(角度) */
 	UPROPERTY(EditAnywhere)
 	float ConeAngle;
 
-	// 全フレームでアクティブだったか
+	/** 全フレームでアクティブだったか */
 	bool bPrevActive;
 
-	// 開始の角度
+	/** 開始の角度 */
 	UPROPERTY(EditAnywhere)
 	float StartAngle;
 
-	// 現在の角度
+	/** 現在の角度 */
 	UPROPERTY(EditAnywhere)
 	float CurrentAngle;
 
-	// ノックバックの強さ
+	/** ノックバックの強さ */
 	UPROPERTY(EditAnywhere)
 	float KnockbackPower;
 
