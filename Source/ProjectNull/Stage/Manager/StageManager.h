@@ -17,8 +17,6 @@ class PROJECTNULL_API UStageManager : public UObject
 	
 public:
 
-	void Initialize();
-
 	void LoadFromSaveData(UMySaveGame* inSaveGame);
 
 	void SaveToData(UMySaveGame* inSaveGame);
@@ -32,7 +30,7 @@ public:
 private:
 
 	/** ステージの進行状況リスト */
-	TArray<FStageProgressData>StageProgressList;
+	TArray<FStageProgressData>* StageProgressList;
 
 	/** 現在のステージのインデックス */
 	int32 NowStageIndex;

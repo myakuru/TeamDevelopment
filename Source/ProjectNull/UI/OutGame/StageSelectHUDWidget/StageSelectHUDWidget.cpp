@@ -89,7 +89,8 @@ void UStageSelectHUDWidget::OnClickedStageButton(int32 InStageIndex)
 	}
 
 	//StageManagerSubsystem：ステージ開始
-	GetWorld()->GetGameInstance<USuperGameInstance>()->GetStageManagerSubsystem()->StageStart(CurrentSelectedStageIndex);
+	GetWorld()->GetGameInstance<USuperGameInstance>()
+		->GetStageManagerSubsystem()->StageStart(CurrentSelectedStageIndex);
 
 	UGameplayStatics::OpenLevel(this, FName(StageDataAsset->StageData[CurrentSelectedStageIndex].LevelName));
 }

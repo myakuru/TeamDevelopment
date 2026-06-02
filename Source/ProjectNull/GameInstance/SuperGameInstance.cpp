@@ -18,7 +18,6 @@ void USuperGameInstance::Init()
 
 	//StageManager
 	StageManager = NewObject<UStageManager>(this);
-	if (StageManager) StageManager->Initialize();
 
 	//MapActorManagerの初期化
 	MapActorManager = NewObject<UMapActorManager>(this);
@@ -63,12 +62,13 @@ void USuperGameInstance::LoadGameData()
 		// 最初のステージは解放しておく
 		if (StageCount > 0) {
 
-			for(int i = 0; i < StageCount; i++)
-			{
-				CurrentSaveData->StageProgressList[i].MissionClears.SetNum(3);
+			//ステージのクリア状況を初期化(デバッグ用)
+			//for(int i = 0; i < StageCount; i++)
+			//{
+			//	CurrentSaveData->StageProgressList[i].MissionClears.SetNum(3);
 
-				CurrentSaveData->StageProgressList[i].bUnlocked = false;
-			}
+			//	CurrentSaveData->StageProgressList[i].bUnlocked = false;
+			//}
 
 			CurrentSaveData->StageProgressList[0].bUnlocked = true;
 		}
@@ -90,6 +90,8 @@ void USuperGameInstance::SaveGameData()
 {
 	if (!CurrentSaveData)return;
 
+	UE_LOG(LogTemp, Error, TEXT("Save now! : CurrentSaveData"));
+
 	//ステージマネージャー
 	if (StageManager) {
 		StageManager->SaveToData(CurrentSaveData);
@@ -103,7 +105,6 @@ void USuperGameInstance::SaveGameData()
 	const int32 UserIndex = 0;
 
 	UGameplayStatics::SaveGameToSlot(CurrentSaveData, SlotName, UserIndex);
-
 }
 
 inline void USuperGameInstance::SetStageScore(int32 inStageIndex, int32 inScore)
