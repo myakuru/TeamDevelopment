@@ -1,8 +1,12 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+
 #include "Animation/AnimInstance.h"
+
 #include "PlayerAnimInstance.generated.h"
+
+class APlayerBase;
 
 /** プレイヤーのアニメーションインスタンスクラス */
 UCLASS()
@@ -13,6 +17,7 @@ public:
 	UPlayerAnimInstance();
 public:
 
+	void NativeInitializeAnimation() override;
 	void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 	/** Getter */
@@ -34,4 +39,7 @@ private:
 	 */
 	UPROPERTY()
 	FPoseSnapshot PlayerPoseSnapshot;
+
+	UPROPERTY()
+	TObjectPtr<APlayerBase> Player;
 };
