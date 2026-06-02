@@ -24,4 +24,10 @@ void UExplosionGear::Execute(int32 CurrentGearLevel)
 void UExplosionGear::Update(float DeltaTime)
 {
 	UGearBase::Update(DeltaTime);
+
+	if (!IsActive())
+	{
+		SetBlocksMovement(false);
+	}
+
 }

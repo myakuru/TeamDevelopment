@@ -52,12 +52,32 @@ void AExplosionGearSkill::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 生成されたDelay秒後に爆発
+	FTimerDelegate timerDelegate;
+	timerDelegate.BindLambda([this] {
+			if (PreExplosionFX) {
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+					GetWorld(),
+					PreExplosionFX,
+					GetActorLocation()
+				);
+			}
+		}
+	);
+
+	// 生成されたDelay秒後に発火エフェクト生成
 	GetWorldTimerManager().SetTimer(
-		TimerHandle,
+		PreExplosionTimerHandle,
+		timerDelegate,
+		Data.Delay,
+		false
+	);
+
+	// 生成されたIgnitionDelay + Delay秒後に爆発
+	GetWorldTimerManager().SetTimer(
+		ExplosionTimerHandle,
 		this,
 		&AExplosionGearSkill::Explode,
-		Data.Delay,
+		IgnitionDelay + Data.Delay,
 		false
 	);
 	
@@ -68,26 +88,31 @@ void AExplosionGearSkill::Initialize(const FExplosionData& InData)
 {
 	Data = InData;
 
-	Collision->SetSphereRadius(Data.Radius);
+	Collision->SetSphereRadius(CollisionRadius * Data.Scale);
 	Collision->SetGenerateOverlapEvents(true);
 }
 
 void AExplosionGearSkill::Explode()
 {
+	
+
 	if (ExplosionFX) {
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			ExplosionFX,
 			GetActorLocation()
 		);
+
+		NiagaraComp->SetWorldScale3D(FVector(Data.Scale));
+
 	}
+
+	
 
 	// OverlapしているActorを検索
 	TArray<AActor*> actors; 
 	Collision->UpdateOverlaps();
 	Collision->GetOverlappingActors(actors);
-	UE_LOG(LogTemp, Warning, TEXT("Radius = %f"),Data.Radius);
-	UE_LOG(LogTemp, Warning,TEXT("HitActorNum = %d"),actors.Num());
 
 	// 検索したActorからEnemyBaseを見つけてヒット処理を行う
 	for (AActor* actor : actors) {

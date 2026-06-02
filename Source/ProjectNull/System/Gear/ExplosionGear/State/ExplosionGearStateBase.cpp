@@ -2,6 +2,7 @@
 
 
 #include "ExplosionGearStateBase.h"
+#include <ProjectNull/System/Gear/GearBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull\Actor\Explosion\ExplosionGearSkill.h>
 #include "Kismet\GameplayStatics.h"
@@ -12,8 +13,11 @@ UExplosionGearStateBase::UExplosionGearStateBase()
 
 void UExplosionGearStateBase::Execute(int32 CurrentGearLevel)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ExplosionGearStateBase Exucute"));
 	Super::Execute(CurrentGearLevel);
+
+	if (Owner) {
+		Owner->SetBlocksMovement(true);
+	}
 
 	SpawnExplosions();
 }
@@ -38,7 +42,7 @@ void UExplosionGearStateBase::SpawnExplosions()
 		FExplosionData initializeData;
 		initializeData.Damage = data.Damage;
 		initializeData.Delay = data.Delay;
-		initializeData.Radius = data.Radius;
+		initializeData.Scale = data.Scale;
 		Explosion->Initialize(initializeData);
 
 		UGameplayStatics::FinishSpawningActor(

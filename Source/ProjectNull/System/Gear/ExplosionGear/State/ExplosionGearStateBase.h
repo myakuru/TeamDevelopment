@@ -16,8 +16,8 @@ struct FExplosionSpawnData
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FVector Offset = FVector::ZeroVector;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Radius;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float Scale = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage;

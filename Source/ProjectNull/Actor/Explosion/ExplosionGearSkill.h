@@ -21,7 +21,7 @@ struct FExplosionData {
 	float Damage;
 
 	UPROPERTY(EditAnywhere)
-	float Radius;
+	float Scale = 1.0f;
 
 	UPROPERTY(EditAnywhere)
 	float Delay;
@@ -63,6 +63,13 @@ private:
 	UPROPERTY()
 	FExplosionData Data;
 
-	FTimerHandle TimerHandle;
+	UPROPERTY(EditAnywhere)
+	float CollisionRadius = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float IgnitionDelay = 0.0f;
+
+	FTimerHandle ExplosionTimerHandle;
+	FTimerHandle PreExplosionTimerHandle;
 
 };
