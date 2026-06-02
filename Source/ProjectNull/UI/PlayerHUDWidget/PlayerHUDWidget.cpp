@@ -25,7 +25,7 @@
 
 void UPlayerHUDWidget::NativeConstruct()
 {
-	GameTimer->StartTimer(10.0f);
+	GameTimer->StartTimer(120.0f);
 
 	if (ActionButton)
 	{
