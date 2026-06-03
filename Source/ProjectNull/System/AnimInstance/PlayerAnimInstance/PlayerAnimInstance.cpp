@@ -1,9 +1,20 @@
 ﻿#include "PlayerAnimInstance.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+#include "AnimationStateMachineLibrary.h"
+
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
 UPlayerAnimInstance::UPlayerAnimInstance():
-	bIsCombatStance(false)
+	bShouldMove(false),
+	bIsFalling(false),
+	bIsCombatStance(false),
+	Velocity(FVector::ZeroVector),
+	GroundSpeed(0.f),
+	PlayerPoseSnapshot(FPoseSnapshot()),
+	Player(nullptr),
+	MoveThresholdSpeed(3.f),
+	AscendingVelocityThreshold(100.f)
 {
 
 }
@@ -18,7 +29,18 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
+	
+	if (!Player) { return; }
 
+	auto CharacterMovement = Player->GetCharacterMovement();
+	if (!CharacterMovement) { return; }
+
+	bIsFalling	= CharacterMovement->IsFalling();
+	Velocity	= CharacterMovement->Velocity;
+
+	GroundSpeed = Velocity.Size();
+	
+	bShouldMove = GroundSpeed > MoveThresholdSpeed;
 }
 
 FPoseSnapshot& UPlayerAnimInstance::GetPlayerPoseSnapshot()

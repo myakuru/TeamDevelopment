@@ -26,7 +26,8 @@ public class ProjectNull : ModuleRules
 			"LevelSequence",
 			"MovieScene",
 			"CinematicCamera",
-			"AIModule"
+			"AIModule",
+            "AnimGraphRuntime"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
