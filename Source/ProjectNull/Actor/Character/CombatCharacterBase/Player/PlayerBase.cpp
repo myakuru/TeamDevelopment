@@ -61,7 +61,6 @@ APlayerBase::APlayerBase():
 	CineCameraComponent->SetupAttachment(SpringArmComponent);
 	CineCameraComponent->Deactivate();
 
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
 	// ================================================================
 	// ギアコンポーネントの初期化

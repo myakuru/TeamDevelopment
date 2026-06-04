@@ -34,6 +34,8 @@ void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	UpdateGearWidget(DeltaTime);
+
 	for(auto& Gear : PlayerGears) {
 		if (!Gear) { continue; }
 		Gear->Update(DeltaTime);
@@ -184,5 +186,18 @@ void UPlayerGearComponent::UpdateCollisionByInvincibility()
 		false,
 		0.1f);
 
+}
+
+void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
+{
+	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
+		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()
+		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData()) {
+		return;
+	}
+	TObjectPtr<UPlayerParameterData> ParameterData
+		= OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
+
+//	ParameterData->
 }
 
