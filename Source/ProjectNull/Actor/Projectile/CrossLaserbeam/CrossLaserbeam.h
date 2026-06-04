@@ -8,6 +8,9 @@
 #include "CrossLaserbeam.generated.h"
 
 
+/** 敵の中間基底クラス */
+class AEnemyBase;
+
 class UBoxComponent;
 
 UCLASS(Blueprintable)
@@ -24,12 +27,37 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-
-private:
+	void SetLaserEnabled(bool bEnabled);
 	
+private:
+
+	UFUNCTION()
+	void OnLaserBeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void OnLaserEndOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
+
+	void OnHit();
+
+
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<UBoxComponent>> LaserBoxes;
 
+	UPROPERTY()
+	TSet<TWeakObjectPtr<AEnemyBase>> HitEnemies;
+
+	FTimerHandle HitIntervalTimerHandle;
+
 	UPROPERTY(EditAnywhere)
-	TArray<FTransform> LaserRelativeTransforms;
+	float HitInterval;
 };

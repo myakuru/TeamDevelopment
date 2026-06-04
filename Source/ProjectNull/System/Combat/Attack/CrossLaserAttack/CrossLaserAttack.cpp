@@ -13,16 +13,21 @@ void UCrossLaserAttack::Initialize(class AActor* Owner)
 	UAttackBase::Initialize(Owner);
 
 	CrossLaserbeam = GetWorld()->SpawnActor<ACrossLaserbeam>(CrossLaserbeamClass);
-
+	if (!CrossLaserbeam) { return; }
 	CrossLaserbeam->AttachToActor(
 		Owner,
 		FAttachmentTransformRules::KeepRelativeTransform);
+	CrossLaserbeam->SetLaserEnabled(false);
+
 }
 
 void UCrossLaserAttack::Execute()
 {
 	CurrentAngle = 0.f;
 	bIsActive = true;
+	if (!CrossLaserbeam) { return; }
+	CrossLaserbeam->SetLaserEnabled(true);
+
 }
 
 void UCrossLaserAttack::Update(
@@ -41,4 +46,6 @@ void UCrossLaserAttack::Update(
 void UCrossLaserAttack::End()
 {
 	bIsActive = false;
+	if (!CrossLaserbeam) { return; }
+	CrossLaserbeam->SetLaserEnabled(false);
 }
