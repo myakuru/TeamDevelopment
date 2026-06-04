@@ -49,18 +49,6 @@ void UPlayerHUDWidget::NativeConstruct()
 
 void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	// デバック用
-	if (GameInstance && GameInstance->GetPlayerParameterData())
-	{
-		UPlayerParameterData* CharacterParameterData = GameInstance->GetPlayerParameterData();
-
-		for(int32 i = 0; i < SkillWidgets.Num(); ++i)
-		{
-			CharacterParameterData->SetSkillCooldownTime(i, 5.0f);
-
-			CharacterParameterData->UpdateSkillCooldown(i, InDeltaTime);
-		}
-	}
 }
 
 void UPlayerHUDWidget::OnClickedActionButton()

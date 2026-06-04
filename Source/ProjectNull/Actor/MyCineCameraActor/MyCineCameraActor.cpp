@@ -20,9 +20,6 @@ AMyCineCameraActor::AMyCineCameraActor(const FObjectInitializer& ObjectInitializ
 void AMyCineCameraActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetWorld()->GetFirstPlayerController()->InputComponent->BindKey(
-		EKeys::K, IE_Pressed, this, &AMyCineCameraActor::TestShake);
 }
 
 void AMyCineCameraActor::Tick(float DeltaTime)
@@ -50,6 +47,8 @@ void AMyCineCameraActor::PlayOpeningCutscene()
 		SetActorTickEnabled(true);
 		SequencePlayer->Play();
 	}
+
+	TestShake();
 }
 
 void AMyCineCameraActor::TestShake()

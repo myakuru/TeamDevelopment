@@ -111,7 +111,7 @@ public:
 
 	/** スキルのクールダウンを毎フレーム更新する */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
-	void UpdateSkillCooldown(int32 SkillIndex, float DeltaTime);
+	void UpdateSkillCooldown(int32 InSkillIndex, float InCooldownTime);
 
 	/** スキルのクールダウンをリセットする処理 */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
