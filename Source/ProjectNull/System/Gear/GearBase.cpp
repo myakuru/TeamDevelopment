@@ -3,6 +3,8 @@
 #include <ProjectNull/System/Gear/State/GearStateBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 
 UGearBase::UGearBase():
@@ -17,7 +19,7 @@ UGearBase::UGearBase():
 	Duration(0.f),
 	bIsActive(false),
 	bBlocksMovement(false),
-	DurationTimerHandle(FTimerHandle())
+	CoolTimerHandle(FTimerHandle())
 {
 
 }
@@ -61,7 +63,7 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 
 	// ギアのクールタイムをセットし、クールタイム終了時にリセット処理を呼ぶ
 	GetWorld()->GetTimerManager().SetTimer(
-		DurationTimerHandle,
+		CoolTimerHandle,
 		this,
 		&UGearBase::Reset,
 		GearStatuses[StateIndex].CoolTime,
@@ -98,6 +100,12 @@ float UGearBase::GetGearDuration(int32 Index) const
 	return GearStatuses[Index].Duration;
 }
 
+float UGearBase::GetGearCoolTime(int32 Index) const
+{
+	if (!GearStatuses.IsValidIndex(Index)) { return 0.f; }
+	return GearStatuses[Index].CoolTime;
+}
+
 void UGearBase::SetGearDuration(float InDuration, int32 Index)
 {
 	if (!GearStatuses.IsValidIndex(Index)) { return; }
@@ -107,5 +115,15 @@ void UGearBase::SetGearDuration(float InDuration, int32 Index)
 void UGearBase::Reset()
 {
 	bCanExecute = true;
+
+	auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+
+	const TObjectPtr<UPlayerParameterData> ParameterData
+		= SuperGameInstance->GetPlayerParameterData();
+	if (!ParameterData)		{ return; }
+
+	ParameterData->ResetSkillCooldown(GearIndex);
+
 }
 
