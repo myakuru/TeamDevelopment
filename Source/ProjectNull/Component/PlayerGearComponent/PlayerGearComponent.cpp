@@ -35,7 +35,7 @@ void UPlayerGearComponent::BeginPlay()
 		if (!PlayerGears[Index]) { continue; }
 		PlayerGears[Index]->Initialize(OwnerPlayer, this);
 		PlayerGears[Index]->SetGearIndex(Index);
-		ParameterData->SetSkillCooldownTime(Index, PlayerGears[Index]->GetGearCoolTime(CurrentGearLevel));
+		//ParameterData->SetSkillCooldownTime(Index, PlayerGears[Index]->GetGearCoolTime(CurrentGearLevel));
 		ParameterData->ResetSkillCooldown(Index);
 	}
 
