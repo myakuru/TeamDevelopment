@@ -24,10 +24,20 @@ void UPlayerGearComponent::BeginPlay()
 
 	OwnerPlayer = Cast<APlayerBase>(GetOwner());
 
-	for (auto& Gear : PlayerGears) {
-		if (!Gear) { continue; }
-		Gear->Initialize(OwnerPlayer,this);
+	auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+
+	const TObjectPtr<UPlayerParameterData> ParameterData
+		= SuperGameInstance->GetPlayerParameterData();
+
+	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
+	{
+		if (!PlayerGears[Index]) { continue; }
+		PlayerGears[Index]->Initialize(OwnerPlayer, this);
+		PlayerGears[Index]->SetGearIndex(Index);
+		ParameterData->SetSkillCooldownTime(Index, PlayerGears[Index]->GetGearCoolTime(CurrentGearLevel));
 	}
+
 }
 
 void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -75,12 +85,22 @@ void UPlayerGearComponent::ChangeGear()
 	if (!CanChangeGear()) { return; }
 	const TObjectPtr<UPlayerRuntimeData> RuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
 	RuntimeData->ResetDataOnGearChange(CurrentGearLevel);
+	
 
 	// プレイヤーのパラメータデータ取得
 	const TObjectPtr<UPlayerParameterData> ParameterData = OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
 	RuntimeData->CalculateInvincibilityTime(ParameterData->GetGearData());
 	CurrentGearLevel = (CurrentGearLevel % 4 + 1);
 	UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
+
+	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
+	{
+		const TObjectPtr<const UGearBase> Gear = PlayerGears[Index];
+		if (!Gear) { continue; }
+
+		//UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"), RemainTime);
+		ParameterData->SetSkillCooldownTime(Index, Gear->GetGearCoolTime(CurrentGearLevel));
+	}
 
 	OnInvincibilityStart();
 }
@@ -198,6 +218,16 @@ void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
 	TObjectPtr<UPlayerParameterData> ParameterData
 		= OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
 
-//	ParameterData->
+	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
+	{
+		const TObjectPtr<const UGearBase> Gear = PlayerGears[Index];
+		if (!Gear) { continue; }
+		const float RemainTime
+			= GetWorld()->GetTimerManager().GetTimerRemaining(Gear->GetCoolTimerHandle());
+		UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"),RemainTime);
+		//ParameterData->SetSkillCooldownTime(Index, RemainTime);
+		ParameterData->UpdateSkillCooldown(Index, DeltaTime);
+	}
+
 }
 
