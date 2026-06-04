@@ -35,6 +35,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsCombatStance;
 
+	/** 減速中か */
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDecelerating;
+	
 	/** 速度 */
 	UPROPERTY(BlueprintReadOnly)
 	FVector Velocity;
@@ -42,6 +46,9 @@ public:
 	/** 地面での速度 */
 	UPROPERTY(BlueprintReadOnly)
 	float GroundSpeed;
+
+	/** 前フレームの地面での速度 */
+	float PrevGroundSpeed;
 
 private:
 

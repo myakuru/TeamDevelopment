@@ -10,8 +10,10 @@ UPlayerAnimInstance::UPlayerAnimInstance():
 	bShouldMove(false),
 	bIsFalling(false),
 	bIsCombatStance(false),
+	bIsDecelerating(false),
 	Velocity(FVector::ZeroVector),
 	GroundSpeed(0.f),
+	PrevGroundSpeed(0.f),
 	PlayerPoseSnapshot(FPoseSnapshot()),
 	Player(nullptr),
 	MoveThresholdSpeed(3.f),
@@ -41,6 +43,11 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	GroundSpeed = Velocity.Size();
 	
+	bIsDecelerating = (GroundSpeed != PrevGroundSpeed) && (GroundSpeed < PrevGroundSpeed);
+	
+
+	PrevGroundSpeed = GroundSpeed;
+
 	bShouldMove = GroundSpeed > MoveThresholdSpeed;
 }
 
