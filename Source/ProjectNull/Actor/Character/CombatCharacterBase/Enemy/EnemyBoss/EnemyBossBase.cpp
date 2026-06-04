@@ -30,8 +30,8 @@ void AEnemyBossBase::BeginPlay()
 // Called every frame
 void AEnemyBossBase::Tick(float DeltaTime)
 {
-	ACombatCharacterBase::Tick();
-	ActorLocation = GetActorLocation();
+	//ACombatCharacterBase::Tick();
+//	ActorLocation = GetActorLocation();
 	//AEnemyBase::Tick(DeltaTime);
 }
 

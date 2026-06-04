@@ -80,9 +80,6 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		MapActorMan->RegisterDestroyedActor(TreasureID);
 	}
 
-	//セーブ
-	GetWorld()->GetGameInstance<USuperGameInstance>()->SaveGameData();
-
 	//アニメーション再生
 	if (!Mesh || !OpenAnimation) return;
 	Mesh->PlayAnimation(OpenAnimation, false);
