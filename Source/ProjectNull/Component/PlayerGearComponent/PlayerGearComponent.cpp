@@ -29,13 +29,14 @@ void UPlayerGearComponent::BeginPlay()
 
 	const TObjectPtr<UPlayerParameterData> ParameterData
 		= SuperGameInstance->GetPlayerParameterData();
+	if (!ParameterData) { return; }
 
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
 		if (!PlayerGears[Index]) { continue; }
 		PlayerGears[Index]->Initialize(OwnerPlayer, this);
 		PlayerGears[Index]->SetGearIndex(Index);
-		ParameterData->SetSkillCooldownTime(Index, PlayerGears[Index]->GetGearCoolTime(CurrentGearLevel));
+		//ParameterData->SetSkillCooldownTime(Index, PlayerGears[Index]->GetGearCoolTime(CurrentGearLevel));
 	}
 
 }
@@ -93,14 +94,14 @@ void UPlayerGearComponent::ChangeGear()
 	CurrentGearLevel = (CurrentGearLevel % 4 + 1);
 	UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
 
-	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
-	{
-		const TObjectPtr<const UGearBase> Gear = PlayerGears[Index];
-		if (!Gear) { continue; }
+	//for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
+	//{
+	//	const TObjectPtr<const UGearBase> Gear = PlayerGears[Index];
+	//	if (!Gear) { continue; }
 
-		//UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"), RemainTime);
-		ParameterData->SetSkillCooldownTime(Index, Gear->GetGearCoolTime(CurrentGearLevel));
-	}
+	//	//UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"), RemainTime);
+	//	ParameterData->SetSkillCooldownTime(Index, Gear->GetGearCoolTime(CurrentGearLevel));
+	//}
 
 	OnInvincibilityStart();
 }
@@ -225,8 +226,7 @@ void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
 		const float RemainTime
 			= GetWorld()->GetTimerManager().GetTimerRemaining(Gear->GetCoolTimerHandle());
 		UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"),RemainTime);
-		//ParameterData->SetSkillCooldownTime(Index, RemainTime);
-		ParameterData->UpdateSkillCooldown(Index, DeltaTime);
+		ParameterData->UpdateSkillCooldown(Index, RemainTime);
 	}
 
 }
