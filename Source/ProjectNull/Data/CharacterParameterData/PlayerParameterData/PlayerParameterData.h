@@ -123,6 +123,11 @@ public:
 	inline FSpeedParameterData GetSpeedData() const { return Speed; }
 	inline FGearParameterData GetGearData() const { return Gear; }
 
+	void SetSkillCooldownTime(int8 InIndex,float InSetTime)
+	{
+		SkillCooldownTime[InIndex] = InSetTime;
+	}
+
 	/** スキルのクールダウン時間が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
 	FOnSkillCooldownChanged OnSkillCooldownChanged;
