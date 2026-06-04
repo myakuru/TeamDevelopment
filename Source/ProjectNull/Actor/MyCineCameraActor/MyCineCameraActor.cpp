@@ -4,72 +4,71 @@
 #include "MyCineCameraActor.h"
 #include "LevelSequenceActor.h"
 #include "LevelSequencePlayer.h"
-#include "Kismet/GameplayStatics.h"
-#include "LevelSequenceActor.h"
-
-#include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include "Camera/CameraShakeSourceComponent.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/Component/CameraShakeSourceComponent/MyCameraShakeSourceComponent.h>
 
-void AMyCineCameraActor::UpdateActorRelativeLocation()
+AMyCineCameraActor::AMyCineCameraActor(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
+
+	CameraShakeSourceComponent = CreateDefaultSubobject<UMyCameraShakeSourceComponent>(TEXT("CameraShakeSourceComponent"));
+}
+
+void AMyCineCameraActor::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetWorld()->GetFirstPlayerController()->InputComponent->BindKey(
+		EKeys::K, IE_Pressed, this, &AMyCineCameraActor::TestShake);
+}
+
+void AMyCineCameraActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 	SetActorRelativeLocation(OpeningCameraRelativeOffset);
 	SetActorRelativeRotation(OpeningCameraRelativeOffsetRotation);
 }
 
-void AMyCineCameraActor::OnOpeningCutsceneFinished()
-{
-	// 入力を解放してゲーム開始
-	if (ARobotController* RC = Cast<ARobotController>(GetWorld()->GetFirstPlayerController()))
-	{
-		RC->SetCanReceiveInput(true);
-	}
-
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	APlayerBase* Player = PC ? Cast<APlayerBase>(PC->GetPawn()) : nullptr;
-
-	if (PC && Player)
-	{
-		PC->SetViewTargetWithBlend(Player, TargetBlendSpeed);
-	}
-}
-
 void AMyCineCameraActor::PlayOpeningCutscene()
 {
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	APlayerBase* Player = PC ? Cast<APlayerBase>(PC->GetPawn()) : nullptr;
-
+	APlayerBase* Player = Cast<APlayerBase>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (Player)
 	{
 		AttachToActor(Player, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	}
 
-	if (PC)
-	{
-		PC->SetViewTargetWithBlend(this, TargetBlendSpeed);
-	}
-
-	// 入力をブロック
-	if (ARobotController* RC = Cast<ARobotController>(GetWorld()->GetFirstPlayerController()))
-	{
-		RC->SetCanReceiveInput(false);
-	}
-
 	ALevelSequenceActor* OutActor = nullptr;
-
-	// レベルシーケンスを再生
 	FMovieSceneSequencePlaybackSettings Settings;
-	SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer
-	(
-		GetWorld(), OpeningSequence, Settings, OutActor
-	);
+	SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), OpeningSequence, Settings, OutActor);
 
 	if (SequencePlayer)
 	{
-		// 再生終了時に OnOpeningCutsceneFinished を呼ぶ
-		SequencePlayer->OnFinished.AddDynamic
-		(
-			this, &AMyCineCameraActor::OnOpeningCutsceneFinished
-		);
+		SequencePlayer->OnFinished.AddDynamic(this, &AMyCineCameraActor::OnOpeningCutsceneFinished);
+		SetActorTickEnabled(true);
 		SequencePlayer->Play();
 	}
+}
+
+void AMyCineCameraActor::TestShake()
+{
+	auto* PC = GetWorld()->GetFirstPlayerController();
+	if (PC && PC->PlayerCameraManager && OpeningCameraShake)
+	{
+		PC->PlayerCameraManager->StartCameraShake(OpeningCameraShake);
+	}
+}
+
+void AMyCineCameraActor::OnOpeningCutsceneFinished()
+{
+	SetActorTickEnabled(false);
+
+	if (CameraShakeSourceComponent && OpeningCameraShake)
+	{
+		CameraShakeSourceComponent->StopAllCameraShakes();
+	}
+
+	OnCutsceneFinished.Broadcast();
 }

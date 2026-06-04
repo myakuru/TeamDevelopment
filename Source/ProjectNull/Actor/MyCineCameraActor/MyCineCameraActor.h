@@ -5,13 +5,17 @@
 #include "CoreMinimal.h"
 #include "CineCameraActor.h"
 #include "MyCineCameraActor.generated.h"
+
 class ULevelSequence;
 class ALevelSequenceActor;
 class ULevelSequencePlayer;
-class APlayerBase;
+class UMyCameraShakeSourceComponent;
+class UCameraShakeBase;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCutsceneFinished);
 
 /**
- * 
+ *　オープニングカットシーン用のカメラアクター
  */
 UCLASS()
 class PROJECTNULL_API AMyCineCameraActor : public ACineCameraActor
@@ -19,9 +23,18 @@ class PROJECTNULL_API AMyCineCameraActor : public ACineCameraActor
 	GENERATED_BODY()
 
 public:
-	void UpdateActorRelativeLocation();
+	AMyCineCameraActor(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	void PlayOpeningCutscene();
+
+	void TestShake();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCutsceneFinished OnCutsceneFinished;
 
 protected:
 	/** プレイヤーからのカメラ相対オフセット */
@@ -36,9 +49,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Opening")
 	TObjectPtr<ULevelSequence> OpeningSequence;
 
-	/** ターゲットを切り替える速度変更 */
+	/** カメラシェイクの発生源コンポーネント */
+	UPROPERTY(VisibleAnywhere, Category = "Opening")
+	TObjectPtr<UMyCameraShakeSourceComponent> CameraShakeSourceComponent;
+
+	/** オープニングで再生するカメラシェイク */
 	UPROPERTY(EditAnywhere, Category = "Opening")
-	float TargetBlendSpeed = 0.0f;
+	TSubclassOf<UCameraShakeBase> OpeningCameraShake;
 
 	/** シーケンス終了時に呼ばれる */
 	UFUNCTION()

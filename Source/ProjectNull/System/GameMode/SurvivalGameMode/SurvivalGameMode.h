@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
@@ -24,8 +24,15 @@ protected:
 
 	void BeginPlay() override;
 
+	UFUNCTION()
+	void OnCutsceneFinished();
+
 	/** レベルに配置したシネカメラ（エディタで設定） */
 	UPROPERTY()
 	TObjectPtr<AMyCineCameraActor> OpeningCameraActor;
+
+	/** ビュー切り替え時のブレンド速度 */
+	UPROPERTY(EditAnywhere, Category = "Opening")
+	float TargetBlendSpeed = 0.0f;
 
 };

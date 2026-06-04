@@ -27,11 +27,6 @@ void UPlayerHUDWidget::NativeConstruct()
 {
 	GameTimer->StartTimer(120.0f);
 
-	if (ActionButton)
-	{
-		ActionButton->OnClicked.AddDynamic(this, &UPlayerHUDWidget::OnClickedActionButton);
-	}
-
 	Super::NativeConstruct();
 
 	// スキルは3つある想定で、配列にまとめる(今後増やすとき、ここに追加)
@@ -61,6 +56,8 @@ void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 		for(int32 i = 0; i < SkillWidgets.Num(); ++i)
 		{
+			CharacterParameterData->SetSkillCooldownTime(i, 5.0f);
+
 			CharacterParameterData->UpdateSkillCooldown(i, InDeltaTime);
 		}
 	}

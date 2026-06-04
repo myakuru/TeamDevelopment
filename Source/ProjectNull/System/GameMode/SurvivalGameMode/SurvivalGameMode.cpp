@@ -5,6 +5,8 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/Actor/MyCineCameraActor/MyCineCameraActor.h>
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
 ASurvivalGameMode::ASurvivalGameMode()
 {
@@ -16,35 +18,53 @@ void ASurvivalGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	OpeningCameraActor = Cast<AMyCineCameraActor>(
-    UGameplayStatics::GetActorOfClass(GetWorld(), AMyCineCameraActor::StaticClass()));
+		UGameplayStatics::GetActorOfClass(GetWorld(), AMyCineCameraActor::StaticClass()));
 
 	if (!OpeningCameraActor) return;
 
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (ARobotController* RC = Cast<ARobotController>(PC))
+	{
+		RC->SetCanReceiveInput(false);
+	}
+
+	if (PC)
+	{
+		PC->SetViewTargetWithBlend(OpeningCameraActor, TargetBlendSpeed);
+	}
+
+	OpeningCameraActor->OnCutsceneFinished.AddDynamic(this, &ASurvivalGameMode::OnCutsceneFinished);
 	OpeningCameraActor->PlayOpeningCutscene();
+}
+
+void ASurvivalGameMode::OnCutsceneFinished()
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	APlayerBase* Player = PC ? Cast<APlayerBase>(PC->GetPawn()) : nullptr;
+
+	if (ARobotController* RC = Cast<ARobotController>(PC))
+	{
+		RC->SetCanReceiveInput(true);
+	}
+
+	if (PC && Player)
+	{
+		PC->SetViewTargetWithBlend(Player, TargetBlendSpeed);
+	}
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (OpeningCameraActor)
-	{
-		OpeningCameraActor->UpdateActorRelativeLocation();
-	}
-
-	// 敵管理クラスの情報取得
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	
-	// 敵管理クラスの更新メソッドを呼ぶ（毎フレーム）
-	if (enemyManager) {
-		//(LogTemp, Warning, TEXT("num %d"), enemyManager->GetEnemyNum());
+	if (enemyManager)
+	{
 		enemyManager->UpdateEnemies(DeltaTime);
 	}
 
-	/** アイテム管理クラスの情報取得*/
 	UItemManagerSubsystem* itemManager = GetWorld()->GetSubsystem<UItemManagerSubsystem>();
-
-	/** 更新*/
 	if (itemManager)
 	{
 		itemManager->UpdateItemManagers(DeltaTime);
