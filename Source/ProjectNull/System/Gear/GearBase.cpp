@@ -124,6 +124,7 @@ void UGearBase::Reset()
 	if (!ParameterData)		{ return; }
 
 	ParameterData->ResetSkillCooldown(GearIndex);
+	UE_LOG(LogTemp, Display, TEXT("GearIndex %d"), GearIndex);
 
 }
 

@@ -74,4 +74,6 @@ private:
 
 	/** ギアチェンジによる無敵時間ハンドル */
 	FTimerHandle InvincibilityTimerHandle;
+
+	float ffff = 20.0f;
 };
