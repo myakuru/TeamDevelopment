@@ -23,7 +23,7 @@ void USTE_EnemyBase::Tick(FStateTreeExecutionContext& a_Context, const float a_D
 
 	Super::Tick(a_Context, a_DeltaTime);
 
-	UE_LOG(LogTemp, Warning, TEXT("EnemyState : %d"),EnemyState);
+	//UE_LOG(LogTemp, Warning, TEXT("EnemyState : %d"),EnemyState);
 }
 
 void USTE_EnemyBase::TreeStop(FStateTreeExecutionContext& a_Context)
