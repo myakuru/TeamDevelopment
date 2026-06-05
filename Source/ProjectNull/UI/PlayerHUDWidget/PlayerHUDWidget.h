@@ -99,6 +99,4 @@ private:
 	 */
 	void RegisterDelegates();
 
-	float ACooldownTime = 10.0f;
-
 };
