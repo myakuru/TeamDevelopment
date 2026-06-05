@@ -30,7 +30,6 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 
 void UPlayerRuntimeData::Initialize()
 {
-	UpdateStatus();
 
 	// プレイヤーの情報を取得する（0番:1P）
 	auto* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
@@ -45,6 +44,8 @@ void UPlayerRuntimeData::Initialize()
 	{
 		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
 	}
+
+	UpdateStatus();
 
 	// プレイヤーのパラメータデータ取得
 	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();

@@ -48,8 +48,16 @@ public:
 	float GroundSpeed;
 
 	/** 前フレームの地面での速度 */
+	UPROPERTY(BlueprintReadOnly)
 	float PrevGroundSpeed;
 
+	/** RunStopへ遷移する最低速度 */
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	float RunStopSpeedThreshold;
+
+	/** RunStopへ遷移すべきか */
+	UPROPERTY(BlueprintReadOnly)
+	bool bShouldEnterRunStop;
 private:
 
 	/**
@@ -63,7 +71,7 @@ private:
 	UPROPERTY()
 	FPoseSnapshot PlayerPoseSnapshot;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<APlayerBase> Player;
 
 	/** 移動中と判定する速度(cm/s) */
