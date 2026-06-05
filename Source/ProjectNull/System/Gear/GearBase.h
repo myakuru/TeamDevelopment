@@ -77,12 +77,15 @@ public:
 	inline bool BlocksMovement()		const		{ return bBlocksMovement; }
 	inline bool IsActive()				const		{ return bIsActive; }
 	inline bool IsMovementBlocked()		const		{ return bBlocksMovement; }
+	inline FTimerHandle GetCoolTimerHandle() const	{ return CoolTimerHandle; }
 
 	float GetGearDuration(int32 Index) const;
+	float GetGearCoolTime(int32 Index) const;
 
 	/** Setter */
 	inline void SetBlocksMovement(bool bInBlocksMovement)	{ bBlocksMovement = bInBlocksMovement; }
 	inline void SetCanExecute(bool bInCanExecute)			{ bCanExecute = bInCanExecute; }
+	inline void SetGearIndex(int32 InGearIndex)				{ GearIndex = InGearIndex; }
 	void		SetGearDuration(float InDuration, int32 Index);
 
 
@@ -133,5 +136,8 @@ private:
 	bool bBlocksMovement;
 
 	/** ギアの発動時間管理用タイマーハンドル */
-	FTimerHandle DurationTimerHandle;
+	FTimerHandle CoolTimerHandle;
+
+	/** ギアの装備インデックス */
+	int32 GearIndex;
 };

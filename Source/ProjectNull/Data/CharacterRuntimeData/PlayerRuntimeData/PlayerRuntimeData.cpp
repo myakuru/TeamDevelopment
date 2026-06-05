@@ -72,7 +72,7 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 void UPlayerRuntimeData::AddGearEnergy(float Amount)
 {
 	Gear.GearEnergy += Amount;
-	UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
+	//UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
 }
 
 bool UPlayerRuntimeData::CanChangeGear(int32 CurrentGearLevel)
