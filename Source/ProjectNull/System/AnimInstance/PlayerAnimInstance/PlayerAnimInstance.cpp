@@ -19,7 +19,7 @@ UPlayerAnimInstance::UPlayerAnimInstance():
 	MoveThresholdSpeed(3.f),
 	AscendingVelocityThreshold(100.f),
 	RunStopSpeedThreshold(100.f),
-	bShouldEnterRunStop(false),
+	bShouldEnterRunStop(false)
 {
 
 }

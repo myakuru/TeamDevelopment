@@ -230,10 +230,10 @@ void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
 		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 		const bool IsCooldownActive = TimerManager.IsTimerActive(CoolTimerHandle);
 		const float RemainTime = IsCooldownActive ? TimerManager.GetTimerRemaining(CoolTimerHandle) : 0.f;
-		UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"),RemainTime);
+		//UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"),RemainTime);
 		//UE_LOG(LogTemp, Display, TEXT("ffff %.2f"), ffff);
 		//ParameterData->SetSkillCooldownTime(Index, RemainTime);
-		ParameterData->UpdateSkillCooldown(Index, RemainTime);
+		ParameterData->UpdateSkillCooldown(Index, RemainTime,Gear->GetGearCoolTime(Index));
 	}
 
 }
