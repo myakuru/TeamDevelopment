@@ -41,6 +41,9 @@ void UPlayerHUDWidget::NativeConstruct()
 		}
 	}
 
+	GetWorld()->GetFirstPlayerController()->InputComponent->BindKey(
+		EKeys::K, IE_Pressed, this, &UPlayerHUDWidget::ResetSkillCooldowns);
+
 	// デリゲートの登録
 	RegisterDelegates();
 
@@ -52,29 +55,20 @@ void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	// デバック用
 	if (GameInstance && GameInstance->GetPlayerParameterData())
 	{
-		UPlayerParameterData* CharacterParameterData = GameInstance->GetPlayerParameterData();
+		/*UPlayerParameterData* CharacterParameterData = GameInstance->GetPlayerParameterData();
 
 		for(int32 i = 0; i < SkillWidgets.Num(); ++i)
 		{
-			static float CooldownTime = 10.0f;
 
-			CooldownTime -= InDeltaTime;
+			ACooldownTime -= InDeltaTime;
 
-			CharacterParameterData->UpdateSkillCooldown(i, CooldownTime);
-		}
+			CharacterParameterData->UpdateSkillCooldown(i, ACooldownTime, 10.0f);
+		}*/
 	}
 }
 
 void UPlayerHUDWidget::OnClickedActionButton()
 {
-	UPlayerParameterData* CharacterParameterData = GameInstance->GetPlayerParameterData();
-	if (CharacterParameterData)
-	{
-		for (int32 i = 0; i < SkillWidgets.Num(); ++i)
-		{
-			CharacterParameterData->ResetSkillCooldown(i);
-		}
-	}
 }
 
 void UPlayerHUDWidget::SetPlayerHp(float CurrentHp, float MaxHp)
@@ -93,15 +87,15 @@ void UPlayerHUDWidget::SetPlayerExp(float CurrentExp, float NextLevelExp)
 	}
 }
 
-void UPlayerHUDWidget::SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime, float CooldownRunTime)
+void UPlayerHUDWidget::SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime, float MaxCooldown)
 {
 	if (SkillWidgets.IsValidIndex(SkillIndex) && SkillWidgets[SkillIndex])
 	{
 		// クールダウンのImageの回転
-		SkillWidgets[SkillIndex]->UpdateRotationImage(CooldownTime);
+		SkillWidgets[SkillIndex]->UpdateRotationImage(CooldownTime, MaxCooldown);
 
 		// クールダウン時間のテキスト
-		SkillWidgets[SkillIndex]->UpdateCooldownText(CooldownRunTime);
+		SkillWidgets[SkillIndex]->UpdateCooldownText(CooldownTime);
 	}
 }
 
@@ -136,4 +130,8 @@ void UPlayerHUDWidget::RegisterDelegates()
 		// スキルのクールダウンのデリゲートを登録
 		CharacterParameterData->OnSkillCooldownChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerSkillCooldown);
 	}
+}
+
+void UPlayerHUDWidget::ResetSkillCooldowns()
+{
 }

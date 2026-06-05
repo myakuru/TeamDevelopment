@@ -96,7 +96,7 @@ public:
 	 * @param CooldownTime クールダウン時間（0~1の範囲）
 	 */
 	UFUNCTION(BlueprintCallable)
-	void SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime,float CooldownRunTime);
+	void SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime,float MaxCooldown);
 
 	/**
 	 * @brief ギアチェンジエネルギーを設定します。
@@ -110,5 +110,9 @@ private:
 	 * @brief デリゲートを登録します
 	 */
 	void RegisterDelegates();
+
+	void ResetSkillCooldowns();
+
+	float ACooldownTime = 10.0f;
 
 };
