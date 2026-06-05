@@ -41,34 +41,10 @@ void UPlayerHUDWidget::NativeConstruct()
 		}
 	}
 
-	GetWorld()->GetFirstPlayerController()->InputComponent->BindKey(
-		EKeys::K, IE_Pressed, this, &UPlayerHUDWidget::ResetSkillCooldowns);
-
 	// デリゲートの登録
 	RegisterDelegates();
 
 	SetIsFocusable(false);
-}
-
-void UPlayerHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	// デバック用
-	if (GameInstance && GameInstance->GetPlayerParameterData())
-	{
-		/*UPlayerParameterData* CharacterParameterData = GameInstance->GetPlayerParameterData();
-
-		for(int32 i = 0; i < SkillWidgets.Num(); ++i)
-		{
-
-			ACooldownTime -= InDeltaTime;
-
-			CharacterParameterData->UpdateSkillCooldown(i, ACooldownTime, 10.0f);
-		}*/
-	}
-}
-
-void UPlayerHUDWidget::OnClickedActionButton()
-{
 }
 
 void UPlayerHUDWidget::SetPlayerHp(float CurrentHp, float MaxHp)
@@ -130,8 +106,4 @@ void UPlayerHUDWidget::RegisterDelegates()
 		// スキルのクールダウンのデリゲートを登録
 		CharacterParameterData->OnSkillCooldownChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerSkillCooldown);
 	}
-}
-
-void UPlayerHUDWidget::ResetSkillCooldowns()
-{
 }

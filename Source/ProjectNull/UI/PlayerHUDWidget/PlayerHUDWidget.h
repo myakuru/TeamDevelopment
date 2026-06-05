@@ -21,19 +21,7 @@ class PROJECTNULL_API UPlayerHUDWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UTextBlock> HPText;
-
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UButton> ActionButton;
-
 	virtual void NativeConstruct() override;
-
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
-	UFUNCTION()
-	void OnClickedActionButton();
 
 	/** プレイヤーの経験値バー */
 	UPROPERTY(meta = (BindWidget))
@@ -110,8 +98,6 @@ private:
 	 * @brief デリゲートを登録します
 	 */
 	void RegisterDelegates();
-
-	void ResetSkillCooldowns();
 
 	float ACooldownTime = 10.0f;
 
