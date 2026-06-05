@@ -113,7 +113,7 @@ void UPlayerRuntimeData::LevelUp()
 
 void UPlayerRuntimeData::UpdateHealth(float NewHealth)
 {
-	Health.Current = FMath::Clamp(NewHealth, 0.0f, Health.Max);
+	Health.SetCurrent(NewHealth);
 
 	OnHealthChanged.Broadcast(Health.Current, Health.Max);
 }

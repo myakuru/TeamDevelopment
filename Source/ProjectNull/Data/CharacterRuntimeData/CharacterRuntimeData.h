@@ -38,12 +38,17 @@ public:
 	{
 	}
 
+	void SetCurrent(float NewCurrent)
+	{
+		Current = FMath::Clamp(NewCurrent, 0.0f, Max);
+	}
+
 	/** 現在の体力 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Current;
 
 	/** 最大体力 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Max;
 };
 
@@ -60,6 +65,20 @@ public:
 
 public:
 	virtual void Initialize() { return; }
+
+	/** ゲッター */
+	/** 体力を取得する処理 */
+	float GetHealth() const { return Health.Current; }
+
+	/** 体力の最大値を取得 */
+	float GetMaxHealth() const { return Health.Max; }
+
+	/** セッター */
+	/** 体力を固定値にセットする処理 */
+	void SetHealth(float inCurrentHealth) { Health.SetCurrent(inCurrentHealth); }
+
+	/** 体力を加算する処理 */
+	void AddHealth(float Amount) { SetHealth(Health.Current + Amount); }
 
 protected:
 
