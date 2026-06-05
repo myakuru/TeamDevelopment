@@ -28,7 +28,7 @@ public:
 	/// </summary>
 	virtual void Execute()override;
 	
-	virtual void Update(float DeltaTime, AActor* Player = nullptr, UEnemyManagerSubsystem* EnemyManager = nullptr)override;
+	virtual void Update(float DeltaTime)override;
 
 	/// <summary>
 	/// 更新処理

@@ -27,6 +27,11 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
+	// 前ステートの終了フラグをリセット
+	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
+	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
+	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(static_cast<uint32>(EEnemyState::Death), true, true);
+
 	return EStateTreeRunStatus::Running;
 }
 

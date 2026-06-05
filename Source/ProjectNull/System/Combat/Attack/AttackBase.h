@@ -27,47 +27,40 @@ public:
 
 public:
 
-	/// <summary>
-	/// ����������
-	/// </summary>
+	/**
+	 * @brief 初期化
+	 * @param Owner 
+	 */
 	virtual void Initialize(class AActor* Owner);
 
-	/// <summary>
-	/// �U���̎��s
-	/// ���������z�֐��ł���A�h���N���X�ŕK����������K�v������
-	/// </summary>
+	/**
+	 * @brief 有効化処理
+	 */
 	virtual void Execute() PURE_VIRTUAL(UAttackBase::Execute, );
 	
-	/// <summary>
-	/// �X�V����
-	/// </summary>
-	/// <param name="DeltaTime		">�f���^�^�C��				</param>
-	/// <param name="Player			">�v���C���[�N���X�̃A�h���X	</param>
-	/// <param name="EnemyManager	">�G�Ǘ��N���X�̃A�h���X		</param>
-	virtual void Update(float DeltaTime, AActor* Player = nullptr,UEnemyManagerSubsystem* EnemyManager = nullptr) { return; }
+	/**
+	 * @brief 更新処理
+	 * @param DeltaTime デルタタイム
+	 */
+	virtual void Update(float DeltaTime) { return; }
 
-	/// <summary>
-	/// �U������
-	/// </summary>
-	/// <param name="Player			">�v���C���[�N���X�̃A�h���X	</param>
-	/// <param name="EnemyManager	">�G�Ǘ��N���X�̃A�h���X		</param>
-	virtual void AttackJudge(AActor* Player = nullptr, UEnemyManagerSubsystem* EnemyManager = nullptr);
+	/**
+	 * @brief 当たり判定処理
+	 */
+	virtual void AttackJudge();
 
-
-	/// <summary>
-	/// �U���͈͓�Ƀ^�[�Q�b�g�����邩�ǂ����̔���
-	/// </summary>
-	/// <param name="Target			">�^�[�Q�b�g	</param>
-	/// <param name="OwnerLocation	">�U���҂̈ʒu	</param>
-	/// <param name="AttackDir		">�U������	</param>
-	/// <returns>�^�[�Q�b�g���U���͈͓���ǂ���</returns>
+	/**
+	 * @brief 扇範囲内にターゲットがいるかどうかの判定
+	 * @param Target HITした対象
+	 * @return ターゲットが範囲内にいる場合はtrue
+	 */
 	virtual bool IsTargetInRange(AActor* Target) { return false; }
 
-	/// <summary>
-	/// ������̑O���x�N�g������U��������v�Z����
-	/// </summary>
-	/// <param name="forwardVector">�O���x�N�g��</param>
-	/// <returns></returns>
+	/**
+	 * @brief 攻撃方向を計算する
+	 * @param forwardVector 基準となる前方ベクトル(オーナーの前方ベクトル)
+	 * @return 計算された攻撃方向ベクトル
+	 */
 	virtual FVector CalcAttackDir(const FVector& forwardVector)const;
 
 	/**
@@ -83,18 +76,6 @@ public:
 	bool IsActive()		const { return bIsActive; }
 
 protected:
-
-	/// <summary>
-	/// �v���C���[�ɑ΂���U������
-	/// </summary>
-	/// <param name="Player">�v���C���[�N���X�̃A�h���X</param>
-	virtual void AttackJudgePlayer(AActor* Player) { return; };
-	
-	/// <summary>
-	/// �G���X�g�ɑ΂���U������
-	/// </summary>
-	/// <param name="EnemyManager">�G�Ǘ��N���X�̃A�h���X</param>
-	virtual void AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager) { return; };
 
 	/**	オーナー */
 	UPROPERTY()

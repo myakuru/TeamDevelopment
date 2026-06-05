@@ -25,16 +25,8 @@ void UAttackBase::Initialize(AActor* Owner)
 		FAttachmentTransformRules::KeepRelativeTransform);
 }
 
-void UAttackBase::AttackJudge(AActor* Player, UEnemyManagerSubsystem* EnemyManager)
+void UAttackBase::AttackJudge()
 {
-	if (Player)
-	{
-		AttackJudgePlayer(Player);
-	}
-	else if (EnemyManager)
-	{
-		AttackJudgeEnemys(EnemyManager);
-	}
 }
 
 FVector UAttackBase::CalcAttackDir(const FVector& forwardVector) const

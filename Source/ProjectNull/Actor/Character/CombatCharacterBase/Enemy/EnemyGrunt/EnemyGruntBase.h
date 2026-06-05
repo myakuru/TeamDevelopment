@@ -36,6 +36,4 @@ public:
 	/// <param name="Player">プレイヤー</param>
 	/// <param name="DeltaTime">デルタタイム</param>
 	virtual void OnUpdate(APawn* Player, float DeltaTime) override;
-
-	float kariData = 0.0f;
 };
