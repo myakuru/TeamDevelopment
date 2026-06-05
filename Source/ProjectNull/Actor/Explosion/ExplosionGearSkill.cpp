@@ -10,6 +10,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "../../Utility/Common/Definitions/CollisionChannels.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Camera/CameraShakeBase.h"
 
 // Sets default values
 AExplosionGearSkill::AExplosionGearSkill()
@@ -77,7 +79,7 @@ void AExplosionGearSkill::BeginPlay()
 		ExplosionTimerHandle,
 		this,
 		&AExplosionGearSkill::Explode,
-		IgnitionDelay + Data.Delay,
+		Data.IgnitionDelay + Data.Delay,
 		false
 	);
 	
@@ -95,7 +97,7 @@ void AExplosionGearSkill::Initialize(const FExplosionData& InData)
 void AExplosionGearSkill::Explode()
 {
 	
-
+	// 爆発エフェクト再生
 	if (ExplosionFX) {
 		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
@@ -107,7 +109,14 @@ void AExplosionGearSkill::Explode()
 
 	}
 
-	
+	// カメラシェイクを爆発のスケールに応じて再生
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
+	if (playerController) {
+		playerController->ClientStartCameraShake(
+			ExplosionCameraShakeClass,
+			Data.Scale
+		);
+	}
 
 	// OverlapしているActorを検索
 	TArray<AActor*> actors; 

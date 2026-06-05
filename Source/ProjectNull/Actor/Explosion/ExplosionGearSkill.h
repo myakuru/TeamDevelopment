@@ -26,6 +26,9 @@ struct FExplosionData {
 	UPROPERTY(EditAnywhere)
 	float Delay;
 
+	UPROPERTY(EditAnywhere)
+	float IgnitionDelay;
+
 };
 
 UCLASS()
@@ -63,12 +66,15 @@ private:
 	UPROPERTY()
 	FExplosionData Data;
 
+	/** カメラシェイククラス */
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCameraShakeBase> ExplosionCameraShakeClass;
+
+	/** エフェクトと合わせた当たり判定サイズ */
 	UPROPERTY(EditAnywhere)
 	float CollisionRadius = 0.0f;
 
-	UPROPERTY(EditAnywhere)
-	float IgnitionDelay = 0.0f;
-
+	/** タイマーハンドル */
 	FTimerHandle ExplosionTimerHandle;
 	FTimerHandle PreExplosionTimerHandle;
 

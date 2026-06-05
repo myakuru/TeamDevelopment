@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+
+
 UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UExplosionGearState_Lv3 : public UExplosionGearStateBase
 {
@@ -16,4 +19,20 @@ class PROJECTNULL_API UExplosionGearState_Lv3 : public UExplosionGearStateBase
 
 public:
 	UExplosionGearState_Lv3();
+
+	void Execute(int32 CurrentGearLevel)override;
+	void Update(float DeltaTime)		override;
+
+private:
+	UPROPERTY(EditAnywhere)
+	FExplosionSpawnData FirstExplosionData;
+
+	UPROPERTY(EditAnywhere)
+	double JumpPow = 0.0;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FCircleSpawnData> CircleSpawnDatas;
+
+	FTimerHandle FirstExplosionTimerHandle;
+
 };

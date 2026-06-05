@@ -19,7 +19,6 @@ void UExplosionGearStateBase::Execute(int32 CurrentGearLevel)
 		Owner->SetBlocksMovement(true);
 	}
 
-	SpawnExplosions();
 }
 
 void UExplosionGearStateBase::Update(float DeltaTime)
@@ -42,7 +41,66 @@ void UExplosionGearStateBase::SpawnExplosions()
 		FExplosionData initializeData;
 		initializeData.Damage = data.Damage;
 		initializeData.Delay = data.Delay;
+		initializeData.IgnitionDelay = data.IgnitionDelay;
 		initializeData.Scale = data.Scale;
+		Explosion->Initialize(initializeData);
+
+		UGameplayStatics::FinishSpawningActor(
+			Explosion,
+			FTransform(spawnLocation)
+		);
+
+	}
+}
+
+void UExplosionGearStateBase::SpawnExplosion(const FExplosionSpawnData& ExplosionData)
+{
+
+	if (!ExplosionClass)return;
+
+	FVector spawnLocation = Player->GetActorTransform().TransformPosition(ExplosionData.Offset);
+	AExplosionGearSkill* Explosion =
+		GetWorld()->SpawnActorDeferred<AExplosionGearSkill>(
+			ExplosionClass,
+			FTransform(spawnLocation)
+		);
+
+	FExplosionData initializeData;
+	initializeData.Damage = ExplosionData.Damage;
+	initializeData.Delay = ExplosionData.Delay;
+	initializeData.IgnitionDelay = ExplosionData.IgnitionDelay;
+	initializeData.Scale = ExplosionData.Scale;
+	Explosion->Initialize(initializeData);
+
+	UGameplayStatics::FinishSpawningActor(
+		Explosion,
+		FTransform(spawnLocation)
+	);
+
+}
+
+void UExplosionGearStateBase::SpawnExplosionsInCircle(const FExplosionSpawnData& ExplosionData,float CircleRadius, int32 Count, float Interval)
+{
+	if (!ExplosionClass)return;
+	for (int i = 0; i < Count; i++) {
+
+		float angle = (360.0f / Count) * i;
+
+		FVector offset = FRotator(0.0f, angle, 0.0f).RotateVector(FVector(CircleRadius, 0.0f, 0.0f));
+
+		FVector spawnLocation = Player->GetActorTransform().TransformPosition(offset);
+
+		AExplosionGearSkill* Explosion =
+			GetWorld()->SpawnActorDeferred<AExplosionGearSkill>(
+				ExplosionClass,
+				FTransform(spawnLocation)
+			);
+
+		FExplosionData initializeData;
+		initializeData.Damage = ExplosionData.Damage;
+		initializeData.Delay = ExplosionData.Delay + Interval * i;
+		initializeData.IgnitionDelay = ExplosionData.IgnitionDelay;
+		initializeData.Scale = ExplosionData.Scale;
 		Explosion->Initialize(initializeData);
 
 		UGameplayStatics::FinishSpawningActor(

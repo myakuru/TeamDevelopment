@@ -20,10 +20,28 @@ struct FExplosionSpawnData
 	float Scale = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Damage;
+	float Damage = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Delay;
+	float Delay = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float IgnitionDelay = 0.0f;
+
+};
+
+USTRUCT(BlueprintType)
+struct FCircleSpawnData {
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FExplosionSpawnData ExplosionData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Radius = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Count = 0;
 };
 
 UCLASS()
@@ -47,5 +65,7 @@ protected:
 	TArray<FExplosionSpawnData> ExplosionDatas;
 
 	void SpawnExplosions();
+	void SpawnExplosion(const FExplosionSpawnData& ExplosionData);
+	void SpawnExplosionsInCircle(const FExplosionSpawnData& ExplosionData,float CircleRadius, int32 Count, float Interval = 0.0f);
 
 };
