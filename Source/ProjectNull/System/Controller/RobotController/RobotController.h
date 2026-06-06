@@ -28,6 +28,8 @@ public:
 
 	/** Setter */
 	inline void SetCanReceiveInput(bool bInCanReceiveInput) { bCanReceiveInput = bInCanReceiveInput;}
+	inline bool HasMoveInput() const { return bHasMoveInput; }
+	
 
 protected:
 
@@ -55,8 +57,13 @@ private:
 		int32 ExecuteIndex);
 
 
+
 	/** 入力受付可能か */
 	bool bCanReceiveInput;
+
+	/** 移動入力が存在するか */
+	UPROPERTY()
+	bool bHasMoveInput;
 
 	UPROPERTY()
 	TObjectPtr<APlayerBase> PlayerBase;

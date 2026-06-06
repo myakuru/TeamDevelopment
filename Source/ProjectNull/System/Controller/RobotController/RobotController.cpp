@@ -13,6 +13,7 @@
 
 ARobotController::ARobotController():
 		bCanReceiveInput(true),
+		bHasMoveInput(true),
 		PlayerBase(nullptr),
 		InputContext(nullptr),
 		MoveAction(nullptr),
@@ -79,11 +80,15 @@ void ARobotController::InitializeInputContext()
 
 void ARobotController::Move(const FInputActionValue& MoveActionValue)
 {
-	if (!bCanReceiveInput) { return; }
-	if (!Cast<APlayerBase>(GetCharacter())) { return; }
-	auto* ControlledPlayer = Cast<APlayerBase>(GetCharacter());
+	if (!bCanReceiveInput)		{ return; }
+	if (!PlayerBase)				{ return; }
 
-	ControlledPlayer->Move(MoveActionValue.Get<FVector2D>());
+	const FVector2D MoveInput =
+		MoveActionValue.Get<FVector2D>();
+
+	bHasMoveInput = !MoveInput.IsNearlyZero();
+
+	PlayerBase->Move(MoveInput);
 }
 
 void ARobotController::Look(const FInputActionValue& LookActionValue)

@@ -5,6 +5,7 @@
 #include "AnimationStateMachineLibrary.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
 
 UPlayerAnimInstance::UPlayerAnimInstance():
 	bShouldMove(false),
@@ -40,10 +41,15 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	auto CharacterMovement = Player->GetCharacterMovement();
 	if (!CharacterMovement) { return; }
 
+	auto Controller = Player->GetController();
+	auto PlayerController = Cast<ARobotController>(Controller);
+
+	if (!PlayerController) { return; }
+	bHasMoveInput = PlayerController->HasMoveInput();
 	PrevGroundSpeed = GroundSpeed;
 	bIsFalling		= CharacterMovement->IsFalling();
 	Velocity		= CharacterMovement->Velocity;
-
+	
 	GroundSpeed = Velocity.Size();
 	
 	bIsDecelerating = (GroundSpeed != PrevGroundSpeed) && (GroundSpeed < PrevGroundSpeed);
