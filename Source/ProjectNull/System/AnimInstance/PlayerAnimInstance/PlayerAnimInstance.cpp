@@ -42,10 +42,12 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!CharacterMovement) { return; }
 
 	auto Controller = Player->GetController();
-	auto PlayerController = Cast<ARobotController>(Controller);
+	if (!Controller) { return; }
 
+	auto PlayerController = Cast<ARobotController>(Controller);
 	if (!PlayerController) { return; }
-	bHasMoveInput = PlayerController->HasMoveInput();
+
+	bHasMoveInput	= PlayerController->HasMoveInput();
 	PrevGroundSpeed = GroundSpeed;
 	bIsFalling		= CharacterMovement->IsFalling();
 	Velocity		= CharacterMovement->Velocity;
@@ -57,6 +59,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bShouldEnterRunStop = GroundSpeed >= RunStopSpeedThreshold;
 
 	//UE_LOG(LogTemp, Display, TEXT("GroundSpeed %.2f"), GroundSpeed);
+	//UE_LOG(LogTemp, Display, TEXT("bHasMoveInput %d"), bHasMoveInput);
+	//UE_LOG(LogTemp, Display, TEXT("bShouldEnterRunStop %d"), bShouldEnterRunStop);
 	bShouldMove = GroundSpeed > MoveThresholdSpeed;
 }
 
