@@ -2,12 +2,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include <ProjectNull/System/Gear/LaserGear/State/LaserGearStateBase.h>
+
 #include "LaserGearState_Lv3.generated.h"
 
-/**
- * 
- */
+class UCrossLaserAttack;
+
+/** レーザーギアの3レベル状態クラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API ULaserGearState_Lv3 final : public ULaserGearStateBase
 {
@@ -27,4 +29,6 @@ public:
 
 private:
 
+	UPROPERTY(EditAnywhere, Instanced)
+	TObjectPtr<UCrossLaserAttack> CrossLaserAttack;
 };

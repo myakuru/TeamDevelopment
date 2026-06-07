@@ -27,6 +27,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	FVector ActorLocation;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 

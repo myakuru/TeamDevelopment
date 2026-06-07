@@ -1,8 +1,12 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+
 #include "Animation/AnimInstance.h"
+
 #include "PlayerAnimInstance.generated.h"
+
+class APlayerBase;
 
 /** プレイヤーのアニメーションインスタンスクラス */
 UCLASS()
@@ -13,15 +17,51 @@ public:
 	UPlayerAnimInstance();
 public:
 
-	void NativeUpdateAnimation(float DeltaSeconds) override;
-	
+	void NativeInitializeAnimation()				override;
+	void NativeUpdateAnimation(float DeltaSeconds)	override;
+
 	/** Getter */
 	FPoseSnapshot& GetPlayerPoseSnapshot();
+
+	/** 移動すべきかどうか */
+	UPROPERTY(BlueprintReadOnly)
+	bool bShouldMove;
+
+	/** 落下中かどうか */
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsFalling;
 
 	/** 戦闘構え状態か */
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsCombatStance;
 
+	/** 減速中か */
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDecelerating;
+	
+	/** 速度 */
+	UPROPERTY(BlueprintReadOnly)
+	FVector Velocity;
+
+	/** 地面での速度 */
+	UPROPERTY(BlueprintReadOnly)
+	float GroundSpeed;
+
+	/** 前フレームの地面での速度 */
+	UPROPERTY(BlueprintReadOnly)
+	float PrevGroundSpeed;
+
+	/** RunStopへ遷移する最低速度 */
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	float RunStopSpeedThreshold;
+
+	/** RunStopへ遷移すべきか */
+	UPROPERTY(BlueprintReadOnly)
+	bool bShouldEnterRunStop;
+
+	/** 移動入力が存在するか */
+	UPROPERTY(BlueprintReadOnly)
+	bool bHasMoveInput;
 private:
 
 	/**
@@ -34,4 +74,15 @@ private:
 	 */
 	UPROPERTY()
 	FPoseSnapshot PlayerPoseSnapshot;
+
+	UPROPERTY(BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<APlayerBase> Player;
+
+	/** 移動中と判定する速度(cm/s) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	float MoveThresholdSpeed;
+
+	/** 上昇中と判定するための最小上向き速度(cm/s) */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	float AscendingVelocityThreshold;
 };

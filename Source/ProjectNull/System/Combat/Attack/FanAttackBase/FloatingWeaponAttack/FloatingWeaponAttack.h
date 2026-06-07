@@ -48,11 +48,11 @@ private:
 
 	/** 自動攻撃のポインタ */
 	UPROPERTY()
-	UAutoAttack* AutoAttack;
+	TObjectPtr<UAutoAttack> AutoAttack;
 
 	/** 浮遊武器エフェクトクラス */
 	UPROPERTY(EditAnywhere, Instanced)
-	UFloatingWeaponEffect* FloatingWeaponEffect;
+	TObjectPtr<UFloatingWeaponEffect> FloatingWeaponEffect;
 
 	/** 斬撃エフェクト */
 	UPROPERTY(EditAnywhere, Instanced)

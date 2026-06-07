@@ -9,6 +9,8 @@ void USkillWidgetBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	MaxUiScale = SkillImage->RenderTransform.Scale;
+
 	if (SkillImage)
 	{
 		CooldownMaterial = SkillImage->GetDynamicMaterial();
@@ -20,18 +22,18 @@ void USkillWidgetBase::SetUIScale(float CooldownTime)
 	if (CooldownTime <= 0.0f)
 	{
 		UIScale -= UIScaleDecreaseRate * GetWorld()->GetDeltaSeconds();
-	}
 
-	if (SkillImage && CooldownText)
-	{
-		if (UIScale >= 0.0f)
+		if (SkillImage && CooldownText)
 		{
-			SkillImage->SetRenderScale(FVector2D(UIScale, UIScale));
-			CooldownText->SetRenderScale(FVector2D(UIScale, UIScale));
-		}
-		else
-		{
-			UIScale = 0.0f;
+			if (UIScale >= 0.0f)
+			{
+				SkillImage->SetRenderScale(FVector2D(UIScale, UIScale));
+				CooldownText->SetRenderScale(FVector2D(UIScale, UIScale));
+			}
+			else
+			{
+				UIScale = 0.0f;
+			}
 		}
 	}
 }
@@ -50,15 +52,23 @@ void USkillWidgetBase::ShowUI(bool bShow)
 	}
 }
 
-void USkillWidgetBase::UpdateRotationImage(float CooldownTime)
+void USkillWidgetBase::UpdateRotationImage(float CooldownTime, float MaxCooldownTime)
 {
 	if(CooldownMaterial)
 	{
-		// 角度はマテリアル側で0から1の範囲にしてる。
-		CooldownTime = FMath::Clamp(CooldownTime, 0.0f, 1.0f);
+		if (float Ratio = MaxCooldownTime > 0.0f)
+		{
+			Ratio = FMath::Clamp(CooldownTime / MaxCooldownTime, 0.0f, 1.0f);
 
-		// マテリアル側に回転角度を渡す
-		CooldownMaterial->SetScalarParameterValue(TEXT("RotationAngle"), CooldownTime);
+			// マテリアル側に 0〜1 の値を渡す
+			CooldownMaterial->SetScalarParameterValue(TEXT("RotationAngle"), Ratio);
+		}
+		else
+		{
+			Ratio = 0.0f;
+			CooldownMaterial->SetScalarParameterValue(TEXT("RotationAngle"), Ratio);
+			return;
+		}
 	}
 }
 
@@ -71,10 +81,25 @@ void USkillWidgetBase::UpdateCooldownText(float CooldownTime)
 
 		CooldownText->SetText(FText::FromString(CooldownString));
 
+		if (CooldownTime > 0.0f)
+		{
+			ResetUi();
+		}
+		
 		// クールダウン時間に応じてUIの拡大率を変更する
 		SetUIScale(CooldownTime);
 
-		// クールダウン時間が0以下ならテキストを非表示にする
 		UIScale <= 0.0f ? ShowUI(false) : ShowUI(true);
+		
 	}
+}
+
+void USkillWidgetBase::ResetUi()
+{
+	UIScale = MaxUiScale.X; // アイコンの拡大率をリセット
+
+	SkillImage->SetRenderScale(MaxUiScale);
+	CooldownText->SetRenderScale(MaxUiScale);
+
+	ShowUI(true);
 }

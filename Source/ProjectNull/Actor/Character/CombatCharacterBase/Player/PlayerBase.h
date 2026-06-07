@@ -90,7 +90,7 @@ private:
 	TObjectPtr<UAutoAttack> AutoAttack;
 
 	/** プレイヤークラスからMaterial Parameter Collectionへの更新処理クラス */
-	UPROPERTY(VisibleAnywhere, Category = "MaterialCollection")
+	UPROPERTY(EditAnywhere, Instanced, Category = "MaterialCollection")
 	TObjectPtr<UPlayerMaterialCollectionUpdater> MaterialCollectionUpdater;
 
 	/** ゲーム全体で共有されるデータや機能を管理するクラス */

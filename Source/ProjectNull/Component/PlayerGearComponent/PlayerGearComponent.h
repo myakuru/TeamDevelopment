@@ -24,6 +24,8 @@ public:
 	/** 最大ギアレベル */
 	static constexpr int32 kMaxGearLevel = 4;
 
+	static constexpr int32 kMaxGearNum = 3;
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool IsMovementBlockedByGear() const;
@@ -59,15 +61,19 @@ private:
 	 */
 	void UpdateCollisionByInvincibility();
 
+	void UpdateGearWidget(float DeltaTime);
+
 	UPROPERTY()
-	APlayerBase* OwnerPlayer;
+	TObjectPtr<APlayerBase> OwnerPlayer;
 
 	UPROPERTY(EditAnywhere, Instanced)
-	TArray<UGearBase*> PlayerGears;
+	TArray<TObjectPtr<UGearBase>> PlayerGears;
 
 	UPROPERTY(EditAnywhere)
 	int32 CurrentGearLevel;
 
 	/** ギアチェンジによる無敵時間ハンドル */
 	FTimerHandle InvincibilityTimerHandle;
+
+	float ffff = 20.0f;
 };

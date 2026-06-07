@@ -61,7 +61,6 @@ APlayerBase::APlayerBase():
 	CineCameraComponent->SetupAttachment(SpringArmComponent);
 	CineCameraComponent->Deactivate();
 
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
 	// ================================================================
 	// ギアコンポーネントの初期化
@@ -110,6 +109,48 @@ void APlayerBase::Tick(float DeltaTime)
 
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
+	UCharacterMovementComponent* MoveComp =
+		GetCharacterMovement();
+
+	float TargetPitch = 0.0f;
+
+	if (MoveComp->IsMovingOnGround() &&
+		MoveComp->CurrentFloor.IsWalkableFloor())
+	{
+		const FVector Normal =
+			MoveComp->CurrentFloor.HitResult.ImpactNormal;
+
+		// プレイヤー前方向
+		const FVector Forward =
+			GetActorForwardVector();
+
+		// 前方向成分だけ取得
+		const float Slope =
+			FVector::DotProduct(
+				Forward,
+				FVector::VectorPlaneProject(
+					FVector::UpVector,
+					Normal));
+
+		TargetPitch =
+			FMath::RadiansToDegrees(FMath::Asin(Slope));
+	}
+
+	FRotator CurrentRot =
+		GetMesh()->GetRelativeRotation();
+
+	FRotator TargetRot = CurrentRot;
+	TargetPitch *= -1.f;
+	TargetRot.Roll = TargetPitch;
+
+	FRotator NewRot =
+		FMath::RInterpTo(
+			CurrentRot,
+			TargetRot,
+			DeltaTime,
+			8.0f);
+
+	GetMesh()->SetRelativeRotation(NewRot);
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -30,15 +30,15 @@ protected:
 
 	/** 持ち主のクラス */
 	UPROPERTY()
-	AActor* OwnerActor;
+	TObjectPtr<AActor> OwnerActor;
 
 	/** Niagaraシステム */
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* EffectSystem;
+	TObjectPtr<UNiagaraSystem> EffectSystem;
 
 	/** Niagaraコンポーネント */
 	UPROPERTY()
-	UNiagaraComponent* EffectComponent;
+	TObjectPtr<UNiagaraComponent> EffectComponent;
 
 	/** エフェクトのRelativeTransform */
 	UPROPERTY(EditAnywhere)

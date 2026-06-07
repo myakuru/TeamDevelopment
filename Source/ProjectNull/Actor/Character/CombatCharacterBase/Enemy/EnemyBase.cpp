@@ -16,6 +16,7 @@
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
+#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)

@@ -27,6 +27,7 @@ public class ProjectNull : ModuleRules
 			"MovieScene",
 			"CinematicCamera",
 			"AIModule",
+            "AnimGraphRuntime",
             "NavigationSystem"
         });
 

@@ -8,25 +8,20 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
 
-
 AProjectileBase::AProjectileBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	// ================================================================
-	// ルートコンポーネントの初期化
-	// ================================================================
-	/*Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	SetRootComponent(Root);*/
+	
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
 
 	// ================================================================
 	// スフィアコリジョンコンポーネントの初期化
 	// ================================================================
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
-	//if (!SphereCollision) { return; }
-	//
-	SetRootComponent(SphereCollision);
+	if (!SphereCollision) { return; }
 
-	//SphereCollision->SetupAttachment(Root);
+	SphereCollision->SetupAttachment(Root);
 
 	SphereCollision->SetCollisionEnabled(
 		ECollisionEnabled::QueryAndPhysics);
@@ -50,7 +45,7 @@ AProjectileBase::AProjectileBase()
 	// ================================================================
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	if (!StaticMesh) { return; }
-	StaticMesh->SetupAttachment(SphereCollision);
+	StaticMesh->SetupAttachment(Root);
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// ================================================================
@@ -58,7 +53,7 @@ AProjectileBase::AProjectileBase()
 	// ================================================================
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	if (!ProjectileMovement) { return; }
-	ProjectileMovement->UpdatedComponent = SphereCollision;
+	ProjectileMovement->UpdatedComponent = Root;
 }
 
 void AProjectileBase::BeginPlay()
@@ -82,20 +77,8 @@ void AProjectileBase::BeginPlay()
 
 }
 
-void AProjectileBase::Tick(float DeltaTime)
+void AProjectileBase::HandleCollision(AActor* OtherActor)
 {
-	Super::Tick(DeltaTime);
-}
-
-void AProjectileBase::OnCollisionOverlap(
-	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
-{
-	UE_LOG(LogTemp, Display, TEXT("当たった!"));
 	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
 
 	auto Enemy = Cast<AEnemyBase>(OtherActor);
@@ -109,6 +92,23 @@ void AProjectileBase::OnCollisionOverlap(
 	Enemy->SetTakeDamaged();
 
 	Destroy();
+}
+
+void AProjectileBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void AProjectileBase::OnCollisionOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	HandleCollision(OtherActor);
 }
 
 void AProjectileBase::OnProjectileStop(const FHitResult& Hit)

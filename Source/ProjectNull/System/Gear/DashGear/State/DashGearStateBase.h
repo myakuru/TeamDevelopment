@@ -7,6 +7,8 @@
 /** ナイアガラシステムクラス */
 class UNiagaraSystem;
 
+/** アニメーションモンタージュ */
+class UAnimMontage;
 
 UCLASS()
 class PROJECTNULL_API UDashGearStateBase : public UGearStateBase
@@ -21,6 +23,7 @@ public:
 
 	virtual void Execute(int32 CurrentGearLevel)		override;
 	virtual void Update(float DeltaTime)				override;
+	virtual void End()									override;
 
 protected:
 	
@@ -30,7 +33,10 @@ protected:
 	void PlayDashEffect();
 
 	UPROPERTY(EditAnywhere, Category = "Effect")
-	UNiagaraSystem* DashEffect;
+	TObjectPtr<UNiagaraSystem> DashEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> DashAnimMontage;
 
 private:
 
