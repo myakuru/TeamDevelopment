@@ -165,3 +165,4 @@ UDataTable* UWeaponManager::GetWeaponDataTable()
 	if (m_WeaponDataTable) return m_WeaponDataTable;
 	else return nullptr;
 }
+

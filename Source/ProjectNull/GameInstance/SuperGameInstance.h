@@ -6,6 +6,7 @@
 
 class UMySaveGame;
 class UStageDataAsset;
+class UStageManager;
 class UWeaponManager;
 class UMapActorManager;
 class UPlayerParameterData;
@@ -29,11 +30,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SaveGameData();
 
-	/** ゲームデータを取得する */
+	/** セーブデータを取得する */
 	inline UMySaveGame* GetCurrentSaveData() const { return CurrentSaveData; }
 
 	/** ステージデータを取得する */
 	inline TObjectPtr<UStageDataAsset> GetStageDataAsset() const { return StageDataAsset; }
+
+	/** ステージマネージャーを取得する */
+	inline TObjectPtr<UStageManager> GetStageManagerSubsystem() const { return StageManager; }
 
 	/** 最高スコアか判定し、保存する */
 	inline void SetStageScore(int32 inStageIndex, int32 inScore);
@@ -45,6 +49,7 @@ public:
 	UMapActorManager* GetMapActorManager() const { return MapActorManager; }
 protected:
 
+	/** セーブデータ */
 	UPROPERTY()
 	UMySaveGame* CurrentSaveData;
 
@@ -52,11 +57,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStageDataAsset> StageDataAsset;
 
+	/** ステージマネージャー */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UStageManager> StageManager;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UDataTable* WeaponDataTable;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UDataTable* WeaponMaterialDataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UWeaponManager> WeaponManagerClass;
 
 	UPROPERTY(BlueprintReadOnly)
 	UWeaponManager* WeaponManager;

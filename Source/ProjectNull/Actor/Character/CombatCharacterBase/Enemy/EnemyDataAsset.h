@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "EnemyDataStruct.h"
 #include <ProjectNull/Utility/StateMachine/StateDataBase.h>
 #include "EnemyDataAsset.generated.h"
 

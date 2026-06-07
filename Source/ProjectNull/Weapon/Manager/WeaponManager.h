@@ -15,7 +15,9 @@ class UMySaveGame;
 /**
  * 
  */
-UCLASS(BlueprintType)
+
+
+UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UWeaponManager : public UObject
 {
 	GENERATED_BODY()
@@ -60,6 +62,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UDataTable* GetWeaponDataTable();
+
 
 
 private:

@@ -37,6 +37,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	float UIScale = 1.0f;
 
+	FVector2D MaxUiScale = FVector2D(1.0f, 1.0f);
+
 	/** アイコンの拡大率の減少速度 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	float UIScaleDecreaseRate = 10.0f;
@@ -47,11 +49,12 @@ protected:
 
 	void ShowUI(bool bShow);
 
+	void ResetUi();
 
 public:
 	/** 表示位置を更新、PlayerHUDWidgetで変更されてる*/
 	UFUNCTION(BlueprintCallable)
-	void UpdateRotationImage(float CooldownTime);
+	void UpdateRotationImage(float CooldownTime, float MaxCooldownTime);
 
 	/** クールダウンテキストを更新する関数 */
 	UFUNCTION(BlueprintCallable)

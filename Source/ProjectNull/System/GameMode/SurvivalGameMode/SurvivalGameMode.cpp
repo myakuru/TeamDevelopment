@@ -1,14 +1,10 @@
 ﻿
 #include "SurvivalGameMode.h"
-
-#include "EngineUtils.h" 
-#include "CineCameraActor.h"
-#include "CineCameraComponent.h"
-#include "LevelSequenceActor.h"
-#include "LevelSequencePlayer.h"
+#include "Kismet/GameplayStatics.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
+#include <ProjectNull/Actor/MyCineCameraActor/MyCineCameraActor.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
@@ -21,50 +17,40 @@ void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// PlayerController の初期化を待って次フレームで再生
-	GetWorldTimerManager().SetTimerForNextTick
-	(
-		this, &ASurvivalGameMode::PlayOpeningCutscene
-	);
-}
+	OpeningCameraActor = Cast<AMyCineCameraActor>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), AMyCineCameraActor::StaticClass()));
 
-void ASurvivalGameMode::PlayOpeningCutscene()
-{
-	// シーケンスが未設定ならそのままゲーム開始
-	if (!OpeningSequence) return;
+	if (!OpeningCameraActor) return;
 
-	// 入力をブロック
-	if (ARobotController* RC = Cast<ARobotController>(GetWorld()->GetFirstPlayerController()))
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (ARobotController* RC = Cast<ARobotController>(PC))
 	{
 		RC->SetCanReceiveInput(false);
 	}
 
-	ALevelSequenceActor* OutActor = nullptr;
-
-	// レベルシーケンスを再生
-	FMovieSceneSequencePlaybackSettings Settings;
-	SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer
-	(
-		GetWorld(), OpeningSequence, Settings, OutActor
-	);
-
-	if (SequencePlayer)
+	if (PC)
 	{
-		// 再生終了時に OnOpeningCutsceneFinished を呼ぶ
-		SequencePlayer->OnFinished.AddDynamic
-		(
-			this, &ASurvivalGameMode::OnOpeningCutsceneFinished
-		);
-		SequencePlayer->Play();
+		PC->SetViewTargetWithBlend(OpeningCameraActor, TargetBlendSpeed);
 	}
+
+	OpeningCameraActor->OnCutsceneFinished.AddDynamic(this, &ASurvivalGameMode::OnCutsceneFinished);
+	OpeningCameraActor->PlayOpeningCutscene();
 }
 
-void ASurvivalGameMode::OnOpeningCutsceneFinished()
+void ASurvivalGameMode::OnCutsceneFinished()
 {
-	// 入力を解放してゲーム開始
-	if (ARobotController* RC = Cast<ARobotController>(GetWorld()->GetFirstPlayerController()))
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	APlayerBase* Player = PC ? Cast<APlayerBase>(PC->GetPawn()) : nullptr;
+
+	if (ARobotController* RC = Cast<ARobotController>(PC))
 	{
 		RC->SetCanReceiveInput(true);
+	}
+
+	if (PC && Player)
+	{
+		PC->SetViewTargetWithBlend(Player, TargetBlendSpeed);
 	}
 }
 
@@ -72,19 +58,13 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 敵管理クラスの情報取得
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	
-	// 敵管理クラスの更新メソッドを呼ぶ（毎フレーム）
-	if (enemyManager) {
-		//(LogTemp, Warning, TEXT("num %d"), enemyManager->GetEnemyNum());
+	if (enemyManager)
+	{
 		enemyManager->UpdateEnemies(DeltaTime);
 	}
 
-	/** アイテム管理クラスの情報取得*/
 	UItemManagerSubsystem* itemManager = GetWorld()->GetSubsystem<UItemManagerSubsystem>();
-
-	/** 更新*/
 	if (itemManager)
 	{
 		itemManager->UpdateItemManagers(DeltaTime);

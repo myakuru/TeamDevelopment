@@ -211,6 +211,12 @@ public:
 	 */
 	void AddGearEnergy(float Amount);
 
+	/**
+	 * @brief プレイヤーのHP減算処理
+	 * @param Amount　減算されるHP
+	 */
+	void SubtractHealth(float Amount);
+
 	bool CanChangeGear(int32 CurrentGearLevel);
 
 	void ResetDataOnGearChange(int32 CurrentGearLevel);

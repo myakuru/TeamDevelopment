@@ -22,62 +22,54 @@ enum class EAutoAttackType : uint8
 	Count UMETA(Hidden)
 };
 
-/// <summary>
-/// 自動攻撃クラス
-/// </summary>
+
+/** 自動攻撃クラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UAutoAttack final : public UAttackBase
 {
 	GENERATED_BODY()
-
 public:
-
 	UAutoAttack();
-
 public:
 
 	void Initialize(AActor* Owner)	override;
-	void Update(float DeltaTime,
+	void Update(
+			float DeltaTime,
 			AActor* Player = nullptr,
 			UEnemyManagerSubsystem* EnemyManager = nullptr)	override;
 	void Execute()					override { return; }
 
-	// ゲッター
+	/** Getter */
 	inline float GetAutoAttackInterval() const	{ return AutoAttackInterval; }
 	inline float GetFrontToRingDelay() const	{ return FrontToRingDelay; }
 
 private:
-
-	/// <summary>
-	/// 自動攻撃の開始
-	/// </summary>
+	
+	/**
+	 * @brief 自動攻撃の開始
+	 */
 	void StartAutoAttack();
 
-	/// <summary>
-	/// 周囲2段階（リング状に移動）自動斬撃攻撃の開始
-	/// </summary>
+	/**
+	 * @brief 周囲2段階（リング状に移動）自動斬撃攻撃の開始
+	 */
 	void StartAutoRingAttack();
 	
-	// 自動攻撃の間隔時間
+	/** 自動攻撃の間隔時間 */
 	UPROPERTY(EditAnywhere)
 	float AutoAttackInterval;
 
-	// 前方扇状自動攻撃からの周囲攻撃遅延時間
+	/** 前方扇状自動攻撃からの周囲攻撃遅延時間 */
 	UPROPERTY(EditAnywhere)
 	float FrontToRingDelay;
 
-	// 自動攻撃のパラメータマップ配列
+	/** 自動攻撃のパラメータマップ配列 */
 	UPROPERTY(EditAnywhere, Instanced)
 	TMap<EAutoAttackType, UFloatingWeaponAttack*> AutoAttackParamsMap;
 
-	// ================================================================
-	// タイマー関連
-	// ================================================================
-
-	// 前方扇状自動攻撃タイマー
+	/** 前方扇状自動攻撃タイマー*/
 	FTimerHandle AutoFrontConeAttackTimerHandle;
 
-	// 前方扇状自動攻撃からの周囲攻撃遅延タイマー
+	/** 前方扇状自動攻撃からの周囲攻撃遅延タイマー */
 	FTimerHandle FrontToRingDelayTimerHandle;
-
 };
