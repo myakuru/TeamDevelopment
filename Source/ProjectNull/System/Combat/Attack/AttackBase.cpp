@@ -25,10 +25,6 @@ void UAttackBase::Initialize(AActor* Owner)
 		FAttachmentTransformRules::KeepRelativeTransform);
 }
 
-void UAttackBase::AttackJudge()
-{
-}
-
 FVector UAttackBase::CalcAttackDir(const FVector& forwardVector) const
 {
 	return forwardVector.RotateAngleAxis(0.0f, FVector::UpVector);

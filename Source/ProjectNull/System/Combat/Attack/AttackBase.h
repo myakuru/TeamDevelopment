@@ -4,18 +4,11 @@
 #include "UObject/Object.h"
 #include "AttackBase.generated.h"
 
-// �G�Ǘ��N���X
-class UEnemyManagerSubsystem;
-
-// �v���C���[���N���X
-class APlayerBase;
-
 class USceneComponent;
 
-/// <summary>
-/// �U���̊��N���X
-/// �v���C���[��G�̍U���R���|�[�l���g�N���X�Ŏg�p�����U���N���X�̊��N���X
-/// </summary>
+/**
+ * @brief 攻撃の基底クラス
+ */
 UCLASS()
 class PROJECTNULL_API UAttackBase : public UObject
 {
@@ -29,7 +22,7 @@ public:
 
 	/**
 	 * @brief 初期化
-	 * @param Owner 
+	 * @param Owner オーナーアクター
 	 */
 	virtual void Initialize(class AActor* Owner);
 
@@ -47,7 +40,7 @@ public:
 	/**
 	 * @brief 当たり判定処理
 	 */
-	virtual void AttackJudge();
+	virtual void AttackJudge() { return; }
 
 	/**
 	 * @brief 扇範囲内にターゲットがいるかどうかの判定
@@ -79,11 +72,11 @@ protected:
 
 	/**	オーナー */
 	UPROPERTY()
-	AActor* OwnerActor;
+	TObjectPtr<AActor> OwnerActor;
 	
 	/** アタッチ用のルート（位置・回転管理） */
 	UPROPERTY()
-	USceneComponent* RootComponent;
+	TObjectPtr<USceneComponent> RootComponent;
 
 	/**	攻撃可能フラグ */
 	bool bCanExecute = true;
