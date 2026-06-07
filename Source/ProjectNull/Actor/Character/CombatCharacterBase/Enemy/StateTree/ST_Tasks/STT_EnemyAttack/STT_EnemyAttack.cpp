@@ -18,14 +18,14 @@ USTT_EnemyAttack::USTT_EnemyAttack(const FObjectInitializer& a_ObjInit)
 EStateTreeRunStatus USTT_EnemyAttack::EnterState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
 	Super::EnterState(a_Context, a_Transition);
-
-	// 攻撃処理初期化
-	Attack->Initialize(OwnerEnemy);
-	if (!Attack)		{ return EStateTreeRunStatus::Failed; }
 	
 	// オーナーセット
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy)	{ return EStateTreeRunStatus::Failed; }
+
+	// 攻撃処理初期化
+	Attack->Initialize(OwnerEnemy);
+	if (!Attack) { return EStateTreeRunStatus::Failed; }
 
 	// 前ステートの終了フラグをリセット
 	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();

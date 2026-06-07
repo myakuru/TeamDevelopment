@@ -26,7 +26,8 @@ public class ProjectNull : ModuleRules
 			"LevelSequence",
 			"MovieScene",
 			"CinematicCamera",
-			"AIModule"
+			"AIModule",
+            "NavigationSystem"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
