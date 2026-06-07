@@ -58,6 +58,10 @@ public:
 	/** RunStopへ遷移すべきか */
 	UPROPERTY(BlueprintReadOnly)
 	bool bShouldEnterRunStop;
+
+	/** 移動入力が存在するか */
+	UPROPERTY(BlueprintReadOnly)
+	bool bHasMoveInput;
 private:
 
 	/**

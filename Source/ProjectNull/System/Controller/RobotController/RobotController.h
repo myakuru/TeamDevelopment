@@ -28,11 +28,14 @@ public:
 
 	/** Setter */
 	inline void SetCanReceiveInput(bool bInCanReceiveInput) { bCanReceiveInput = bInCanReceiveInput;}
+	inline bool HasMoveInput() const { return bHasMoveInput; }
+	
 
 protected:
 
 	virtual void BeginPlay()			override;
 	virtual void SetupInputComponent()	override;
+	virtual void Tick(float DeltaTime)	override;
 
 
 
@@ -55,8 +58,13 @@ private:
 		int32 ExecuteIndex);
 
 
+
 	/** 入力受付可能か */
 	bool bCanReceiveInput;
+
+	/** 移動入力が存在するか */
+	UPROPERTY()
+	bool bHasMoveInput;
 
 	UPROPERTY()
 	TObjectPtr<APlayerBase> PlayerBase;
