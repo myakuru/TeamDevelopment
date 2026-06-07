@@ -13,7 +13,10 @@ void USuperGameInstance::Init()
 {
 	Super::Init();
 
-	WeaponManager = NewObject<UWeaponManager>(this);
+
+	if (WeaponManagerClass) {
+		WeaponManager = NewObject<UWeaponManager>(this, WeaponManagerClass);
+	}
 	if (WeaponManager) WeaponManager->Initialize(WeaponDataTable,WeaponMaterialDataTable);
 
 	//StageManager

@@ -16,5 +16,13 @@ class PROJECTNULL_API UExplosionGearState_Lv2 : public UExplosionGearStateBase
 
 public:
 	UExplosionGearState_Lv2();
+
+	void Execute(int32 CurrentGearLevel)override;
+	void Update(float DeltaTime)		override;
+
+private:
+
+	UPROPERTY(EditAnywhere)
+	TArray<FCircleSpawnData> CircleSpawnDatas;
 	
 };
