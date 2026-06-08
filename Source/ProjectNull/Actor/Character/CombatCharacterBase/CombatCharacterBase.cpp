@@ -23,5 +23,3 @@ void ACombatCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-
-

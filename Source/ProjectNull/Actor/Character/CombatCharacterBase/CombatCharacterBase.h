@@ -6,7 +6,7 @@
 #include "CombatCharacterBase.generated.h"
 
 UCLASS()
-class PROJECTNULL_API ACombatCharacterBase : public ACharacter
+class PROJECTNULL_API ACombatCharacterBase :public ACharacter
 {
 	GENERATED_BODY()
 
@@ -21,5 +21,4 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
 };

@@ -35,7 +35,6 @@ ACrossLaserbeam::ACrossLaserbeam()
 		Box->OnComponentBeginOverlap.AddDynamic(
 			this,
 			&ACrossLaserbeam::OnLaserBeginOverlap);
-
 		Box->OnComponentEndOverlap.AddDynamic(
 			this,
 			&ACrossLaserbeam::OnLaserEndOverlap);

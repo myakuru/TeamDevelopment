@@ -177,13 +177,14 @@ void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
 	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
 }
 
-void AEnemyBase::SetTakeDamaged(int32 AttackPower)
+void AEnemyBase::TakeDamaged(float a_Damage)
 {
-	// 簡易的に渡された値分,FinalHPを減算
-	EnemyStatus.FinalHP -= AttackPower;
+	// 渡された値分、FinalHPを減算
+	EnemyRuntimeData->AddHealth(-a_Damage);
 	OnHit();
 
-	if (EnemyStatus.FinalHP <= 0)
+	// 体力が0以下なら死亡フラグを立てる
+	if (EnemyRuntimeData->GetHealth() <= 0)
 	{
 		EnemyStatus.IsAlive = false;
 		EnemyRuntimeData->ChangedIsAlive(EnemyStatus.IsAlive);

@@ -5,6 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
+#include "../../../../System/Interface/CharacterInterface/CharacterInterface.h"
 #include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
@@ -53,7 +54,9 @@ class UEnemyRuntimeData;
 ///	重くなる可能性があるためActorを継承する可能性大
 /// </summary>
 UCLASS()
-class PROJECTNULL_API AEnemyBase : public AActor, public IEnemyInterface
+class PROJECTNULL_API AEnemyBase:	public AActor
+								,	public ICharacterInterface
+								,	public IEnemyInterface
 {
 	GENERATED_BODY()
 
@@ -79,12 +82,6 @@ public:
 	 * @param EnemyWeight 敵の重さ
 	 */
 	virtual void SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight);
-
-	/**
-	 * @brief 敵（自身) がダメージを受ける処理
-	 * @param AttackPower 攻撃力
-	 */
-	virtual void SetTakeDamaged(int32 AttackPower = 1);
 
 	/**
 	 * @brief 移動方向のセット
@@ -181,9 +178,9 @@ public:
 	 * @param a_targetBit	上げたいBit
 	 */
 	template<typename T>
-	void UpEnumBit(uint8 a_currentBit, T a_targetBit)
+	void UpEnumBit(uint8 a_CurrentBit, T a_TargetBit)
 	{
-		a_currentBit |= static_cast<uint8>(a_targetBit);
+		a_CurrentBit |= static_cast<uint8>(a_TargetBit);
 	}
 
 	/**
@@ -193,14 +190,19 @@ public:
 	 * @param a_targetBit	下げたいBit
 	 */
 	template<typename T>
-	void DownEnumBit(uint8 a_currentBit, T a_targetBit)
+	void DownEnumBit(uint8 a_CurrentBit, T a_TargetBit)
 	{
-		a_currentBit &= ~static_cast<uint8>(a_targetBit);
+		a_CurrentBit &= ~static_cast<uint8>(a_TargetBit);
 	}
 
 	bool GetAliveFlg() { return EnemyStatus.IsAlive; }
 
 	//~ End Getter
+
+	/* Begin Character Interface.*/
+	virtual void TakeDamaged(float a_Damage = 1.f)override;
+
+	/* End Character Interface.*/
 
 protected:
 

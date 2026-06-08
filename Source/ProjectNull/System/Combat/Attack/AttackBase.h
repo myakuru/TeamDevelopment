@@ -24,13 +24,18 @@ public:
 	 * @brief 初期化
 	 * @param Owner オーナーアクター
 	 */
-	virtual void Initialize(class AActor* Owner);
+	virtual void Initialize(const TObjectPtr<AActor>& Owner);
 
 	/**
 	 * @brief 有効化処理
 	 */
 	virtual void Execute() PURE_VIRTUAL(UAttackBase::Execute, );
 	
+	/**
+	 * @brief 中止処理
+	 */
+	virtual void Cancel()PURE_VIRTUAL(UAttackBase::Cancel, );
+
 	/**
 	 * @brief 更新処理
 	 * @param DeltaTime デルタタイム
@@ -84,5 +89,8 @@ protected:
 	/**	攻撃有効フラグ */
 	bool bIsActive = false;
 
-	FTransform Transform;
+	/**
+	 * @brief 攻撃時の位置・回転・スケールのオフセット値
+	 */
+	FTransform OffsetTransform = FTransform();
 };
