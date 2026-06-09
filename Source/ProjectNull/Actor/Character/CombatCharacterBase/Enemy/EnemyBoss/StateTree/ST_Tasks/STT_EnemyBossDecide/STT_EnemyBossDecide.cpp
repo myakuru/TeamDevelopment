@@ -19,40 +19,6 @@ USTT_EnemyBossDecide::USTT_EnemyBossDecide(const FObjectInitializer& a_ObjInit)
 
 EStateTreeRunStatus USTT_EnemyBossDecide::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	//// どれかポインタがなければリターン
-	//if (!IsValid(OwnerBoss) || !IsValid(TargetActor) || !IsValid(AIC))
-	//{
-	//	return EStateTreeRunStatus::Failed;
-	//}
-
-	//// 距離を算出
-	//const float Distance = FVector::Dist(OwnerBoss->GetActorLocation(),TargetActor->GetActorLocation());
-
-	//// 距離が攻撃範囲より狭ければ次のステートへ
-	//if (Distance <= CurrentAttack.AttackRange)
-	//{
-	//	AIC->StopMovement();
-	//	UE_LOG(LogTemp, Warning, TEXT("Approach: Dist=%f Range=%f"), Distance, CurrentAttack.AttackRange);
-	//	return EStateTreeRunStatus::Succeeded;
-	//}
-
-	//// 速度をとりあえず決める
-	//float Speed = CurrentAttack.SlowSpeed;
-
-	//// 間合いに入ったら一気に距離を詰める
-	//if (CurrentAttack.bUseFastSpeed && Distance <= CurrentAttack.FastStartDistance)
-	//{
-	//	Speed = CurrentAttack.FastSpeed;
-	//}
-
-	//// キャラクターのムーブコンポーネントに速度を代入
-	//if (UCharacterMovementComponent* MoveComp = OwnerBoss->GetCharacterMovement())
-	//{
-	//	MoveComp->MaxWalkSpeed = Speed;
-	//}
-
-	//// 移動処理
-	//UAIBlueprintHelperLibrary::SimpleMoveToActor(AIC, TargetActor);
 
 	return EStateTreeRunStatus::Running;
 }

@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+// ------------------------------------------------------------------------------------
+// Includes
+// ------------------------------------------------------------------------------------
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "EnemyBossAnimInstance.generated.h"
@@ -10,6 +13,10 @@ class PROJECTNULL_API UEnemyBossAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+
+	// ------------------------------------------------------------------------------------
+	// public method
+	// ------------------------------------------------------------------------------------
 
 	/** 初期化（ゲームスレッド）。Pawnをキャッシュしておく*/
 	virtual void NativeInitializeAnimation()override;
@@ -22,6 +29,10 @@ public:
 	float MoveSpeed = 0.0f;
 
 private:
+
+	// ------------------------------------------------------------------------------------
+	// private valiables
+	// ------------------------------------------------------------------------------------
 
 	// このAnimInstanceが動かしているPawn
 	UPROPERTY(Transient)
