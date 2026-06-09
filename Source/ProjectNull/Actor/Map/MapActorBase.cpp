@@ -23,6 +23,7 @@ AMapActorBase::AMapActorBase()
 	Trigger->SetCollisionObjectType(ECC_WorldDynamic);
 	Trigger->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Trigger->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	Trigger->SetGenerateOverlapEvents(true);
 }
 
 void AMapActorBase::BeginPlay()

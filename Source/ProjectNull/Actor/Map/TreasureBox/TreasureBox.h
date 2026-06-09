@@ -54,7 +54,7 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
 	FName TreasureID = NAME_None;
 
-	UPROPERTY(EditAnywhere, Category = "Params|ID")
+	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
 	bool DestroyedFromSaveData = true;
 
 	/**ディゾルブ用マテリアルインスタンス */

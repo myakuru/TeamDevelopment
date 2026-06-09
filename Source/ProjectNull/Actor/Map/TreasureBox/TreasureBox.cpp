@@ -50,7 +50,6 @@ void ATreasureBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//ディゾルブ処理
     if (!bDissolving) return;
 
     DissolveAmount += DeltaTime * DissolveSpeed;
