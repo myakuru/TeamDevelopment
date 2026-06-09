@@ -38,11 +38,10 @@ void ATreasureBox::BeginPlay()
 		}
 	}
 
-	// ディゾルブ用マテリアルインスタンスの生成
+	//メッシュのマテリアルスロット0のマテリアルを動的インスタンス化して保存
 	if (Mesh)
 	{
 		DynamicMaterial = Mesh->CreateAndSetMaterialInstanceDynamic(0);
-		Mesh->SetMaterial(0, DynamicMaterial);
 	}
 }
 
@@ -54,10 +53,13 @@ void ATreasureBox::Tick(float DeltaTime)
 
     DissolveAmount += DeltaTime * DissolveSpeed;
 
-    DynamicMaterial->SetScalarParameterValue(
-        TEXT("DissolveAmount"),
-        DissolveAmount
-    );
+	// ディゾルブマテリアルのパラメータを更新(マテリアルの変数名とTEXTが違うと動かない)
+	if (DynamicMaterial) {
+		DynamicMaterial->SetScalarParameterValue(
+			TEXT("DissolveAmount"),
+			DissolveAmount
+		);
+	}
 
     if (DissolveAmount >= 1.0f)
     {
