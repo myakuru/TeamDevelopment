@@ -4,6 +4,8 @@
 #include "../AttackBase.h"
 #include "FanAttackBase.generated.h"
 
+class UEnemyManagerSubsystem;
+
 /**
  * 扇状攻撃コンポーネントの基底クラス
  */
@@ -18,47 +20,52 @@ public:
 
 public:
 
-	/// <summary>
-	/// 開始の際の初期化
-	/// </summary>
+	/**
+	 * @brief 攻撃開始時の初期化
+	 */
 	virtual void Start();
 
-	/// <summary>
-	/// �U���̎��s
-	/// </summary>
+	/**
+	 * @brief 有効化処理
+	 */
 	virtual void Execute()override;
 	
+	/**
+	 * @brief 更新処理
+	 * @param DeltaTime デルタタイム
+	 * @return 更新結果
+	 */
 	virtual void Update(float DeltaTime)override;
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	/// <param name="DeltaTime">デルタタイム</param>
-	/// <returns>更新結果</returns>
+	/**
+	 * @brief 攻撃判定の更新
+	 * @param DeltaTime デルタタイム
+	 * @return 攻撃が終了しているならtrue
+	 */
 	virtual bool UpdateAttack(float DeltaTime);
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
+	/**
+	 * @brief まだ生存していて削除可能か
+	 * @return 削除可能ならtrue
+	 */
 	bool CanDeactivate();
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
+	/**
+	 * @brief 有効化された瞬間のフレームか
+	 * @return 有効化されたフレームならtrue
+	 */
 	bool IsActiveFirstFrame();
 
-	/// <summary>
-	/// 
-	/// </summary>
+	/**
+	 * @brief PrevFlagを更新
+	 */
 	void UpdatePrevActiveFlg();
 
-	/// <summary>
-	/// 攻撃範囲内にターゲットがいるかどうかの判定
-	/// </summary>
-	/// <param name="Target			">ターゲット	</param>
-	/// <returns>ターゲットが攻撃範囲内かどうか</returns>
+	/**
+	 * @brief 攻撃範囲内にターゲットが居るかの判定
+	 * @param Target ターゲット
+	 * @return 攻撃範囲内ならtrue
+	 */
 	virtual bool IsTargetInRange(AActor* Target) override;
 
 	/// <summary>
@@ -66,34 +73,45 @@ public:
 	/// </summary>
 	/// <param name="forwardVector">前方方向</param>
 	/// <returns>計算結果</returns>
+	
+	/**
+	 * @brief 攻撃方向を算出
+	 * @param forwardVector 前方ベクトル
+	 * @return 計算後のベクトル
+	 */
 	virtual FVector CalcAttackDir(const FVector& forwardVector) const override;
 	FVector CalcAttackDir(const FVector& forwardVector,float Angle) const;
 
-	/// <summary>
-	/// 半径の二乗を取得
-	/// </summary>
-	/// <returns>半径の二乗</returns>
+	/**
+	 * @brief 半径の二乗を取得
+	 * @return 二乗した結果
+	 */
 	inline float GetRadiusSquared() const { return Radius * Radius; }
 
-	/// <summary>
-	/// 扇角のcos値
-	/// </summary>
-	/// <returns>扇角のcos値</returns>
+	/**
+	 * @brief 扇角のcos値を取得
+	 * @return cos値に変換した結果
+	 */
 	inline float GetConeCosine() const { return FMath::Cos(FMath::DegreesToRadians(ConeAngle)); }
 
 protected:
 
-	/// <summary>
-	/// 敵リストに対する攻撃判定
-	/// </summary>
-	/// <param name="EnemyManager">敵管理クラスのアドレス</param>
-	virtual void AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager) override;
+	/**
+	 * @brief 攻撃判定を、「対敵リスト」「対プレイヤー」かを判断
+	 */
+	virtual void AttackJudge()override;
 
-	/// <summary>
-	/// プレイヤーに対する攻撃判定
-	/// </summary>
-	/// <param name="Player">プレイヤークラスのアドレス</param>
-	virtual void AttackJudgePlayer(AActor* Player) override;
+	/**
+	 * @brief 敵リストに対する攻撃判定
+	 * @param EnemyManager 敵管理クラスのアドレス
+	 */
+	virtual void AttackJudgeEnemys(const TObjectPtr<UEnemyManagerSubsystem>& a_EnemyManager);
+
+	/**
+	 * @brief プレイヤーに対する攻撃判定
+	 * @param Player プレイヤークラスのアドレス
+	 */
+	virtual void AttackJudgePlayer(const TObjectPtr<AActor>& a_Player);
 
 public:
 

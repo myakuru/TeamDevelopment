@@ -11,7 +11,7 @@ UFloatingWeaponAttack::UFloatingWeaponAttack()
 
 }
 
-void UFloatingWeaponAttack::Initialize(AActor* Owner)
+void UFloatingWeaponAttack::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	UFanAttackBase::Initialize(Owner);
 
@@ -37,9 +37,9 @@ void UFloatingWeaponAttack::Start()
 	}
 }
 
-void UFloatingWeaponAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
+void UFloatingWeaponAttack::Update(float DeltaTime)
 {
-	UFanAttackBase::Update(DeltaTime, Player, EnemyManager);
+	UFanAttackBase::Update(DeltaTime);
 
 	if (FloatingWeaponEffect)
 	{

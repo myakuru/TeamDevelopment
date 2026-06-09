@@ -1,8 +1,11 @@
 ﻿#include "FanAttackBase.h"
 
+#include "Kismet/GameplayStatics.h"
 #include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
+#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 UFanAttackBase::UFanAttackBase():
@@ -31,9 +34,9 @@ void UFanAttackBase::Execute()
 {
 }
 
-void UFanAttackBase::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
+void UFanAttackBase::Update(float DeltaTime)
 {
-	UAttackBase::Update(DeltaTime, Player, EnemyManager);
+	UAttackBase::Update(DeltaTime);
 
 	UpdateAttack(DeltaTime);
 }
@@ -48,7 +51,6 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 	if (bRotate) {
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("StartAngle %.2f"), StartAngle);
 
 	// 攻撃範囲をデバッグラインで可視化
 	{
@@ -105,42 +107,72 @@ bool UFanAttackBase::IsTargetInRange(AActor* Target)
 	return dot > GetConeCosine();
 }
 
-
-void UFanAttackBase::AttackJudgePlayer(AActor* Player)
+void UFanAttackBase::AttackJudge()
 {
-	if (!Player|| !bIsActive) { return; }
+	if (!OwnerActor) { return; }
+
+	if (auto* root = OwnerActor->GetRootComponent())
+	{
+		ECollisionChannel collisionChannel =
+			root->GetCollisionObjectType();
+
+		// コリジョンタイプが「Pawn(プレイヤー)」か
+		if (collisionChannel == ECC_Player)
+		{
+			auto* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+			if (!enemyManager) { return; }
+
+			AttackJudgeEnemys(enemyManager);
+		}
+		else if (collisionChannel == ECC_Enemy)
+		{
+			auto* playerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+			if (!playerPawn) { return; }
+
+			AttackJudgePlayer(playerPawn);
+		}
+	}
+}
+
+void UFanAttackBase::AttackJudgePlayer(const TObjectPtr<AActor>& a_Player)
+{
+	if (!a_Player|| !bIsActive) { return; }
 
 	// 持ち主の座標を取得
 	const FVector ownerLocation = OwnerActor->GetActorLocation();
 
 	// 敵が攻撃範囲内にいるか判定
-	if (IsTargetInRange(Player))
+	if (IsTargetInRange(a_Player))
 	{
 		// ダメージを与える(未実装)
-		
+		if (auto* interface = Cast<ICharacterInterface>(a_Player))
+		{
+			interface->TakeDamaged();
+			interface->TakeKnockBack(ownerLocation);
+		}
 	}
 }
 
-void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
+void UFanAttackBase::AttackJudgeEnemys(const TObjectPtr<UEnemyManagerSubsystem>& a_EnemyManager)
 {
-	if (!EnemyManager||!bIsActive) { return; }
+	if (!a_EnemyManager||!bIsActive) { return; }
 
 	// プレイヤーの座標を取得
 	const FVector location = OwnerActor->GetActorLocation();
 
 	// 敵リストをループして、攻撃範囲内の敵にダメージを与える
-	for (auto& enemy : EnemyManager->GetEnemyList())
+	for (auto& enemy : a_EnemyManager->GetEnemyList())
 	{
 		if (!enemy) { continue; }
 
 		// 敵が攻撃範囲内にいるか判定
 		if (IsTargetInRange(enemy))
 		{
-			// 第二引数※要改善(ノックバックの強さなどは基底に置くかゲットできるようにしたい)
-			enemy->SetKnockBackData(location, 2.0f, 1.0f);
-
-			// ダメージを与える
-			enemy->SetTakeDamaged();
+			if (auto* interface = Cast<ICharacterInterface>(enemy))
+			{
+				interface->TakeDamaged();
+				interface->TakeKnockBack(location);
+			}
 		}
 	}
 }

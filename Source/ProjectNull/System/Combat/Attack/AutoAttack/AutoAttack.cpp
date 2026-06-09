@@ -4,12 +4,12 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
+#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
-#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
 
 
 
@@ -19,7 +19,7 @@ UAutoAttack::UAutoAttack():
 {
 }
 
-void UAutoAttack::Initialize(AActor* Owner)
+void UAutoAttack::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	UAttackBase::Initialize(Owner);
 
@@ -39,17 +39,14 @@ void UAutoAttack::Initialize(AActor* Owner)
 		&UAutoAttack::StartAutoAttack,
 		AutoAttackInterval,
 		true);
-
 }
 
-void UAutoAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
+void UAutoAttack::Update(float DeltaTime)
 {
-	if (!EnemyManager) { return; }
-
 	for (auto& [Type, ConeSlashParams] : AutoAttackParamsMap)
 	{
 		if (!ConeSlashParams) { continue; }
-		ConeSlashParams->Update(DeltaTime, Player, EnemyManager);
+		ConeSlashParams->Update(DeltaTime);
 	}
 
 	for (auto& [Type, ConeSlashParams] : AutoAttackParamsMap)
@@ -57,7 +54,7 @@ void UAutoAttack::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem
 		if (!ConeSlashParams) { continue; }
 
 		if (!ConeSlashParams->IsActive()) { continue; }
-		ConeSlashParams->AttackJudge(nullptr, EnemyManager);
+		//ConeSlashParams->AttackJudge();
 	}
 }
 

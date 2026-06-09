@@ -9,7 +9,7 @@ class USceneComponent;
 /**
  * @brief 攻撃の基底クラス
  */
-UCLASS()
+UCLASS(Blueprintable,EditInlineNew)
 class PROJECTNULL_API UAttackBase : public UObject
 {
 	GENERATED_BODY()
@@ -19,7 +19,6 @@ public:
 	UAttackBase();
 
 public:
-
 	/**
 	 * @brief 初期化
 	 * @param Owner オーナーアクター
@@ -34,7 +33,7 @@ public:
 	/**
 	 * @brief 中止処理
 	 */
-	virtual void Cancel()PURE_VIRTUAL(UAttackBase::Cancel, );
+	virtual void Cancel() PURE_VIRTUAL(UAttackBase::Cancel, );
 
 	/**
 	 * @brief 更新処理
@@ -84,13 +83,16 @@ protected:
 	TObjectPtr<USceneComponent> RootComponent;
 
 	/**	攻撃可能フラグ */
+	UPROPERTY()
 	bool bCanExecute = true;
 
 	/**	攻撃有効フラグ */
+	UPROPERTY()
 	bool bIsActive = false;
 
 	/**
 	 * @brief 攻撃時の位置・回転・スケールのオフセット値
 	 */
+	UPROPERTY(EditAnywhere)
 	FTransform OffsetTransform = FTransform();
 };

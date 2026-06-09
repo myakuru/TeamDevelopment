@@ -6,35 +6,39 @@
 #include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
 
 USphericalAttack::USphericalAttack()
-	:	AttackSphere(nullptr)
-	,	Duration(1.f)
+	:	Duration(1.f)
 	,	ElpsedTimer(0.f)
 {
-	AttackSphere = CreateDefaultSubobject<USphereComponent>(
-				TEXT("SphereAttack")
-				);
-	AttackSphere->SetCollisionResponseToChannel(
-				ECC_GameTraceChannel1,
-				ECR_Overlap
-				);
-
-	AttackSphere->OnComponentBeginOverlap.AddDynamic(
-				this,
-				&USphericalAttack::OnSphericalBeginOverlap
-				);
-	AttackSphere->OnComponentEndOverlap.AddDynamic(
-				this,
-				&USphericalAttack::OnSphericalEndOverlap
-				);
 }
 
 void USphericalAttack::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	if (!Owner) { return; }
 
-	Super::Initialize(Owner);
-	
-	AttackSphere->SetupAttachment(RootComponent);
+	UAttackBase::Initialize(Owner);
+
+	// 攻撃用のSphereComponentを生成
+	{
+		AttackSphere = NewObject<USphereComponent>(Owner);
+		
+		if (RootComponent)
+		{
+			AttackSphere->SetupAttachment(RootComponent);
+		}
+		AttackSphere->RegisterComponent();
+		AttackSphere->SetCollisionResponseToChannel(
+			ECC_GameTraceChannel1,
+			ECR_Overlap
+		);
+		AttackSphere->OnComponentBeginOverlap.AddDynamic(
+			this,
+			&USphericalAttack::OnSphericalBeginOverlap
+		);
+		AttackSphere->OnComponentEndOverlap.AddDynamic(
+			this,
+			&USphericalAttack::OnSphericalEndOverlap
+		);
+	}
 	Cancel();
 }
 
@@ -64,6 +68,8 @@ void USphericalAttack::Update(float DeltaTime)
 	// 有効時以外は処理しない
 	if (!bIsActive||!AttackSphere) { return; }
 
+	UAttackBase::Update(DeltaTime);
+
 	// 継続時間を超えたら攻撃を終了
 	if (Duration < ElpsedTimer)
 	{
@@ -89,10 +95,10 @@ void USphericalAttack::OnSphericalBeginOverlap(
 	if (!HitActors.Contains(OtherActor))
 	{	
 		// キャラクターインターフェースを実装しているか
-		if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
+		if (auto* interface = Cast<ICharacterInterface>(OtherActor))
 		{
-			Interface->TakeDamaged();
-			Interface->TakeKnockBack(OwnerActor->GetActorLocation());
+			interface->TakeDamaged();
+			interface->TakeKnockBack(OwnerActor->GetActorLocation());
 			HitActors.Add(OtherActor);
 		}
 	}

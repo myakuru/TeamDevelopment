@@ -3,4 +3,8 @@
 #pragma once
 #include "CoreMinimal.h"
 
-#define PLAYER_ATTACK_OVERLAP ECC_GameTraceChannel2
+/**
+ * @brief 便利なマクロ定義(ヒューマンエラーを防ぐために)
+ */
+#define ECC_Enemy	ECollisionChannel::ECC_GameTraceChannel1	// 「敵」のコリジョンチャンネル
+#define ECC_Player	ECollisionChannel::ECC_GameTraceChannel2	// 「プレイヤー」のコリジョンチャンネル

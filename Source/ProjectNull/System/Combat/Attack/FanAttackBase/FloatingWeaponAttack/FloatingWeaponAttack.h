@@ -25,11 +25,9 @@ public:
 
 public:
 
-	void Initialize(class AActor* Owner)						override;
+	void Initialize(const TObjectPtr<AActor>& Owner)			override;
 	void Start()												override;
-	void Update(float DeltaTime,
-				AActor* Player = nullptr,
-				UEnemyManagerSubsystem* EnemyManager = nullptr) override;
+	void Update(float DeltaTime)								override;
 	bool UpdateAttack(float DeltaTime)							override;
 
 	bool IsAttackStateStep();

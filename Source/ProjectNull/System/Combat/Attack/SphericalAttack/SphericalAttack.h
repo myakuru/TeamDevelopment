@@ -10,7 +10,7 @@ class USphereComponent;
 /**
  * 球状の攻撃判定を行うクラス
  */
-UCLASS()
+UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API USphericalAttack : public UAttackBase
 {
 	GENERATED_BODY()
@@ -18,6 +18,8 @@ class PROJECTNULL_API USphericalAttack : public UAttackBase
 public:
 
 	USphericalAttack();
+
+public:
 
 	/**
 	 * @brief 初期化処理
