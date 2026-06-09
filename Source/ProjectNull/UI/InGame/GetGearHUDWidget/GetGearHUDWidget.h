@@ -14,10 +14,12 @@ UCLASS()
 class PROJECTNULL_API UGetGearHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-private:
 
-	void NativeConstruct() override{}
+public:
+
+	void SetGearData(const FText& inGearName);
+
+private:
 
 	/** UIパーツ */
 	UPROPERTY(meta = (BindWidget))

@@ -13,17 +13,20 @@ void USuperGameInstance::Init()
 {
 	Super::Init();
 
-
 	if (WeaponManagerClass) {
 		WeaponManager = NewObject<UWeaponManager>(this, WeaponManagerClass);
 	}
-	if (WeaponManager) WeaponManager->Initialize(WeaponDataTable,WeaponMaterialDataTable);
+	if (WeaponManager) WeaponManager->Initialize();
 
 	//StageManager
-	StageManager = NewObject<UStageManager>(this);
+	if (StageManagerClass) {
+		StageManager = NewObject<UStageManager>(this, StageManagerClass);
+	}
 
-	//MapActorManagerの初期化
-	MapActorManager = NewObject<UMapActorManager>(this);
+	//MapActorManager
+	if (MapActorManagerClass) {
+		MapActorManager = NewObject<UMapActorManager>(this, MapActorManagerClass);
+	}
 
 	if (PlayerRuntimeData) {
 		PlayerRuntimeData->Initialize();

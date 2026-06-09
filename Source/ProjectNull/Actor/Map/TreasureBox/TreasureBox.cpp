@@ -6,6 +6,7 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/SaveGame/MySaveGame.h>
+#include <ProjectNull/UI/InGame/GetGearHUDWidget/GetGearHUDWidget.h>
 
 ATreasureBox::ATreasureBox()
 {
@@ -63,6 +64,8 @@ void ATreasureBox::Tick(float DeltaTime)
 
     if (DissolveAmount >= 1.0f)
     {
+		CreateDropItemWidget();
+
         Destroy();
     }
 }
@@ -95,26 +98,19 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		AnimationLength,
 		false
 	);
+}
 
-	// 経験値ドロップ
-	//if (UItemManagerSubsystem* ItemSubsystem =
-	//	GetWorld()->GetSubsystem<UItemManagerSubsystem>())
-	//{
-	//	const FLinearColor Color = DropItemParams.ExpColor;
-	//	const float Size = DropItemParams.ExpSize;
+UGetGearHUDWidget* ATreasureBox::CreateDropItemWidget()
+{
+	UGetGearHUDWidget* widget = 
+		CreateWidget<UGetGearHUDWidget>(
+		GetWorld(),
+		DropItemWidgetClass
+	);
 
-	//	ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
-	//		GetActorLocation(),
-	//		static_cast<float>(DropItemParams.DropExp),
-	//		Color,
-	//		Size
-	//	);
-	//}
+	widget->SetGearData(FText::FromString(TEXT("Dash")));
 
-	//// ゲームインスタンス経由で、経験値とギアエネルギーをセット
-	//if (USuperGameInstance* GameInstance =
-	//	GetWorld()->GetGameInstance<USuperGameInstance>())
-	//{
-	//	GameInstance->GetPlayerRuntimeData()->AddExperience(DropItemParams.DropExp);
-	//}
+	widget->AddToPlayerScreen();
+
+	return widget;
 }

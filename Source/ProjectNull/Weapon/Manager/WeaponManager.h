@@ -24,7 +24,7 @@ class PROJECTNULL_API UWeaponManager : public UObject
 	
 public:
 
-	void Initialize(UDataTable* a_DTWeapon,UDataTable* a_DTMaterial);
+	void Initialize();
 
 	void SaveToData(UMySaveGame* a_SaveGame);
 
