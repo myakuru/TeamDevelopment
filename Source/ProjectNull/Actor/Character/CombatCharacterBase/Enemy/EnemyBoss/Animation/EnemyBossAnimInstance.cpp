@@ -1,6 +1,7 @@
 ﻿#include "EnemyBossAnimInstance.h"
 #include "GameFramework/Pawn.h"
 
+// アニメーションインスタンスの初期化
 void UEnemyBossAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
@@ -9,6 +10,7 @@ void UEnemyBossAnimInstance::NativeInitializeAnimation()
 	OwnerPawn = TryGetPawnOwner();
 }
 
+// アニメーションインスタンスの更新
 void UEnemyBossAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeThreadSafeUpdateAnimation(DeltaSeconds);
