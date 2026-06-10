@@ -11,7 +11,9 @@
 
 void USuperGameInstance::Init()
 {
-	Super::Init();
+	//class UStageDataAssetを消したら
+	//Super::InitがなぜかUObjectのInitになる
+	UGameInstance::Init();
 
 	if (WeaponManagerClass) {
 		WeaponManager = NewObject<UWeaponManager>(this, WeaponManagerClass);
@@ -53,31 +55,6 @@ void USuperGameInstance::LoadGameData()
 		CurrentSaveData = Cast<UMySaveGame>(
 			UGameplayStatics::CreateSaveGameObject(UMySaveGame::StaticClass())
 		);
-	}
-
-	// ステージ数取得
-	if (StageDataAsset)
-	{
-		const int32 StageCount =StageDataAsset->StageData.Num();
-
-		if (CurrentSaveData->StageProgressList.Num() < StageCount)
-		{
-			CurrentSaveData->StageProgressList.SetNum(StageCount);
-		}
-
-		// 最初のステージは解放しておく
-		if (StageCount > 0) {
-
-			//ステージのクリア状況を初期化(デバッグ用)
-			//for(int i = 0; i < StageCount; i++)
-			//{
-			//	CurrentSaveData->StageProgressList[i].MissionClears.SetNum(3);
-
-			//	CurrentSaveData->StageProgressList[i].bUnlocked = false;
-			//}
-
-			CurrentSaveData->StageProgressList[0].bUnlocked = true;
-		}
 	}
 
 	//セーブデータを渡す

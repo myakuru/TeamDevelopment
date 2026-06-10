@@ -5,7 +5,6 @@
 #include "SuperGameInstance.generated.h"
 
 class UMySaveGame;
-class UStageDataAsset;
 class UStageManager;
 class UWeaponManager;
 class UMapActorManager;
@@ -33,9 +32,6 @@ public:
 	/** セーブデータを取得する */
 	inline UMySaveGame* GetCurrentSaveData() const { return CurrentSaveData; }
 
-	/** ステージデータを取得する */
-	inline TObjectPtr<UStageDataAsset> GetStageDataAsset() const { return StageDataAsset; }
-
 	/** ステージマネージャーを取得する */
 	inline TObjectPtr<UStageManager> GetStageManagerSubsystem() const { return StageManager; }
 
@@ -56,10 +52,6 @@ protected:
 	/** セーブデータ */
 	UPROPERTY()
 	UMySaveGame* CurrentSaveData;
-
-	/** ステージデータの参照 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UStageDataAsset> StageDataAsset;
 
 	/** ステージマネージャー */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
