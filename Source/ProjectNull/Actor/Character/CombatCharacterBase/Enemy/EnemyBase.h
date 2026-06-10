@@ -9,6 +9,7 @@
 #include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
+#include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 #include "EnemyBase.generated.h"
 
 // 前方宣言
@@ -313,7 +314,7 @@ protected:
 	/**
 	 * @brief 坂道範囲内に入った時の通知処理
 	 */
-	virtual void OnEnterSlope()override;
+	virtual void OnEnterSlope()/*override*/;
 
 	float AnimFinishTime = 0.0f;
 
