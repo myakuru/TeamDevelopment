@@ -5,10 +5,8 @@
 #include"../../SaveGame/MySaveGame.h"
 #include"../Data/WeaponMaterialData.h"
 
-void UWeaponManager::Initialize(UDataTable* a_DTWeapon, UDataTable* a_DTMaterial)
+void UWeaponManager::Initialize()
 {
-    m_WeaponDataTable = a_DTWeapon;
-	m_MaterialDataTable = a_DTMaterial;
 	m_EquippedWeaponIDs.Add(-1);
 	m_EquippedWeaponIDs.Add(-1);
 	m_EquippedWeaponIDs.Add(-1);
