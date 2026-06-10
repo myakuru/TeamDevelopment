@@ -81,15 +81,12 @@ void AProjectileBase::HandleCollision(AActor* OtherActor)
 {
 	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
 
-	auto Enemy = Cast<AEnemyBase>(OtherActor);
-
-	const FVector Location = OwnerActor->GetActorLocation();
-
-	if (!Enemy) { return; }
-	Enemy->SetKnockBackData(Location, 2.0f, 1.0f);
-
-	// ダメージを与える
-	Enemy->SetTakeDamaged();
+	// キャラクターインターフェースを実装しているか
+	if (auto* interface = Cast<ICharacterInterface>(OtherActor))
+	{
+		interface->TakeDamaged();
+		interface->TakeKnockBack(OwnerActor->GetActorLocation());
+	}
 
 	Destroy();
 }

@@ -8,7 +8,7 @@ UCrossLaserAttack::UCrossLaserAttack()
 	
 }
 
-void UCrossLaserAttack::Initialize(class AActor* Owner)
+void UCrossLaserAttack::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	UAttackBase::Initialize(Owner);
 
@@ -30,10 +30,7 @@ void UCrossLaserAttack::Execute()
 
 }
 
-void UCrossLaserAttack::Update(
-	float DeltaTime,
-	AActor* Player,
-	UEnemyManagerSubsystem* EnemyManager)
+void UCrossLaserAttack::Update(float DeltaTime)
 {
 	if (!bIsActive || !CrossLaserbeam) { return; }
 

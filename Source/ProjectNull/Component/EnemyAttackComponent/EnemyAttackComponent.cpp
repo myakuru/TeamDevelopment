@@ -15,7 +15,7 @@ void UEnemyAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// �z���̍U���N���X�̏�����
+	// 初期化
 	for (auto& attack : EnemyAttacks)
 	{
 		if (!attack) { continue; }
@@ -28,12 +28,9 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// �v���C���[�̏��擾
-	// �v���C���[�̏���擾����i0��:1P�j
 	APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!pPlayerPawn) { return; }
 
-	// �z���̍U���N���X�̍X�V
 	for (auto& attack : EnemyAttacks)
 	{
 		if (!attack) { continue; }
@@ -43,7 +40,7 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			attack->Execute();
 		}
 
-		attack->Update(DeltaTime, pPlayerPawn);
+		attack->Update(DeltaTime);
 	}
 }
 

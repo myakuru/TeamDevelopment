@@ -67,9 +67,9 @@ void USTT_EnemyAttack::AttackJudge(const float a_DeltaTime)
 {
 	if (!Attack || !TargetActor) { return; }
 
-	Attack->Update(a_DeltaTime, TargetActor);
+	Attack->Update(a_DeltaTime);
 
-	Attack->AttackJudge(TargetActor);
+	Attack->AttackJudge();
 }
 
 void USTT_EnemyAttack::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)

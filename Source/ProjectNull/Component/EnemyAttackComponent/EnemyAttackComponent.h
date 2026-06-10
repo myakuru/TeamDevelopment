@@ -4,15 +4,19 @@
 #include "Components/ActorComponent.h"
 #include "EnemyAttackComponent.generated.h"
 
-// �G�L�����N���X
+/**
+ * @brief 敵の基底クラス
+ */
 class AEnemyBase;
 
-// �U�����N���X
+/**
+ * @brief 攻撃の基底クラス
+ */
 class UAttackBase;
 
-/// <summary>
-/// �G�L����(���[���h��ő���L�����ڊ|���Ēǔ�����L�����N�^�[)�̍U���R���|�[�l���g�N���X
-/// </summary>
+/**
+ * @brief 敵の攻撃コンポーネント
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTNULL_API UEnemyAttackComponent : public UActorComponent
 {
@@ -34,11 +38,15 @@ public:
 
 private:
 
-	// �N���X�̎�����̃A�h���X
+	/**
+	 * @brief 持ち主
+	 */
 	UPROPERTY()
 	AEnemyBase* OwnerEnemy;
 
-	// �G�̍U���N���X�̔z�񃊃X�g
+	/**
+	 * @brief 攻撃オブジェクトリスト
+	 */
 	UPROPERTY(EditAnywhere, Instanced)
-	TArray<UAttackBase*> EnemyAttacks;
+	TArray<TObjectPtr<UAttackBase>> EnemyAttacks;
 };

@@ -105,7 +105,7 @@ void APlayerBase::Tick(float DeltaTime)
 	ACombatCharacterBase::Tick(DeltaTime);
 
 	// 自動攻撃の更新
-	if (AutoAttack) { AutoAttack->Update(DeltaTime,nullptr, EnemyManager); }
+	if (AutoAttack) { AutoAttack->Update(DeltaTime); }
 
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
