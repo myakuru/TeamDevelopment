@@ -2,10 +2,15 @@
 
 #include "Camera/CameraComponent.h"
 #include "CineCameraComponent.h"
+
 #include <GameFramework/SpringArmComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 
@@ -61,6 +66,18 @@ APlayerBase::APlayerBase():
 	CineCameraComponent->SetupAttachment(SpringArmComponent);
 	CineCameraComponent->Deactivate();
 
+	// ================================================================
+	// スフィアコリジョンコンポーネントの初期化
+	// ================================================================
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+	if (!SphereCollision) { return; }
+
+	SphereCollision->SetupAttachment(GetRootComponent());
+
+	SphereCollision->SetCollisionEnabled(
+		ECollisionEnabled::QueryAndPhysics);
+
+	SphereCollision->SetGenerateOverlapEvents(true);
 
 	// ================================================================
 	// ギアコンポーネントの初期化
@@ -95,6 +112,12 @@ void APlayerBase::BeginPlay()
 	// ================================================================
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Initialize(this); }
 
+	/*GetWorld()->GetTimerManager().SetTimer(
+		AlignFloorTimerHandle,
+		this,
+		&APlayerBase::AlignFloor,
+		0.1f,
+		true);*/
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -109,48 +132,8 @@ void APlayerBase::Tick(float DeltaTime)
 
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
-	UCharacterMovementComponent* MoveComp =
-		GetCharacterMovement();
-
-	float TargetPitch = 0.0f;
-
-	if (MoveComp->IsMovingOnGround() &&
-		MoveComp->CurrentFloor.IsWalkableFloor())
-	{
-		const FVector Normal =
-			MoveComp->CurrentFloor.HitResult.ImpactNormal;
-
-		// プレイヤー前方向
-		const FVector Forward =
-			GetActorForwardVector();
-
-		// 前方向成分だけ取得
-		const float Slope =
-			FVector::DotProduct(
-				Forward,
-				FVector::VectorPlaneProject(
-					FVector::UpVector,
-					Normal));
-
-		TargetPitch =
-			FMath::RadiansToDegrees(FMath::Asin(Slope));
-	}
-
-	FRotator CurrentRot =
-		GetMesh()->GetRelativeRotation();
-
-	FRotator TargetRot = CurrentRot;
-	TargetPitch *= -1.f;
-	TargetRot.Roll = TargetPitch;
-
-	FRotator NewRot =
-		FMath::RInterpTo(
-			CurrentRot,
-			TargetRot,
-			DeltaTime,
-			8.0f);
-
-	GetMesh()->SetRelativeRotation(NewRot);
+	AlignFloor();
+	
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -207,6 +190,132 @@ bool APlayerBase::CanMove()
 	}
 
 	return true;
+}
+
+void APlayerBase::AlignFloor()
+{
+	float DeltaTime = GetWorld()->GetDeltaSeconds();
+	UCharacterMovementComponent* MoveComp =
+		GetCharacterMovement();
+
+	if (!MoveComp) { return; }
+
+	//----------------------------------------
+	// Ground Trace
+	//----------------------------------------
+
+	FHitResult Hit;
+
+	const FVector Start = GetActorLocation();
+
+	const FVector End = Start - GetActorUpVector() * GroundTraceLength;
+	//const FVector End = Start - FVector::UpVector * GroundTraceLength;
+
+	DrawDebugLine(GetWorld(), Start, End,FColor::Green);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(
+			Hit,
+			Start,
+			End,
+			ECC_Visibility,
+			Params);
+
+	if (!bHit)
+	{
+		/*MoveComp->SetMovementMode(
+			MOVE_Falling);*/
+		MoveComp->SetGravityDirection(
+			FVector::DownVector);
+		return;
+	}
+
+	//----------------------------------------
+	// Normal
+	//----------------------------------------
+
+	const FVector TargetNormal =
+		Hit.ImpactNormal.GetSafeNormal();
+
+	CurrentGroundNormal = FMath::VInterpNormalRotationTo(
+			CurrentGroundNormal,
+			TargetNormal,
+			DeltaTime,
+			NormalInterpSpeed);
+
+	//----------------------------------------
+	// Walkable Angle
+	//----------------------------------------
+
+	const FVector UpDir =
+		-MoveComp->GetGravityDirection();
+
+	const float Dot =
+		FVector::DotProduct(
+			TargetNormal,
+			FVector::UpVector);
+
+	const float WalkableDot = FMath::Cos(
+			FMath::DegreesToRadians(MaxGroundAngle));
+	//UE_LOG(LogTemp, Display, TEXT("WalkableDot %.2f"), WalkableDot);
+	//UE_LOG(LogTemp, Display, TEXT("Dot %.2f"), Dot);
+
+	FVector Gravity = -CurrentGroundNormal;
+
+	const bool Walkable = Dot >= WalkableDot;
+
+	if (!Walkable)
+	{
+	/*	MoveComp->SetMovementMode(
+			MOVE_Falling);*/
+		//MoveComp->SetGravityDirection(FVector::DownVector);
+		FVector SlideDir =
+			FVector::VectorPlaneProject(
+				FVector(0, 0, -1),
+				CurrentGroundNormal).GetSafeNormal();
+
+		AddMovementInput(
+			SlideDir.GetSafeNormal(),
+			SlideSpeed);
+		Gravity = FVector::DownVector;
+	}
+
+	//----------------------------------------
+	// Gravity
+	//----------------------------------------
+
+	MoveComp->SetGravityDirection(Gravity);
+
+	//----------------------------------------
+	// Rotation
+	//----------------------------------------
+
+	FVector Forward =
+		FVector::VectorPlaneProject(
+			GetActorForwardVector(),
+			CurrentGroundNormal);
+
+	if (Forward.IsNearlyZero())
+	{
+		Forward = FVector::CrossProduct(
+			GetActorRightVector(),
+			CurrentGroundNormal);
+	}
+
+	Forward.Normalize();
+
+	const FQuat TargetQuat = FRotationMatrix::MakeFromZX(
+			CurrentGroundNormal,
+			Forward)
+		.ToQuat();
+
+	const FQuat NewQuat = FQuat::Slerp(
+			GetActorQuat(),
+			TargetQuat,
+			DeltaTime * RotationInterpSpeed);
+
+	SetActorRotation(NewQuat);
 }
 
 

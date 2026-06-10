@@ -9,6 +9,9 @@ class UCameraComponent;
 class UPlayerAttackComponent;
 class UPlayerGearComponent;
 
+/** スフィアコリジョンコンポーネント */
+class USphereComponent;
+
 /** 対象検索コンポーネント */
 class UTargetSearchComponent;
 
@@ -64,6 +67,9 @@ private:
 	 */
 	bool CanMove();
 
+	void AlignFloor();
+
+	FTimerHandle AlignFloorTimerHandle;
 
 	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
@@ -76,6 +82,10 @@ private:
 	/** シネマティックカメラコンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCineCameraComponent> CineCameraComponent;
+
+	/** スフィアコリジョンコンポーネント */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USphereComponent> SphereCollision;
 
 	/** ギアコンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "Gear")
@@ -96,5 +106,28 @@ private:
 	/** ゲーム全体で共有されるデータや機能を管理するクラス */
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
+
+	UPROPERTY()
+	FVector CurrentGroundNormal = FVector::UpVector;
+
+	UPROPERTY(EditAnywhere)
+	float GroundTraceLength = 200.0f;
+
+	UPROPERTY(EditAnywhere)
+	float NormalInterpSpeed = 10.0f;
+
+	UPROPERTY(EditAnywhere)
+	float RotationInterpSpeed = 8.0f;
+
+	UPROPERTY(EditAnywhere)
+	float MaxGroundAngle = 45.f;
+	UPROPERTY(EditAnywhere)
+	float EnterGroundAngle = 45.f;
+
+	UPROPERTY(EditAnywhere)
+	float ExitGroundAngle = 50.f;
+
+	UPROPERTY(EditAnywhere)
+	float SlideSpeed = 1500.f;
 
 };
