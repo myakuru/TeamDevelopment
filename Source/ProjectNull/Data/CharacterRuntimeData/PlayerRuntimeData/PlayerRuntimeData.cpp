@@ -35,7 +35,8 @@ void UPlayerRuntimeData::Initialize()
 	auto* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!PlayerPawn) { return; }
 
-	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn)) {
+	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn))
+	{
 		Owner = PlayerBase;
 	}
 
