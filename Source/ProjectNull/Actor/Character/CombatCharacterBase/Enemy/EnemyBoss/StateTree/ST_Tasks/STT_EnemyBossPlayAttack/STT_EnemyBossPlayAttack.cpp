@@ -70,7 +70,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 	{
 		Boss->AdvanceHitIndex();
 		// 次のアニメーションがあり、flgがtrueなら次のアニメーションを実行
-		if (Atk.bConfirmedCombo && Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
+		if (Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 		{
 			Anim->Montage_Play(Atk.AttackMontages[Boss->GetHitIndex()]);
 
@@ -121,6 +121,8 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::EnterState(FStateTreeExecutionCont
 	{
 		AIC->StopMovement();
 	}
+
+	Boss->ResetHitIndex();
 
 	return EStateTreeRunStatus::Running;
 }

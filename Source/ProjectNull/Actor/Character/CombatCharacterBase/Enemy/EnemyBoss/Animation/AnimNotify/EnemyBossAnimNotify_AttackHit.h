@@ -24,8 +24,6 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
 		const FAnimNotifyEventReference& EventReference) override;
 
-private:
-
 	// ------------------------------------------------------------------------------------
 	// private variables
 	// ------------------------------------------------------------------------------------
@@ -37,9 +35,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float Radius = 50.0f;
 
+	/** スフィアの座標オフセット*/
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	FVector SphereOffset;
+
 	/** デバッグ表示*/
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	bool bDrawDebug = true;
+
+private:
 
 	/** この攻撃で当たったアクター（二重ヒット防止）*/
 	TSet<TWeakObjectPtr<AActor>> HitActors;

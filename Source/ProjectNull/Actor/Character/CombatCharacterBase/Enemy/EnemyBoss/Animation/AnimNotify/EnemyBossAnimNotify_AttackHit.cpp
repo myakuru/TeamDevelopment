@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
+#include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 
 // ------------------------------------------------------------------------------------
 // 当たり判定の開始処理
@@ -34,7 +35,7 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 	if (!IsValid(Owner) || !IsValid(World)) { return; }
 
 	// ソケットの現在位置を取得 → ここに当たり判定を出す
-	const FVector HitCenter = MeshComp->GetSocketLocation(SocketName);
+	const FVector HitCenter = MeshComp->GetSocketLocation(SocketName) + SphereOffset;
 
 	// スフィアで重なり判定
 	TArray<FOverlapResult> Overlaps;
@@ -60,14 +61,17 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 		AActor* Target = Overlap.GetActor();
 		if (!IsValid(Target)) { continue; }
 
+		// IDamageableInterfaceを継承しているオブジェクトを判定
+		IDamageableInterface* DamageInterface = Cast<IDamageableInterface>(Target);
+		if (!DamageInterface) { continue; }
+
 		// この振りで当てていたActorはスキップ、ヒットしたらリストにActorを追加
 		if (HitActors.Contains(Target)) { continue; }
 		HitActors.Add(Target);
 
 		int Damage = 10;
 
-		AController* Inst = Owner->GetInstigatorController();
-		UGameplayStatics::ApplyDamage(Target, Damage, Inst, Owner, nullptr);
+		DamageInterface->ReceiveDamage(Damage);
 	}
 
 	// デバッグ表示

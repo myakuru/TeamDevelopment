@@ -39,7 +39,7 @@ EStateTreeRunStatus USTT_EnemyBossRangedAttack::Tick(FStateTreeExecutionContext&
 	if (!Anim->Montage_IsPlaying(Cur))
 	{
 		Boss->AdvanceHitIndex();
-		if (Atk.bConfirmedCombo && Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
+		if (Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 		{
 			Anim->Montage_Play(Atk.AttackMontages[Boss->GetHitIndex()]);
 			return EStateTreeRunStatus::Running;

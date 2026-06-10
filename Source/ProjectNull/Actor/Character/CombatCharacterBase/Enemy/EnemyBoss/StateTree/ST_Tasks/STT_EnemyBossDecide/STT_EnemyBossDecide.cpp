@@ -52,7 +52,7 @@ EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext&
 		else if (Boss->SelectAttackByDistance(Dist))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("BossAction Attack"));
-			BossAction = EBossActionType::PlayAttack;		// 攻撃
+			BossAction = EBossActionType::PlayAttack;	// 攻撃
 		}
 		else
 		{
@@ -72,7 +72,7 @@ EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext&
 			EBossActionType::JumpAttack,
 			EBossActionType::RangedAttack
 		};
-		BossAction = Far[FMath::RandRange(0, 3)];
+		BossAction = Far[FMath::RandRange(0, 1)];
 		UE_LOG(LogTemp, Warning, TEXT("BossAction Range"));
 	}
 

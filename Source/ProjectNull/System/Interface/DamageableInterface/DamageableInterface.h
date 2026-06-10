@@ -28,7 +28,7 @@ public:
 	// ------------------------------------------------------------------------------------
 
 	/** ダメージを受ける。Causerは攻撃を出したアクター*/
-	virtual void ReceiveDamage(float Damage, AActor* Causer) = 0;
+	virtual void ReceiveDamage(float Damage) = 0;
 
 	/** 生存しているかどうか（攻撃側が死亡判定に利用）*/
 	virtual bool IsAlive() const = 0;

@@ -13,7 +13,7 @@ AEnemyBossBase::AEnemyBossBase()
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
 	PawnSensingComp->SetPeripheralVisionAngle(60.0f);		// 片側６０°（視界１２０°）
-	PawnSensingComp->SightRadius = 2000;					// 視認距離
+	PawnSensingComp->SightRadius = 2000.0f;					// 視認距離
 	// PawnSensingComponentはデフォルトでbOnlySensePlayers = trueなので
 	// OnSeePawnはプレイヤーが視界・距離・視線条件を満たしたときだけ発火する
 
@@ -47,7 +47,7 @@ void AEnemyBossBase::Tick(float DeltaTime)
 // ------------------------------------------------------------------------------------
 // 被弾処理
 // ------------------------------------------------------------------------------------
-void AEnemyBossBase::ReceiveDamage(float Damage, AActor* Causer)
+void AEnemyBossBase::ReceiveDamage(float Damage)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Boss Receive Damage "));
 }
