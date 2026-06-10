@@ -24,7 +24,8 @@ void UStageSelectHUDWidget::NativeConstruct()
 	CurrentSelectedStageIndex = 0;
 
 	//ステージデータをゲームインスタンスから取得しておく
-	StageDataAsset = GetWorld()->GetGameInstance<USuperGameInstance>()->GetStageDataAsset();
+	StageDataAsset = GetWorld()->GetGameInstance<USuperGameInstance>()
+		->GetStageManagerSubsystem()->GetStageDataAsset();
 	if (!StageDataAsset)
 	{
 		UE_LOG(LogTemp, Error, TEXT("StageDataAsset is null in StageSelectHUDWidget!"));

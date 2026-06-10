@@ -41,14 +41,7 @@ public:
 
 	void Tick(float DeltaTime) override;
 
-	void ExtinctionStart(){ 
-		bDissolving = true;
-
-		//ドロップギアの名前の有無で決める
-		if (!DropGearName.IsEmpty()) {
-			CreateDropItemWidget();
-		}
-	}
+	void ExtinctionStart();
 
 	void HitReaction(
 		UPrimitiveComponent* OverlappedComp,
@@ -60,7 +53,7 @@ public:
 	)override;
 
 	UFUNCTION()
-	UGetGearHUDWidget* CreateDropItemWidget();
+	UGetGearHUDWidget* CreateDropItemWidget(const FText& itemName);
 
 	/** ID */
 	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
