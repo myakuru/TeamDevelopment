@@ -111,7 +111,7 @@ public:
 
 	/** スキルのクールダウンを毎フレーム更新する */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
-	void UpdateSkillCooldown(int32 InSkillIndex, float InCooldownTime);
+	void UpdateSkillCooldown(int32 InSkillIndex, float InCooldownTime,float InMaxCooldown);
 
 	/** スキルのクールダウンをリセットする処理 */
 	UFUNCTION(BlueprintCallable, Category = "PlayerParameter")
@@ -123,9 +123,10 @@ public:
 	inline FSpeedParameterData GetSpeedData() const { return Speed; }
 	inline FGearParameterData GetGearData() const { return Gear; }
 
-	void SetSkillCooldownTime(int8 InIndex,float InSetTime)
+	/** スキルの最大クールダウン時間を取得する（正規化用） */
+	float GetSkillCooldownTime(int32 InIndex) const
 	{
-		SkillCooldownTime[InIndex] = InSetTime;
+		return SkillCooldownTime.IsValidIndex(InIndex) ? SkillCooldownTime[InIndex] : 0.0f;
 	}
 
 	/** スキルのクールダウン時間が変更されたときに呼び出されるデリゲート */

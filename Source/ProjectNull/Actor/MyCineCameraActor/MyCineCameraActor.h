@@ -9,7 +9,6 @@
 class ULevelSequence;
 class ALevelSequenceActor;
 class ULevelSequencePlayer;
-class UMyCameraShakeSourceComponent;
 class UCameraShakeBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCutsceneFinished);
@@ -27,31 +26,15 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void Tick(float DeltaTime) override;
-
 	void PlayOpeningCutscene();
-
-	void TestShake();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCutsceneFinished OnCutsceneFinished;
 
 protected:
-	/** プレイヤーからのカメラ相対オフセット */
-	UPROPERTY(EditAnywhere, Category = "Opening")
-	FVector OpeningCameraRelativeOffset = { 0,0,0 };
-
-	/** プレイヤーからのカメラの相対角度 */
-	UPROPERTY(EditAnywhere, Category = "Opening")
-	FRotator OpeningCameraRelativeOffsetRotation = { 0,0,0 };
-
 	/** オープニングで再生するレベルシーケンス */
 	UPROPERTY(EditAnywhere, Category = "Opening")
 	TObjectPtr<ULevelSequence> OpeningSequence;
-
-	/** カメラシェイクの発生源コンポーネント */
-	UPROPERTY(VisibleAnywhere, Category = "Opening")
-	TObjectPtr<UMyCameraShakeSourceComponent> CameraShakeSourceComponent;
 
 	/** オープニングで再生するカメラシェイク */
 	UPROPERTY(EditAnywhere, Category = "Opening")

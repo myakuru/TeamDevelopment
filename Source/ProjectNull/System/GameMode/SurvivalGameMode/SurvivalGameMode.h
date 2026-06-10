@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
@@ -30,6 +30,9 @@ protected:
 	/** レベルに配置したシネカメラ（エディタで設定） */
 	UPROPERTY()
 	TObjectPtr<AMyCineCameraActor> OpeningCameraActor;
+
+	UPROPERTY(EditAnywhere, Category = "Opening")
+	FVector PlayerLocation = FVector(0.0f, 0.0f, 1000.0f);
 
 	/** ビュー切り替え時のブレンド速度 */
 	UPROPERTY(EditAnywhere, Category = "Opening")

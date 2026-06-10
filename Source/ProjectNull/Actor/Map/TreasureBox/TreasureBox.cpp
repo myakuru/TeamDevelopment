@@ -15,7 +15,7 @@ ATreasureBox::ATreasureBox()
 	if (Trigger) {
 		Trigger->OnComponentBeginOverlap.AddDynamic(
 			this,
-			&AMapActorBase::HitReaction
+			&ATreasureBox::HitReaction
 		);
 	}
 }
@@ -73,7 +73,7 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	// プレイヤーだけにしたい場合
 	if (!pAwn->IsPlayerControlled()) return;
 
-	//状態保存
+	//状態保存(ステージクリア時にセーブするように変更必須！！)
 	auto* MapActorMan = GetWorld()->GetGameInstance<USuperGameInstance>()->GetMapActorManager();
 	if (!TreasureID.IsNone() && MapActorMan && DestroyedFromSaveData)
 	{
@@ -95,24 +95,24 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	);
 
 	// 経験値ドロップ
-	if (UItemManagerSubsystem* ItemSubsystem =
-		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
-	{
-		const FLinearColor Color = DropItemParams.ExpColor;
-		const float Size = DropItemParams.ExpSize;
+	//if (UItemManagerSubsystem* ItemSubsystem =
+	//	GetWorld()->GetSubsystem<UItemManagerSubsystem>())
+	//{
+	//	const FLinearColor Color = DropItemParams.ExpColor;
+	//	const float Size = DropItemParams.ExpSize;
 
-		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
-			GetActorLocation(),
-			static_cast<float>(DropItemParams.DropExp),
-			Color,
-			Size
-		);
-	}
+	//	ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
+	//		GetActorLocation(),
+	//		static_cast<float>(DropItemParams.DropExp),
+	//		Color,
+	//		Size
+	//	);
+	//}
 
-	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
-	if (USuperGameInstance* GameInstance =
-		GetWorld()->GetGameInstance<USuperGameInstance>())
-	{
-		GameInstance->GetPlayerRuntimeData()->AddExperience(DropItemParams.DropExp);
-	}
+	//// ゲームインスタンス経由で、経験値とギアエネルギーをセット
+	//if (USuperGameInstance* GameInstance =
+	//	GetWorld()->GetGameInstance<USuperGameInstance>())
+	//{
+	//	GameInstance->GetPlayerRuntimeData()->AddExperience(DropItemParams.DropExp);
+	//}
 }

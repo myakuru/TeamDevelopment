@@ -41,7 +41,10 @@ void UPlayerGearComponent::BeginPlay()
 
 }
 
-void UPlayerGearComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UPlayerGearComponent::TickComponent(
+	float DeltaTime,
+	ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -218,7 +221,7 @@ void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
 	}
 	TObjectPtr<UPlayerParameterData> ParameterData
 		= OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
-
+	ffff -= DeltaTime;
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
 		const TObjectPtr<const UGearBase> Gear = PlayerGears[Index];
@@ -227,9 +230,10 @@ void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
 		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 		const bool IsCooldownActive = TimerManager.IsTimerActive(CoolTimerHandle);
 		const float RemainTime = IsCooldownActive ? TimerManager.GetTimerRemaining(CoolTimerHandle) : 0.f;
-		UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"),RemainTime);
+		//UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"),RemainTime);
+		//UE_LOG(LogTemp, Display, TEXT("ffff %.2f"), ffff);
 		//ParameterData->SetSkillCooldownTime(Index, RemainTime);
-		ParameterData->UpdateSkillCooldown(Index, RemainTime);
+		ParameterData->UpdateSkillCooldown(Index, RemainTime,Gear->GetGearCoolTime(Index));
 	}
 
 }

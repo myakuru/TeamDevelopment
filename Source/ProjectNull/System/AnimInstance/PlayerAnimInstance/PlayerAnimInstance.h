@@ -35,6 +35,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsCombatStance;
 
+	/** 減速中か */
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDecelerating;
+	
 	/** 速度 */
 	UPROPERTY(BlueprintReadOnly)
 	FVector Velocity;
@@ -43,6 +47,21 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float GroundSpeed;
 
+	/** 前フレームの地面での速度 */
+	UPROPERTY(BlueprintReadOnly)
+	float PrevGroundSpeed;
+
+	/** RunStopへ遷移する最低速度 */
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	float RunStopSpeedThreshold;
+
+	/** RunStopへ遷移すべきか */
+	UPROPERTY(BlueprintReadOnly)
+	bool bShouldEnterRunStop;
+
+	/** 移動入力が存在するか */
+	UPROPERTY(BlueprintReadOnly)
+	bool bHasMoveInput;
 private:
 
 	/**
@@ -56,7 +75,7 @@ private:
 	UPROPERTY()
 	FPoseSnapshot PlayerPoseSnapshot;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<APlayerBase> Player;
 
 	/** 移動中と判定する速度(cm/s) */

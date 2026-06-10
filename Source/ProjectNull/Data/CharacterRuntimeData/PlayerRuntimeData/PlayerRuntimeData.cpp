@@ -30,13 +30,13 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 
 void UPlayerRuntimeData::Initialize()
 {
-	UpdateStatus();
 
 	// プレイヤーの情報を取得する（0番:1P）
 	auto* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!PlayerPawn) { return; }
 
-	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn)) {
+	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn))
+	{
 		Owner = PlayerBase;
 	}
 
@@ -45,6 +45,8 @@ void UPlayerRuntimeData::Initialize()
 	{
 		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
 	}
+
+	UpdateStatus();
 
 	// プレイヤーのパラメータデータ取得
 	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
@@ -72,7 +74,14 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 void UPlayerRuntimeData::AddGearEnergy(float Amount)
 {
 	Gear.GearEnergy += Amount;
-	//UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
+	UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
+	OnGearEnergyChanged.Broadcast(Gear.GearEnergy);
+}
+
+void UPlayerRuntimeData::SubtractHealth(float Amount)
+{
+	Health.SetCurrent(Health.Current - Amount);
+	OnHealthChanged.Broadcast(Health.Current, Health.Max);
 }
 
 bool UPlayerRuntimeData::CanChangeGear(int32 CurrentGearLevel)
@@ -112,7 +121,7 @@ void UPlayerRuntimeData::LevelUp()
 
 void UPlayerRuntimeData::UpdateHealth(float NewHealth)
 {
-	Health.Current = FMath::Clamp(NewHealth, 0.0f, Health.Max);
+	Health.SetCurrent(NewHealth);
 
 	OnHealthChanged.Broadcast(Health.Current, Health.Max);
 }

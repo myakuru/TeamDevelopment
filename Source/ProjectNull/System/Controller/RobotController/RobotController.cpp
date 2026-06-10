@@ -13,6 +13,7 @@
 
 ARobotController::ARobotController():
 		bCanReceiveInput(true),
+		bHasMoveInput(true),
 		PlayerBase(nullptr),
 		InputContext(nullptr),
 		MoveAction(nullptr),
@@ -68,6 +69,11 @@ void ARobotController::SetupInputComponent()
 	}
 }
 
+void ARobotController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
 void ARobotController::InitializeInputContext()
 {
 	if (!InputContext) { return; }
@@ -79,11 +85,12 @@ void ARobotController::InitializeInputContext()
 
 void ARobotController::Move(const FInputActionValue& MoveActionValue)
 {
-	if (!bCanReceiveInput) { return; }
-	if (!Cast<APlayerBase>(GetCharacter())) { return; }
-	auto* ControlledPlayer = Cast<APlayerBase>(GetCharacter());
+	if (!bCanReceiveInput)		{ return; }
+	if (!PlayerBase)			{ return; }
 
-	ControlledPlayer->Move(MoveActionValue.Get<FVector2D>());
+	const FVector2D MoveInput = MoveActionValue.Get<FVector2D>();
+
+	PlayerBase->Move(MoveInput);
 }
 
 void ARobotController::Look(const FInputActionValue& LookActionValue)
@@ -96,15 +103,17 @@ void ARobotController::Look(const FInputActionValue& LookActionValue)
 
 void ARobotController::Jump(const FInputActionValue& JumpActionValue)
 {
-	if (!bCanReceiveInput) { return; }
-	if (!GetCharacter()) { return; }
-	GetCharacter()->Jump();
+	if (!bCanReceiveInput)	{ return; }
+	if (!PlayerBase)		{ return; }
+
+	PlayerBase->Jump();
 }
 
 void ARobotController::ChangeGear(const FInputActionValue& ActionValue)
 {
-	if (!bCanReceiveInput) { return; }
-	if (!PlayerBase) { return; }
+	if (!bCanReceiveInput)	{ return; }
+	if (!PlayerBase)		{ return; }
+
 	PlayerBase->ChangeGear();
 }
 
@@ -125,9 +134,12 @@ void ARobotController::InitializeUI()
 
 void ARobotController::GearExecute(const FInputActionValue& ActionValue, int32 ExecuteIndex)
 {
-	if (!bCanReceiveInput) { return; }
-	if (!PlayerBase || !PlayerBase->GetGearComponent()) { return; }
-	PlayerBase->GetGearComponent()->ExecuteGear(ExecuteIndex);
+	if (!bCanReceiveInput)	{ return; }
+	if (!PlayerBase)		{ return; }
+	auto GearComp = PlayerBase->GetGearComponent();
+	if (!GearComp)			{ return; }
+
+	GearComp->ExecuteGear(ExecuteIndex);
 }
 
 

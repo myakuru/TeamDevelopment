@@ -21,19 +21,7 @@ class PROJECTNULL_API UPlayerHUDWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UTextBlock> HPText;
-
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<UButton> ActionButton;
-
 	virtual void NativeConstruct() override;
-
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
-	UFUNCTION()
-	void OnClickedActionButton();
 
 	/** プレイヤーの経験値バー */
 	UPROPERTY(meta = (BindWidget))
@@ -96,7 +84,7 @@ public:
 	 * @param CooldownTime クールダウン時間（0~1の範囲）
 	 */
 	UFUNCTION(BlueprintCallable)
-	void SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime,float CooldownRunTime);
+	void SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime,float MaxCooldown);
 
 	/**
 	 * @brief ギアチェンジエネルギーを設定します。

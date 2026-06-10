@@ -5,6 +5,7 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
@@ -22,6 +23,14 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 	UGearStateBase::Execute(CurrentGearLevel);
 
 	PlayDashEffect();
+
+	if (!Player) { return; }
+
+	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
+	if (!PlayerAnimInstance) { return; }
+
+	PlayerAnimInstance->Montage_Play(DashAnimMontage);
+
 }
 
 void UDashGearStateBase::Update(float DeltaTime)
@@ -29,6 +38,14 @@ void UDashGearStateBase::Update(float DeltaTime)
 	if (!Owner || !Player) { return; }
 
 	Dash();
+}
+
+void UDashGearStateBase::End()
+{
+	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
+	if (!PlayerAnimInstance) { return; }
+
+	PlayerAnimInstance->Montage_Stop(0.2f);
 }
 
 void UDashGearStateBase::Dash()

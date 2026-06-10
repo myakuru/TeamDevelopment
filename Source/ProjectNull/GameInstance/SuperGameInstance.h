@@ -67,6 +67,9 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UDataTable* WeaponMaterialDataTable;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UWeaponManager> WeaponManagerClass;
+
 	UPROPERTY(BlueprintReadOnly)
 	UWeaponManager* WeaponManager;
 
