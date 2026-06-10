@@ -46,6 +46,10 @@ public:
 	inline TObjectPtr<UPlayerParameterData> GetPlayerParameterData() const { return PlayerParameterData; }
 	inline TObjectPtr<UPlayerRuntimeData> GetPlayerRuntimeData() const { return PlayerRuntimeData; }
 
+	/** ギアマネージャーを取得する */
+	UWeaponManager* GetWeaponManager() const { return WeaponManager; }
+
+	/** マップアクターマネージャーを取得する */
 	UMapActorManager* GetMapActorManager() const { return MapActorManager; }
 protected:
 
@@ -58,22 +62,23 @@ protected:
 	TObjectPtr<UStageDataAsset> StageDataAsset;
 
 	/** ステージマネージャー */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UStageManager> StageManagerClass;
+
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UStageManager> StageManager;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UDataTable* WeaponDataTable;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	UDataTable* WeaponMaterialDataTable;
-
+	//ギアマネージャー
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWeaponManager> WeaponManagerClass;
 
 	UPROPERTY(BlueprintReadOnly)
 	UWeaponManager* WeaponManager;
 
-	/** MapActorManager */
+	/** マップアクターマネージャー */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UMapActorManager> MapActorManagerClass;
+
 	UPROPERTY(BlueprintReadOnly)
 	UMapActorManager* MapActorManager;
 

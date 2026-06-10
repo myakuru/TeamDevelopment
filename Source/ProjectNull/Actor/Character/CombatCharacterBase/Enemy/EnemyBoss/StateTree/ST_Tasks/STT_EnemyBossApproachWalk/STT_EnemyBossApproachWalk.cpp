@@ -26,7 +26,7 @@ EStateTreeRunStatus USTT_EnemyBossApproachWalk::Tick(FStateTreeExecutionContext&
 	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }
 
 	// 距離を算出
-	const float Distance = FVector::Dist(OwnerBoss->GetActorLocation(),TargetActor->GetActorLocation());
+	const float Distance = FVector::Dist(Boss->GetActorLocation(),TargetActor->GetActorLocation());
 
 	// 距離が攻撃範囲より狭ければ次のステートへ
 	if (Distance <= Boss->GetNearRange())
@@ -34,12 +34,15 @@ EStateTreeRunStatus USTT_EnemyBossApproachWalk::Tick(FStateTreeExecutionContext&
 		AIC->StopMovement();
 		//UE_LOG(LogTemp, Warning, TEXT("Approach: Dist=%f Range=%f"), Distance, CurrentAttack.AttackRange);
 		return EStateTreeRunStatus::Succeeded;
+
+		UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Succeeded"));
 	}
 
 	// キャラクターのムーブコンポーネントに速度を代入
 	if (UCharacterMovementComponent* MoveComp = OwnerBoss->GetCharacterMovement())
 	{
 		MoveComp->MaxWalkSpeed = MoveSpeed;
+		UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Move"));
 	}
 
 	// 移動処理

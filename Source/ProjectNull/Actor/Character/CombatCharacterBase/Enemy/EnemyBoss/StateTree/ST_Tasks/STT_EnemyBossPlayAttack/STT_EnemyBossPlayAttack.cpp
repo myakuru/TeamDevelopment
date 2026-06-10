@@ -23,14 +23,14 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
 
+	// オーナーのボスチェック
 	AEnemyBossBase* Boss = GetBoss();
 	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }
 
+	// メッシュチェック
 	USkeletalMeshComponent* Mesh = Boss->GetMesh();
 	UAnimInstance* Anim = Mesh ? Mesh->GetAnimInstance() : nullptr;
 	if (!IsValid(Anim)) { return EStateTreeRunStatus::Failed; }
-
-	UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick Mesh atta"));
 
 	// まず向き直る、プレイヤーに向きなおったらMontage再生
 	if (!bMontageStarted)
@@ -49,7 +49,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 		{
 			const FBossAttackPattern& Atk = Boss->GetCurrentAttack();
 			if (Atk.AttackMontages.Num() == 0) { return EStateTreeRunStatus::Failed; }
-			Anim->Montage_Play(Atk.AttackMontages[0]);
+			Anim->Montage_Play(Atk.AttackMontages[Boss->GetHitIndex()]);
 			bMontageStarted = true;
 		}
 		return EStateTreeRunStatus::Running;   // 向き直り中
@@ -57,21 +57,25 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 
 	// Tick：今のモンタージュが終わったら次へ
 	const FBossAttackPattern& Atk = Boss->GetCurrentAttack();
+	// 指定した配列内にアニメーションがあるかチェック
 	if (!Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick AnimEnd"));
 		return EStateTreeRunStatus::Succeeded;
 	}
+	// 現在のアニメーションモンタージュを取得
 	UAnimMontage* Cur = Atk.AttackMontages[Boss->GetHitIndex()];
+	// アニメーションモンタージュの終了チェック
 	if (!Anim->Montage_IsPlaying(Cur))
 	{
 		Boss->AdvanceHitIndex();
-		if (Atk.bConfirmedCombo && Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
+		// 次のアニメーションがあり、flgがtrueなら次のアニメーションを実行
+		if (Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 		{
 			Anim->Montage_Play(Atk.AttackMontages[Boss->GetHitIndex()]);
+
 			return EStateTreeRunStatus::Running;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick AnimEnd FinalAnim"));
 		return EStateTreeRunStatus::Succeeded;
 	}
 
@@ -117,6 +121,8 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::EnterState(FStateTreeExecutionCont
 	{
 		AIC->StopMovement();
 	}
+
+	Boss->ResetHitIndex();
 
 	return EStateTreeRunStatus::Running;
 }

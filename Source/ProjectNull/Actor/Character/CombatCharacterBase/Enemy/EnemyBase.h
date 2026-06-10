@@ -5,9 +5,9 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
-#include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
+#include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 #include "EnemyBase.generated.h"
 
 // 前方宣言
@@ -53,7 +53,7 @@ class UEnemyRuntimeData;
 ///	重くなる可能性があるためActorを継承する可能性大
 /// </summary>
 UCLASS()
-class PROJECTNULL_API AEnemyBase : public AActor, public IEnemyInterface
+class PROJECTNULL_API AEnemyBase : public AActor
 {
 	GENERATED_BODY()
 
@@ -311,7 +311,7 @@ protected:
 	/**
 	 * @brief 坂道範囲内に入った時の通知処理
 	 */
-	virtual void OnEnterSlope()override;
+	virtual void OnEnterSlope()/*override*/;
 
 	float AnimFinishTime = 0.0f;
 

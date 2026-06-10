@@ -4,6 +4,8 @@
 #include "../MapActorBase.h"
 #include "TreasureBox.generated.h"
 
+class UGetGearHUDWidget;
+
 /** プレイヤーが近づくと破壊される宝箱 */
 
  //宝箱のドロップアイテムパラメータ
@@ -39,7 +41,14 @@ public:
 
 	void Tick(float DeltaTime) override;
 
-	void ExtinctionStart(){ bDissolving = true; }
+	void ExtinctionStart(){ 
+		bDissolving = true;
+
+		//ドロップギアの名前の有無で決める
+		if (!DropGearName.IsEmpty()) {
+			CreateDropItemWidget();
+		}
+	}
 
 	void HitReaction(
 		UPrimitiveComponent* OverlappedComp,
@@ -49,6 +58,9 @@ public:
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	)override;
+
+	UFUNCTION()
+	UGetGearHUDWidget* CreateDropItemWidget();
 
 	/** ID */
 	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
@@ -68,16 +80,24 @@ public:
 	UPROPERTY()
 	float DissolveAmount = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Params|Dissolve")
+	UPROPERTY(EditDefaultsOnly, Category = "Params|Dissolve")
 	float DissolveSpeed = 1.0f;
 
 	/** 開くアニメーション */
-	UPROPERTY(EditAnywhere, Category = "Params|Animation")
+	UPROPERTY(EditDefaultsOnly, Category = "Params|Animation")
 	UAnimationAsset* OpenAnimation;
 
+	/** ドロップギア */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params|DropItem")
+	FText DropGearName = FText::FromString("");
+
 	/** ドロップアイテムのパラメータ */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params|DropItem")
 	FDropItemParams DropItemParams;
+
+	/** ドロップアイテムのHUDウィジェットクラス */
+	UPROPERTY(EditDefaultsOnly, Category = "Params|DropItem")
+	TSubclassOf<UGetGearHUDWidget> DropItemWidgetClass;
 
 	//タイマー
 	FTimerHandle DestroyTimerHandle;

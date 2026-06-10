@@ -6,6 +6,7 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/SaveGame/MySaveGame.h>
+#include <ProjectNull/UI/InGame/GetGearHUDWidget/GetGearHUDWidget.h>
 
 ATreasureBox::ATreasureBox()
 {
@@ -15,7 +16,7 @@ ATreasureBox::ATreasureBox()
 	if (Trigger) {
 		Trigger->OnComponentBeginOverlap.AddDynamic(
 			this,
-			&AMapActorBase::HitReaction
+			&ATreasureBox::HitReaction
 		);
 	}
 }
@@ -38,11 +39,10 @@ void ATreasureBox::BeginPlay()
 		}
 	}
 
-	// ディゾルブ用マテリアルインスタンスの生成
+	//メッシュのマテリアルスロット0のマテリアルを動的インスタンス化して保存
 	if (Mesh)
 	{
 		DynamicMaterial = Mesh->CreateAndSetMaterialInstanceDynamic(0);
-		Mesh->SetMaterial(0, DynamicMaterial);
 	}
 }
 
@@ -54,10 +54,13 @@ void ATreasureBox::Tick(float DeltaTime)
 
     DissolveAmount += DeltaTime * DissolveSpeed;
 
-    DynamicMaterial->SetScalarParameterValue(
-        TEXT("DissolveAmount"),
-        DissolveAmount
-    );
+	// ディゾルブマテリアルのパラメータを更新(マテリアルの変数名とTEXTが違うと動かない)
+	if (DynamicMaterial) {
+		DynamicMaterial->SetScalarParameterValue(
+			TEXT("DissolveAmount"),
+			DissolveAmount
+		);
+	}
 
     if (DissolveAmount >= 1.0f)
     {
@@ -73,7 +76,7 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	// プレイヤーだけにしたい場合
 	if (!pAwn->IsPlayerControlled()) return;
 
-	//状態保存
+	//状態保存(ステージクリア時にセーブするように変更必須！！)
 	auto* MapActorMan = GetWorld()->GetGameInstance<USuperGameInstance>()->GetMapActorManager();
 	if (!TreasureID.IsNone() && MapActorMan && DestroyedFromSaveData)
 	{
@@ -93,26 +96,21 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		AnimationLength,
 		false
 	);
+}
 
-	// 経験値ドロップ
-	if (UItemManagerSubsystem* ItemSubsystem =
-		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
-	{
-		const FLinearColor Color = DropItemParams.ExpColor;
-		const float Size = DropItemParams.ExpSize;
+UGetGearHUDWidget* ATreasureBox::CreateDropItemWidget()
+{
+	UGetGearHUDWidget* widget = 
+		CreateWidget<UGetGearHUDWidget>(
+		GetWorld(),
+		DropItemWidgetClass
+	);
 
-		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
-			GetActorLocation(),
-			static_cast<float>(DropItemParams.DropExp),
-			Color,
-			Size
-		);
-	}
+	widget->SetGearData(DropGearName);
 
-	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
-	if (USuperGameInstance* GameInstance =
-		GetWorld()->GetGameInstance<USuperGameInstance>())
-	{
-		GameInstance->GetPlayerRuntimeData()->AddExperience(DropItemParams.DropExp);
-	}
+	widget->OpenUI();
+
+	widget->AddToPlayerScreen();
+
+	return widget;
 }
