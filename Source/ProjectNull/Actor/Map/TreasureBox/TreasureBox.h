@@ -41,7 +41,14 @@ public:
 
 	void Tick(float DeltaTime) override;
 
-	void ExtinctionStart(){ bDissolving = true; }
+	void ExtinctionStart(){ 
+		bDissolving = true;
+
+		//ドロップギアの名前の有無で決める
+		if (!DropGearName.IsEmpty()) {
+			CreateDropItemWidget();
+		}
+	}
 
 	void HitReaction(
 		UPrimitiveComponent* OverlappedComp,
@@ -79,6 +86,10 @@ public:
 	/** 開くアニメーション */
 	UPROPERTY(EditDefaultsOnly, Category = "Params|Animation")
 	UAnimationAsset* OpenAnimation;
+
+	/** ドロップギア */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params|DropItem")
+	FText DropGearName = FText::FromString("");
 
 	/** ドロップアイテムのパラメータ */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params|DropItem")

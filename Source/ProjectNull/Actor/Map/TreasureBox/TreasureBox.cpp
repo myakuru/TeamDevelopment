@@ -64,8 +64,6 @@ void ATreasureBox::Tick(float DeltaTime)
 
     if (DissolveAmount >= 1.0f)
     {
-		CreateDropItemWidget();
-
         Destroy();
     }
 }
@@ -108,7 +106,9 @@ UGetGearHUDWidget* ATreasureBox::CreateDropItemWidget()
 		DropItemWidgetClass
 	);
 
-	widget->SetGearData(FText::FromString(TEXT("Dash")));
+	widget->SetGearData(DropGearName);
+
+	widget->OpenUI();
 
 	widget->AddToPlayerScreen();
 

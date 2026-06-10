@@ -6,6 +6,7 @@
 
 class UTextBlock;
 class UImage;
+class UButton;
 
 /**
  * 
@@ -19,7 +20,17 @@ public:
 
 	void SetGearData(const FText& inGearName);
 
+	UFUNCTION()
+	void OpenUI();
+
 private:
+
+	virtual void NativeOnInitialized()override;
+
+	virtual void NativeDestruct()override;
+
+	UFUNCTION()
+    void RemoveSelf();
 
 	/** UIパーツ */
 	UPROPERTY(meta = (BindWidget))
@@ -27,4 +38,7 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> GearImage;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> CloseUIButton;
 };
