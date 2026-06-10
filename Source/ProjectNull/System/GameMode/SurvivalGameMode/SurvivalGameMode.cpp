@@ -32,6 +32,13 @@ void ASurvivalGameMode::BeginPlay()
 	if (PC)
 	{
 		PC->SetViewTargetWithBlend(OpeningCameraActor, TargetBlendSpeed);
+
+		// プレイヤーの初期位置をz+1000に設定
+		if (APlayerBase* Player = Cast<APlayerBase>(PC->GetPawn()))
+		{
+			PlayerLocation = Player->GetActorLocation();
+			Player->SetActorLocation(PlayerLocation);
+		}
 	}
 
 	OpeningCameraActor->OnCutsceneFinished.AddDynamic(this, &ASurvivalGameMode::OnCutsceneFinished);
