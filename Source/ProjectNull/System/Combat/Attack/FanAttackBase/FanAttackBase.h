@@ -13,11 +13,8 @@ UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFanAttackBase : public UAttackBase
 {
 	GENERATED_BODY()
-	
 public:
-
 	UFanAttackBase();
-
 public:
 
 	/**
@@ -113,6 +110,10 @@ protected:
 	 */
 	virtual void AttackJudgePlayer(const TObjectPtr<AActor>& a_Player);
 
+private:
+
+	void UpdateRotation(float DeltaTime);
+
 public:
 
 	// 攻撃の持続時間（秒）
@@ -152,6 +153,9 @@ public:
 	// ノックバックの強さ
 	UPROPERTY(EditAnywhere)
 	float KnockbackPower;
+
+	UPROPERTY(EditAnywhere)
+	float RotationInterpSpeed;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsDrawDebugLine;

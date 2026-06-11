@@ -4,27 +4,32 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
-UAttackBase::UAttackBase()
-	:	OwnerActor(nullptr)
-	,	bCanExecute(true)
-	,	bIsActive(false)
+UAttackBase::UAttackBase():
+		OwnerActor(nullptr),
+		bCanExecute(true),
+		bIsActive(false),
+		bAbsoluteScale(false),
+		bAbsoluteRotation(false),
+		bAbsoluteLocation(false)
 {
 }
 
 void UAttackBase::Initialize(const TObjectPtr<AActor>& Owner)
 {
-	OwnerActor = Owner;
-	RootComponent = NewObject<USceneComponent>(Owner);
+	OwnerActor		= Owner;
+	RootComponent	= NewObject<USceneComponent>(Owner);
 
 	if (!RootComponent) { return; }
-
 	RootComponent->RegisterComponent();
+
 	RootComponent->AttachToComponent(
-		Owner->GetRootComponent(),
-		FAttachmentTransformRules::KeepRelativeTransform);
+			Owner->GetRootComponent(),
+			FAttachmentTransformRules::KeepRelativeTransform);
+
+	RootComponent->SetAbsolute(bAbsoluteLocation, bAbsoluteRotation, bAbsoluteScale);
 }
 
-FVector UAttackBase::CalcAttackDir(const FVector& forwardVector) const
+FVector UAttackBase::CalcAttackDir(const FVector& ForwardVector) const
 {
-	return forwardVector.RotateAngleAxis(0.0f, FVector::UpVector);
+	return ForwardVector.RotateAngleAxis(0.f, FVector::UpVector);
 }
