@@ -140,14 +140,13 @@ UGetGearHUDWidget* ATreasureBox::CreateDropItemWidget(const FText& itemName)
 	UGetGearHUDWidget* widget =
 		CreateWidget<UGetGearHUDWidget>(
 			GetWorld(),
-			DropItemWidgetClass
-		);
+			DropItemWidgetClass);
 
 	widget->SetGearData(itemName);
 
 	widget->OpenUI();
 
-	widget->AddToPlayerScreen();
+	widget->AddToViewport(InGameDefinition::GetGearUIZOrder);
 
 	return widget;
 }
