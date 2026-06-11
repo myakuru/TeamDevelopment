@@ -58,6 +58,7 @@ public:
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
+	FVector&								GetCurrentFloorNormal() const;
 
 private:
 
@@ -82,10 +83,6 @@ private:
 	/** シネマティックカメラコンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCineCameraComponent> CineCameraComponent;
-
-	/** スフィアコリジョンコンポーネント */
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USphereComponent> SphereCollision;
 
 	/** ギアコンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "Gear")
@@ -130,4 +127,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float SlideSpeed = 1500.f;
 
+	UPROPERTY()
+	float CurrentGroundTraceLength = 1500.f;
 };

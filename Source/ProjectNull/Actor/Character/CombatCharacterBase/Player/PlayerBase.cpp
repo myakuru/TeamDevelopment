@@ -14,7 +14,6 @@
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 
-
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
@@ -67,19 +66,6 @@ APlayerBase::APlayerBase():
 	CineCameraComponent->Deactivate();
 
 	// ================================================================
-	// スフィアコリジョンコンポーネントの初期化
-	// ================================================================
-	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
-	if (!SphereCollision) { return; }
-
-	SphereCollision->SetupAttachment(GetRootComponent());
-
-	SphereCollision->SetCollisionEnabled(
-		ECollisionEnabled::QueryAndPhysics);
-
-	SphereCollision->SetGenerateOverlapEvents(true);
-
-	// ================================================================
 	// ギアコンポーネントの初期化
 	// ================================================================
 	GearComponent = CreateDefaultSubobject<UPlayerGearComponent>("Gear");
@@ -118,6 +104,7 @@ void APlayerBase::BeginPlay()
 		&APlayerBase::AlignFloor,
 		0.1f,
 		true);*/
+	CurrentGroundTraceLength = GroundTraceLength;
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -128,11 +115,13 @@ void APlayerBase::Tick(float DeltaTime)
 	ACombatCharacterBase::Tick(DeltaTime);
 
 	// 自動攻撃の更新
-	if (AutoAttack) { AutoAttack->Update(DeltaTime,nullptr, EnemyManager); }
+	if (AutoAttack) { AutoAttack->Update(DeltaTime, nullptr, EnemyManager); }
 
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
-	AlignFloor();
+
+
+	//AlignFloor();
 	
 }
 
@@ -166,19 +155,38 @@ int32 APlayerBase::GetCurrentGearLevel() const
 	return GearComponent->GetCurrentGearLevel();
 }
 
+FVector& APlayerBase::GetCurrentFloorNormal() const
+{
+	auto CharacterMovementComp = GetCharacterMovement();
+	FVector OutVector = FVector::ZeroVector;
+	if (!CharacterMovementComp) { return OutVector; }
+	OutVector = CharacterMovementComp->CurrentFloor.HitResult.ImpactNormal;
+	return OutVector;
+}
+
 UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 {
-	if (!GetMesh() || !GetMesh()->GetAnimInstance()) { return nullptr; }
-	return Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (!GetMesh()) { return nullptr; }
+
+	auto AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance) { return nullptr; }
+
+	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
+	return PlayerAnimInstance;
 }
 
 FPoseSnapshot& APlayerBase::GetPlayerPoseSnapshot()
 {
 	FPoseSnapshot PoseSnapshot;
-	if (!GetMesh() || !GetMesh()->GetAnimInstance()
-		|| !Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance())) { return PoseSnapshot; }
 
-	auto* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (!GetMesh())				{ return PoseSnapshot; }
+
+	auto AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance)			{ return PoseSnapshot; }
+
+	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
+	if (!PlayerAnimInstance)	{ return PoseSnapshot; }
+
 	return PlayerAnimInstance->GetPlayerPoseSnapshot();
 }
 
@@ -195,21 +203,15 @@ bool APlayerBase::CanMove()
 void APlayerBase::AlignFloor()
 {
 	float DeltaTime = GetWorld()->GetDeltaSeconds();
-	UCharacterMovementComponent* MoveComp =
-		GetCharacterMovement();
-
-	if (!MoveComp) { return; }
-
+	
 	//----------------------------------------
 	// Ground Trace
 	//----------------------------------------
 
-	FHitResult Hit;
+	FHitResult Hit;	
 
 	const FVector Start = GetActorLocation();
-
-	const FVector End = Start - GetActorUpVector() * GroundTraceLength;
-	//const FVector End = Start - FVector::UpVector * GroundTraceLength;
+	const FVector End = Start - GetActorUpVector() * CurrentGroundTraceLength;
 
 	DrawDebugLine(GetWorld(), Start, End,FColor::Green);
 	FCollisionQueryParams Params;
@@ -226,9 +228,13 @@ void APlayerBase::AlignFloor()
 	{
 		/*MoveComp->SetMovementMode(
 			MOVE_Falling);*/
-		MoveComp->SetGravityDirection(
-			FVector::DownVector);
+		/*MoveComp->SetGravityDirection(
+			FVector::DownVector);*/
+		CurrentGroundTraceLength += 50.0f;
 		return;
+	}
+	else {
+		CurrentGroundTraceLength = GroundTraceLength;
 	}
 
 	//----------------------------------------
@@ -248,8 +254,8 @@ void APlayerBase::AlignFloor()
 	// Walkable Angle
 	//----------------------------------------
 
-	const FVector UpDir =
-		-MoveComp->GetGravityDirection();
+	/*const FVector UpDir =
+		-MoveComp->GetGravityDirection();*/
 
 	const float Dot =
 		FVector::DotProduct(
@@ -270,52 +276,46 @@ void APlayerBase::AlignFloor()
 	/*	MoveComp->SetMovementMode(
 			MOVE_Falling);*/
 		//MoveComp->SetGravityDirection(FVector::DownVector);
-		FVector SlideDir =
+		/*FVector SlideDir =
 			FVector::VectorPlaneProject(
 				FVector(0, 0, -1),
 				CurrentGroundNormal).GetSafeNormal();
 
 		AddMovementInput(
 			SlideDir.GetSafeNormal(),
-			SlideSpeed);
+			SlideSpeed);*/
+
 		Gravity = FVector::DownVector;
 	}
+	
+	/*DrawDebugCapsule(
+		GetWorld(),
+		GetActorLocation(),
+		WalkCapsuleHalfHeight,
+		WalkCapsuleRadius,
+		GetActorQuat(),
+		FColor::Magenta);
+
+	DrawDebugCapsule(
+		GetWorld(),
+		GetActorLocation(),
+		FallCapsuleHalfHeight,
+		FallCapsuleRadius,
+		GetActorQuat(),
+		FColor::Orange);*/
+
 
 	//----------------------------------------
 	// Gravity
 	//----------------------------------------
 
-	MoveComp->SetGravityDirection(Gravity);
+	//MoveComp->SetGravityDirection(Gravity);
 
 	//----------------------------------------
 	// Rotation
 	//----------------------------------------
 
-	FVector Forward =
-		FVector::VectorPlaneProject(
-			GetActorForwardVector(),
-			CurrentGroundNormal);
-
-	if (Forward.IsNearlyZero())
-	{
-		Forward = FVector::CrossProduct(
-			GetActorRightVector(),
-			CurrentGroundNormal);
-	}
-
-	Forward.Normalize();
-
-	const FQuat TargetQuat = FRotationMatrix::MakeFromZX(
-			CurrentGroundNormal,
-			Forward)
-		.ToQuat();
-
-	const FQuat NewQuat = FQuat::Slerp(
-			GetActorQuat(),
-			TargetQuat,
-			DeltaTime * RotationInterpSpeed);
-
-	SetActorRotation(NewQuat);
+	
 }
 
 
