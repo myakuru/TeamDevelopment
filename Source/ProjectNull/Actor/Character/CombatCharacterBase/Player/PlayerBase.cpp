@@ -2,13 +2,17 @@
 
 #include "Camera/CameraComponent.h"
 #include "CineCameraComponent.h"
+
 #include <GameFramework/SpringArmComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
-
 
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
@@ -61,7 +65,6 @@ APlayerBase::APlayerBase():
 	CineCameraComponent->SetupAttachment(SpringArmComponent);
 	CineCameraComponent->Deactivate();
 
-
 	// ================================================================
 	// ギアコンポーネントの初期化
 	// ================================================================
@@ -95,6 +98,13 @@ void APlayerBase::BeginPlay()
 	// ================================================================
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Initialize(this); }
 
+	/*GetWorld()->GetTimerManager().SetTimer(
+		AlignFloorTimerHandle,
+		this,
+		&APlayerBase::AlignFloor,
+		0.1f,
+		true);*/
+	CurrentGroundTraceLength = GroundTraceLength;
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -105,52 +115,14 @@ void APlayerBase::Tick(float DeltaTime)
 	ACombatCharacterBase::Tick(DeltaTime);
 
 	// 自動攻撃の更新
-	if (AutoAttack) { AutoAttack->Update(DeltaTime,nullptr, EnemyManager); }
+	if (AutoAttack) { AutoAttack->Update(DeltaTime, nullptr, EnemyManager); }
 
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
-	UCharacterMovementComponent* MoveComp =
-		GetCharacterMovement();
 
-	float TargetPitch = 0.0f;
 
-	if (MoveComp->IsMovingOnGround() &&
-		MoveComp->CurrentFloor.IsWalkableFloor())
-	{
-		const FVector Normal =
-			MoveComp->CurrentFloor.HitResult.ImpactNormal;
-
-		// プレイヤー前方向
-		const FVector Forward =
-			GetActorForwardVector();
-
-		// 前方向成分だけ取得
-		const float Slope =
-			FVector::DotProduct(
-				Forward,
-				FVector::VectorPlaneProject(
-					FVector::UpVector,
-					Normal));
-
-		TargetPitch =
-			FMath::RadiansToDegrees(FMath::Asin(Slope));
-	}
-
-	FRotator CurrentRot =
-		GetMesh()->GetRelativeRotation();
-
-	FRotator TargetRot = CurrentRot;
-	TargetPitch *= -1.f;
-	TargetRot.Roll = TargetPitch;
-
-	FRotator NewRot =
-		FMath::RInterpTo(
-			CurrentRot,
-			TargetRot,
-			DeltaTime,
-			8.0f);
-
-	GetMesh()->SetRelativeRotation(NewRot);
+	//AlignFloor();
+	
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -183,19 +155,38 @@ int32 APlayerBase::GetCurrentGearLevel() const
 	return GearComponent->GetCurrentGearLevel();
 }
 
+FVector& APlayerBase::GetCurrentFloorNormal() const
+{
+	auto CharacterMovementComp = GetCharacterMovement();
+	FVector OutVector = FVector::ZeroVector;
+	if (!CharacterMovementComp) { return OutVector; }
+	OutVector = CharacterMovementComp->CurrentFloor.HitResult.ImpactNormal;
+	return OutVector;
+}
+
 UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 {
-	if (!GetMesh() || !GetMesh()->GetAnimInstance()) { return nullptr; }
-	return Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (!GetMesh()) { return nullptr; }
+
+	auto AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance) { return nullptr; }
+
+	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
+	return PlayerAnimInstance;
 }
 
 FPoseSnapshot& APlayerBase::GetPlayerPoseSnapshot()
 {
 	FPoseSnapshot PoseSnapshot;
-	if (!GetMesh() || !GetMesh()->GetAnimInstance()
-		|| !Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance())) { return PoseSnapshot; }
 
-	auto* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (!GetMesh())				{ return PoseSnapshot; }
+
+	auto AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance)			{ return PoseSnapshot; }
+
+	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
+	if (!PlayerAnimInstance)	{ return PoseSnapshot; }
+
 	return PlayerAnimInstance->GetPlayerPoseSnapshot();
 }
 
@@ -207,6 +198,124 @@ bool APlayerBase::CanMove()
 	}
 
 	return true;
+}
+
+void APlayerBase::AlignFloor()
+{
+	float DeltaTime = GetWorld()->GetDeltaSeconds();
+	
+	//----------------------------------------
+	// Ground Trace
+	//----------------------------------------
+
+	FHitResult Hit;	
+
+	const FVector Start = GetActorLocation();
+	const FVector End = Start - GetActorUpVector() * CurrentGroundTraceLength;
+
+	DrawDebugLine(GetWorld(), Start, End,FColor::Green);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	const bool bHit = GetWorld()->LineTraceSingleByChannel(
+			Hit,
+			Start,
+			End,
+			ECC_Visibility,
+			Params);
+
+	if (!bHit)
+	{
+		/*MoveComp->SetMovementMode(
+			MOVE_Falling);*/
+		/*MoveComp->SetGravityDirection(
+			FVector::DownVector);*/
+		CurrentGroundTraceLength += 50.0f;
+		return;
+	}
+	else {
+		CurrentGroundTraceLength = GroundTraceLength;
+	}
+
+	//----------------------------------------
+	// Normal
+	//----------------------------------------
+
+	const FVector TargetNormal =
+		Hit.ImpactNormal.GetSafeNormal();
+
+	CurrentGroundNormal = FMath::VInterpNormalRotationTo(
+			CurrentGroundNormal,
+			TargetNormal,
+			DeltaTime,
+			NormalInterpSpeed);
+
+	//----------------------------------------
+	// Walkable Angle
+	//----------------------------------------
+
+	/*const FVector UpDir =
+		-MoveComp->GetGravityDirection();*/
+
+	const float Dot =
+		FVector::DotProduct(
+			TargetNormal,
+			FVector::UpVector);
+
+	const float WalkableDot = FMath::Cos(
+			FMath::DegreesToRadians(MaxGroundAngle));
+	//UE_LOG(LogTemp, Display, TEXT("WalkableDot %.2f"), WalkableDot);
+	//UE_LOG(LogTemp, Display, TEXT("Dot %.2f"), Dot);
+
+	FVector Gravity = -CurrentGroundNormal;
+
+	const bool Walkable = Dot >= WalkableDot;
+
+	if (!Walkable)
+	{
+	/*	MoveComp->SetMovementMode(
+			MOVE_Falling);*/
+		//MoveComp->SetGravityDirection(FVector::DownVector);
+		/*FVector SlideDir =
+			FVector::VectorPlaneProject(
+				FVector(0, 0, -1),
+				CurrentGroundNormal).GetSafeNormal();
+
+		AddMovementInput(
+			SlideDir.GetSafeNormal(),
+			SlideSpeed);*/
+
+		Gravity = FVector::DownVector;
+	}
+	
+	/*DrawDebugCapsule(
+		GetWorld(),
+		GetActorLocation(),
+		WalkCapsuleHalfHeight,
+		WalkCapsuleRadius,
+		GetActorQuat(),
+		FColor::Magenta);
+
+	DrawDebugCapsule(
+		GetWorld(),
+		GetActorLocation(),
+		FallCapsuleHalfHeight,
+		FallCapsuleRadius,
+		GetActorQuat(),
+		FColor::Orange);*/
+
+
+	//----------------------------------------
+	// Gravity
+	//----------------------------------------
+
+	//MoveComp->SetGravityDirection(Gravity);
+
+	//----------------------------------------
+	// Rotation
+	//----------------------------------------
+
+	
 }
 
 

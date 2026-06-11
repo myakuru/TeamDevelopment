@@ -9,6 +9,9 @@ class UCameraComponent;
 class UPlayerAttackComponent;
 class UPlayerGearComponent;
 
+/** スフィアコリジョンコンポーネント */
+class USphereComponent;
+
 /** 対象検索コンポーネント */
 class UTargetSearchComponent;
 
@@ -55,6 +58,7 @@ public:
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
+	FVector&								GetCurrentFloorNormal() const;
 
 private:
 
@@ -64,6 +68,9 @@ private:
 	 */
 	bool CanMove();
 
+	void AlignFloor();
+
+	FTimerHandle AlignFloorTimerHandle;
 
 	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
@@ -97,4 +104,29 @@ private:
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
 
+	UPROPERTY()
+	FVector CurrentGroundNormal = FVector::UpVector;
+
+	UPROPERTY(EditAnywhere)
+	float GroundTraceLength = 200.0f;
+
+	UPROPERTY(EditAnywhere)
+	float NormalInterpSpeed = 10.0f;
+
+	UPROPERTY(EditAnywhere)
+	float RotationInterpSpeed = 8.0f;
+
+	UPROPERTY(EditAnywhere)
+	float MaxGroundAngle = 45.f;
+	UPROPERTY(EditAnywhere)
+	float EnterGroundAngle = 45.f;
+
+	UPROPERTY(EditAnywhere)
+	float ExitGroundAngle = 50.f;
+
+	UPROPERTY(EditAnywhere)
+	float SlideSpeed = 1500.f;
+
+	UPROPERTY()
+	float CurrentGroundTraceLength = 1500.f;
 };
