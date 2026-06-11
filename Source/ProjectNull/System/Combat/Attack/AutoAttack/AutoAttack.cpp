@@ -54,13 +54,13 @@ void UAutoAttack::Update(float DeltaTime)
 		if (!ConeSlashParams) { continue; }
 
 		if (!ConeSlashParams->IsActive()) { continue; }
-		//ConeSlashParams->AttackJudge();
+		ConeSlashParams->AttackJudge();
 	}
 }
 
 void UAutoAttack::StartAutoAttack()
 {
-	if (!OwnerActor) { return; }
+	if (!GetOwnerActor()) { return; }
 
 	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front)
 		&& AutoAttackParamsMap[EAutoAttackType::Front])

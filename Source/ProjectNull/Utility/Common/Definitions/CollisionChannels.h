@@ -7,4 +7,4 @@
  * @brief 便利なマクロ定義(ヒューマンエラーを防ぐために)
  */
 #define ECC_Enemy	ECollisionChannel::ECC_GameTraceChannel1	// 「敵」のコリジョンチャンネル
-#define ECC_Player	ECollisionChannel::ECC_GameTraceChannel2	// 「プレイヤー」のコリジョンチャンネル
+#define ECC_Player	ECollisionChannel::ECC_Pawn	// 「プレイヤー」のコリジョンチャンネル

@@ -57,7 +57,6 @@ class UEnemyRuntimeData;
 UCLASS()
 class PROJECTNULL_API AEnemyBase:	public AActor
 								,	public ICharacterInterface
-								,	public IEnemyInterface
 {
 	GENERATED_BODY()
 
@@ -160,6 +159,12 @@ public:
 		return ISMManagerClass;
 	}
 
+	/** @brief 敵攻撃コンポーネントの取得 */
+	TObjectPtr<UEnemyAttackComponent> GetEnemyAttackComponent()const
+	{
+		return EnemyAttackComponent;
+	}
+
 	/** ターゲットとの距離を返す*/
 	float GetTargetDistanceSqr()const { return EnemyStatus.TargetDistanceSqr; }
 
@@ -201,7 +206,7 @@ public:
 	//~ End Getter
 
 	/* Begin Character Interface.*/
-	virtual void TakeDamaged(float a_Damage = 1.f)override;
+	virtual void ApplyDamaged(float a_Damage = 1.f)override;
 
 	/* End Character Interface.*/
 
@@ -233,7 +238,7 @@ protected:
 	UDataTable* KnockBackDataTable;
 
 	///** 敵管理クラスのポインタ */
-	//UPROPERTY()
+	UPROPERTY()
 	UEnemyManagerSubsystem* EnemyManager;
 
 	/** ゲームの進行管理クラスのポインタ */
@@ -242,7 +247,7 @@ protected:
 
 	/** 敵の攻撃コンポーネントクラス */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyAttack")
-	UEnemyAttackComponent* EnemyAttackComponent;
+	TObjectPtr<UEnemyAttackComponent> EnemyAttackComponent;
 
 	/** アイテムの設定*/
 	//UPROPERTY(EditAnywhere, Category = "Drop")

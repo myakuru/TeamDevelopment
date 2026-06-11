@@ -2,22 +2,22 @@
 
 #include "CoreMinimal.h"
 #include "../AttackBase.h"
-#include "SphericalAttack.generated.h"
+#include "CapsuleAttack.generated.h"
 
-/** 球状の当たり判定コンポーネント */
-class USphereComponent;
+// カプセルコンポーネント
+class UCapsuleComponent;
 
 /**
- * 球状の攻撃判定を行うクラス
+ * カプセルを持った攻撃クラス
  */
-UCLASS(Blueprintable, EditInlineNew)
-class PROJECTNULL_API USphericalAttack : public UAttackBase
+UCLASS()
+class PROJECTNULL_API UCapsuleAttack : public UAttackBase
 {
 	GENERATED_BODY()
 
 public:
 
-	USphericalAttack();
+	UCapsuleAttack();
 
 public:
 
@@ -25,7 +25,7 @@ public:
 	 * @brief 初期化処理
 	 * @param Owner オーナーアクター
 	 */
-	virtual void Initialize(const TObjectPtr<AActor>& Owner)override;
+	virtual void Initialize(const TObjectPtr<AActor>& InOwner)override;
 
 	/**
 	 * @brief 有効化処理
@@ -72,10 +72,10 @@ private:
 private:
 
 	/**
-	 * @brief 球状の当たり判定コンポーネント
+	 * @brief カプセル状の当たり判定コンポーネント
 	 */
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USphereComponent> AttackSphere;
+	TObjectPtr<UCapsuleComponent> AttackCapsule;
 
 	/**
 	 * @brief 攻撃の継続時間

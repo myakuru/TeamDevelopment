@@ -84,8 +84,8 @@ void AProjectileBase::HandleCollision(AActor* OtherActor)
 	// キャラクターインターフェースを実装しているか
 	if (auto* interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		interface->TakeDamaged();
-		interface->TakeKnockBack(OwnerActor->GetActorLocation());
+		interface->ApplyDamaged();
+		interface->ApplyKnockBack(OwnerActor->GetActorLocation());
 	}
 
 	Destroy();

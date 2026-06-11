@@ -2,8 +2,10 @@
 
 #include "Components\SphereComponent.h"
 
+#include <ProjectNull\Utility\Common\Definitions\CollisionChannels.h>
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
 #include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
+#include "SphericalAttack.h"
 
 USphericalAttack::USphericalAttack()
 	:	Duration(1.f)
@@ -21,15 +23,15 @@ void USphericalAttack::Initialize(const TObjectPtr<AActor>& Owner)
 	{
 		AttackSphere = NewObject<USphereComponent>(Owner);
 		
-		if (RootComponent)
+		if (GetRootComponent())
 		{
-			AttackSphere->SetupAttachment(RootComponent);
+			AttackSphere->SetupAttachment(GetRootComponent());
 		}
 		AttackSphere->RegisterComponent();
-		AttackSphere->SetCollisionResponseToChannel(
-			ECC_GameTraceChannel1,
+		/*AttackSphere->SetCollisionResponseToChannel(
+			ECC_Player,
 			ECR_Overlap
-		);
+		);*/
 		AttackSphere->OnComponentBeginOverlap.AddDynamic(
 			this,
 			&USphericalAttack::OnSphericalBeginOverlap
@@ -46,27 +48,27 @@ void USphericalAttack::Execute()
 {
 	if (!AttackSphere) { return; }
 
-	bIsActive = true;	// 攻撃有効化
-	bCanExecute = false;// 攻撃実行不可にする
-	ElpsedTimer = 0.f;	// 経過時間をリセット
+	SetIsActive(true);		// 攻撃有効化
+	SetCanExecute(false);	// 攻撃実行不可にする
+	ElpsedTimer = 0.f;		// 経過時間をリセット
 	AttackSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);	// 当たり判定有効化
-	AttackSphere->SetRelativeTransform(OffsetTransform);				// 初期Transformに設定
+	AttackSphere->SetRelativeTransform(GetOffsetTransform());			// 初期Transformに設定
 }
 
 void USphericalAttack::Cancel()
 {
 	if (!AttackSphere) { return; }
 
-	bIsActive = false;	// 攻撃無効化
-	bCanExecute = true;	// 攻撃実行可にする
-	ElpsedTimer = 0.f;	// 経過時間をリセット
+	SetIsActive(false);		// 攻撃無効化
+	SetCanExecute(true);		// 攻撃実行可にする
+	ElpsedTimer = 0.f;		// 経過時間をリセット
 	AttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
 }
 
 void USphericalAttack::Update(float DeltaTime)
 {
 	// 有効時以外は処理しない
-	if (!bIsActive||!AttackSphere) { return; }
+	if (!IsActive()||!AttackSphere) { return; }
 
 	UAttackBase::Update(DeltaTime);
 
@@ -89,17 +91,17 @@ void USphericalAttack::OnSphericalBeginOverlap(
 	const FHitResult& SweepResult
 )
 {
-	if (!OtherActor || !OwnerActor
-		|| OtherActor == OwnerActor) { return; }
+	if (!OtherActor || !GetOwnerActor()
+		|| OtherActor == GetOwnerActor()) { return; }
 	
-	if (!HitActors.Contains(OtherActor))
+	if (!GetHitActors().Contains(OtherActor))
 	{	
 		// キャラクターインターフェースを実装しているか
 		if (auto* interface = Cast<ICharacterInterface>(OtherActor))
 		{
-			interface->TakeDamaged();
-			interface->TakeKnockBack(OwnerActor->GetActorLocation());
-			HitActors.Add(OtherActor);
+			interface->ApplyDamaged();
+			interface->ApplyKnockBack(GetOwnerActor()->GetActorLocation());
+			AddHitActors(OtherActor);
 		}
 	}
 }
@@ -111,11 +113,11 @@ void USphericalAttack::OnSphericalEndOverlap(
 	int32 OtherBodyIndex
 )
 {
-	if (!OtherActor || !OwnerActor
-		|| OtherActor == OwnerActor) {return;}
+	if (!OtherActor || !GetOwnerActor()
+		|| OtherActor == GetOwnerActor()) {return;}
 
-	if (HitActors.Contains(OtherActor))
+	if (GetHitActors().Contains(OtherActor))
 	{
-		HitActors.Remove(OtherActor);
+		RemoveActor(OtherActor);
 	}
 }

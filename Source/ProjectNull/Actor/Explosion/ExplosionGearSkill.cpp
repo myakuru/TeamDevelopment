@@ -134,8 +134,8 @@ void AExplosionGearSkill::Explode()
 		// キャラクターインターフェースを実装しているか
 		if (auto* interface = Cast<ICharacterInterface>(enemy))
 		{
-			interface->TakeDamaged(Data.Damage);
-			interface->TakeKnockBack(GetActorLocation());
+			interface->ApplyDamaged(Data.Damage);
+			interface->ApplyKnockBack(GetActorLocation());
 		}
 	}
 

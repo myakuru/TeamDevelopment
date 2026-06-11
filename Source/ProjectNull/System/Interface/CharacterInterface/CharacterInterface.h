@@ -24,12 +24,12 @@ public:
 	 * @brief ダメージを受ける処理
 	 * @param Damage ダメージ量
 	 */
-	virtual void TakeDamaged(float a_Damage = 1.f)PURE_VIRTUAL(ICharacterInterface::TakeDamaged,);
+	virtual void ApplyDamaged(float a_Damage = 1.f)PURE_VIRTUAL(ICharacterInterface::TakeDamaged,);
 
 	/**
 	 * @brief ノックバックを受ける処理
 	 * @param OwnerLocation 攻撃者の位置
 	 * @param AttackPower	攻撃力
 	 */
-	virtual void TakeKnockBack(const FVector& a_OwnerLocation, float a_AttackPower=1.f) { return; }
+	virtual void ApplyKnockBack(const FVector& a_OwnerLocation, float a_AttackPower=1.f) { return; }
 };

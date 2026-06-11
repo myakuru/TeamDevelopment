@@ -44,3 +44,28 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	}
 }
 
+bool UEnemyAttackComponent::IsAllAttackDeactivate()
+{
+	bool bIsAllDeactive = true;
+	if (EnemyAttacks.IsEmpty()) { return bIsAllDeactive; }
+
+	for (auto& Attack : EnemyAttacks)
+	{
+		if (!Attack) { continue; }
+		if (Attack->IsActive())
+		{
+			bIsAllDeactive = false;
+			break;
+		}
+	}
+
+	return bIsAllDeactive;
+}
+
+void UEnemyAttackComponent::TestActive()
+{
+	if (EnemyAttacks.IsEmpty()) { return; }
+
+	// 試しに0番目の要素をアクティブ化
+	EnemyAttacks[0]->Execute();
+}

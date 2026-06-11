@@ -121,8 +121,8 @@ void UDashGearStateBase::UpdateDashAttack()
 			// キャラクターインターフェースを実装しているか
 			if (auto* interface = Cast<ICharacterInterface>(enemy))
 			{
-				interface->TakeDamaged();
-				interface->TakeKnockBack(PlayerLocation);
+				interface->ApplyDamaged();
+				interface->ApplyKnockBack(PlayerLocation);
 			}
 		}
 	}

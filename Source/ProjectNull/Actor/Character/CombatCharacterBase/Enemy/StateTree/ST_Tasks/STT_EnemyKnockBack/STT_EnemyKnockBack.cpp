@@ -47,10 +47,10 @@ EStateTreeRunStatus USTT_EnemyKnockBack::Tick(FStateTreeExecutionContext& a_Cont
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
 	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
-	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
+	/*if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
 	{
 		return EStateTreeRunStatus::Succeeded;
-	}
+	}*/
 
 	// ノックバックが停止したらステート終了
 	if(MoveToKnockBack(a_DeltaTime)){ return EStateTreeRunStatus::Succeeded; }

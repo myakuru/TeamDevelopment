@@ -38,6 +38,11 @@ public:
 	virtual void Update(float DeltaTime)override;
 
 	/**
+	 * @brief 攻撃判定を、「対敵リスト」「対プレイヤー」かを判断
+	 */
+	virtual void AttackJudge()override;
+
+	/**
 	 * @brief 攻撃判定の更新
 	 * @param DeltaTime デルタタイム
 	 * @return 攻撃が終了しているならtrue
@@ -95,11 +100,6 @@ public:
 	inline float GetConeCosine() const { return FMath::Cos(FMath::DegreesToRadians(ConeAngle)); }
 
 protected:
-
-	/**
-	 * @brief 攻撃判定を、「対敵リスト」「対プレイヤー」かを判断
-	 */
-	virtual void AttackJudge()override;
 
 	/**
 	 * @brief 敵リストに対する攻撃判定

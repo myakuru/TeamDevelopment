@@ -25,7 +25,7 @@ UFanAttackBase::UFanAttackBase():
 
 void UFanAttackBase::Start()
 {
-	bIsActive		= true;
+	SetIsActive(true);
 	CurrentAngle	= StartAngle;
 	ElapsedTime		= 0.0f;
 }
@@ -43,7 +43,10 @@ void UFanAttackBase::Update(float DeltaTime)
 
 bool UFanAttackBase::UpdateAttack(float DeltaTime)
 {
-	if (!bIsActive || !RootComponent || !RootComponent->GetAttachParent()) { return false; }
+	if (!IsActive() ||
+		!GetRootComponent() ||
+		!GetRootComponent()->GetAttachParent())
+	{ return false; }
 
 	ElapsedTime += DeltaTime;
 
@@ -55,8 +58,8 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 	// 攻撃範囲をデバッグラインで可視化
 	{
 		// プレイヤーの座標と前方ベクトルを取得
-		const FVector location = RootComponent->GetComponentLocation();
-		const FVector forwardVector = RootComponent->GetForwardVector();
+		const FVector location = GetRootComponent()->GetComponentLocation();
+		const FVector forwardVector = GetRootComponent()->GetForwardVector();
 
 		// 攻撃方向ベクトル
 		const FVector attackDir = CalcAttackDir(forwardVector);
@@ -76,7 +79,7 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 
 	// 終了判定
 	if (ElapsedTime >= Duration) {
-		bIsActive = false;
+		SetIsActive(false);
 	}
 
 	return true;
@@ -84,8 +87,11 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 
 bool UFanAttackBase::IsTargetInRange(AActor* Target)
 {
-	if (!OwnerActor || !Target || !RootComponent || !RootComponent->GetAttachParent())	{ return false; }
-	const auto* parent = RootComponent->GetAttachParent();
+	if (!GetOwnerActor() ||
+		!Target ||
+		!GetRootComponent()||
+		!GetRootComponent()->GetAttachParent()) { return false; }
+	const auto* parent = GetRootComponent()->GetAttachParent();
 
 	// 敵へのベクトル
 	FVector toEnemy = Target->GetActorLocation() - parent->GetComponentLocation();
@@ -109,9 +115,9 @@ bool UFanAttackBase::IsTargetInRange(AActor* Target)
 
 void UFanAttackBase::AttackJudge()
 {
-	if (!OwnerActor) { return; }
+	if (!GetOwnerActor()) { return; }
 
-	if (auto* root = OwnerActor->GetRootComponent())
+	if (auto* root = GetOwnerActor()->GetRootComponent())
 	{
 		ECollisionChannel collisionChannel =
 			root->GetCollisionObjectType();
@@ -136,10 +142,10 @@ void UFanAttackBase::AttackJudge()
 
 void UFanAttackBase::AttackJudgePlayer(const TObjectPtr<AActor>& a_Player)
 {
-	if (!a_Player|| !bIsActive) { return; }
+	if (!a_Player|| !IsActive()) { return; }
 
 	// 持ち主の座標を取得
-	const FVector ownerLocation = OwnerActor->GetActorLocation();
+	const FVector ownerLocation = GetOwnerActor()->GetActorLocation();
 
 	// 敵が攻撃範囲内にいるか判定
 	if (IsTargetInRange(a_Player))
@@ -147,18 +153,18 @@ void UFanAttackBase::AttackJudgePlayer(const TObjectPtr<AActor>& a_Player)
 		// ダメージを与える(未実装)
 		if (auto* interface = Cast<ICharacterInterface>(a_Player))
 		{
-			interface->TakeDamaged();
-			interface->TakeKnockBack(ownerLocation);
+			interface->ApplyDamaged();
+			interface->ApplyKnockBack(ownerLocation);
 		}
 	}
 }
 
 void UFanAttackBase::AttackJudgeEnemys(const TObjectPtr<UEnemyManagerSubsystem>& a_EnemyManager)
 {
-	if (!a_EnemyManager||!bIsActive) { return; }
+	if (!a_EnemyManager||!IsActive()) { return; }
 
 	// プレイヤーの座標を取得
-	const FVector location = OwnerActor->GetActorLocation();
+	const FVector location = GetOwnerActor()->GetActorLocation();
 
 	// 敵リストをループして、攻撃範囲内の敵にダメージを与える
 	for (auto& enemy : a_EnemyManager->GetEnemyList())
@@ -170,8 +176,8 @@ void UFanAttackBase::AttackJudgeEnemys(const TObjectPtr<UEnemyManagerSubsystem>&
 		{
 			if (auto* interface = Cast<ICharacterInterface>(enemy))
 			{
-				interface->TakeDamaged();
-				interface->TakeKnockBack(location);
+				interface->ApplyDamaged();
+				interface->ApplyKnockBack(location);
 			}
 		}
 	}
@@ -179,21 +185,24 @@ void UFanAttackBase::AttackJudgeEnemys(const TObjectPtr<UEnemyManagerSubsystem>&
 
 bool UFanAttackBase::CanDeactivate()
 {
-	bool canDeactivate = (bIsActive != bPrevActive) && !bIsActive;
-	bPrevActive = bIsActive;
+	const bool bCurrentActive = IsActive();
+	bool canDeactivate = (bCurrentActive != bPrevActive) && !bCurrentActive;
+	bPrevActive = bCurrentActive;
 	return canDeactivate;
 }
 
 bool UFanAttackBase::IsActiveFirstFrame()
 {
-	bool canDeactivate = (bIsActive != bPrevActive) && bIsActive;
-	bPrevActive = bIsActive;
+	const bool bCurrentActive = IsActive();
+	bool canDeactivate = (bCurrentActive != bPrevActive) && bCurrentActive;
+	bPrevActive = bCurrentActive;
+	bPrevActive = bCurrentActive;
 	return canDeactivate;
 }
 
 void UFanAttackBase::UpdatePrevActiveFlg()
 {
-	bPrevActive = bIsActive;
+	bPrevActive = IsActive();
 }
 
 FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector) const

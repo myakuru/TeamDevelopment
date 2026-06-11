@@ -26,9 +26,9 @@ void UFloatingWeaponAttack::Initialize(const TObjectPtr<AActor>& Owner)
 
 void UFloatingWeaponAttack::Start()
 {
-	if (!OwnerActor) { return; }
+	if (!GetOwnerActor()) { return; }
 
-	auto* ActorRootComponent = OwnerActor->GetRootComponent();
+	auto* ActorRootComponent = GetOwnerActor()->GetRootComponent();
 
 	UFanAttackBase::Start();
 

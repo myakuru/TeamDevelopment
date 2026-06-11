@@ -199,8 +199,8 @@ void UPlayerGearComponent::UpdateCollisionByInvincibility()
 			// キャラクターインターフェースを実装しているか
 			if (auto* interface = Cast<ICharacterInterface>(Enemy))
 			{
-				interface->TakeDamaged();
-				interface->TakeKnockBack(PlayerLocation);
+				interface->ApplyDamaged();
+				interface->ApplyKnockBack(PlayerLocation);
 			}
 		}
 	}

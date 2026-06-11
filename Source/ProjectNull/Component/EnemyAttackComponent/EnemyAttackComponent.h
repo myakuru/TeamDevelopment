@@ -36,6 +36,23 @@ public:
 
 	virtual void SetOwnerEnemy(AEnemyBase* Enemy) { OwnerEnemy = Enemy; }
 
+public:
+
+	/**
+	 * @brief 全ての攻撃が終了しているか
+	 * @return 終了しているならtrue
+	 */
+	bool IsAllAttackDeactivate();
+
+	/**
+	 * @brief 指定の攻撃が終了しているか
+	 * @return 終了しているならtrue
+	 */
+	// 指定方法が未定の為今は未実装
+	//bool IsAttackDeactivate();
+
+	void TestActive();
+
 private:
 
 	/**
