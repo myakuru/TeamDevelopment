@@ -13,11 +13,8 @@ UCLASS(Blueprintable,EditInlineNew)
 class PROJECTNULL_API UAttackBase : public UObject
 {
 	GENERATED_BODY()
-
 public:
-
 	UAttackBase();
-
 public:
 	/**
 	 * @brief 初期化
@@ -58,7 +55,7 @@ public:
 	 * @param forwardVector 基準となる前方ベクトル(オーナーの前方ベクトル)
 	 * @return 計算された攻撃方向ベクトル
 	 */
-	virtual FVector CalcAttackDir(const FVector& forwardVector)const;
+	virtual FVector CalcAttackDir(const FVector& ForwardVector)const;
 	
 	/**
 	 * @brief 攻撃がHITした敵をリストへ追加
@@ -106,7 +103,7 @@ public:
 	 * @brief 攻撃処理の有効無効の切り替え
 	 * @param bInIsActive trueで有効
 	 */
-	void SetIsActive(const bool bInIsActive) { bIsActive = bInIsActive; }
+	void SetIsActive(const bool InbIsActive) { bIsActive = InbIsActive; }
 	/* End ProtectedMenber Setters */
 
 
@@ -148,6 +145,9 @@ public:
 	bool IsActive()		const { return bIsActive; }
 	/* End ProtectedMenber Getters */
 
+	inline bool AbsoluteRotation() const { return bAbsoluteRotation;}
+
+
 private:
 
 	/**	オーナー */
@@ -173,4 +173,13 @@ private:
 	/** 攻撃時の位置・回転・スケールのオフセット値 */
 	UPROPERTY(EditAnywhere)
 	FTransform OffsetTransform = FTransform();
+
+	UPROPERTY(EditAnywhere)
+	bool bAbsoluteScale;
+
+	UPROPERTY(EditAnywhere)
+	bool bAbsoluteRotation;
+
+	UPROPERTY(EditAnywhere)
+	bool bAbsoluteLocation;
 };
