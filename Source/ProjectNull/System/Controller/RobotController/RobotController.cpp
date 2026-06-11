@@ -4,6 +4,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/System/Gear/GearBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/Robot/Robot.h>
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
@@ -126,8 +127,8 @@ void ARobotController::InitializeUI()
 
 		if (PlayerHud && PlayerExpUpgradeWidget)
 		{
-			PlayerHud->AddToViewport();
-			PlayerExpUpgradeWidget->AddToViewport();
+			PlayerHud->AddToViewport(InGameDefinition::PlayerUIZOrder);
+			PlayerExpUpgradeWidget->AddToViewport(InGameDefinition::GetGearUIZOrder);
 		}
 	}
 }

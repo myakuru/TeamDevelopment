@@ -58,7 +58,7 @@ public:
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
-	FVector&								GetCurrentFloorNormal() const;
+	//FVector&								GetCurrentFloorNormal() const;
 
 private:
 

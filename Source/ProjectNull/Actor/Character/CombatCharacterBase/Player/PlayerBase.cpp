@@ -155,14 +155,14 @@ int32 APlayerBase::GetCurrentGearLevel() const
 	return GearComponent->GetCurrentGearLevel();
 }
 
-FVector& APlayerBase::GetCurrentFloorNormal() const
-{
-	auto CharacterMovementComp = GetCharacterMovement();
-	FVector OutVector = FVector::ZeroVector;
-	if (!CharacterMovementComp) { return OutVector; }
-	OutVector = CharacterMovementComp->CurrentFloor.HitResult.ImpactNormal;
-	return OutVector;
-}
+//FVector& APlayerBase::GetCurrentFloorNormal() const
+//{
+//	auto CharacterMovementComp = GetCharacterMovement();
+//	FVector OutVector = FVector::ZeroVector;
+//	if (!CharacterMovementComp) { return OutVector; }
+//	OutVector = CharacterMovementComp->CurrentFloor.HitResult.ImpactNormal;
+//	return OutVector;
+//}
 
 UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 {
