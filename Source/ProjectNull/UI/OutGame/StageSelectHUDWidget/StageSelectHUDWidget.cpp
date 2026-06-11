@@ -8,12 +8,12 @@
 
 //ゲームインスタンス
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
+//ステージマネージャー
+#include<ProjectNull/Stage/Manager/StageManager.h>
 //セーブデータ
 #include <ProjectNull/SaveGame/MySaveGame.h>
 //ステージのデータアセット
 #include<ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
-//ステージマネージャー
-#include<ProjectNull/Stage/Manager/StageManager.h>
 //ステージボタンUI
 #include<ProjectNull/UI/OutGame/StageSelectHUDWidget/StageSelectHUDParts/StageButtonWidget.h>
 
@@ -40,6 +40,21 @@ void UStageSelectHUDWidget::NativeConstruct()
 	ChangeStageDetails(CurrentSelectedStageIndex);
 
 	CreateStageButtons();
+
+	//マウスカーソル表示
+	APlayerController* PC =
+		GetWorld()->GetFirstPlayerController();
+
+	if (!PC)return;
+
+	PC->bShowMouseCursor = true;
+
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(
+		TakeWidget()
+	);
+
+	PC->SetInputMode(InputMode);
 }
 
 void UStageSelectHUDWidget::CreateStageButtons()
@@ -49,7 +64,8 @@ void UStageSelectHUDWidget::CreateStageButtons()
 	auto* SaveData = GetWorld()->GetGameInstance<USuperGameInstance>()->GetCurrentSaveData();
 
 	//解放済みステージの数だけステージボタンを生成していく
-	for (int32 i = 0; i < StageDataAsset->StageData.Num(); i++)
+	for (int32 i = StageDefinition::FirstStageIndex;
+		i < StageDataAsset->GetStageData().Num() + StageDefinition::FirstStageIndex; i++)
 	{
 		if (!SaveData || !SaveData->StageProgressList.IsValidIndex(i)) break;
 
@@ -83,17 +99,13 @@ void UStageSelectHUDWidget::CreateStageButtons()
 
 void UStageSelectHUDWidget::OnClickedStageButton(int32 InStageIndex)
 {
-	if (!StageDataAsset || StageDataAsset->StageData.Num() == 0)return;
+	if (!StageDataAsset || StageDataAsset->GetStageData().Num() == 0)return;
 
 	if (CurrentSelectedStageIndex != InStageIndex) {
 		CurrentSelectedStageIndex = ClampStageIndex(InStageIndex);
 	}
 
-	//StageManagerSubsystem：ステージ開始
-	GetWorld()->GetGameInstance<USuperGameInstance>()
-		->GetStageManagerSubsystem()->StageStart(CurrentSelectedStageIndex);
-
-	UGameplayStatics::OpenLevel(this, FName(StageDataAsset->StageData[CurrentSelectedStageIndex].LevelName));
+	UGameplayStatics::OpenLevel(this, FName(StageDataAsset->GetStageData()[CurrentSelectedStageIndex].LevelName));
 }
 
 void UStageSelectHUDWidget::OnHoveredStageButton(int32 InStageIndex)
@@ -113,7 +125,7 @@ int32 UStageSelectHUDWidget::ClampStageIndex(int32 InStageIndex)
 	int32 stageIndex = InStageIndex;
 
 	stageIndex = FMath::Clamp(stageIndex, 0,
-		StageDataAsset->StageData.Num() - 1);
+		StageDataAsset->GetStageData().Num() - 1);
 
 	return stageIndex;
 }
@@ -121,16 +133,16 @@ int32 UStageSelectHUDWidget::ClampStageIndex(int32 InStageIndex)
 bool UStageSelectHUDWidget::CheckStageDetailsExistence()
 {
 	if (!StageNameText || !StageImage)return false;
-	if (!StageDataAsset || StageDataAsset->StageData.Num() == 0)return false;
+	if (!StageDataAsset || StageDataAsset->GetStageData().Num() == 0)return false;
 
 	return true;
 }
 
 bool UStageSelectHUDWidget::CheckStageData(int32 CheckStageIndex)
 {
-	if (!StageDataAsset || StageDataAsset->StageData.Num() == 0)return false;
+	if (!StageDataAsset || StageDataAsset->GetStageData().Num() == 0)return false;
 
-	if (!StageDataAsset->StageData.IsValidIndex(CheckStageIndex))return false;
+	if (!StageDataAsset->GetStageData().IsValidIndex(CheckStageIndex))return false;
 
 	return true;
 }
@@ -147,10 +159,10 @@ void UStageSelectHUDWidget::ChangeStageDetails(int32 InStageIndex)
 
 	//ステージ詳細更新
 	//ステージ名
-	StageNameText->SetText(StageDataAsset->StageData[stageIndex].StageName);
+	StageNameText->SetText(StageDataAsset->GetStageData()[stageIndex].StageName);
 
 	//ステージ画像
-	ChangeStageImageTexture(StageDataAsset->StageData[stageIndex].StageImage);
+	ChangeStageImageTexture(StageDataAsset->GetStageData()[stageIndex].StageImage);
 
 	ChangeHighScoreText(stageIndex);
 

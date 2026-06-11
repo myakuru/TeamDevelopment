@@ -24,6 +24,7 @@ void USuperGameInstance::Init()
 	if (StageManagerClass) {
 		StageManager = NewObject<UStageManager>(this, StageManagerClass);
 	}
+	if (StageManager) StageManager->Initialize();
 
 	//MapActorManager
 	if (MapActorManagerClass) {

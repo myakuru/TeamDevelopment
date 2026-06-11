@@ -4,6 +4,20 @@
 #include "Engine/GameInstance.h"
 #include "SuperGameInstance.generated.h"
 
+/** ステージ関係の定義 */
+namespace StageDefinition {
+	inline constexpr int32 OutGameStageIndex	= -1;
+	inline constexpr int32 FirstStageIndex		= 0;
+	inline constexpr int32 LastStageIndex		= 2;
+}
+
+/** インゲーム関係の定数定義 */
+namespace InGameDefinition {
+	inline constexpr int32 HUD				= 0;
+	inline constexpr int32 PlayerUIZOrder	= 100;
+	inline constexpr int32 GetGearUIZOrder	= 200;
+}
+
 class UMySaveGame;
 class UStageManager;
 class UWeaponManager;

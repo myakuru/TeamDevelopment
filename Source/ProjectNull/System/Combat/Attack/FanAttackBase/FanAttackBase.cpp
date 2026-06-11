@@ -2,6 +2,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
+#include <ProjectNull/Utility/GroundUtility/GroundUtility.h>
 #include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
@@ -43,10 +44,14 @@ void UFanAttackBase::Update(float DeltaTime)
 
 bool UFanAttackBase::UpdateAttack(float DeltaTime)
 {
-	if (!IsActive() ||
-		!GetRootComponent() ||
-		!GetRootComponent()->GetAttachParent())
-	{ return false; }
+	if (!IsActive())	{ return false; }
+
+	auto RootComp		= GetRootComponent();
+	if (!RootComp)		{ return false; }
+
+	auto AttachParent	= RootComp->GetAttachParent();
+	if (!AttachParent)	{ return false; }
+
 
 	ElapsedTime += DeltaTime;
 
@@ -58,18 +63,18 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 	// 攻撃範囲をデバッグラインで可視化
 	{
 		// プレイヤーの座標と前方ベクトルを取得
-		const FVector location = GetRootComponent()->GetComponentLocation();
-		const FVector forwardVector = GetRootComponent()->GetForwardVector();
+		const FVector Location		= RootComp->GetComponentLocation();
+		const FVector ForwardVector = RootComp->GetForwardVector();
 
 		// 攻撃方向ベクトル
-		const FVector attackDir = CalcAttackDir(forwardVector);
+		const FVector AttackDir = CalcAttackDir(ForwardVector);
 
 		if (bIsDrawDebugLine)
 		{
 			UDebugDrawLibrary::DrawDebugFan(
 				GetWorld(),
-				location,
-				attackDir,
+				Location,
+				AttackDir,
 				Radius,
 				ConeAngle,
 				10
@@ -215,4 +220,29 @@ FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector, float Angle)
 {
 	const float angle = bRotate ? Angle : 0.0f;
 	return forwardVector.RotateAngleAxis(angle, FVector::UpVector);
+}
+
+void UFanAttackBase::UpdateRotation(float DeltaTime)
+{
+	if (!AbsoluteRotation())	{ return; }
+
+	auto RootComp	= GetRootComponent();
+	if (!RootComp)				{ return; }
+
+	auto Player		= Cast<APlayerBase>(GetOwnerActor());
+	if (!Player)				{ return; }
+
+	FVector FloorNormal = FVector::ZeroVector;
+	if (!Player->GetCurrentFloorNormal(FloorNormal)) { return; }
+
+	const FQuat TargetQuat = UGroundUtility::MakeRotationFromGroundNormal(
+		RootComp->GetComponentTransform(),
+		FloorNormal);
+
+	const FQuat NewQuat = FQuat::Slerp(
+		RootComp->GetComponentQuat(),
+		TargetQuat,
+		DeltaTime * RotationInterpSpeed);
+
+	RootComp->SetWorldRotation(NewQuat);
 }

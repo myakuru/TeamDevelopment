@@ -28,11 +28,6 @@ void UGetGearHUDWidget::SetGearData(const FText& inGearName)
 
 void UGetGearHUDWidget::OpenUI()
 {
-	APlayerController* PC =
-		GetWorld()->GetFirstPlayerController();
-
-	if (!PC)return;
-
 	//ザ・ワールド
 	UGameplayStatics::SetGamePaused(
 		GetWorld(),
@@ -40,6 +35,11 @@ void UGetGearHUDWidget::OpenUI()
 	);
 
 	//マウスカーソル表示
+	APlayerController* PC =
+		GetWorld()->GetFirstPlayerController();
+
+	if (!PC)return;
+
 	PC->bShowMouseCursor = true;
 
 	FInputModeUIOnly InputMode;

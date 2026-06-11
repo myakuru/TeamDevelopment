@@ -18,6 +18,8 @@ class PROJECTNULL_API UStageManager : public UObject
 	
 public:
 
+	void Initialize();
+
 	void LoadFromSaveData(UMySaveGame* inSaveGame);
 
 	void SaveToData(UMySaveGame* inSaveGame);
@@ -52,6 +54,9 @@ public:
 	/* セッター */
 
 private:
+
+	/** ステージの調査を行う */
+	void ChangeStageInvestigation(UWorld* LoadedWorld);
 
 	/** ステージデータの参照 */
 	UPROPERTY(EditAnywhere)
