@@ -28,10 +28,7 @@ void USphericalAttack::Initialize(const TObjectPtr<AActor>& Owner)
 			AttackSphere->SetupAttachment(GetRootComponent());
 		}
 		AttackSphere->RegisterComponent();
-		/*AttackSphere->SetCollisionResponseToChannel(
-			ECC_Player,
-			ECR_Overlap
-		);*/
+
 		AttackSphere->OnComponentBeginOverlap.AddDynamic(
 			this,
 			&USphericalAttack::OnSphericalBeginOverlap
@@ -60,7 +57,6 @@ void USphericalAttack::Cancel()
 	if (!AttackSphere) { return; }
 
 	SetIsActive(false);		// 攻撃無効化
-	SetCanExecute(true);		// 攻撃実行可にする
 	ElpsedTimer = 0.f;		// 経過時間をリセット
 	AttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
 }
@@ -78,6 +74,18 @@ void USphericalAttack::Update(float DeltaTime)
 		Cancel();
 		return;
 	}
+
+	DrawDebugSphere(
+		GetWorld(),             // ワールドポインタ
+		AttackSphere->GetComponentLocation(),     // 中心のワールド座標
+		AttackSphere->GetScaledSphereRadius(),                  // 半径
+		12.f,                     // セグメント数（円の滑らかさ）
+		FColor::Red,            // 色
+		false,                  // 永続的に表示するかどうか
+		1.f,                  // 表示時間（負の値で1フレーム）
+		0,                      // 優先度
+		10.0f                    // 線の太さ
+	);
 
 	ElpsedTimer += DeltaTime;
 }

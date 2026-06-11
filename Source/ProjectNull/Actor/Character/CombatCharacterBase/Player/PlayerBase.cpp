@@ -120,7 +120,6 @@ void APlayerBase::Tick(float DeltaTime)
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
 
-
 	//AlignFloor();
 	
 }
@@ -129,6 +128,20 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	ACombatCharacterBase::SetupPlayerInputComponent(PlayerInputComponent);
 	
+}
+
+void APlayerBase::ApplyDamaged(float InDamage)
+{
+	auto GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
+
+	if (GameInstance&& GameInstance->GetPlayerRuntimeData())
+	{
+		auto PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+
+		PlayerRuntimeData->SubtractHealth(InDamage);
+
+		UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
+	}
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)
@@ -155,7 +168,7 @@ int32 APlayerBase::GetCurrentGearLevel() const
 	return GearComponent->GetCurrentGearLevel();
 }
 
-FVector& APlayerBase::GetCurrentFloorNormal() const
+FVector APlayerBase::GetCurrentFloorNormal() const
 {
 	auto CharacterMovementComp = GetCharacterMovement();
 	FVector OutVector = FVector::ZeroVector;

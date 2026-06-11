@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "../CombatCharacterBase.h"
+#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
 #include "PlayerBase.generated.h"
 
 class USpringArmComponent;
@@ -24,6 +25,7 @@ class UCineCameraComponent;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
+								  , public ICharacterInterface
 {
 	GENERATED_BODY()
 public:
@@ -36,6 +38,12 @@ public:
 
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	/**
+	 * @brief ダメージを受ける
+	 * @param Damage 受けるダメージ量
+	 */
+	virtual void ApplyDamaged(float InDamage = 1.f)override;
 
 	/**
 	 * @brief 移動処理
@@ -58,7 +66,7 @@ public:
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
-	FVector&								GetCurrentFloorNormal() const;
+	FVector									GetCurrentFloorNormal() const;
 
 private:
 
