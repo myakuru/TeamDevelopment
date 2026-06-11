@@ -49,8 +49,6 @@ protected:
 
 	void ShowUI(bool bShow);
 
-	void ResetUi();
-
 public:
 	/** 表示位置を更新、PlayerHUDWidgetで変更されてる*/
 	UFUNCTION(BlueprintCallable)
@@ -60,11 +58,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateCooldownText(float CooldownTime);
 
-	void ResetUi()
-	{
-		SetUIScale(0.0f);
-		ShowUI(true);
-	}
+	void ResetUi();
 
 	/** このWidgetが担当するスキルのインデックス（0〜2,PlayerHUDWidgetで変更されてる） */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
