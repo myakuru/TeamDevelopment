@@ -49,9 +49,6 @@ class PROJECTNULL_API UStageDataAsset : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	/** ステージのデータ構造体 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "StageData　Setting")
-	TArray<FStageDataStruct> StageData;
 
 	//ランダムに抽選する
 	FDataTableRowHandle DropRandomGear(int stageIndex)
@@ -80,4 +77,22 @@ public:
 
 		return FDataTableRowHandle();
 	}
+
+	//ゲッター
+	UFUNCTION(BlueprintCallable)
+	TArray<FStageDataStruct> GetStageData() const { return StageData; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetStageTimerLimit() const { return StageTimerLimit; }
+
+private:
+
+	/** ステージのデータ構造体 */
+	UPROPERTY(EditAnywhere, Category = "StageData|Setting")
+	TArray<FStageDataStruct> StageData;
+
+	/** ステージ制限時間 */
+	UPROPERTY(EditAnywhere, Category = "StageData|Setting")
+	float StageTimerLimit;
+
 };

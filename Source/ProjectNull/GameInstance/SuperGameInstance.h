@@ -4,6 +4,13 @@
 #include "Engine/GameInstance.h"
 #include "SuperGameInstance.generated.h"
 
+/** ステージの定義 */
+namespace StageDefinition {
+	const int32 OutGameStageIndex = -1;
+	const int32 FirstStageIndex = 0;
+	const int32 LastStageIndex = 2;
+}
+
 class UMySaveGame;
 class UStageManager;
 class UWeaponManager;

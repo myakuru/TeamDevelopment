@@ -21,7 +21,7 @@ void UGameTimerWidget::CountDownTimer()
 		GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
 		TimerText = TEXT("Time's Up!");
 
-		//StageManagerSubsystem：ステージクリア
+		//StageManagerSubsystem：ステージクリア(StageManagerにどうにか移して東堂葵)
 		GetWorld()->GetGameInstance<USuperGameInstance>()->GetStageManagerSubsystem()->StageClear();
 	}
 	else
