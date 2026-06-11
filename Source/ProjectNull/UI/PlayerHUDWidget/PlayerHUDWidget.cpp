@@ -15,6 +15,9 @@
 
 // ゲームインスタンスへの参照
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Stage/Manager/StageManager.h>
+
+#include <ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
 
 // キャラクターパラメーターデータへの参照
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
@@ -25,7 +28,10 @@
 
 void UPlayerHUDWidget::NativeConstruct()
 {
-	GameTimer->StartTimer(120.0f);
+	//タイマー設定
+	GameTimer->StartTimer(
+		GetWorld()->GetGameInstance<USuperGameInstance>()
+		->GetStageManagerSubsystem()->GetStageDataAsset()->GetStageTimerLimit());
 
 	Super::NativeConstruct();
 
