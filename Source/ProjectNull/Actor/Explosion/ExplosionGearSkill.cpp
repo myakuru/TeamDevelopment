@@ -26,7 +26,7 @@ AExplosionGearSkill::AExplosionGearSkill()
 
 	// 自身をPlayerAttackOverlapとして設定
 	Collision->SetCollisionObjectType(
-		PLAYER_ATTACK_OVERLAP
+		ECC_Player
 	);
 
 	// 当たり判定の種類設定(物理衝突を行わず、判定のみ行う)
@@ -131,9 +131,12 @@ void AExplosionGearSkill::Explode()
 			continue;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("TakeDamege"));
-		enemy->SetKnockBackData(GetActorLocation(), 4, 1);
-		enemy->SetTakeDamaged(Data.Damage);
+		// キャラクターインターフェースを実装しているか
+		if (auto* interface = Cast<ICharacterInterface>(enemy))
+		{
+			interface->ApplyDamaged(Data.Damage);
+			interface->ApplyKnockBack(GetActorLocation());
+		}
 	}
 
 

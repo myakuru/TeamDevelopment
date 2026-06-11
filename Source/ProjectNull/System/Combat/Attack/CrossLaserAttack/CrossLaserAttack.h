@@ -20,12 +20,9 @@ class PROJECTNULL_API UCrossLaserAttack final : public UAttackBase
 public:
 	UCrossLaserAttack();
 public:
-	void Initialize(class AActor* Owner) override;
+	void Initialize(const TObjectPtr<AActor>& Owner) override;
 	void Execute()override;
-	void Update(
-		float DeltaTime,
-		AActor* Player = nullptr,
-		UEnemyManagerSubsystem* EnemyManager = nullptr)override;
+	void Update(float DeltaTime)override;
 
 	void End();
 

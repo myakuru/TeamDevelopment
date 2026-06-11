@@ -32,12 +32,9 @@ public:
 	UAutoAttack();
 public:
 
-	void Initialize(AActor* Owner)	override;
-	void Update(
-			float DeltaTime,
-			AActor* Player = nullptr,
-			UEnemyManagerSubsystem* EnemyManager = nullptr)	override;
-	void Execute()					override { return; }
+	void Initialize(const TObjectPtr<AActor>& Owner)	override;
+	void Update(float DeltaTime)						override;
+	void Execute()										override { return; }
 
 	/** Getter */
 	inline float GetAutoAttackInterval() const	{ return AutoAttackInterval; }
@@ -65,7 +62,7 @@ private:
 
 	/** 自動攻撃のパラメータマップ配列 */
 	UPROPERTY(EditAnywhere, Instanced)
-	TMap<EAutoAttackType, UFloatingWeaponAttack*> AutoAttackParamsMap;
+	TMap<EAutoAttackType, TObjectPtr<UFloatingWeaponAttack>> AutoAttackParamsMap;
 
 	/** 前方扇状自動攻撃タイマー*/
 	FTimerHandle AutoFrontConeAttackTimerHandle;

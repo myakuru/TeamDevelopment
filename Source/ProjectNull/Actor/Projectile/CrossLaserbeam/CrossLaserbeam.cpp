@@ -35,7 +35,6 @@ ACrossLaserbeam::ACrossLaserbeam()
 		Box->OnComponentBeginOverlap.AddDynamic(
 			this,
 			&ACrossLaserbeam::OnLaserBeginOverlap);
-
 		Box->OnComponentEndOverlap.AddDynamic(
 			this,
 			&ACrossLaserbeam::OnLaserEndOverlap);
@@ -85,10 +84,8 @@ void ACrossLaserbeam::OnLaserBeginOverlap(
 {
 	if (!OtherActor || OtherActor == this) { return; }
 
-	auto Enemy = Cast<AEnemyBase>(OtherActor);
-	if (!Enemy) { return; }
-	OnHit();
-	//HitEnemies.Add(Enemy);
+	OnHit(OtherActor);
+	//HitActors.Add(Enemy);
 }
 
 void ACrossLaserbeam::OnLaserEndOverlap(
@@ -101,16 +98,16 @@ void ACrossLaserbeam::OnLaserEndOverlap(
 
 	if (!Enemy) { return; }
 
-	//HitEnemies.Remove(Enemy);
+	//HitActors.Remove(Enemy);
 }
 
-void ACrossLaserbeam::OnHit()
+void ACrossLaserbeam::OnHit(const TObjectPtr<AActor>& Actor)
 {
-	for (auto& HitEnemy : HitEnemies) 
+	// キャラクターインターフェースを実装しているか
+	if (auto* interface = Cast<ICharacterInterface>(Actor))
 	{
-		auto Enemy = HitEnemy.Get();
-		if (!Enemy) { continue; }
-		Enemy->SetKnockBackData(GetActorLocation(), 2.0f, 1.0f);
-		Enemy->SetTakeDamaged();
+		interface->ApplyDamaged();
+		interface->ApplyKnockBack(GetActorLocation());
+		//HitActors.Add(Actor);
 	}
 }

@@ -9,12 +9,11 @@
 #include "RHICommandList.h"
 #include "TextureResource.h"
 
-#include "Components/InstancedStaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
-#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include "Components/InstancedStaticMeshComponent.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
-#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 AEnemyISMManager::AEnemyISMManager()
 {
@@ -44,6 +43,7 @@ void AEnemyISMManager::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("[EnemyISMManager] EnemyMesh Null : %s"), *GetName());
 	}
 
+	// 
 	InitAnimBuffer();
 
 	// アニメーション状態テクスチャの初期化
@@ -147,6 +147,7 @@ void AEnemyISMManager::InitAnimInfoTexture()
 void AEnemyISMManager::InitAnimBuffer()
 {
 	// 初期データをCPU側で作成
+	// インスタンス数分、配列を確保して0で初期化する
 	TArray<FGPUAnimState> InitData;
 	InitData.SetNumZeroed(MaxInstances);
 
@@ -161,7 +162,7 @@ void AEnemyISMManager::InitAnimBuffer()
 
 			// リクエストをGPUバッファにアップロード
 			// CPU側のRequestCopyをGPUで読めるバッファにアップロード
-			// TArray<FGPUAnimChangeRequest>をGPU StructuredBufferに
+			// TArray<FGPUAnimState>をGPU StructuredBufferに
 			FRDGBufferRef Buffer = CreateStructuredBuffer(
 				GraphBuilder,
 				TEXT("AnimStateBuffer"),
@@ -328,53 +329,53 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 // デバッグ用：AnimStateRTの中身をCPUに読み戻してログに出す
 void AEnemyISMManager::DebugReadbackAnimStateRT()
 {
-	//if (!AnimStateRT) { return; }
+	if (!AnimStateRT) { return; }
 
-	//FTextureRenderTargetResource* RTResource =
-	//	AnimStateRT->GameThread_GetRenderTargetResource();
+	FTextureRenderTargetResource* RTResource =
+		AnimStateRT->GameThread_GetRenderTargetResource();
 
-	//TArray<FFloat16Color> Pixels;
-	//RTResource->ReadFloat16Pixels(Pixels);
+	TArray<FFloat16Color> Pixels;
+	RTResource->ReadFloat16Pixels(Pixels);
 
-	//const int32 Width = AnimStateRT->SizeX;
-	//const int32 Height = AnimStateRT->SizeY;
+	const int32 Width = AnimStateRT->SizeX;
+	const int32 Height = AnimStateRT->SizeY;
 
-	//if (Pixels.Num() >= Width * Height && Height > 1)
-	//{
-	//	const FFloat16Color Row0 = Pixels[0 + 0 * Width];
-	//	const FFloat16Color Row1 = Pixels[0 + 1 * Width];
+	if (Pixels.Num() >= Width * Height && Height > 1)
+	{
+		const FFloat16Color Row0 = Pixels[0 + 0 * Width];
+		const FFloat16Color Row1 = Pixels[0 + 1 * Width];
 
-	//	UE_LOG(LogTemp, Warning,
-	//		TEXT("[AnimStateRT] Inst0 Row0: R=%.2f G=%.2f B=%.2f A=%.2f"),
-	//		(float)Row0.R, (float)Row0.G, (float)Row0.B, (float)Row0.A);
+		UE_LOG(LogTemp, Warning,
+			TEXT("[AnimStateRT] Inst0 Row0: R=%.2f G=%.2f B=%.2f A=%.2f"),
+			(float)Row0.R, (float)Row0.G, (float)Row0.B, (float)Row0.A);
 
-	//	UE_LOG(LogTemp, Warning,
-	//		TEXT("[AnimStateRT] Inst0 Row1: R=%.2f G=%.2f B=%.2f A=%.2f"),
-	//		(float)Row1.R, (float)Row1.G, (float)Row1.B, (float)Row1.A);
-	//}
+		UE_LOG(LogTemp, Warning,
+			TEXT("[AnimStateRT] Inst0 Row1: R=%.2f G=%.2f B=%.2f A=%.2f"),
+			(float)Row1.R, (float)Row1.G, (float)Row1.B, (float)Row1.A);
+	}
 
-	//static int kari = 0;
-	//if (kari > 1) { return; }
-	//kari++;
-	//if (!AnimInfoTexture) { return; }
+	static int kari = 0;
+	if (kari > 1) { return; }
+	kari++;
+	if (!AnimInfoTexture) { return; }
 
-	//FTexture2DMipMap& Mip = AnimInfoTexture->GetPlatformData()->Mips[0];
-	//FLinearColor* Data = static_cast<FLinearColor*>(
-	//	Mip.BulkData.Lock(LOCK_READ_ONLY));
+	FTexture2DMipMap& Mip = AnimInfoTexture->GetPlatformData()->Mips[0];
+	FLinearColor* Data = static_cast<FLinearColor*>(
+		Mip.BulkData.Lock(LOCK_READ_ONLY));
 
-	//const int32 NumAnims = AnimDataAsset->Animations.Num();
-	//for (int32 i = 0; i < NumAnims; ++i)
-	//{
-	//	UE_LOG(LogTemp, Warning,
-	//		TEXT("[AnimInfoTexture] Anim[%d]: StartTime=%.2f NumFrames=%.2f"),
-	//		i,
-	//		(float)Data[i].R,
-	//		(float)Data[i].G);
-	//}
+	const int32 NumAnims = AnimDataAsset->Animations.Num();
+	for (int32 i = 0; i < NumAnims; ++i)
+	{
+		UE_LOG(LogTemp, Warning,
+			TEXT("[AnimInfoTexture] Anim[%d]: StartTime=%.2f NumFrames=%.2f"),
+			i,
+			(float)Data[i].R,
+			(float)Data[i].G);
+	}
 
 
 
-	//Mip.BulkData.Unlock();
+	Mip.BulkData.Unlock();
 }
 
 // ReadRT → ComputeShader → WriteRT → Material
@@ -504,6 +505,10 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 
 			TShaderMapRef<FAnimUpdateCS> Pass2CS(GetGlobalShaderMap(GMaxRHIFeatureLevel));
 			const int32 Pass2Groups = FMath::CeilToInt((float)NumInstances / 64.0f);
+			{
+				/* CeilToInt()・小数点以下を切り上げる */
+				// 0.1->1, 0.5->1, 1.0->1, 1.1->2, 3.9->4
+			}
 
 			FComputeShaderUtils::AddPass(
 				GraphBuilder,
@@ -527,7 +532,6 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 			MID->SetTextureParameterValue(TEXT("AnimInfoTexture"), AnimInfoTexture);
 		}
 }
-
 
 //// 1〜2フレームのレイテンシが発生するが実用上問題なし
 //void UEnemyISMManager::ReadbackFinishedFlags()

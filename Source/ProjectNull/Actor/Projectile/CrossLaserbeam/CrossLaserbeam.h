@@ -7,10 +7,6 @@
 
 #include "CrossLaserbeam.generated.h"
 
-
-/** 敵の中間基底クラス */
-class AEnemyBase;
-
 class UBoxComponent;
 
 UCLASS(Blueprintable)
@@ -47,14 +43,14 @@ private:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
 
-	void OnHit();
+	void OnHit(const TObjectPtr<AActor>& Actor);
 
 
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<UBoxComponent>> LaserBoxes;
 
 	UPROPERTY()
-	TSet<TWeakObjectPtr<AEnemyBase>> HitEnemies;
+	TSet<TWeakObjectPtr<AActor>> HitActors;
 
 	FTimerHandle HitIntervalTimerHandle;
 

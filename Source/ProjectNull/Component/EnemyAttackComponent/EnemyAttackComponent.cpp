@@ -15,7 +15,7 @@ void UEnemyAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// �z���̍U���N���X�̏�����
+	// 初期化
 	for (auto& attack : EnemyAttacks)
 	{
 		if (!attack) { continue; }
@@ -28,12 +28,9 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// �v���C���[�̏��擾
-	// �v���C���[�̏���擾����i0��:1P�j
 	APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!pPlayerPawn) { return; }
 
-	// �z���̍U���N���X�̍X�V
 	for (auto& attack : EnemyAttacks)
 	{
 		if (!attack) { continue; }
@@ -43,7 +40,32 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			attack->Execute();
 		}
 
-		attack->Update(DeltaTime, pPlayerPawn);
+		attack->Update(DeltaTime);
 	}
 }
 
+bool UEnemyAttackComponent::IsAllAttackDeactivate()
+{
+	bool bIsAllDeactive = true;
+	if (EnemyAttacks.IsEmpty()) { return bIsAllDeactive; }
+
+	for (auto& Attack : EnemyAttacks)
+	{
+		if (!Attack) { continue; }
+		if (Attack->IsActive())
+		{
+			bIsAllDeactive = false;
+			break;
+		}
+	}
+
+	return bIsAllDeactive;
+}
+
+void UEnemyAttackComponent::TestActive()
+{
+	if (EnemyAttacks.IsEmpty()) { return; }
+
+	// 試しに0番目の要素をアクティブ化
+	EnemyAttacks[0]->Execute();
+}

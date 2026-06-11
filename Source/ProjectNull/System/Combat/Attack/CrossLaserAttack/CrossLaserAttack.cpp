@@ -8,7 +8,7 @@ UCrossLaserAttack::UCrossLaserAttack()
 	
 }
 
-void UCrossLaserAttack::Initialize(class AActor* Owner)
+void UCrossLaserAttack::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	UAttackBase::Initialize(Owner);
 
@@ -24,18 +24,15 @@ void UCrossLaserAttack::Initialize(class AActor* Owner)
 void UCrossLaserAttack::Execute()
 {
 	CurrentAngle = 0.f;
-	bIsActive = true;
+	SetIsActive(true);
 	if (!CrossLaserbeam) { return; }
 	CrossLaserbeam->SetLaserEnabled(true);
 
 }
 
-void UCrossLaserAttack::Update(
-	float DeltaTime,
-	AActor* Player,
-	UEnemyManagerSubsystem* EnemyManager)
+void UCrossLaserAttack::Update(float DeltaTime)
 {
-	if (!bIsActive || !CrossLaserbeam) { return; }
+	if (!IsActive() || !CrossLaserbeam) { return; }
 
 	CurrentAngle += RotationSpeed * DeltaTime;
 
@@ -45,7 +42,7 @@ void UCrossLaserAttack::Update(
 
 void UCrossLaserAttack::End()
 {
-	bIsActive = false;
+	SetIsActive(false);
 	if (!CrossLaserbeam) { return; }
 	CrossLaserbeam->SetLaserEnabled(false);
 }

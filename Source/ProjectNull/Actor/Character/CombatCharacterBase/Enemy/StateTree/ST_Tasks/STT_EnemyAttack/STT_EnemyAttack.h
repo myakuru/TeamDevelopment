@@ -42,10 +42,4 @@ protected:
 	UPROPERTY()
 	TObjectPtr<APawn>		TargetActor;
 
-	/**
-	 * @brief 攻撃オブジェクト
-	 */
-	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
-	TObjectPtr<UAttackBase> Attack;
-
 };

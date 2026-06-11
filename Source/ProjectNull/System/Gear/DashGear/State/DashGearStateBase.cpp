@@ -118,8 +118,12 @@ void UDashGearStateBase::UpdateDashAttack()
 
 		if (DistSq <= DashAttackRangeSquared)
 		{
-			enemy->SetKnockBackData(PlayerLocation,3,1);
-			enemy->SetTakeDamaged();
+			// キャラクターインターフェースを実装しているか
+			if (auto* interface = Cast<ICharacterInterface>(enemy))
+			{
+				interface->ApplyDamaged();
+				interface->ApplyKnockBack(PlayerLocation);
+			}
 		}
 	}
 

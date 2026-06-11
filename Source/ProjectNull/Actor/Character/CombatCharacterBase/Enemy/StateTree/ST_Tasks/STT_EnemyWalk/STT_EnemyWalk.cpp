@@ -4,11 +4,16 @@
 #include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 
 USTT_EnemyWalk::USTT_EnemyWalk(const FObjectInitializer& a_ObjInit)
-	: Super(a_ObjInit)
-	, MoveDir(FVector::ZeroVector)
-	, AfterGroundNormal(FVector::ZeroVector)
-	, GravityVelocity(FVector::ZeroVector)
-	, isGround(false)
+	:	Super(a_ObjInit)
+	,	MoveDir(FVector::ZeroVector)
+	,	AfterGroundNormal(FVector::ZeroVector)
+	,	GravityVelocity(FVector::ZeroVector)
+	,	MoveSpeed(600.f)
+	,	RotationInterpSpeed(5.f)
+	,	WarkableFloorAngle(45.f)
+	,	MaxStepHeight(100.f)
+	,	CapsuleHalfHeight(88.f)
+	,	isGround(false)
 {
 	// Tick処理有効化	
 	bShouldCallTick = true;
@@ -19,6 +24,7 @@ EStateTreeRunStatus USTT_EnemyWalk::EnterState(FStateTreeExecutionContext& a_Con
 	Super::EnterState(a_Context, a_Transition);
 
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
+	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
 	// パラメータの初期化
 	InitializeWalkParams();
@@ -26,7 +32,7 @@ EStateTreeRunStatus USTT_EnemyWalk::EnterState(FStateTreeExecutionContext& a_Con
 	// 前ステートの終了フラグをリセット
 	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
 	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(1, true, true);
+	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(static_cast<uint32>(EEnemyState::Walk), true, true);
 
 	OwnerEnemy->PlayAnimation(0, true);
 
@@ -51,8 +57,6 @@ void USTT_EnemyWalk::ExitState(FStateTreeExecutionContext& a_Context, const FSta
 
 void USTT_EnemyWalk::Move(const float a_DeltaTime)
 {
-	TRACE_CPUPROFILER_EVENT_SCOPE(Enemy_Event_Walk);
-
 	if (!OwnerEnemy) { return; }
 
 	// 回転角度補間
@@ -74,12 +78,11 @@ void USTT_EnemyWalk::Move(const float a_DeltaTime)
 	{
 		GravityVelocity = FVector::ZeroVector;
 	}
-
+	
 	FVector _cacheMoveVec = MoveDir * MoveSpeed * a_DeltaTime;
-	_cacheMoveVec.Z = 0;												// Z成分は考慮しない
-	_cacheMoveVec 
-		= FVector::VectorPlaneProject(_cacheMoveVec, AfterGroundNormal);// 前に触れた地面の斜面に沿わせる
-	_cacheMoveVec += GravityVelocity * a_DeltaTime;						// 重力適応	
+	_cacheMoveVec.Z = 0.f;
+	_cacheMoveVec = FVector::VectorPlaneProject(_cacheMoveVec, AfterGroundNormal);	// 坂道に沿った移動ベクトルに変換
+	_cacheMoveVec += GravityVelocity * a_DeltaTime;									// 重力適応
 
 	FHitResult _hit;
 	OwnerEnemy->AddActorWorldOffset(
@@ -103,12 +106,31 @@ void USTT_EnemyWalk::Move(const float a_DeltaTime)
 			{
 				// 坂道処理
 				MoveSlope(_hit);
+				_cacheMoveVec = FVector::VectorPlaneProject(CaluculateRemainingMoveDir(_cacheMoveVec, _hit.Time), _hit.ImpactNormal);
+				OwnerEnemy->AddActorWorldOffset(_cacheMoveVec);
 			}
+			// 上向き法線が一定以下で、段差の高さが一定以下なら段差とみなす
+			else if (FMath::IsNearlyZero(_hit.ImpactNormal.Z) && _heightDiff < MaxStepHeight)
+			{
+				// 段差処理
+				MoveStep(_hit, _cacheMoveVec, _heightDiff);
+			}
+			// それ以外は壁とみなす
 			else
 			{
-				// 段差移動
 				isGround = true;
-				OwnerEnemy->AddActorWorldOffset((FVector::UpVector * (MoveSpeed) * a_DeltaTime));
+				// 急斜面移動
+				// 直接上に速度半分で移動させる(壁の法線に沿って移動させると、凹凸に応じてクネる為)
+				OwnerEnemy->AddActorWorldOffset((FVector::UpVector * MoveSpeed * a_DeltaTime));
+				{
+					// 壁の法線に沿って移動する処理(法線をそのまま使う為、凹凸に応じてクネる)
+					/*FVector SurfaceMove =
+						FVector::VectorPlaneProject(
+							OwnerEnemy->GetActorForwardVector(),
+							_hit.ImpactNormal).GetSafeNormal();
+
+					OwnerEnemy->AddActorWorldOffset(CaluculateRemainingMoveDir(SurfaceMove * MoveSpeed * a_DeltaTime, _hit.Time));*/
+				}
 			}
 		}
 	}

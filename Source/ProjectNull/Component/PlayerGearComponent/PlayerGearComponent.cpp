@@ -196,8 +196,12 @@ void UPlayerGearComponent::UpdateCollisionByInvincibility()
 
 		if (DistSq <= InvincibilityCollisionRadiusSquared)
 		{
-			Enemy->SetKnockBackData(PlayerLocation, 3, 1);
-			Enemy->SetTakeDamaged();
+			// キャラクターインターフェースを実装しているか
+			if (auto* interface = Cast<ICharacterInterface>(Enemy))
+			{
+				interface->ApplyDamaged();
+				interface->ApplyKnockBack(PlayerLocation);
+			}
 		}
 	}
 

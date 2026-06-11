@@ -11,7 +11,7 @@
 // AnimInfoTextureのレイアウト:
 //   Width  = アニメーション数
 //   Height = 1行
-//   各テクセル : float4(StartFrame, NumFrames, 0, 0)
+//   各テクセル : float4(StartFrame, NumFrames, AnimNum, 0)
 //=============================================================
 
 RWTexture2D<float4> AnimStateTextureReadWrite;

@@ -89,7 +89,10 @@ void AEnemyBase::BeginPlay()
 
 	// コンポーネントに自身の参照を渡す
 	{
-		if (EnemyAttackComponent)EnemyAttackComponent->SetOwnerEnemy(this);
+		if (EnemyAttackComponent)
+		{
+			EnemyAttackComponent->SetOwnerEnemy(this);
+		}
 	}
 
 	// ゲームの進行に合わせて敵パラメータを設定
@@ -177,18 +180,19 @@ void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
 	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
 }
 
-void AEnemyBase::SetTakeDamaged(int32 AttackPower)
+void AEnemyBase::ApplyDamaged(float a_Damage)
 {
-	// 簡易的に渡された値分,FinalHPを減算
-	EnemyStatus.FinalHP -= AttackPower;
+	// 渡された値分、FinalHPを減算
+	EnemyRuntimeData->AddHealth(-a_Damage);
 	OnHit();
 
-	if (EnemyStatus.FinalHP <= 0)
+	// 体力が0以下なら死亡フラグを立てる
+	/*if (EnemyRuntimeData->GetHealth() <= 0)
 	{
 		EnemyStatus.IsAlive = false;
 		EnemyRuntimeData->ChangedIsAlive(EnemyStatus.IsAlive);
 		OnDeath();
-	}
+	}*/
 }
 
 void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime)
@@ -271,10 +275,6 @@ void AEnemyBase::CheckCanAttack()
 	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
 	{
 		NotifyChangedStateEnum(EEnemyState::Attack);
-	}
-	else
-	{
-		NotifyChangedStateEnum(EEnemyState::Idle);
 	}
 }
 

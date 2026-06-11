@@ -1,8 +1,11 @@
 ﻿#include "FanAttackBase.h"
 
+#include "Kismet/GameplayStatics.h"
 #include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
+#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 
 UFanAttackBase::UFanAttackBase():
@@ -22,7 +25,7 @@ UFanAttackBase::UFanAttackBase():
 
 void UFanAttackBase::Start()
 {
-	bIsActive		= true;
+	SetIsActive(true);
 	CurrentAngle	= StartAngle;
 	ElapsedTime		= 0.0f;
 }
@@ -31,16 +34,19 @@ void UFanAttackBase::Execute()
 {
 }
 
-void UFanAttackBase::Update(float DeltaTime, AActor* Player, UEnemyManagerSubsystem* EnemyManager)
+void UFanAttackBase::Update(float DeltaTime)
 {
-	UAttackBase::Update(DeltaTime, Player, EnemyManager);
+	UAttackBase::Update(DeltaTime);
 
 	UpdateAttack(DeltaTime);
 }
 
 bool UFanAttackBase::UpdateAttack(float DeltaTime)
 {
-	if (!bIsActive || !RootComponent || !RootComponent->GetAttachParent()) { return false; }
+	if (!IsActive() ||
+		!GetRootComponent() ||
+		!GetRootComponent()->GetAttachParent())
+	{ return false; }
 
 	ElapsedTime += DeltaTime;
 
@@ -48,13 +54,12 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 	if (bRotate) {
 		CurrentAngle += RotationSpeed * DeltaTime;
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("StartAngle %.2f"), StartAngle);
 
 	// 攻撃範囲をデバッグラインで可視化
 	{
 		// プレイヤーの座標と前方ベクトルを取得
-		const FVector location = RootComponent->GetComponentLocation();
-		const FVector forwardVector = RootComponent->GetForwardVector();
+		const FVector location = GetRootComponent()->GetComponentLocation();
+		const FVector forwardVector = GetRootComponent()->GetForwardVector();
 
 		// 攻撃方向ベクトル
 		const FVector attackDir = CalcAttackDir(forwardVector);
@@ -74,7 +79,7 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 
 	// 終了判定
 	if (ElapsedTime >= Duration) {
-		bIsActive = false;
+		SetIsActive(false);
 	}
 
 	return true;
@@ -82,8 +87,11 @@ bool UFanAttackBase::UpdateAttack(float DeltaTime)
 
 bool UFanAttackBase::IsTargetInRange(AActor* Target)
 {
-	if (!OwnerActor || !Target || !RootComponent || !RootComponent->GetAttachParent())	{ return false; }
-	const auto* parent = RootComponent->GetAttachParent();
+	if (!GetOwnerActor() ||
+		!Target ||
+		!GetRootComponent()||
+		!GetRootComponent()->GetAttachParent()) { return false; }
+	const auto* parent = GetRootComponent()->GetAttachParent();
 
 	// 敵へのベクトル
 	FVector toEnemy = Target->GetActorLocation() - parent->GetComponentLocation();
@@ -105,63 +113,96 @@ bool UFanAttackBase::IsTargetInRange(AActor* Target)
 	return dot > GetConeCosine();
 }
 
-
-void UFanAttackBase::AttackJudgePlayer(AActor* Player)
+void UFanAttackBase::AttackJudge()
 {
-	if (!Player|| !bIsActive) { return; }
+	if (!GetOwnerActor()) { return; }
 
-	// 持ち主の座標を取得
-	const FVector ownerLocation = OwnerActor->GetActorLocation();
-
-	// 敵が攻撃範囲内にいるか判定
-	if (IsTargetInRange(Player))
+	if (auto* root = GetOwnerActor()->GetRootComponent())
 	{
-		// ダメージを与える(未実装)
-		
+		ECollisionChannel collisionChannel =
+			root->GetCollisionObjectType();
+
+		// コリジョンタイプが「Pawn(プレイヤー)」か
+		if (collisionChannel == ECC_Player)
+		{
+			auto* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
+			if (!enemyManager) { return; }
+
+			AttackJudgeEnemys(enemyManager);
+		}
+		else if (collisionChannel == ECC_Enemy)
+		{
+			auto* playerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+			if (!playerPawn) { return; }
+
+			AttackJudgePlayer(playerPawn);
+		}
 	}
 }
 
-void UFanAttackBase::AttackJudgeEnemys(UEnemyManagerSubsystem* EnemyManager)
+void UFanAttackBase::AttackJudgePlayer(const TObjectPtr<AActor>& a_Player)
 {
-	if (!EnemyManager||!bIsActive) { return; }
+	if (!a_Player|| !IsActive()) { return; }
+
+	// 持ち主の座標を取得
+	const FVector ownerLocation = GetOwnerActor()->GetActorLocation();
+
+	// 敵が攻撃範囲内にいるか判定
+	if (IsTargetInRange(a_Player))
+	{
+		// ダメージを与える(未実装)
+		if (auto* interface = Cast<ICharacterInterface>(a_Player))
+		{
+			interface->ApplyDamaged();
+			interface->ApplyKnockBack(ownerLocation);
+		}
+	}
+}
+
+void UFanAttackBase::AttackJudgeEnemys(const TObjectPtr<UEnemyManagerSubsystem>& a_EnemyManager)
+{
+	if (!a_EnemyManager||!IsActive()) { return; }
 
 	// プレイヤーの座標を取得
-	const FVector location = OwnerActor->GetActorLocation();
+	const FVector location = GetOwnerActor()->GetActorLocation();
 
 	// 敵リストをループして、攻撃範囲内の敵にダメージを与える
-	for (auto& enemy : EnemyManager->GetEnemyList())
+	for (auto& enemy : a_EnemyManager->GetEnemyList())
 	{
 		if (!enemy) { continue; }
 
 		// 敵が攻撃範囲内にいるか判定
 		if (IsTargetInRange(enemy))
 		{
-			// 第二引数※要改善(ノックバックの強さなどは基底に置くかゲットできるようにしたい)
-			enemy->SetKnockBackData(location, 2.0f, 1.0f);
-
-			// ダメージを与える
-			enemy->SetTakeDamaged();
+			if (auto* interface = Cast<ICharacterInterface>(enemy))
+			{
+				interface->ApplyDamaged();
+				interface->ApplyKnockBack(location);
+			}
 		}
 	}
 }
 
 bool UFanAttackBase::CanDeactivate()
 {
-	bool canDeactivate = (bIsActive != bPrevActive) && !bIsActive;
-	bPrevActive = bIsActive;
+	const bool bCurrentActive = IsActive();
+	bool canDeactivate = (bCurrentActive != bPrevActive) && !bCurrentActive;
+	bPrevActive = bCurrentActive;
 	return canDeactivate;
 }
 
 bool UFanAttackBase::IsActiveFirstFrame()
 {
-	bool canDeactivate = (bIsActive != bPrevActive) && bIsActive;
-	bPrevActive = bIsActive;
+	const bool bCurrentActive = IsActive();
+	bool canDeactivate = (bCurrentActive != bPrevActive) && bCurrentActive;
+	bPrevActive = bCurrentActive;
+	bPrevActive = bCurrentActive;
 	return canDeactivate;
 }
 
 void UFanAttackBase::UpdatePrevActiveFlg()
 {
-	bPrevActive = bIsActive;
+	bPrevActive = IsActive();
 }
 
 FVector UFanAttackBase::CalcAttackDir(const FVector& forwardVector) const

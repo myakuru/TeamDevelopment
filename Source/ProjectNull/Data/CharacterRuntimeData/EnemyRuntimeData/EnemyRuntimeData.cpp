@@ -18,6 +18,11 @@ void UEnemyRuntimeData::SetNextAnimData(int32 NextIndex, bool RoopFlg, bool Chan
 
 void UEnemyRuntimeData::UpdateAnimation(float DeltaTime, float BlendSpeed)
 {
+	/* 備忘録 */
+	// アニメション進行度を知る
+	// Executeの度にAnimFrameを更新
+	// 
+
 	PrevAnimTime = AnimTime;
 
 	// アニメーションブレンド中はCurrentAnimTimeを止めてブレンドするため

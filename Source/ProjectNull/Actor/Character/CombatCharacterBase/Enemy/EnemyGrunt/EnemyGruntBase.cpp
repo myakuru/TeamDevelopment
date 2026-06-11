@@ -54,11 +54,11 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 
 	EnemyRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
 
-	if (EnemyStatus.StateTag == EEnemyState::Hit)
+	/*if (EnemyStatus.StateTag == EEnemyState::Hit)
 	{
 		MoveToKnockBack(FVector::ZeroVector, 0, DeltaTime);
 		return;
-	}
+	}*/
 
 	// 攻撃可能か判断
 	CheckCanAttack();
