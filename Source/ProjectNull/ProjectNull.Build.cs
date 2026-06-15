@@ -28,7 +28,8 @@ public class ProjectNull : ModuleRules
 			"CinematicCamera",
 			"AIModule",
             "AnimGraphRuntime",
-            "NavigationSystem"
+            "NavigationSystem",
+            "PhysicsCore"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

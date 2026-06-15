@@ -28,7 +28,6 @@ public:
 	void Initialize(const TObjectPtr<AActor>& Owner)			override;
 	void Start()												override;
 	void Update(float DeltaTime)								override;
-	bool UpdateAttack(float DeltaTime)							override;
 
 	bool IsAttackStateStep();
 
@@ -54,7 +53,7 @@ private:
 
 	/** 斬撃エフェクト */
 	UPROPERTY(EditAnywhere, Instanced)
-	TArray<USlashEffectBase*> SlashEffectArray;
+	TArray<TObjectPtr<USlashEffectBase>> SlashEffectArray;
 
 	/** 待機状態の割合（0.0～1.0）*/
 	UPROPERTY(EditAnywhere)

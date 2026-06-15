@@ -26,14 +26,15 @@ void UFloatingWeaponAttack::Initialize(const TObjectPtr<AActor>& Owner)
 
 void UFloatingWeaponAttack::Start()
 {
-	if (!GetOwnerActor()) { return; }
-
-	auto* ActorRootComponent = GetOwnerActor()->GetRootComponent();
+	auto Owner = GetOwnerActor();
+	if (!Owner) { return; }
 
 	UFanAttackBase::Start();
 
-	for (auto& SlashEffect : SlashEffectArray) {
-		SlashEffect->Start(ActorRootComponent);
+	for (TObjectPtr<UEffectBase> SlashEffect : SlashEffectArray) 
+	{
+		if (!SlashEffect) { continue; }
+		SlashEffect->Start(Owner->GetRootComponent());
 	}
 }
 
@@ -45,11 +46,6 @@ void UFloatingWeaponAttack::Update(float DeltaTime)
 	{
 		FloatingWeaponEffect->Update(DeltaTime);
 	}
-}
-
-bool UFloatingWeaponAttack::UpdateAttack(float DeltaTime)
-{
-	return UFanAttackBase::UpdateAttack(DeltaTime);
 }
 
 bool UFloatingWeaponAttack::IsAttackStateStep()
