@@ -26,7 +26,12 @@ public:
 	/**
 	 * @brief ルートの親子関係を解除
 	 */
-	void DetachRootComponent();
+	void DetachRootComponent()
+	{
+		if (!RootComponent) { return; }
+
+		RootComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	}
 
 	/* ~Begin Setters */
 	/**
@@ -35,7 +40,32 @@ public:
 	 */
 	void AttachOwnerRoot(const TObjectPtr<USceneComponent>& InOwnerRoot)
 	{
+		if (!RootComponent) { return; }
+
 		RootComponent->SetupAttachment(InOwnerRoot);
+	}
+
+	/**
+	 * @brief コリジョンチャンネルとそれに対するレスポンスをセット
+	 * @param CollisionChannel	判定したいチャンネル(PawnやEnemy..)
+	 * @param CollisionResponse それに対するレスポンス
+	 */
+	void SetCollisionResponseToChannnel(
+		const ECollisionChannel		InCollisionChannel,
+		const ECollisionResponse	InCollisionResponse)
+	{
+		if (!SphereComponent) { return; }
+		SphereComponent->SetCollisionResponseToChannel(
+			InCollisionChannel,
+			InCollisionResponse
+		);
+	}
+
+	void SetCollisionEnable(const ECollisionEnabled::Type InEnabled)
+	{
+		if (!SphereComponent) { return; }
+
+
 	}
 	/* End Setters~ */
 
@@ -55,4 +85,5 @@ private:
 	 */
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USphereComponent> SphereComponent;
+
 };

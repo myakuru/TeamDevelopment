@@ -4,6 +4,7 @@
 
 #include <ProjectNull\Utility\Common\Definitions\CollisionChannels.h>
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
+#include <ProjectNull\Actor\CollisionActor\SphereCollision\SphereCollision.h>
 #include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
 #include "SphericalAttack.h"
 
@@ -19,52 +20,78 @@ void USphericalAttack::Initialize(const TObjectPtr<AActor>& Owner)
 
 	UAttackBase::Initialize(Owner);
 
-	// 攻撃用のSphereComponentを生成
+	
+	// 攻撃用のSphereCollisionアクターの設定
 	{
-		AttackSphere = NewObject<USphereComponent>(Owner);
+		SphereCollision = GetWorld()->SpawnActor<ASphereCollision>(SubSphereCollision);
+		if (!SphereCollision) { return; }
 		
-		if (GetRootComponent())
-		{
-			AttackSphere->SetupAttachment(GetRootComponent());
-		}
-		AttackSphere->RegisterComponent();
+		// 攻撃用球アクターに親をアタッチ
+		SphereCollision->AttachToActor(
+			Owner,
+			FAttachmentTransformRules::KeepRelativeTransform
+		);
 
-		AttackSphere->OnComponentBeginOverlap.AddDynamic(
-			this,
-			&USphericalAttack::OnSphericalBeginOverlap
+		// 指定したコリジョンチャンネルとそれに対するレスポンスをセット
+		SphereCollision->SetCollisionResponseToChannnel(
+			CollisionChannel,
+			CollisionResponse
 		);
-		AttackSphere->OnComponentEndOverlap.AddDynamic(
-			this,
-			&USphericalAttack::OnSphericalEndOverlap
-		);
+
+		if (auto Root = GetRootComponent())
+		{
+			SphereCollision->AttachOwnerRoot(Root);
+		}
+
+		if (auto SphereComponent = SphereCollision->GetSphereComponent())
+		{
+			// オーバーラップ時、オーバーラップ抜け時の関数をセット
+			SphereComponent->OnComponentBeginOverlap.AddDynamic(
+				this,
+				&USphericalAttack::OnSphericalBeginOverlap
+			);
+			SphereComponent->OnComponentEndOverlap.AddDynamic(
+				this,
+				&USphericalAttack::OnSphericalEndOverlap
+			);
+		}
+
+		Cancel();
 	}
-	Cancel();
 }
 
 void USphericalAttack::Execute()
 {
-	if (!AttackSphere) { return; }
+	if (!SphereCollision) { return; }
 
 	SetIsActive(true);		// 攻撃有効化
 	SetCanExecute(false);	// 攻撃実行不可にする
 	ElpsedTimer = 0.f;		// 経過時間をリセット
-	AttackSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);	// 当たり判定有効化
-	AttackSphere->SetRelativeTransform(GetOffsetTransform());			// 初期Transformに設定
+	
+	if (auto SphereComponent = SphereCollision->GetSphereComponent())
+	{
+		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);	// 当たり判定有効化
+		SphereComponent->SetRelativeTransform(GetOffsetTransform());		// 初期Transformに設定
+	}
 }
 
 void USphericalAttack::Cancel()
 {
-	if (!AttackSphere) { return; }
+	if (!SphereCollision) { return; }
 
 	SetIsActive(false);		// 攻撃無効化
 	ElpsedTimer = 0.f;		// 経過時間をリセット
-	AttackSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
+	
+	if (auto SphereComponent = SphereCollision->GetSphereComponent())
+	{
+		SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
+	}
 }
 
 void USphericalAttack::Update(float DeltaTime)
 {
 	// 有効時以外は処理しない
-	if (!IsActive()||!AttackSphere) { return; }
+	if (!IsActive()||!SphereCollision) { return; }
 
 	UAttackBase::Update(DeltaTime);
 
@@ -75,17 +102,20 @@ void USphericalAttack::Update(float DeltaTime)
 		return;
 	}
 
-	DrawDebugSphere(
-		GetWorld(),             // ワールドポインタ
-		AttackSphere->GetComponentLocation(),     // 中心のワールド座標
-		AttackSphere->GetScaledSphereRadius(),                  // 半径
-		12.f,                     // セグメント数（円の滑らかさ）
-		FColor::Red,            // 色
-		false,                  // 永続的に表示するかどうか
-		1.f,                  // 表示時間（負の値で1フレーム）
-		0,                      // 優先度
-		10.0f                    // 線の太さ
-	);
+	if (auto SphereComponent = SphereCollision->GetSphereComponent())
+	{
+		DrawDebugSphere(
+			GetWorld(),									// ワールドポインタ
+			SphereComponent->GetComponentLocation(),	// 中心のワールド座標
+			SphereComponent->GetScaledSphereRadius(),	// 半径
+			12.f,										// セグメント数（円の滑らかさ）
+			FColor::Red,								// 色
+			false,										// 永続的に表示するかどうか
+			1.f,										// 表示時間（負の値で1フレーム）
+			0,											// 優先度
+			10.0f										// 線の太さ
+		);
+	}
 
 	ElpsedTimer += DeltaTime;
 }

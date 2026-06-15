@@ -5,13 +5,13 @@
 // Sets default values
 ASphereCollision::ASphereCollision()
 {
-	PrimaryActorTick.bCanEverTick = false;
-
+	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
 	// 球の初期化(生成・デリゲート関数をセットetc)
 	{
 		SphereComponent = CreateDefaultSubobject<USphereComponent>("Sphere");
+		SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		SphereComponent->SetupAttachment(RootComponent);
 	}
 }
@@ -20,9 +20,4 @@ ASphereCollision::ASphereCollision()
 void ASphereCollision::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void ASphereCollision::DetachRootComponent()
-{
-	RootComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 }
