@@ -38,7 +38,9 @@ void UPlayerCutsceneComponent::PlayCutscene()
 		SequenceActor
 	);
 
-	if (!SequencePlayer) { return; }
+	if (!SequencePlayer || !SequenceActor) { return; }
+
+	SequenceActor->SetActorTransform(OwnerPlayer->GetActorTransform());
 
 	SequencePlayer->Play();
 }
