@@ -44,6 +44,7 @@ void UFanAttackBase::Update(float DeltaTime)
 
 bool UFanAttackBase::UpdateAttack(float DeltaTime)
 {
+	UpdateRotation(DeltaTime);
 	if (!IsActive())	{ return false; }
 
 	auto RootComp		= GetRootComponent();
