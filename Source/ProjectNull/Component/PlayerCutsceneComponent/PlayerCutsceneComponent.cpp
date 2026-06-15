@@ -3,6 +3,7 @@
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 #include "LevelSequenceActor.h"
+#include "DefaultLevelSequenceInstanceData.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
@@ -40,19 +41,11 @@ void UPlayerCutsceneComponent::PlayCutscene()
 
 	if (!SequencePlayer || !SequenceActor) { return; }
 
-	// 実プレイヤーにバインド
-	UMovieScene* MovieScene = CutsceneSequence->GetMovieScene();
-	for (const FMovieSceneBinding& Binding : MovieScene->GetBindings())
-	{
-		if (Binding.GetName().Contains(TEXT("BP_Robot")))
-		{
-			FMovieSceneObjectBindingID BindingID =
-				UE::MovieScene::FFixedObjectBindingID(Binding.GetObjectGuid(), MovieSceneSequenceID::Root);
-			SequenceActor->SetBinding(BindingID, { OwnerPlayer }, true);
-			break;
-		}
-	}
-
+	// レベルシーケンスの原点をプレイヤーに設定
+	UDefaultLevelSequenceInstanceData* InstanceData = NewObject<UDefaultLevelSequenceInstanceData>(SequenceActor);
+	InstanceData->TransformOriginActor = OwnerPlayer;
+	SequenceActor->DefaultInstanceData = InstanceData;
+	SequenceActor->bOverrideInstanceData = true;
 
 	SequencePlayer->Play();
 }
