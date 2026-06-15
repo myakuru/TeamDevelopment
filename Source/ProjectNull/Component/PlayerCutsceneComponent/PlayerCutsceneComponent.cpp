@@ -40,7 +40,19 @@ void UPlayerCutsceneComponent::PlayCutscene()
 
 	if (!SequencePlayer || !SequenceActor) { return; }
 
-	SequenceActor->SetActorTransform(OwnerPlayer->GetActorTransform());
+	// 実プレイヤーにバインド
+	UMovieScene* MovieScene = CutsceneSequence->GetMovieScene();
+	for (const FMovieSceneBinding& Binding : MovieScene->GetBindings())
+	{
+		if (Binding.GetName().Contains(TEXT("BP_Robot")))
+		{
+			FMovieSceneObjectBindingID BindingID =
+				UE::MovieScene::FFixedObjectBindingID(Binding.GetObjectGuid(), MovieSceneSequenceID::Root);
+			SequenceActor->SetBinding(BindingID, { OwnerPlayer }, true);
+			break;
+		}
+	}
+
 
 	SequencePlayer->Play();
 }
