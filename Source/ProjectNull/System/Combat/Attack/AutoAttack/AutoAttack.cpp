@@ -65,7 +65,7 @@ void UAutoAttack::StartAutoAttack()
 	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front)
 		&& AutoAttackParamsMap[EAutoAttackType::Front])
 	{
-		AutoAttackParamsMap[EAutoAttackType::Front]->Start();	
+		AutoAttackParamsMap[EAutoAttackType::Front]->Start();
 	}
 
 	// 前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット

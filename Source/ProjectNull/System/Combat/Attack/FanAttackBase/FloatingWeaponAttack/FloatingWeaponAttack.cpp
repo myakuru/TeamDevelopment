@@ -31,6 +31,8 @@ void UFloatingWeaponAttack::Start()
 
 	UFanAttackBase::Start();
 
+	//if (!FloatingWeaponEffect) { return; }
+
 	for (TObjectPtr<UEffectBase> SlashEffect : SlashEffectArray) 
 	{
 		if (!SlashEffect) { continue; }
@@ -42,10 +44,9 @@ void UFloatingWeaponAttack::Update(float DeltaTime)
 {
 	UFanAttackBase::Update(DeltaTime);
 
-	if (FloatingWeaponEffect)
-	{
-		FloatingWeaponEffect->Update(DeltaTime);
-	}
+	if (!FloatingWeaponEffect) { return; }
+	
+	FloatingWeaponEffect->Update(DeltaTime);
 }
 
 bool UFloatingWeaponAttack::IsAttackStateStep()
