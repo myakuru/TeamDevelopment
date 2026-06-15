@@ -33,18 +33,6 @@ public:
 		RootComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 	}
 
-	/* ~Begin Setters */
-	/**
-	 * @brief 自身のルートを持ち主のルートへアタッチする
-	 * @param InOwnerRoot 持ち主のルート
-	 */
-	void AttachOwnerRoot(const TObjectPtr<USceneComponent>& InOwnerRoot)
-	{
-		if (!RootComponent) { return; }
-
-		RootComponent->SetupAttachment(InOwnerRoot);
-	}
-
 	/**
 	 * @brief コリジョンチャンネルとそれに対するレスポンスをセット
 	 * @param CollisionChannel	判定したいチャンネル(PawnやEnemy..)
@@ -52,23 +40,20 @@ public:
 	 */
 	void SetCollisionResponseToChannnel(
 		const ECollisionChannel		InCollisionChannel,
-		const ECollisionResponse	InCollisionResponse)
-	{
-		if (!SphereComponent) { return; }
-		SphereComponent->SetCollisionResponseToChannel(
-			InCollisionChannel,
-			InCollisionResponse
-		);
-	}
+		const ECollisionResponse	InCollisionResponse);
 
-	void SetCollisionEnable(const ECollisionEnabled::Type InEnabled)
-	{
-		if (!SphereComponent) { return; }
+	/**
+	 * @brief コリジョン判定の有効無効の切り替え
+	 * @param InEnabled NoCollisionで無効
+	 */
+	void SetCollisionEnabled(const ECollisionEnabled::Type InEnabled);
 
-
-	}
+	/**
+	 * @brief オフセット用のTransformに変更する
+	 * @param InOffsetTransform オフセット用Transform
+	 */
+	void SetRelativeTransform(const FTransform& InOffsetTransform);
 	/* End Setters~ */
-
 
 	/* ~Begin Getters */
 	/**　球状当たり判定コンポーネントの取得 */

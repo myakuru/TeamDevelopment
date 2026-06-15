@@ -2,11 +2,8 @@
 
 #include "Components\SphereComponent.h"
 
-#include <ProjectNull\Utility\Common\Definitions\CollisionChannels.h>
-#include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
 #include <ProjectNull\Actor\CollisionActor\SphereCollision\SphereCollision.h>
 #include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
-#include "SphericalAttack.h"
 
 USphericalAttack::USphericalAttack()
 	:	Duration(1.f)
@@ -19,7 +16,6 @@ void USphericalAttack::Initialize(const TObjectPtr<AActor>& Owner)
 	if (!Owner) { return; }
 
 	UAttackBase::Initialize(Owner);
-
 	
 	// 攻撃用のSphereCollisionアクターの設定
 	{
@@ -37,11 +33,6 @@ void USphericalAttack::Initialize(const TObjectPtr<AActor>& Owner)
 			CollisionChannel,
 			CollisionResponse
 		);
-
-		if (auto Root = GetRootComponent())
-		{
-			SphereCollision->AttachOwnerRoot(Root);
-		}
 
 		if (auto SphereComponent = SphereCollision->GetSphereComponent())
 		{
@@ -67,12 +58,8 @@ void USphericalAttack::Execute()
 	SetIsActive(true);		// 攻撃有効化
 	SetCanExecute(false);	// 攻撃実行不可にする
 	ElpsedTimer = 0.f;		// 経過時間をリセット
-	
-	if (auto SphereComponent = SphereCollision->GetSphereComponent())
-	{
-		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);	// 当たり判定有効化
-		SphereComponent->SetRelativeTransform(GetOffsetTransform());		// 初期Transformに設定
-	}
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);	// 当たり判定有効化	
+	SphereCollision->SetRelativeTransform(GetOffsetTransform());		// 初期Transformに設定
 }
 
 void USphericalAttack::Cancel()
@@ -81,11 +68,7 @@ void USphericalAttack::Cancel()
 
 	SetIsActive(false);		// 攻撃無効化
 	ElpsedTimer = 0.f;		// 経過時間をリセット
-	
-	if (auto SphereComponent = SphereCollision->GetSphereComponent())
-	{
-		SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
-	}
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
 }
 
 void USphericalAttack::Update(float DeltaTime)

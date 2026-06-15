@@ -2,25 +2,25 @@
 
 #include "CoreMinimal.h"
 #include "../AttackBase.h"
-#include "SphericalAttack.generated.h"
+#include "BoxAttack.generated.h"
 
-/** 球状の当たり判定を持つアクタークラス */
-class ASphereCollision;
+/* Box状の当たり判定を持つアクタークラス */
+class ABoxCollision;
 
 /**
- * 球状の攻撃判定を行うクラス
+ * Box状の攻撃判定を行うクラス
  */
-UCLASS(Blueprintable, EditInlineNew)
-class PROJECTNULL_API USphericalAttack : public UAttackBase
+UCLASS(Blueprintable,EditInlineNew)
+class PROJECTNULL_API UBoxAttack : public UAttackBase
 {
 	GENERATED_BODY()
+	
+public:
+	
+	UBoxAttack();
 
 public:
-
-	USphericalAttack();
-
-public:
-
+	
 	/**
 	 * @brief 初期化処理
 	 * @param Owner オーナーアクター
@@ -75,13 +75,13 @@ private:
 	 * @brief デフォルトエディタ側でされるようにする
 	 */
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<ASphereCollision> SubSphereCollision;
+	TSubclassOf<ABoxCollision> SubBoxCollision;
 
 	/**
 	 * @brief 球状の当たり判定アクター
 	 */
 	UPROPERTY()
-	TObjectPtr<ASphereCollision> SphereCollision;
+	TObjectPtr<ABoxCollision> BoxCollision;
 
 	/**
 	* @brief 判定させたいコリジョンチャンネル
