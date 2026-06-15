@@ -123,6 +123,7 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	//アニメーション再生
 	if (!Mesh || !OpenAnimation) return;
 	Mesh->PlayAnimation(OpenAnimation, false);
+	Mesh->SetPlayRate(OpenAnimationPlayRate);
 
 	//消滅タイマー
 	float AnimationLength = OpenAnimation->GetPlayLength();
@@ -130,7 +131,7 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		DestroyTimerHandle,
 		this,
 		&ATreasureBox::ExtinctionStart,
-		AnimationLength,
+		AnimationLength / OpenAnimationPlayRate,
 		false
 	);
 }

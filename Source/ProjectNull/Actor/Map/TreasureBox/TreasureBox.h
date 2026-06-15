@@ -78,6 +78,9 @@ public:
 
 	/** 開くアニメーション */
 	UPROPERTY(EditDefaultsOnly, Category = "Params|Animation")
+	float OpenAnimationPlayRate = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Params|Animation")
 	UAnimationAsset* OpenAnimation;
 
 	/** ドロップギア */
