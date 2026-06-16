@@ -174,7 +174,7 @@ void APlayerBase::ChangeGear()
 void APlayerBase::StartCutscene()
 {
 	if (!CutsceneComponent) { return; }
-	CutsceneComponent->PlayCutscene();
+	//CutsceneComponent->PlayCutscene(NullGameplayTags::Cutscene_Intro);
 }
 
 int32 APlayerBase::GetCurrentGearLevel() const

@@ -4,8 +4,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "SurvivalGameMode.generated.h"
 
-class AMyCineCameraActor;
-
 /**
  * defaultのゲームモード
  */
@@ -23,19 +21,5 @@ public:
 protected:
 
 	void BeginPlay() override;
-
-	UFUNCTION()
-	void OnCutsceneFinished();
-
-	/** レベルに配置したシネカメラ（エディタで設定） */
-	UPROPERTY()
-	TObjectPtr<AMyCineCameraActor> OpeningCameraActor;
-
-	UPROPERTY(EditAnywhere, Category = "Opening")
-	FVector PlayerLocation = FVector(0.0f, 0.0f, 1000.0f);
-
-	/** ビュー切り替え時のブレンド速度 */
-	UPROPERTY(EditAnywhere, Category = "Opening")
-	float TargetBlendSpeed = 0.0f;
 
 };
