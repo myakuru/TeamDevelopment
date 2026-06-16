@@ -40,4 +40,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	float StrifeDir = 1.0f;
+
+	/** 一定範囲外にターゲットが出たらステートを抜ける用*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	float GetOutDistance = 300.0f;
 };
