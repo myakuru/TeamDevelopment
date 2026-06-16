@@ -58,10 +58,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Cutscene")
 	FOnCutsceneFinished OnCutsceneFinished;
 
-	UFUNCTION(BlueprintCosmetic, Category = "Cutscene")
 	bool PlayCutScene(FGameplayTag CutsceneId);
 
-	UFUNCTION(BlueprintCosmetic, Category = "Cutscene")
 	void StopCutScene(FGameplayTag CutsceneId);
 
 	/** 現在カットシーン再生中か */
@@ -72,6 +70,7 @@ protected:
 
 private:
 
+	UFUNCTION()
 	void HandleSequenceFinished();
 
 	/** カットシーンのIDと再生するシーケンスのマップ */

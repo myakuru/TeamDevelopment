@@ -5,6 +5,7 @@
 #include "LevelSequenceActor.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/Core/NullGameplayTags.h>
 
 UPlayerCutsceneComponent::UPlayerCutsceneComponent():
 		OwnerPlayer(nullptr),
@@ -18,7 +19,6 @@ UPlayerCutsceneComponent::UPlayerCutsceneComponent():
 void UPlayerCutsceneComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 	OwnerPlayer = Cast<APlayerBase>(GetOwner());
 }
 
@@ -28,7 +28,7 @@ bool UPlayerCutsceneComponent::PlayCutScene(FGameplayTag CutsceneId)
 
 	// カットシーンIDに対応するエントリーを取得
 	const FCutsceneEntry* CutsceneEntry = CutsceneEntries.Find(CutsceneId);
-	if (!CutsceneEntry || !CutsceneEntry->Sequence) { return false; }
+	if (!CutsceneEntry) { return false; }
 
 	// シーケンスプレイヤーの作成
 	CurrentCutsceneId = CutsceneId;
@@ -47,7 +47,8 @@ bool UPlayerCutsceneComponent::PlayCutScene(FGameplayTag CutsceneId)
 		Settings,
 		SequenceActor);
 
-	if (!SequencePlayer || !SequenceActor) { return false; }
+	// シーケンスプレイヤーの作成に失敗した場合は再生できない
+	if (!SequencePlayer) { return false; }
 
 	if (CutsceneEntry->bUsePlayerAsOrigin && OwnerPlayer)
 	{

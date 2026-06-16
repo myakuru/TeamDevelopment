@@ -25,6 +25,7 @@
 #include <ProjectNull/System/Material/PlayerMaterialCollectionUpdater/PlayerMaterialCollectionUpdater.h>
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 #include <ProjectNull/Component/PlayerCutsceneComponent/PlayerCutsceneComponent.h>
+#include <ProjectNull/Core/NullGameplayTags.h>
 
 
 APlayerBase::APlayerBase():
@@ -174,7 +175,7 @@ void APlayerBase::ChangeGear()
 void APlayerBase::StartCutscene()
 {
 	if (!CutsceneComponent) { return; }
-	//CutsceneComponent->PlayCutscene(NullGameplayTags::Cutscene_Intro);
+	CutsceneComponent->PlayCutScene(NullGameplayTags::Cutscene_Intro);
 }
 
 int32 APlayerBase::GetCurrentGearLevel() const
