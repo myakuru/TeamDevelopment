@@ -85,7 +85,6 @@ void ACrossLaserbeam::OnLaserBeginOverlap(
 	if (!OtherActor || OtherActor == this) { return; }
 
 	OnHit(OtherActor);
-	//HitActors.Add(Enemy);
 }
 
 void ACrossLaserbeam::OnLaserEndOverlap(
@@ -95,19 +94,16 @@ void ACrossLaserbeam::OnLaserEndOverlap(
 	int32 OtherBodyIndex)
 {
 	auto Enemy = Cast<AEnemyBase>(OtherActor);
-
 	if (!Enemy) { return; }
 
-	//HitActors.Remove(Enemy);
 }
 
 void ACrossLaserbeam::OnHit(const TObjectPtr<AActor>& Actor)
 {
 	// キャラクターインターフェースを実装しているか
-	if (auto* interface = Cast<ICharacterInterface>(Actor))
+	if (auto* Interface = Cast<ICharacterInterface>(Actor))
 	{
-		interface->ApplyDamaged();
-		interface->ApplyKnockBack(GetActorLocation());
-		//HitActors.Add(Actor);
+		Interface->ApplyDamaged();
+		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }

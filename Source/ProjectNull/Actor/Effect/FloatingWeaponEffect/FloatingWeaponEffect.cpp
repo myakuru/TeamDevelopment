@@ -6,7 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
+#include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponAttackState/FloatingWeaponAttackState.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStandState/FloatingWeaponStandState.h>
@@ -92,7 +92,7 @@ FTransform UFloatingWeaponEffect::GetAttackStartTransformOffset()
 	FTransform ResultTransform;
 	if (!AttakState) { return ResultTransform; }
 
-	ResultTransform = AttakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle);
+	ResultTransform = AttakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->GetStartAngle());
 	return ResultTransform;
 }
 

@@ -2,7 +2,7 @@
 #include "FloatingWeaponTransitionState.h"
 
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
+#include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 
 
 UFloatingWeaponTransitionState::UFloatingWeaponTransitionState():
@@ -62,6 +62,15 @@ void UFloatingWeaponTransitionState::UpdateTransformOffsetLerp(float DeltaTime)
 	RelativeTransform.SetLocation(resultLocation);
 	RelativeTransform.SetRotation(resultQuaternion);
 
+	auto OwnerAttack = Owner->GetOwnerAttack();
+	if (!OwnerAttack) { return; }
+
+	if (OwnerAttack->IsAttackStateStep())
+	{
+		Owner->ChangeState(EFloatingWeaponState::Attack);
+		return;
+	}
+
 	// 状態遷移処理
 	switch (NextState)
 	{
@@ -86,11 +95,14 @@ void UFloatingWeaponTransitionState::TryChangeToStandState()
 
 void UFloatingWeaponTransitionState::TryChangeToAttackState()
 {
-	if (!Owner || !Owner->GetOwnerAttack()) { return; }
+	if (!Owner)			{ return; }
 
-	if (Owner->GetOwnerAttack()->IsAttackStateStep())
+	auto OwnerAttack = Owner->GetOwnerAttack();
+	if (!OwnerAttack)	{ return; }
+
+	if (OwnerAttack->IsAttackStateStep())
 	{
 		Owner->ChangeState(EFloatingWeaponState::Attack);
 		return;
-	}	
+	}
 }
