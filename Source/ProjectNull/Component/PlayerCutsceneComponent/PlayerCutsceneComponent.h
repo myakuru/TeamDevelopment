@@ -8,6 +8,7 @@ class APlayerBase;
 class ULevelSequence;
 class ULevelSequencePlayer;
 class ALevelSequenceActor;
+class UDefaultLevelSequenceInstanceData;
 
 /** プレイヤーのカットシーン再生コンポーネント */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -40,6 +41,13 @@ private:
 	/** 再生するLevelSequenceアセット（BP側でアサイン） */
 	UPROPERTY(EditAnywhere, Category = "Cutscene")
 	TObjectPtr<ULevelSequence> CutsceneSequence;
+
+	/** シーケンサーの再生位置更新 */
+	UPROPERTY()
+	TObjectPtr<UDefaultLevelSequenceInstanceData> DefaultLevelSequenceInstanceData;
+
+	UPROPERTY()
+	ALevelSequenceActor* SequenceActor;
 
 	/** シーケンスプレイヤー */
 	UPROPERTY()
