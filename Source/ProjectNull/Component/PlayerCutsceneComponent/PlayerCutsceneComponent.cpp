@@ -1,8 +1,8 @@
 ﻿#include "PlayerCutsceneComponent.h"
-
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 #include "LevelSequenceActor.h"
+#include "DefaultLevelSequenceInstanceData.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
@@ -10,7 +10,9 @@
 UPlayerCutsceneComponent::UPlayerCutsceneComponent():
 		OwnerPlayer(nullptr),
 		CutsceneSequence(nullptr),
-		SequencePlayer(nullptr)
+		SequencePlayer(nullptr),
+		SequenceActor(nullptr),
+		DefaultLevelSequenceInstanceData(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
@@ -26,10 +28,14 @@ void UPlayerCutsceneComponent::PlayCutscene()
 {
 	if (!CutsceneSequence) { return; }
 
-	ALevelSequenceActor* SequenceActor = nullptr;
-
 	FMovieSceneSequencePlaybackSettings Settings;
+
+	// 自動再生を無効化
 	Settings.bAutoPlay = false;
+	Settings.bHidePlayer = true;
+	Settings.bDisableLookAtInput = true;
+	Settings.bHideHud = true;
+	Settings.bDisableMovementInput = true;
 
 	SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
 		GetWorld(),
@@ -40,7 +46,11 @@ void UPlayerCutsceneComponent::PlayCutscene()
 
 	if (!SequencePlayer || !SequenceActor) { return; }
 
-	SequenceActor->SetActorTransform(OwnerPlayer->GetActorTransform());
+	// レベルシーケンスの原点をプレイヤーに設定
+	DefaultLevelSequenceInstanceData = NewObject<UDefaultLevelSequenceInstanceData>(SequenceActor);
+	DefaultLevelSequenceInstanceData->TransformOriginActor = OwnerPlayer;
+	SequenceActor->DefaultInstanceData = DefaultLevelSequenceInstanceData;
+	SequenceActor->bOverrideInstanceData = true;
 
 	SequencePlayer->Play();
 }

@@ -28,8 +28,8 @@ public:
 
 	void PlayOpeningCutscene();
 
-	UPROPERTY(BlueprintAssignable)
-	FOnCutsceneFinished OnCutsceneFinished;
+	//UPROPERTY(BlueprintAssignable)
+	//FOnCutsceneFinished OnCutsceneFinished;
 
 protected:
 	/** オープニングで再生するレベルシーケンス */
