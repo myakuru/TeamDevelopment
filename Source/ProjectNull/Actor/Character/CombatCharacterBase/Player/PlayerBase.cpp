@@ -185,7 +185,7 @@ UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 	if (!GetMesh())		{ return nullptr; }
 
 	auto AnimInstance = GetMesh()->GetAnimInstance();
-	if (!AnimInstance) { return nullptr; }
+	if (!AnimInstance)	{ return nullptr; }
 
 	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
 	return PlayerAnimInstance;
