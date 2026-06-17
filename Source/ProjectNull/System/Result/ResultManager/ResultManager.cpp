@@ -4,6 +4,7 @@
 #include "ResultManager.h"
 #include <ProjectNull/Data/Result/RewardData/RewardData.h>
 #include <ProjectNull/Weapon/Data/EffectPoolDataAsset/EffectPoolDataAsset.h>
+#include <ProjectNull/Data/Result/RankConditionData/RankConditionData.h>
 
 void UResultManager::Initialize()
 {
@@ -34,6 +35,7 @@ void UResultManager::Initialize()
 void UResultManager::SetResultData(const FResultData& ResultData)
 {
 	CurrentResultData = ResultData;
+	RewardWeapons.Empty();
 	EvoluteReward();
 }
 
@@ -43,18 +45,8 @@ void UResultManager::EvoluteReward()
 
 	// 評価ランク決定
 	for (int i = 0; i < SortedClearRankDatas.Num(); i++) {
-		
-		// フェーズがその評価の規定値まで達しているか
-		if (CurrentResultData.ClearPhase < SortedClearRankDatas[i].ClearPhase)break;
 
-		// 中ボス出現までフェーズを進めているか
-		if (CurrentResultData.bReachedMidBossPhase != SortedClearRankDatas[i].bReachedMidBossPhase)break;
-
-		// 中ボスを倒しているか
-		if (CurrentResultData.bReachedFinalPhase != SortedClearRankDatas[i].bReachedFinalPhase)break;
-
-		// クリア時間がその評価の規定値以下か
-		if (CurrentResultData.ClearTime > SortedClearRankDatas[i].ClearTime)break;
+		if (!SortedClearRankDatas[i].ConditionData->IsConditionMet(CurrentResultData))break;
 
 		rewardRow = SortedClearRankDatas[i].RewardRow;
 	}

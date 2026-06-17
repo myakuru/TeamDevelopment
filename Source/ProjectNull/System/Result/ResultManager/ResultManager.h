@@ -23,6 +23,11 @@ public:
 
 	void Initialize();
 	void SetResultData(const FResultData& ResultData);
+	TArray<FWeaponInstance> GetRewardWeapons() { return RewardWeapons; }
+
+	FResultData GetResultData() { return CurrentResultData; }
+
+	TArray<FClearRankData> GetSortedClearRankDatas() { return SortedClearRankDatas; }
 
 private:
 
