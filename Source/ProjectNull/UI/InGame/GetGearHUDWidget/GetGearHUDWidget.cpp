@@ -73,6 +73,7 @@ void UGetGearHUDWidget::NativeDestruct()
 
 void UGetGearHUDWidget::RemoveSelf()
 {
+	//フェードアウトアニメーション再生
 	if (FadeOutAnim)
 	{
 		PlayAnimation(FadeOutAnim);
