@@ -187,12 +187,12 @@ void AEnemyBase::ApplyDamaged(float a_Damage)
 	OnHit();
 
 	// 体力が0以下なら死亡フラグを立てる
-	/*if (EnemyRuntimeData->GetHealth() <= 0)
+	if (EnemyRuntimeData->GetHealth() <= 0)
 	{
 		EnemyStatus.IsAlive = false;
 		EnemyRuntimeData->ChangedIsAlive(EnemyStatus.IsAlive);
 		OnDeath();
-	}*/
+	}
 }
 
 void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime)

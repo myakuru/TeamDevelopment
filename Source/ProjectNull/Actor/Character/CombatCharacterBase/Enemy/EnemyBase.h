@@ -177,30 +177,6 @@ public:
 		return GameProgress;
 	}
 
-	/**
-	 * @brief 汎用的なEnumビット(uint8型)上昇処理
-	 * @tparam T クラス(Enum Class名etc)
-	 * @param a_currentBit  元のBit
-	 * @param a_targetBit	上げたいBit
-	 */
-	template<typename T>
-	void UpEnumBit(uint8 a_CurrentBit, T a_TargetBit)
-	{
-		a_CurrentBit |= static_cast<uint8>(a_TargetBit);
-	}
-
-	/**
-	 * @brief 汎用的なEnumビット(uint8型)下降処理
-	 * @tparam T クラス(Enum Class名etc)
-	 * @param a_currentBit  元のBit
-	 * @param a_targetBit	下げたいBit
-	 */
-	template<typename T>
-	void DownEnumBit(uint8 a_CurrentBit, T a_TargetBit)
-	{
-		a_CurrentBit &= ~static_cast<uint8>(a_TargetBit);
-	}
-
 	bool GetAliveFlg() { return EnemyStatus.IsAlive; }
 
 	//~ End Getter
