@@ -48,6 +48,12 @@ void UGetGearHUDWidget::OpenUI()
 	);
 
 	PC->SetInputMode(InputMode);
+
+	//フェードインアニメーション再生
+	if (FadeInAnim)
+	{
+		PlayAnimation(FadeInAnim);
+	}
 }
 
 void UGetGearHUDWidget::NativeOnInitialized()
@@ -66,6 +72,24 @@ void UGetGearHUDWidget::NativeDestruct()
 }
 
 void UGetGearHUDWidget::RemoveSelf()
+{
+	//フェードアウトアニメーション再生
+	if (FadeOutAnim)
+	{
+		PlayAnimation(FadeOutAnim);
+
+		FWidgetAnimationDynamicEvent AnimationFinishedEvent;
+		AnimationFinishedEvent.BindDynamic(this, &UGetGearHUDWidget::OnFadeOutAnimFinished);
+
+		BindToAnimationFinished(FadeOutAnim, AnimationFinishedEvent);
+
+		return;
+	}
+
+	OnFadeOutAnimFinished();
+}
+
+void UGetGearHUDWidget::OnFadeOutAnimFinished()
 {
 	APlayerController* PC =
 		GetWorld()->GetFirstPlayerController();

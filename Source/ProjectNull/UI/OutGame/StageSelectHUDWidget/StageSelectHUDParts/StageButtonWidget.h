@@ -1,11 +1,9 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "../../../Parts/Button/ButtonBaseWidget.h"
 #include "Delegates/DelegateCombinations.h"
 #include "StageButtonWidget.generated.h"
-
-class UButton;
 
 /** デリゲート宣言 */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedStageButton, int32, InStageIndex);
@@ -15,22 +13,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHoveredStageButton, int32, InStag
  * stageSelectHUDWidgetで使用するstageボタン
  */
 UCLASS()
-class PROJECTNULL_API UStageButtonWidget : public UUserWidget
+class PROJECTNULL_API UStageButtonWidget : public UButtonBaseWidget
 {
 	GENERATED_BODY()
 	
 protected:
 
-	virtual void NativeConstruct() override;
+	virtual void DoHoveredButton() override;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> StageButton;
-
-	UFUNCTION()
-	void OnClickedStageButton();
-
-	UFUNCTION()
-	void OnHoveredStageButton();
+	virtual void DoClickedButton() override;
 
 	UPROPERTY()
 	int32	StageIndex	= 1;

@@ -49,9 +49,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<UBoxComponent>> LaserBoxes;
 
-	UPROPERTY()
-	TSet<TWeakObjectPtr<AActor>> HitActors;
-
 	FTimerHandle HitIntervalTimerHandle;
 
 	UPROPERTY(EditAnywhere)
