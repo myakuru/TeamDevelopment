@@ -32,6 +32,9 @@ private:
 	UFUNCTION()
     void RemoveSelf();
 
+	UFUNCTION()
+	void OnFadeOutAnimFinished();
+
 	/** UIパーツ */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> GearName;
@@ -41,4 +44,11 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> CloseUIButton;
+
+	/** アニメーション */
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> FadeInAnim;
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> FadeOutAnim;
 };
