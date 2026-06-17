@@ -80,10 +80,6 @@ private:
 	 */
 	bool CanMove();
 
-	void AlignFloor();
-
-	FTimerHandle AlignFloorTimerHandle;
-
 	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
@@ -119,30 +115,4 @@ private:
 	/** ゲーム全体で共有されるデータや機能を管理するクラス */
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
-
-	UPROPERTY()
-	FVector CurrentGroundNormal = FVector::UpVector;
-
-	UPROPERTY(EditAnywhere)
-	float GroundTraceLength = 200.0f;
-
-	UPROPERTY(EditAnywhere)
-	float NormalInterpSpeed = 10.0f;
-
-	UPROPERTY(EditAnywhere)
-	float RotationInterpSpeed = 8.0f;
-
-	UPROPERTY(EditAnywhere)
-	float MaxGroundAngle = 45.f;
-	UPROPERTY(EditAnywhere)
-	float EnterGroundAngle = 45.f;
-
-	UPROPERTY(EditAnywhere)
-	float ExitGroundAngle = 50.f;
-
-	UPROPERTY(EditAnywhere)
-	float SlideSpeed = 1500.f;
-
-	UPROPERTY()
-	float CurrentGroundTraceLength = 1500.f;
 };

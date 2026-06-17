@@ -36,6 +36,7 @@ APlayerBase::APlayerBase():
 		TargetSearchComponent(nullptr),
 		AutoAttack(nullptr),
 		MaterialCollectionUpdater(nullptr),
+		CutsceneComponent(nullptr),
 		SuperGameInstance(nullptr)
 {
 	// ================================================================
@@ -67,9 +68,9 @@ APlayerBase::APlayerBase():
 	CineCameraComponent->SetupAttachment(SpringArmComponent);
 	CineCameraComponent->Deactivate();
 
-	/// ================================================================
+	// ================================================================
 	// カットシーン再生用コンポーネントの初期化
-	//  ================================================================
+	// ================================================================
 	CutsceneComponent = CreateDefaultSubobject<UPlayerCutsceneComponent>("Cutscene");
 
 	// ================================================================
@@ -107,21 +108,10 @@ void APlayerBase::BeginPlay()
 
 	GetWorld()->GetFirstPlayerController()->InputComponent->BindKey(
 		EKeys::K, IE_Pressed, this, &APlayerBase::StartCutscene);
-
-	/*GetWorld()->GetTimerManager().SetTimer(
-		AlignFloorTimerHandle,
-		this,
-		&APlayerBase::AlignFloor,
-		0.1f,
-		true);*/
-	CurrentGroundTraceLength = GroundTraceLength;
 }
 
 void APlayerBase::Tick(float DeltaTime)
 {
-	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!EnemyManager) { return; }
-
 	ACombatCharacterBase::Tick(DeltaTime);
 
 	// 自動攻撃の更新
@@ -130,8 +120,6 @@ void APlayerBase::Tick(float DeltaTime)
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
 
-	//AlignFloor();
-	
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -150,7 +138,7 @@ void APlayerBase::ApplyDamaged(float InDamage)
 
 		PlayerRuntimeData->SubtractHealth(InDamage);
 
-		UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
+		//UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
 	}
 }
 
@@ -194,7 +182,7 @@ bool APlayerBase::GetCurrentFloorNormal(FVector& OutCurrentFloorNormal)
 
 UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 {
-	if (!GetMesh()) { return nullptr; }
+	if (!GetMesh())		{ return nullptr; }
 
 	auto AnimInstance = GetMesh()->GetAnimInstance();
 	if (!AnimInstance) { return nullptr; }
@@ -226,124 +214,6 @@ bool APlayerBase::CanMove()
 	}
 
 	return true;
-}
-
-void APlayerBase::AlignFloor()
-{
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
-	
-	//----------------------------------------
-	// Ground Trace
-	//----------------------------------------
-
-	FHitResult Hit;	
-
-	const FVector Start = GetActorLocation();
-	const FVector End = Start - GetActorUpVector() * CurrentGroundTraceLength;
-
-	DrawDebugLine(GetWorld(), Start, End,FColor::Green);
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	const bool bHit = GetWorld()->LineTraceSingleByChannel(
-			Hit,
-			Start,
-			End,
-			ECC_Visibility,
-			Params);
-
-	if (!bHit)
-	{
-		/*MoveComp->SetMovementMode(
-			MOVE_Falling);*/
-		/*MoveComp->SetGravityDirection(
-			FVector::DownVector);*/
-		CurrentGroundTraceLength += 50.0f;
-		return;
-	}
-	else {
-		CurrentGroundTraceLength = GroundTraceLength;
-	}
-
-	//----------------------------------------
-	// Normal
-	//----------------------------------------
-
-	const FVector TargetNormal =
-		Hit.ImpactNormal.GetSafeNormal();
-
-	CurrentGroundNormal = FMath::VInterpNormalRotationTo(
-			CurrentGroundNormal,
-			TargetNormal,
-			DeltaTime,
-			NormalInterpSpeed);
-
-	//----------------------------------------
-	// Walkable Angle
-	//----------------------------------------
-
-	/*const FVector UpDir =
-		-MoveComp->GetGravityDirection();*/
-
-	const float Dot =
-		FVector::DotProduct(
-			TargetNormal,
-			FVector::UpVector);
-
-	const float WalkableDot = FMath::Cos(
-			FMath::DegreesToRadians(MaxGroundAngle));
-	//UE_LOG(LogTemp, Display, TEXT("WalkableDot %.2f"), WalkableDot);
-	//UE_LOG(LogTemp, Display, TEXT("Dot %.2f"), Dot);
-
-	FVector Gravity = -CurrentGroundNormal;
-
-	const bool Walkable = Dot >= WalkableDot;
-
-	if (!Walkable)
-	{
-	/*	MoveComp->SetMovementMode(
-			MOVE_Falling);*/
-		//MoveComp->SetGravityDirection(FVector::DownVector);
-		/*FVector SlideDir =
-			FVector::VectorPlaneProject(
-				FVector(0, 0, -1),
-				CurrentGroundNormal).GetSafeNormal();
-
-		AddMovementInput(
-			SlideDir.GetSafeNormal(),
-			SlideSpeed);*/
-
-		Gravity = FVector::DownVector;
-	}
-	
-	/*DrawDebugCapsule(
-		GetWorld(),
-		GetActorLocation(),
-		WalkCapsuleHalfHeight,
-		WalkCapsuleRadius,
-		GetActorQuat(),
-		FColor::Magenta);
-
-	DrawDebugCapsule(
-		GetWorld(),
-		GetActorLocation(),
-		FallCapsuleHalfHeight,
-		FallCapsuleRadius,
-		GetActorQuat(),
-		FColor::Orange);*/
-
-
-	//----------------------------------------
-	// Gravity
-	//----------------------------------------
-
-	//MoveComp->SetGravityDirection(Gravity);
-
-	//----------------------------------------
-	// Rotation
-	//----------------------------------------
-
-	
 }
 
 
