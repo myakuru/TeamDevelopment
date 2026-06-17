@@ -1,8 +1,10 @@
 ﻿#include "STT_EnemyKnockBack.h"
 #include "StateTreeExecutionContext.h"
+
+#include <ProjectNull\Utility\Common\Definitions\CollisionChannels.h>
 #include <ProjectNull\System\DataTable\KnockBackData\KnockBackData.h>
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
-#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
+#include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
 
 USTT_EnemyKnockBack::USTT_EnemyKnockBack(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
@@ -35,7 +37,7 @@ EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& 
 	SetKnockBackData();
 	
 	// 敵同士の当たり判定を一時的に消す
-	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECC_Enemy, ECollisionResponse::ECR_Ignore);
 
 	return EStateTreeRunStatus::Running;
 }
@@ -53,7 +55,7 @@ EStateTreeRunStatus USTT_EnemyKnockBack::Tick(FStateTreeExecutionContext& a_Cont
 	}*/
 
 	// ノックバックが停止したらステート終了
-	if(MoveToKnockBack(a_DeltaTime)){ return EStateTreeRunStatus::Succeeded; }
+	if (MoveToKnockBack(a_DeltaTime)) { return EStateTreeRunStatus::Succeeded; }
 
 	return EStateTreeRunStatus::Running;
 }
@@ -68,7 +70,7 @@ void USTT_EnemyKnockBack::ExitState(FStateTreeExecutionContext& a_Context, const
 	OwnerEnemy->NotifyChangedStateEnum(EEnemyState::Idle);
 
 	// 敵同士の当たり判定を戻す
-	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
+	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECC_Enemy, ECollisionResponse::ECR_Block);
 }
 
 void USTT_EnemyKnockBack::SetKnockBackData()
@@ -93,8 +95,6 @@ void USTT_EnemyKnockBack::SetKnockBackData()
 
 	// 水平方向(移動方向を反転)
 	FVector HorizontalDir = -MoveDir;
-	HorizontalDir.Z = 0.f;
-	HorizontalDir.Normalize();
 
 	// 吹き飛び角度
 	const float Rad = FMath::DegreesToRadians(KnockBackData->LaunchAngleDeg);
