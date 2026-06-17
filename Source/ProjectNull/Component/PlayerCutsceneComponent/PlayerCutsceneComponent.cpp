@@ -1,15 +1,14 @@
 ﻿#include "PlayerCutsceneComponent.h"
-#include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
-#include "LevelSequenceActor.h"
 #include "DefaultLevelSequenceInstanceData.h"
+#include "GameplayTagContainer.h"
+#include "LevelSequenceActor.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
-
+#include <ProjectNull/Core/NullGameplayTags.h>
 
 UPlayerCutsceneComponent::UPlayerCutsceneComponent():
 		OwnerPlayer(nullptr),
-		CutsceneSequence(nullptr),
 		SequencePlayer(nullptr),
 		SequenceActor(nullptr),
 		DefaultLevelSequenceInstanceData(nullptr)
@@ -20,39 +19,59 @@ UPlayerCutsceneComponent::UPlayerCutsceneComponent():
 void UPlayerCutsceneComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 	OwnerPlayer = Cast<APlayerBase>(GetOwner());
 }
 
-void UPlayerCutsceneComponent::PlayCutscene()
+bool UPlayerCutsceneComponent::PlayCutScene(FGameplayTag CutsceneId)
 {
-	if (!CutsceneSequence) { return; }
+	if (IsPlaying()) { return false; }
+
+	// カットシーンIDに対応するエントリーを取得
+	const FCutsceneEntry* CutsceneEntry = CutsceneEntries.Find(CutsceneId);
+	if (!CutsceneEntry) { return false; }
+
+	// シーケンスプレイヤーの作成
+	CurrentCutsceneId = CutsceneId;
 
 	FMovieSceneSequencePlaybackSettings Settings;
-
-	// 自動再生を無効化
 	Settings.bAutoPlay = false;
-	Settings.bHidePlayer = true;
+	Settings.bHidePlayer = CutsceneEntry->bHidePlayer;
+	Settings.bHideHud = CutsceneEntry->bHideHud;
+	Settings.bDisableMovementInput = CutsceneEntry->bDisableMovementInput;
 	Settings.bDisableLookAtInput = true;
-	Settings.bHideHud = true;
-	Settings.bDisableMovementInput = true;
 
+	// シーケンサーの作成
 	SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
 		GetWorld(),
-		CutsceneSequence,
+		CutsceneEntry->Sequence,
 		Settings,
-		SequenceActor
-	);
+		SequenceActor);
 
-	if (!SequencePlayer || !SequenceActor) { return; }
+	// シーケンスプレイヤーの作成に失敗した場合は再生できない
+	if (!SequencePlayer) { return false; }
 
-	// レベルシーケンスの原点をプレイヤーに設定
-	DefaultLevelSequenceInstanceData = NewObject<UDefaultLevelSequenceInstanceData>(SequenceActor);
-	DefaultLevelSequenceInstanceData->TransformOriginActor = OwnerPlayer;
-	SequenceActor->DefaultInstanceData = DefaultLevelSequenceInstanceData;
-	SequenceActor->bOverrideInstanceData = true;
+	if (CutsceneEntry->bUsePlayerAsOrigin && OwnerPlayer)
+	{
+		DefaultLevelSequenceInstanceData = NewObject<UDefaultLevelSequenceInstanceData>(SequenceActor);
+		DefaultLevelSequenceInstanceData->TransformOrigin = OwnerPlayer->GetMesh()->GetComponentTransform();
+		
+		SequenceActor->DefaultInstanceData = DefaultLevelSequenceInstanceData;
+		SequenceActor->bOverrideInstanceData = true;
+	}
 
+	SequencePlayer->OnFinished.AddDynamic(this, &UPlayerCutsceneComponent::HandleSequenceFinished);
 	SequencePlayer->Play();
+	return true;
+}
+
+void UPlayerCutsceneComponent::StopCutScene(FGameplayTag CutsceneId)
+{
+}
+
+void UPlayerCutsceneComponent::HandleSequenceFinished()
+{
+	OnCutsceneFinished.Broadcast(CurrentCutsceneId);
+	CurrentCutsceneId = FGameplayTag();
 }
 
 bool UPlayerCutsceneComponent::IsPlaying() const
