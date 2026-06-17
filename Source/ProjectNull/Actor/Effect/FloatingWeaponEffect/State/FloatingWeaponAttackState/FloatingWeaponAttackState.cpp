@@ -1,7 +1,7 @@
 ﻿
 #include "FloatingWeaponAttackState.h"
 
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
+#include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 
 UFloatingWeaponAttackState::UFloatingWeaponAttackState()
@@ -21,7 +21,7 @@ void UFloatingWeaponAttackState::Update(float DeltaTime)
 		return;
 	}
 
-	const float currentAngle = attack->CurrentAngle;
+	const float currentAngle = attack->GetCurrentAngle();
 
 	RelativeTransform = CalcAttackStateTransformOffset(attack, currentAngle);
 	

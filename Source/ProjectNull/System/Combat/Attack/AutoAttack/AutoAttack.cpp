@@ -9,7 +9,7 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
+#include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 
 
 
@@ -49,13 +49,6 @@ void UAutoAttack::Update(float DeltaTime)
 		ConeSlashParams->Update(DeltaTime);
 	}
 
-	for (auto& [Type, ConeSlashParams] : AutoAttackParamsMap)
-	{
-		if (!ConeSlashParams) { continue; }
-
-		if (!ConeSlashParams->IsActive()) { continue; }
-		ConeSlashParams->AttackJudge();
-	}
 }
 
 void UAutoAttack::StartAutoAttack()
@@ -65,7 +58,7 @@ void UAutoAttack::StartAutoAttack()
 	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front)
 		&& AutoAttackParamsMap[EAutoAttackType::Front])
 	{
-		AutoAttackParamsMap[EAutoAttackType::Front]->Start();	
+		AutoAttackParamsMap[EAutoAttackType::Front]->Execute();
 	}
 
 	// 前方扇状自動攻撃からの周囲攻撃遅延タイマーをセット
@@ -82,6 +75,6 @@ void UAutoAttack::StartAutoRingAttack()
 	if (AutoAttackParamsMap.Contains(EAutoAttackType::Ring)
 		&& AutoAttackParamsMap[EAutoAttackType::Ring])
 	{
-		AutoAttackParamsMap[EAutoAttackType::Ring]->Start();
+		AutoAttackParamsMap[EAutoAttackType::Ring]->Execute();
 	}
 }
