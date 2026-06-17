@@ -24,6 +24,7 @@
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 #include <ProjectNull/System/Material/PlayerMaterialCollectionUpdater/PlayerMaterialCollectionUpdater.h>
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
+#include <ProjectNull/Component/PlayerCutsceneComponent/PlayerCutsceneComponent.h>
 
 
 APlayerBase::APlayerBase():
@@ -65,6 +66,11 @@ APlayerBase::APlayerBase():
 	CineCameraComponent->SetupAttachment(SpringArmComponent);
 	CineCameraComponent->Deactivate();
 
+	/// ================================================================
+	// カットシーン再生用コンポーネントの初期化
+	//  ================================================================
+	CutsceneComponent = CreateDefaultSubobject<UPlayerCutsceneComponent>("Cutscene");
+
 	// ================================================================
 	// ギアコンポーネントの初期化
 	// ================================================================
@@ -98,6 +104,9 @@ void APlayerBase::BeginPlay()
 	// ================================================================
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Initialize(this); }
 
+	GetWorld()->GetFirstPlayerController()->InputComponent->BindKey(
+		EKeys::K, IE_Pressed, this, &APlayerBase::StartCutscene);
+
 	/*GetWorld()->GetTimerManager().SetTimer(
 		AlignFloorTimerHandle,
 		this,
@@ -120,7 +129,6 @@ void APlayerBase::Tick(float DeltaTime)
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
 
-
 	//AlignFloor();
 	
 }
@@ -129,6 +137,20 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	ACombatCharacterBase::SetupPlayerInputComponent(PlayerInputComponent);
 	
+}
+
+void APlayerBase::ApplyDamaged(float InDamage)
+{
+	auto GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
+
+	if (GameInstance&& GameInstance->GetPlayerRuntimeData())
+	{
+		auto PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+
+		PlayerRuntimeData->SubtractHealth(InDamage);
+
+		UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
+	}
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)
@@ -147,6 +169,12 @@ void APlayerBase::ChangeGear()
 {
 	if (!GearComponent) { return; }
 	GearComponent->ChangeGear();
+}
+
+void APlayerBase::StartCutscene()
+{
+	if (!CutsceneComponent) { return; }
+	CutsceneComponent->PlayCutscene();
 }
 
 int32 APlayerBase::GetCurrentGearLevel() const

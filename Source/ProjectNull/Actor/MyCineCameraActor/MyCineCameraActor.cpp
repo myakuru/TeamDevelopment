@@ -19,21 +19,11 @@ void AMyCineCameraActor::BeginPlay()
 
 void AMyCineCameraActor::PlayOpeningCutscene()
 {
-	ALevelSequenceActor* OutActor = nullptr;
-	FMovieSceneSequencePlaybackSettings Settings;
-	SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), OpeningSequence, Settings, OutActor);
-
-	if (SequencePlayer)
-	{
-		SequencePlayer->OnFinished.AddDynamic(this, &AMyCineCameraActor::OnOpeningCutsceneFinished);
-		SetActorTickEnabled(true);
-		SequencePlayer->Play();
-	}
 }
 
 void AMyCineCameraActor::OnOpeningCutsceneFinished()
 {
 	SetActorTickEnabled(false);
 
-	OnCutsceneFinished.Broadcast();
+	//OnCutsceneFinished.Broadcast();
 }

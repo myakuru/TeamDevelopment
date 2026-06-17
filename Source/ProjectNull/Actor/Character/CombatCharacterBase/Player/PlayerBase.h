@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "../CombatCharacterBase.h"
+#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
 #include "PlayerBase.generated.h"
 
 class USpringArmComponent;
@@ -21,9 +22,11 @@ class USuperGameInstance;
 class UPlayerAnimInstance;
 class UPlayerMaterialCollectionUpdater;
 class UCineCameraComponent;
+class UPlayerCutsceneComponent;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
+								  , public ICharacterInterface
 {
 	GENERATED_BODY()
 public:
@@ -38,6 +41,12 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/**
+	 * @brief ダメージを受ける
+	 * @param Damage 受けるダメージ量
+	 */
+	virtual void ApplyDamaged(float InDamage = 1.f)override;
+
+	/**
 	 * @brief 移動処理
 	 * @param InputVector 入力値
 	 */
@@ -48,6 +57,8 @@ public:
 	 */
 	void ChangeGear();
 
+	void StartCutscene();
+
 	/** Getter */
 	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
 	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
@@ -55,6 +66,7 @@ public:
 	inline UTargetSearchComponent*			GetTargetSearchComponent() const	{ return TargetSearchComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
 	inline UCineCameraComponent*			GetCineCameraComponent() const		{ return CineCameraComponent; }
+	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent() const	{ return CutsceneComponent; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
@@ -99,6 +111,10 @@ private:
 	/** プレイヤークラスからMaterial Parameter Collectionへの更新処理クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "MaterialCollection")
 	TObjectPtr<UPlayerMaterialCollectionUpdater> MaterialCollectionUpdater;
+
+	/** カットシーンの再生用 */
+	UPROPERTY(EditAnywhere, Instanced, Category = "Cutscene")
+	TObjectPtr<UPlayerCutsceneComponent> CutsceneComponent;
 
 	/** ゲーム全体で共有されるデータや機能を管理するクラス */
 	UPROPERTY()

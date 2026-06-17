@@ -16,49 +16,10 @@ ASurvivalGameMode::ASurvivalGameMode()
 void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OpeningCameraActor = Cast<AMyCineCameraActor>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), AMyCineCameraActor::StaticClass()));
-
-	if (!OpeningCameraActor) return;
-
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-
-	if (ARobotController* RC = Cast<ARobotController>(PC))
-	{
-		RC->SetCanReceiveInput(false);
-	}
-
-	if (PC)
-	{
-		PC->SetViewTargetWithBlend(OpeningCameraActor, TargetBlendSpeed);
-
-		// プレイヤーの初期位置をz+1000に設定
-		if (APlayerBase* Player = Cast<APlayerBase>(PC->GetPawn()))
-		{
-			PlayerLocation = Player->GetActorLocation();
-			Player->SetActorLocation(PlayerLocation);
-		}
-	}
-
-	OpeningCameraActor->OnCutsceneFinished.AddDynamic(this, &ASurvivalGameMode::OnCutsceneFinished);
-	OpeningCameraActor->PlayOpeningCutscene();
 }
 
 void ASurvivalGameMode::OnCutsceneFinished()
 {
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	APlayerBase* Player = PC ? Cast<APlayerBase>(PC->GetPawn()) : nullptr;
-
-	if (ARobotController* RC = Cast<ARobotController>(PC))
-	{
-		RC->SetCanReceiveInput(true);
-	}
-
-	if (PC && Player)
-	{
-		PC->SetViewTargetWithBlend(Player, TargetBlendSpeed);
-	}
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)

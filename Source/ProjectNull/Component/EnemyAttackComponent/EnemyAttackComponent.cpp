@@ -67,5 +67,5 @@ void UEnemyAttackComponent::TestActive()
 	if (EnemyAttacks.IsEmpty()) { return; }
 
 	// 試しに0番目の要素をアクティブ化
-	EnemyAttacks[0]->Execute();
+	EnemyAttacks[0]->SetCanExecute(true);
 }

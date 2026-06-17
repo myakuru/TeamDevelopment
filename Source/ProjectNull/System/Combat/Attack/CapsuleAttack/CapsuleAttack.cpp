@@ -2,6 +2,7 @@
 
 #include "Components\CapsuleComponent.h"
 
+#include <ProjectNull\Actor\CollisionActor\CapsuleCollision\CapsuleCollision.h>
 #include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
 
 UCapsuleAttack::UCapsuleAttack()
@@ -18,53 +19,61 @@ void UCapsuleAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 
 	// 攻撃用のCapsuleComponentを生成
 	{
-		AttackCapsule = NewObject<UCapsuleComponent>(InOwner);
+		CapsuleCollision = GetWorld()->SpawnActor<ACapsuleCollision>(SubCapsuleCollision);
+		if (!CapsuleCollision) { return; }
 
-		if (GetRootComponent())
+		// 攻撃用カプセル状アクターに親をアタッチ
+		CapsuleCollision->AttachToActor(
+			InOwner,
+			FAttachmentTransformRules::KeepRelativeTransform
+		);
+
+		// 指定したコリジョンチャンネルとそれに対応するレスポンスをセット
+		CapsuleCollision->SetCollisionResponseToChannnel(
+			CollisionChannel,
+			CollisionResponse
+		);
+		
+		if (auto CapsuleComponent = CapsuleCollision->GetCapsuleComponent())
 		{
-			AttackCapsule->SetupAttachment(GetRootComponent());
+			CapsuleComponent->OnComponentBeginOverlap.AddDynamic(
+				this,
+				&UCapsuleAttack::OnSphericalBeginOverlap
+			);
+			CapsuleComponent->OnComponentEndOverlap.AddDynamic(
+				this,
+				&UCapsuleAttack::OnSphericalEndOverlap
+			);
 		}
-		AttackCapsule->RegisterComponent();
-		AttackCapsule->SetCollisionResponseToChannel(
-			ECC_GameTraceChannel1,
-			ECR_Overlap
-		);
-		AttackCapsule->OnComponentBeginOverlap.AddDynamic(
-			this,
-			&UCapsuleAttack::OnSphericalBeginOverlap
-		);
-		AttackCapsule->OnComponentEndOverlap.AddDynamic(
-			this,
-			&UCapsuleAttack::OnSphericalEndOverlap
-		);
+
+		Cancel();
 	}
 }
 
 void UCapsuleAttack::Execute()
 {
-	if (!AttackCapsule) { return; }
+	if (!CapsuleCollision) { return; }
 
 	SetIsActive(true);		// 攻撃有効化
 	SetCanExecute(false);	// 攻撃実行不可にする
 	ElpsedTimer = 0.f;		// 経過時間をリセット
-	AttackCapsule->SetCollisionEnabled(ECollisionEnabled::QueryOnly);	// 当たり判定有効化
-	AttackCapsule->SetRelativeTransform(GetOffsetTransform());			// 初期Transformに設定
+	CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);	// 当たり判定有効化
+	CapsuleCollision->SetRelativeTransform(GetOffsetTransform());			// 初期Transformに設定
 }
 
 void UCapsuleAttack::Cancel()
 {
-	if (!AttackCapsule) { return; }
+	if (!CapsuleCollision) { return; }
 
 	SetIsActive(false);		// 攻撃無効化
-	SetCanExecute(true);	// 攻撃実行可にする
 	ElpsedTimer = 0.f;		// 経過時間をリセット
-	AttackCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
+	CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
 }
 
 void UCapsuleAttack::Update(float DeltaTime)
 {
 	// 有効時以外は処理しない
-	if (!IsActive() || !AttackCapsule) { return; }
+	if (!IsActive() || !CapsuleCollision) { return; }
 
 	UAttackBase::Update(DeltaTime);
 
@@ -73,6 +82,22 @@ void UCapsuleAttack::Update(float DeltaTime)
 	{
 		Cancel();
 		return;
+	}
+
+	if (auto CapsuleComponent = CapsuleCollision->GetCapsuleComponent())
+	{
+		DrawDebugCapsule(
+			GetWorld(),										// ワールドポインタ
+			CapsuleComponent->GetComponentLocation(),		// 中心座標
+			CapsuleComponent->GetScaledCapsuleHalfHeight(),	// 高さの半径
+			CapsuleComponent->GetScaledCapsuleRadius(),		// 半径
+			CapsuleComponent->GetComponentQuat(),			// 角度
+			FColor::Red,									// 色
+			false,											// 永続的に表示するか
+			1.f,											// 表示時間(負の値で1フレーム)
+			0,												// 優先度
+			2.f												// 線の太さ
+		);
 	}
 
 	ElpsedTimer += DeltaTime;
@@ -88,9 +113,7 @@ void UCapsuleAttack::OnSphericalBeginOverlap(
 )
 {
 	if (!OtherActor || !GetOwnerActor()
-		|| OtherActor == GetOwnerActor()) {
-		return;
-	}
+		|| OtherActor == GetOwnerActor()) { return; }
 
 	if (!GetHitActors().Contains(OtherActor))
 	{
@@ -112,9 +135,7 @@ void UCapsuleAttack::OnSphericalEndOverlap(
 )
 {
 	if (!OtherActor || !GetOwnerActor()
-		|| OtherActor == GetOwnerActor()) {
-		return;
-	}
+		|| OtherActor == GetOwnerActor()) { return; }
 
 	if (GetHitActors().Contains(OtherActor))
 	{
