@@ -63,7 +63,7 @@ public:
 	void UpdatePrevActiveFlg();
 
 	FVector CalcAttackDir(
-		const FVector& forwardVector,
+		const FVector& ForwardVector,
 		float Angle) const;
 
 
@@ -133,7 +133,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float RotationInterpSpeed;
-
-	UPROPERTY(EditAnywhere)
-	bool bIsDrawDebugLine;
 };

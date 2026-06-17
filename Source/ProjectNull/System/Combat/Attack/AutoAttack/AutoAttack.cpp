@@ -47,8 +47,6 @@ void UAutoAttack::Update(float DeltaTime)
 	{
 		if (!ConeSlashParams) { continue; }
 		ConeSlashParams->Update(DeltaTime);
-		/*if (!ConeSlashParams->IsActive()) { continue; }
-		ConeSlashParams->AttackJudge();*/
 	}
 
 }

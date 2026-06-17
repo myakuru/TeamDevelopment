@@ -33,15 +33,15 @@ void UFloatingWeaponStandState::Update(float DeltaTime)
 
 	RelativeTransform = StartTransformOffset;
 	Phase += Frequency * DeltaTime;
-	const float resultOffsetZ = FMath::Sin(Phase) * Amplitude;
+	const float ResultOffsetZ = FMath::Sin(Phase) * Amplitude;
 
-	const FVector currentLocation = Owner->GetRelativeTransform().GetLocation();
-	const FVector resultLocation = { currentLocation.X,
-									currentLocation.Y,
-									currentLocation.Z + resultOffsetZ };
+	const FVector CurrentLocation = Owner->GetRelativeTransform().GetLocation();
+	const FVector ResultLocation = { CurrentLocation.X,
+									CurrentLocation.Y,
+									CurrentLocation.Z + ResultOffsetZ };
 	//UE_LOG(LogTemp, Warning, TEXT("resultOffsetZ %.2f"), resultOffsetZ);
 
-	RelativeTransform.SetLocation(resultLocation);
+	RelativeTransform.SetLocation(ResultLocation);
 
 	if (IsFinishedTransitionState())
 	{

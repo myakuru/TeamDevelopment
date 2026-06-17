@@ -18,8 +18,7 @@ UFloatingWeaponAttack::UFloatingWeaponAttack():
 	bPrevActive(false),
 	CurrentAngle(0.0f),
 	KnockbackPower(2.0f),
-	StartAngle(0.0f),
-	bIsDrawDebugLine(false)
+	StartAngle(0.0f)
 {
 
 }
@@ -28,19 +27,29 @@ void UFloatingWeaponAttack::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	Super::Initialize(Owner);
 
-	AutoAttackHitActor = GetWorld()->SpawnActor<AAutoAttackHitActor>(AutoAttackHitActorClass);
-	if (!AutoAttackHitActor) { return; }
+	// 自身のRootは持ち主のクラスのRootにアタッチ済み
 
-	AutoAttackHitActor->AttachToActor(
-		Owner,
+	// 自動攻撃の当たり判定アクターを出現
+	AutoAttackHitActor = GetWorld()->SpawnActor<AAutoAttackHitActor>
+		(AutoAttackHitActorClass);
+
+	// 自身のRoot取得
+	const auto RootComp = GetRootComponent();
+	if (!RootComp)				{ return; }
+
+	if (!AutoAttackHitActor)	{ return; }
+
+	// 自動攻撃の当たり判定アクターを
+	AutoAttackHitActor->AttachToComponent(
+		RootComp,
 		FAttachmentTransformRules::KeepRelativeTransform);
 
-	if (!FloatingWeaponEffect) { return; }
+	if (!FloatingWeaponEffect)	{ return; }
 	
 	FloatingWeaponEffect->SetOwnerAttack(this);
 	FloatingWeaponEffect->SetOwnerActor(Owner);
 	FloatingWeaponEffect->Initialize();
-	FloatingWeaponEffect->Start(Owner->GetRootComponent());
+	FloatingWeaponEffect->Start(RootComp);
 	
 }
 
@@ -49,7 +58,7 @@ void UFloatingWeaponAttack::Update(float DeltaTime)
 	AlignFloor(DeltaTime);
 	
 	UpdateRotation(DeltaTime);
-
+	
 	if (FloatingWeaponEffect) {
 		FloatingWeaponEffect->Update(DeltaTime);
 	}
@@ -62,17 +71,19 @@ void UFloatingWeaponAttack::Execute()
 
 	SetIsActive(true);
 	CurrentAngle = StartAngle;
-	ElapsedTime = 0.0f;
+	ElapsedTime	= 0.0f;
 
 	if (!AutoAttackHitActor) { return; }
 	AutoAttackHitActor->SetHitEnabled(true);
 
-	//if (!FloatingWeaponEffect) { return; }
+	// 自身のRoot取得
+	const auto RootComp = GetRootComponent();
+	if (!RootComp) { return; }
 
-	for (TObjectPtr<UEffectBase> SlashEffect : SlashEffectArray)
+	for (auto& SlashEffect : SlashEffectArray)
 	{
 		if (!SlashEffect) { continue; }
-		SlashEffect->Start(Owner->GetRootComponent());
+		SlashEffect->Start(RootComp);
 	}
 }
 
@@ -98,13 +109,12 @@ float UFloatingWeaponAttack::StandStateTime()
 	if (!AutoAttack) { return ResultTime; }
 	const float Interval = AutoAttack->GetAutoAttackInterval();
 	ResultTime = (Interval - Duration) * StandTimeRatio;
-
 	return ResultTime;
 }
 
-FVector UFloatingWeaponAttack::CalcAttackDir(const FVector& forwardVector, float Angle) const
+FVector UFloatingWeaponAttack::CalcAttackDir(const FVector& ForwardVector, float Angle) const
 {
-	return forwardVector.RotateAngleAxis(Angle, FVector::UpVector);
+	return ForwardVector.RotateAngleAxis(Angle, FVector::UpVector);
 }
 
 bool UFloatingWeaponAttack::CanDeactivate()
@@ -128,7 +138,6 @@ void UFloatingWeaponAttack::UpdatePrevActiveFlg()
 {
 	bPrevActive = IsActive();
 }
-
 
 void UFloatingWeaponAttack::UpdateRotation(float DeltaTime)
 {
@@ -166,7 +175,8 @@ void UFloatingWeaponAttack::AlignFloor(float DeltaTime)
 	if (!Player->GetCurrentFloorNormal(FloorNormal)) { return; }
 
 	const FQuat TargetQuat = UGroundUtility::MakeRotationFromGroundNormal(
-		RootComp->GetComponentTransform(),
+		//RootComp->GetComponentTransform(),
+		Player->GetActorTransform(),
 		FloorNormal);
 
 	const FQuat NewQuat = FQuat::Slerp(
