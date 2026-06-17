@@ -95,6 +95,8 @@ void USTT_EnemyKnockBack::SetKnockBackData()
 
 	// 水平方向(移動方向を反転)
 	FVector HorizontalDir = -MoveDir;
+	HorizontalDir.Z = 0;
+	HorizontalDir.Normalize();
 
 	// 吹き飛び角度
 	const float Rad = FMath::DegreesToRadians(KnockBackData->LaunchAngleDeg);

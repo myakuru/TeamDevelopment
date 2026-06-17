@@ -32,7 +32,7 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
 	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(static_cast<uint32>(EEnemyState::Death), true, true);
 
-	return EStateTreeRunStatus::Running;
+	return EStateTreeRunStatus::Succeeded;
 }
 
 EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)
@@ -42,10 +42,10 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 	Super::Tick(a_Context, a_DeltaTime);
 
 	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
-	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
+	/*if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
 	{
 		return EStateTreeRunStatus::Succeeded;
-	}
+	}*/
 
 	return EStateTreeRunStatus::Running;
 }

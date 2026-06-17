@@ -5,8 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
-#include "../../../../System/Interface/CharacterInterface/CharacterInterface.h"
-#include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
+#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
@@ -182,7 +181,7 @@ public:
 	//~ End Getter
 
 	/* Begin Character Interface.*/
-	virtual void ApplyDamaged(float a_Damage = 1.f)override;
+	virtual void ApplyDamaged(float InDamaged = 1.f)override;
 
 	/* End Character Interface.*/
 

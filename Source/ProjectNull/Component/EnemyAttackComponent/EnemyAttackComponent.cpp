@@ -44,6 +44,16 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	}
 }
 
+void UEnemyAttackComponent::AllAtackDeactivate()
+{
+	if (EnemyAttacks.IsEmpty()) { return; }
+
+	for (auto& Attack : EnemyAttacks)
+	{
+		Attack->Cancel();
+	}
+}
+
 bool UEnemyAttackComponent::IsAllAttackDeactivate()
 {
 	bool bIsAllDeactive = true;
