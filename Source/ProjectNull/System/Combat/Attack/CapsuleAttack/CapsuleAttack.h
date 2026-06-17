@@ -4,6 +4,7 @@
 #include "../AttackBase.h"
 #include "CapsuleAttack.generated.h"
 
+/** カプセル状の当たり判定を持つアクタークラス */
 class ACapsuleCollision;
 
 /**
