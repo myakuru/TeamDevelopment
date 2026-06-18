@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "../CombatCharacterBase.h"
+#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
 #include "PlayerBase.generated.h"
 
 class USpringArmComponent;
@@ -21,9 +22,11 @@ class USuperGameInstance;
 class UPlayerAnimInstance;
 class UPlayerMaterialCollectionUpdater;
 class UCineCameraComponent;
+class UPlayerCutsceneComponent;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
+								  , public ICharacterInterface
 {
 	GENERATED_BODY()
 public:
@@ -38,6 +41,12 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/**
+	 * @brief ダメージを受ける
+	 * @param Damage 受けるダメージ量
+	 */
+	virtual void ApplyDamaged(float InDamage = 1.f)override;
+
+	/**
 	 * @brief 移動処理
 	 * @param InputVector 入力値
 	 */
@@ -48,6 +57,8 @@ public:
 	 */
 	void ChangeGear();
 
+	void StartCutscene();
+
 	/** Getter */
 	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
 	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
@@ -55,6 +66,7 @@ public:
 	inline UTargetSearchComponent*			GetTargetSearchComponent() const	{ return TargetSearchComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
 	inline UCineCameraComponent*			GetCineCameraComponent() const		{ return CineCameraComponent; }
+	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent() const	{ return CutsceneComponent; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
@@ -67,10 +79,6 @@ private:
 	 * @return 動けるならtrue 動けないならfalse
 	 */
 	bool CanMove();
-
-	void AlignFloor();
-
-	FTimerHandle AlignFloorTimerHandle;
 
 	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
@@ -100,33 +108,11 @@ private:
 	UPROPERTY(EditAnywhere, Instanced, Category = "MaterialCollection")
 	TObjectPtr<UPlayerMaterialCollectionUpdater> MaterialCollectionUpdater;
 
+	/** カットシーンの再生用 */
+	UPROPERTY(EditAnywhere, Instanced, Category = "Cutscene")
+	TObjectPtr<UPlayerCutsceneComponent> CutsceneComponent;
+
 	/** ゲーム全体で共有されるデータや機能を管理するクラス */
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
-
-	UPROPERTY()
-	FVector CurrentGroundNormal = FVector::UpVector;
-
-	UPROPERTY(EditAnywhere)
-	float GroundTraceLength = 200.0f;
-
-	UPROPERTY(EditAnywhere)
-	float NormalInterpSpeed = 10.0f;
-
-	UPROPERTY(EditAnywhere)
-	float RotationInterpSpeed = 8.0f;
-
-	UPROPERTY(EditAnywhere)
-	float MaxGroundAngle = 45.f;
-	UPROPERTY(EditAnywhere)
-	float EnterGroundAngle = 45.f;
-
-	UPROPERTY(EditAnywhere)
-	float ExitGroundAngle = 50.f;
-
-	UPROPERTY(EditAnywhere)
-	float SlideSpeed = 1500.f;
-
-	UPROPERTY()
-	float CurrentGroundTraceLength = 1500.f;
 };

@@ -44,6 +44,16 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	}
 }
 
+void UEnemyAttackComponent::AllAtackDeactivate()
+{
+	if (EnemyAttacks.IsEmpty()) { return; }
+
+	for (auto& Attack : EnemyAttacks)
+	{
+		Attack->Cancel();
+	}
+}
+
 bool UEnemyAttackComponent::IsAllAttackDeactivate()
 {
 	bool bIsAllDeactive = true;
@@ -67,5 +77,5 @@ void UEnemyAttackComponent::TestActive()
 	if (EnemyAttacks.IsEmpty()) { return; }
 
 	// 試しに0番目の要素をアクティブ化
-	EnemyAttacks[0]->Execute();
+	EnemyAttacks[0]->SetCanExecute(true);
 }

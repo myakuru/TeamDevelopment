@@ -1,7 +1,10 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+
 #include "../../State/GearStateBase.h"
+
+
 #include "DashGearStateBase.generated.h"
 
 /** ナイアガラシステムクラス */

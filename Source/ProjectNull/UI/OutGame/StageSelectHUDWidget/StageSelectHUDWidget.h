@@ -10,7 +10,7 @@ class UTextBlock;
 class UImage;
 class UTexture2D;
 class UStageButtonWidget;
-class UButton;
+class UReturnButtonWidget;
 
 /**
  * ステージセレクト画面のHUDWidget
@@ -34,7 +34,7 @@ protected:
 	void OnHoveredStageButton(int32 InStageIndex);
 
 	UFUNCTION()
-	void OnClickedReturnButton();
+	void OpenCurrentSelectedStageLevel();
 
 	/** ステージ番号をクランプ */
 	UFUNCTION(BlueprintCallable, Category = "UI")
@@ -119,5 +119,15 @@ protected:
 
 	/** 戻るボタン */
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> ReturnButton;
+	TObjectPtr<UReturnButtonWidget> ReturnButton;
+
+	/** アニメーション */
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> FadeAnim;
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> BackAnim;
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> MissionAnim;
 };

@@ -1,22 +1,22 @@
 ﻿#include "EnemyBase.h"
 #include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "Components/StateTreeComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Utility/StateMachine/StateMachine.h>
+#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
-#include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
-#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -180,19 +180,19 @@ void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
 	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
 }
 
-void AEnemyBase::ApplyDamaged(float a_Damage)
+void AEnemyBase::ApplyDamaged(float InDamaged)
 {
 	// 渡された値分、FinalHPを減算
-	EnemyRuntimeData->AddHealth(-a_Damage);
+	EnemyRuntimeData->AddHealth(-InDamaged);
 	OnHit();
 
 	// 体力が0以下なら死亡フラグを立てる
-	/*if (EnemyRuntimeData->GetHealth() <= 0)
+	if (EnemyRuntimeData->GetHealth() <= 0)
 	{
 		EnemyStatus.IsAlive = false;
 		EnemyRuntimeData->ChangedIsAlive(EnemyStatus.IsAlive);
 		OnDeath();
-	}*/
+	}
 }
 
 void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime)

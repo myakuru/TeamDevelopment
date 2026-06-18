@@ -4,13 +4,13 @@
 #include "../AttackBase.h"
 #include "CapsuleAttack.generated.h"
 
-// カプセルコンポーネント
-class UCapsuleComponent;
+/** カプセル状の当たり判定を持つアクタークラス */
+class ACapsuleCollision;
 
 /**
  * カプセルを持った攻撃クラス
  */
-UCLASS()
+UCLASS(Blueprintable,EditInlineNew)
 class PROJECTNULL_API UCapsuleAttack : public UAttackBase
 {
 	GENERATED_BODY()
@@ -72,10 +72,28 @@ private:
 private:
 
 	/**
-	 * @brief カプセル状の当たり判定コンポーネント
+	 * @brief デフォルトエディタ側でされるようにする
 	 */
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UCapsuleComponent> AttackCapsule;
+	TSubclassOf<ACapsuleCollision> SubCapsuleCollision;
+
+	/**
+	 * @brief カプセル状の当たり判定コンポーネント
+	 */
+	UPROPERTY()
+	TObjectPtr<ACapsuleCollision> CapsuleCollision;
+
+	/**
+	* @brief 判定させたいコリジョンチャンネル
+	*/
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
+
+	/**
+	 * @brief 指定したコリジョンチャンネルに対するレスポンス
+	 */
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<ECollisionResponse> CollisionResponse;
 
 	/**
 	 * @brief 攻撃の継続時間

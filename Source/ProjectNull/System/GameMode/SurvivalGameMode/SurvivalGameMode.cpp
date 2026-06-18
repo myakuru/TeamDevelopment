@@ -4,7 +4,6 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
-#include <ProjectNull/Actor/MyCineCameraActor/MyCineCameraActor.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
@@ -16,49 +15,6 @@ ASurvivalGameMode::ASurvivalGameMode()
 void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OpeningCameraActor = Cast<AMyCineCameraActor>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), AMyCineCameraActor::StaticClass()));
-
-	if (!OpeningCameraActor) return;
-
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-
-	if (ARobotController* RC = Cast<ARobotController>(PC))
-	{
-		RC->SetCanReceiveInput(false);
-	}
-
-	if (PC)
-	{
-		PC->SetViewTargetWithBlend(OpeningCameraActor, TargetBlendSpeed);
-
-		// プレイヤーの初期位置をz+1000に設定
-		if (APlayerBase* Player = Cast<APlayerBase>(PC->GetPawn()))
-		{
-			PlayerLocation = Player->GetActorLocation();
-			Player->SetActorLocation(PlayerLocation);
-		}
-	}
-
-	OpeningCameraActor->OnCutsceneFinished.AddDynamic(this, &ASurvivalGameMode::OnCutsceneFinished);
-	OpeningCameraActor->PlayOpeningCutscene();
-}
-
-void ASurvivalGameMode::OnCutsceneFinished()
-{
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	APlayerBase* Player = PC ? Cast<APlayerBase>(PC->GetPawn()) : nullptr;
-
-	if (ARobotController* RC = Cast<ARobotController>(PC))
-	{
-		RC->SetCanReceiveInput(true);
-	}
-
-	if (PC && Player)
-	{
-		PC->SetViewTargetWithBlend(Player, TargetBlendSpeed);
-	}
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)

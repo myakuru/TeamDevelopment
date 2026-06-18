@@ -5,8 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
-#include "../../../../System/Interface/CharacterInterface/CharacterInterface.h"
-#include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
+#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
@@ -177,36 +176,12 @@ public:
 		return GameProgress;
 	}
 
-	/**
-	 * @brief 汎用的なEnumビット(uint8型)上昇処理
-	 * @tparam T クラス(Enum Class名etc)
-	 * @param a_currentBit  元のBit
-	 * @param a_targetBit	上げたいBit
-	 */
-	template<typename T>
-	void UpEnumBit(uint8 a_CurrentBit, T a_TargetBit)
-	{
-		a_CurrentBit |= static_cast<uint8>(a_TargetBit);
-	}
-
-	/**
-	 * @brief 汎用的なEnumビット(uint8型)下降処理
-	 * @tparam T クラス(Enum Class名etc)
-	 * @param a_currentBit  元のBit
-	 * @param a_targetBit	下げたいBit
-	 */
-	template<typename T>
-	void DownEnumBit(uint8 a_CurrentBit, T a_TargetBit)
-	{
-		a_CurrentBit &= ~static_cast<uint8>(a_TargetBit);
-	}
-
 	bool GetAliveFlg() { return EnemyStatus.IsAlive; }
 
 	//~ End Getter
 
 	/* Begin Character Interface.*/
-	virtual void ApplyDamaged(float a_Damage = 1.f)override;
+	virtual void ApplyDamaged(float InDamaged = 1.f)override;
 
 	/* End Character Interface.*/
 
@@ -334,9 +309,6 @@ public:
 	void SetAnimSequence(UAnimSequence* InAnimSequence, bool LoopFlg);
 
 public:
-
-	/** アニメーション*/
-	//void PlayAnimationMontage();
 
 
 	/** ISMのどのインスタンスに対応するかを示すインデックス*/

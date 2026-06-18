@@ -4,8 +4,8 @@
 #include "../AttackBase.h"
 #include "SphericalAttack.generated.h"
 
-/** 球状の当たり判定コンポーネント */
-class USphereComponent;
+/** 球状の当たり判定を持つアクタークラス */
+class ASphereCollision;
 
 /**
  * 球状の攻撃判定を行うクラス
@@ -72,10 +72,28 @@ private:
 private:
 
 	/**
-	 * @brief 球状の当たり判定コンポーネント
+	 * @brief デフォルトエディタ側でされるようにする
 	 */
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USphereComponent> AttackSphere;
+	TSubclassOf<ASphereCollision> SubSphereCollision;
+
+	/**
+	 * @brief 球状の当たり判定アクター
+	 */
+	UPROPERTY()
+	TObjectPtr<ASphereCollision> SphereCollision;
+
+	/**
+	* @brief 判定させたいコリジョンチャンネル
+	*/
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
+
+	/**
+	 * @brief 指定したコリジョンチャンネルに対するレスポンス
+	 */
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<ECollisionResponse> CollisionResponse;
 
 	/**
 	 * @brief 攻撃の継続時間

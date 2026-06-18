@@ -98,19 +98,19 @@ private:
 
 	/** 基準とする攻撃クラス */
 	UPROPERTY()
-	UFloatingWeaponAttack* OwnerAttack;
+	TObjectPtr<UFloatingWeaponAttack> OwnerAttack;
 
 	/** 持ち主のクラス */
 	UPROPERTY()
-	AActor* OwnerActor;
+	TObjectPtr<AActor> OwnerActor;
 
 	/** Niagaraシステム */
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* EffectSystem;
+	TObjectPtr<UNiagaraSystem> EffectSystem;
 
 	/** Niagaraコンポーネント */
 	UPROPERTY()
-	UNiagaraComponent* EffectComponent;
+	TObjectPtr<UNiagaraComponent> EffectComponent;
 
 	/** エフェクトのRelativeTransform */
 	UPROPERTY()
@@ -118,10 +118,10 @@ private:
 
 	/** 浮遊武器の状態の配列 */
 	UPROPERTY(EditAnywhere, Instanced)
-	TMap<EFloatingWeaponState,UFloatingWeaponStateBase*> States;
+	TMap<EFloatingWeaponState, TObjectPtr<UFloatingWeaponStateBase>> States;
 
 	/** 現在の浮遊武器状態 */
 	UPROPERTY()
-	UFloatingWeaponStateBase* CurrentState;
+	TObjectPtr<UFloatingWeaponStateBase> CurrentState;
 
 };

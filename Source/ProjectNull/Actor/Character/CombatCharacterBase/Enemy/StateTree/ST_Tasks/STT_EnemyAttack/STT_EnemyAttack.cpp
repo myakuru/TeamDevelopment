@@ -26,9 +26,7 @@ EStateTreeRunStatus USTT_EnemyAttack::EnterState(FStateTreeExecutionContext& a_C
 	// 前ステートの終了フラグをリセット
 	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
 	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(static_cast<uint32>(EEnemyState::Attack), true, true);
-
-	OwnerEnemy->PlayAnimation(static_cast<uint32>(EEnemyState::Attack), true);
+	OwnerEnemy->PlayAnimation(static_cast<uint32>(EEnemyState::Attack), false);
 
 	if (auto AttackComponent = OwnerEnemy->GetEnemyAttackComponent())
 	{
@@ -48,12 +46,21 @@ EStateTreeRunStatus USTT_EnemyAttack::Tick(FStateTreeExecutionContext& a_Context
 
 	if (auto AttackComponent = OwnerEnemy->GetEnemyAttackComponent())
 	{
+		// 攻撃以外のステートに切り替わったか
+		if (OwnerEnemy->GetEnemyState() != EEnemyState::Attack)
+		{
+			// 攻撃を全て終了
+			AttackComponent->AllAtackDeactivate();
+			return EStateTreeRunStatus::Succeeded;
+		}
+
 		// 攻撃全てが終了しているか
 		if (AttackComponent->IsAllAttackDeactivate())
 		{
 			return EStateTreeRunStatus::Succeeded;
 		}
 	}
+
 
 	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
 	/*if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())

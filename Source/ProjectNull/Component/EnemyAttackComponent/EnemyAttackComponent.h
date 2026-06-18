@@ -39,6 +39,11 @@ public:
 public:
 
 	/**
+	 * @brief 全ての攻撃終了
+	 */
+	void AllAtackDeactivate();
+
+	/**
 	 * @brief 全ての攻撃が終了しているか
 	 * @return 終了しているならtrue
 	 */
