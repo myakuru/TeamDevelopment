@@ -291,11 +291,6 @@ public:
 
 protected:
 
-	/**
-	 * @brief 坂道範囲内に入った時の通知処理
-	 */
-	virtual void OnEnterSlope()/*override*/;
-
 	float AnimFinishTime = 0.0f;
 
 public:

@@ -16,6 +16,16 @@ void UEnemyRuntimeData::SetNextAnimData(int32 NextIndex, bool RoopFlg, bool Chan
 	AnimChangeFlg = ChangeFlg;
 }
 
+void UEnemyRuntimeData::SetFinalHP(float InFinalHP)
+{
+	Health.Max = Health.Current = InFinalHP;
+}
+
+void UEnemyRuntimeData::SetFinalAttack(float InFinalAttack)
+{
+	Attack.Final = InFinalAttack;
+}
+
 void UEnemyRuntimeData::UpdateAnimation(float DeltaTime, float BlendSpeed)
 {
 	/* 備忘録 */

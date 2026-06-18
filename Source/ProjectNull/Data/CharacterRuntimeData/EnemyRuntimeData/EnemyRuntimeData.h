@@ -70,6 +70,18 @@ public:
 	/*			次のアニメーションのインデックス, ループフラグ,アニメーションチェンジフラグ*/
 	void SetNextAnimData(int32 NextIndex, bool AnimRoopFlg, bool AnimChangeFlg);
 
+	/**
+	 * @brief 最終的なHP
+	 * @param InFinalHP 計算後の最終HP
+	 */
+	void SetFinalHP(float InFinalHP);
+
+	/**
+	 * @brief 最終的な攻撃力
+	 * @param InFinalAttack 計算後の最終攻撃力
+	 */
+	void SetFinalAttack(float InFinalAttack);
+
 	void NotifyAnimFinished() { bAnimFinished = true; }
 	void ResetAnimFinished() { bAnimFinished = false; }
 
