@@ -41,12 +41,12 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 	Super::Tick(a_Context, a_DeltaTime);
 
 	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
-	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
+	/*if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
 	{
 		return EStateTreeRunStatus::Succeeded;
-	}
+	}*/
 
-	return EStateTreeRunStatus::Running;
+	return EStateTreeRunStatus::Succeeded;
 }
 
 void USTT_EnemyDead::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)

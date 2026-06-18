@@ -39,7 +39,8 @@ void UPlayerGearComponent::BeginPlay()
 	PlayerRuntimeData	= SuperGameInstance->GetPlayerRuntimeData();
 	if (!PlayerRuntimeData)		{ return; }
 
-	
+	InitializeSphereCollision();
+
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
 		if (!PlayerGears[Index]) { continue; }
@@ -55,6 +56,7 @@ void UPlayerGearComponent::TickComponent(
 	ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
+	
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	UpdateGearWidget(DeltaTime);
@@ -65,6 +67,9 @@ void UPlayerGearComponent::TickComponent(
 	}
 
 	UpdateCollisionByInvincibility();
+
+	if (!PlayerRuntimeData) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("hi IsInvincible %d"), PlayerRuntimeData->IsInvincible());
 
 }
 
@@ -103,9 +108,10 @@ void UPlayerGearComponent::ChangeGear()
 
 	PlayerRuntimeData->CalculateInvincibilityTime(GearParameterData);
 	CurrentGearLevel = (CurrentGearLevel % 4 + 1);
-	//UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
+	UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
 
 	OnInvincibilityStart();
+
 }
 
 void UPlayerGearComponent::OnGearBeginOverlap(
@@ -221,6 +227,7 @@ void UPlayerGearComponent::UpdateCollisionByInvincibility()
 		!PlayerRuntimeData)					{ return; }
 
 	if (!PlayerRuntimeData->IsInvincible()) { return; }
+	//UE_LOG(LogTemp, Warning, TEXT("hi addmove"));
 	
 	const FRotator	YawRotation	= { 0.f, OwnerPlayer->GetControlRotation().Yaw, 0.f };
 	const FVector	Forward		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
