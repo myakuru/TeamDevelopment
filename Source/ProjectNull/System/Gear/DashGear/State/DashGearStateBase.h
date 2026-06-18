@@ -2,8 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "../../State/GearStateBase.h"
-
+#include <ProjectNull/System/Gear/State/GearStateBase.h>
 
 #include "DashGearStateBase.generated.h"
 
