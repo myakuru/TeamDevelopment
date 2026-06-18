@@ -254,9 +254,6 @@ public:
 	int32 GetUpgradeLevel(FName Id) const;
 
 private:
-
-	
-
 	/**
 	 * @brief HPの更新処理
 	 * @param NewHealth 初期値はPlayerParameterDataから受け取る。
@@ -273,8 +270,6 @@ private:
 	 * @brief 最終的な速度計算処理
 	 */
 	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
-
-	
 
 	/**
 	 * @brief 計算済みの速度をCharacterMovementに適用する
