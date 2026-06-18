@@ -1,8 +1,11 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+
 #include "../CombatCharacterBase.h"
-#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
+
+#include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
+
 #include "PlayerBase.generated.h"
 
 class USpringArmComponent;
@@ -15,6 +18,9 @@ class USphereComponent;
 
 /** 対象検索コンポーネント */
 class UTargetSearchComponent;
+
+/** ヒットストップを行う用のコンポーネント*/
+class UHitStopComponent;
 
 class UAttackBase;
 class UAutoAttack;
@@ -64,6 +70,7 @@ public:
 	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
 	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
 	inline UTargetSearchComponent*			GetTargetSearchComponent() const	{ return TargetSearchComponent; }
+	inline UHitStopComponent*				GetHitStopComponent() const			{ return HitStopComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
 	inline UCineCameraComponent*			GetCineCameraComponent() const		{ return CineCameraComponent; }
 	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent() const	{ return CutsceneComponent; }
@@ -99,6 +106,10 @@ private:
 	/** 対象検索コンポーネント */
 	UPROPERTY(VisibleAnywhere, Category = "TargetSearch")
 	TObjectPtr<UTargetSearchComponent> TargetSearchComponent;
+
+	/** ヒットストップを行う用のコンポーネント*/
+	UPROPERTY(VisibleAnywhere, Category = "HitStopComponent")
+	TObjectPtr<UHitStopComponent> HitStopComponent;
 
 	/** 自動攻撃クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")

@@ -8,25 +8,30 @@ class UGearBase;
 
 class APlayerBase;
 
+class UPlayerRuntimeData;
+
+class UPlayerParameterData;
+
+class ASphereCollision;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTNULL_API UPlayerGearComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
 public:	
 	UPlayerGearComponent();
-
 protected:
 	virtual void BeginPlay() override;
-
 public:	
 	/** 最大ギアレベル */
 	static constexpr int32 kMaxGearLevel = 4;
 
 	static constexpr int32 kMaxGearNum = 3;
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(
+		float DeltaTime,
+		ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool IsMovementBlockedByGear() const;
 
@@ -42,7 +47,26 @@ public:
 
 private:
 
-	void SetIsInvincible(bool SetFlg);
+	UFUNCTION()
+	void OnGearBeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	/**
+	 * @brief 無敵時間用スフィア判定初期化
+	 */
+	void InitializeSphereCollision();
+
+
+	void UpdateSkillCooldown(
+		int32 Index,
+		UGearBase* Gear);
+
+	void SetIsInvincible(bool bInIsInvincible);
 
 	bool CanChangeGear() const;
 
@@ -61,19 +85,34 @@ private:
 	 */
 	void UpdateCollisionByInvincibility();
 
+
 	void UpdateGearWidget(float DeltaTime);
 
 	UPROPERTY()
 	TObjectPtr<APlayerBase> OwnerPlayer;
 
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+
+	UPROPERTY()
+	TObjectPtr<UPlayerParameterData> PlayerParameterData;
+
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<TObjectPtr<UGearBase>> PlayerGears;
 
+	UPROPERTY()
+	TObjectPtr<ASphereCollision> SphereCollision;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ASphereCollision> SphereCollisionClass;
+
+	/** 現在のギアレベル */
 	UPROPERTY(EditAnywhere)
 	int32 CurrentGearLevel;
+
 
 	/** ギアチェンジによる無敵時間ハンドル */
 	FTimerHandle InvincibilityTimerHandle;
 
-	float ffff = 20.0f;
+
 };
