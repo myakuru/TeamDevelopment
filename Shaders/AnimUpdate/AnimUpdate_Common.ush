@@ -17,20 +17,20 @@
 
 struct FAnimChangeRequest
 {
-    int NextAnimIndex; // 次のアニメインデックス
-    float BlendSpeed; // ブレンド速度
-    int bLooping; // ループフラグ
-    int InstanceIndex; // 対象インスタンス
+    int     NextAnimIndex; // 次のアニメインデックス
+    float   BlendSpeed; // ブレンド速度
+    int     bLooping; // ループフラグ
+    int     InstanceIndex; // 対象インスタンス
 };
 
 struct FGPUAnimState
 {
-    float AnimTime;
-    float PrevAnimTime;
-    float NextAnimTime;
-    float BlendWeight;
-    int AnimIndex;
-    int NextAnimIndex;
-    int Flags;
-    float BlendSpeed;
+    float   AnimTime;
+    float   PrevAnimTime;
+    float   NextAnimTime;
+    float   BlendWeight;
+    int     AnimIndex;
+    int     NextAnimIndex;
+    int     Flags;
+    float   BlendSpeed;
 };

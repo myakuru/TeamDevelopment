@@ -26,10 +26,6 @@ public:
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition);
 	virtual	void ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)override;
 
-	/** 選択されている攻撃パターン*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	FBossAttackPattern CurrentAttack;
-
 	/**	 プレイヤーの方向を向いたらtrueにして攻撃モンタージュを開始する*/
 	bool bMontageStarted = false;
 

@@ -1,9 +1,11 @@
 ﻿
 #include "DashGearStateBase.h"
 
-#include <ProjectNull/System/Gear/GearBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+
+#include <ProjectNull/System/Gear/GearBase.h>
+#include <ProjectNull/System/Gear/DashGear/DashGear.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
@@ -24,14 +26,20 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 {
 	UGearStateBase::Execute(CurrentGearLevel);
 
+	
+
 	PlayDashEffect();
 
 	if (!Player) { return; }
-
 	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
-	if (!PlayerAnimInstance) { return; }
 
+	if (!PlayerAnimInstance) { return; }
 	PlayerAnimInstance->Montage_Play(DashAnimMontage);
+
+	auto DashGear = Cast<UDashGear>(Owner);
+	if (!DashGear) { return; }
+
+	DashGear->SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
 }
 
@@ -45,10 +53,16 @@ void UDashGearStateBase::Update(float DeltaTime)
 void UDashGearStateBase::End()
 {
 	if (!Player) { return; }
+
 	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
 	if (!PlayerAnimInstance) { return; }
 
 	PlayerAnimInstance->Montage_Stop(0.2f);
+
+	auto DashGear = Cast<UDashGear>(Owner);
+	if (!DashGear) { return; }
+
+	DashGear->SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void UDashGearStateBase::Dash()
@@ -120,37 +134,7 @@ void UDashGearStateBase::UpdateDashAttack()
 {
 	if (!Player) { return; }
 
-	const FVector PlayerLocation = Player->GetActorLocation();
-
-	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!enemyManager) { return; }
-
-	for (const auto& enemy : enemyManager->GetEnemyList())
-	{
-		if (!enemy) { continue; }
-
-		const float DistSq = FVector::DistSquared(PlayerLocation, enemy->GetActorLocation());
-
-		if (DistSq <= DashAttackRangeSquared)
-		{
-			// キャラクターインターフェースを実装しているか
-			if (auto* interface = Cast<ICharacterInterface>(enemy))
-			{
-				interface->ApplyDamaged();
-				interface->ApplyKnockBack(PlayerLocation);
-			}
-		}
-	}
-
-	//DrawDebugSphere(
-	//	GetWorld(),
-	//	Player->GetActorLocation(),
-	//	FMath::Sqrt(DashAttackRangeSquared),
-	//	16,
-	//	FColor::Green,
-	//	false,
-	//	0.1f
-	//);
+	
 }
 
 
