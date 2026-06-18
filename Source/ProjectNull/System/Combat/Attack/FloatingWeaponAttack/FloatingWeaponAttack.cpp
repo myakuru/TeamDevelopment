@@ -70,8 +70,8 @@ void UFloatingWeaponAttack::Execute()
 	if (!Owner) { return; }
 
 	SetIsActive(true);
-	CurrentAngle = StartAngle;
-	ElapsedTime	= 0.0f;
+	CurrentAngle	= StartAngle;
+	ElapsedTime		= 0.0f;
 
 	if (!AutoAttackHitActor) { return; }
 	AutoAttackHitActor->SetHitEnabled(true);
@@ -163,23 +163,24 @@ void UFloatingWeaponAttack::UpdateRotation(float DeltaTime)
 
 void UFloatingWeaponAttack::AlignFloor(float DeltaTime)
 {
-	if (!AbsoluteRotation()) { return; }
+	auto RootComp	= GetRootComponent();
+	if (!RootComp)										{ return; }
 
-	auto RootComp = GetRootComponent();
-	if (!RootComp) { return; }
-
-	auto Player = Cast<APlayerBase>(GetOwnerActor());
-	if (!Player) { return; }
+	auto Player		= Cast<APlayerBase>(GetOwnerActor());
+	if (!Player)										{ return; }
 
 	FVector FloorNormal = FVector::ZeroVector;
-	if (!Player->GetCurrentFloorNormal(FloorNormal)) { return; }
+	if (!Player->GetCurrentFloorNormal(FloorNormal))	{ return; }
 
-	const FQuat TargetQuat = UGroundUtility::MakeRotationFromGroundNormal(
-		//RootComp->GetComponentTransform(),
+	if (FloorNormal.IsNearlyZero()) {
+		FloorNormal = FVector::UpVector;
+	}
+
+	const FQuat TargetQuat	= UGroundUtility::MakeRotationFromGroundNormal(
 		Player->GetActorTransform(),
 		FloorNormal);
 
-	const FQuat NewQuat = FQuat::Slerp(
+	const FQuat NewQuat		= FQuat::Slerp(
 		RootComp->GetComponentQuat(),
 		TargetQuat,
 		DeltaTime * RotationInterpSpeed);

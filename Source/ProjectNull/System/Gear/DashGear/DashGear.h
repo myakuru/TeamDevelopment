@@ -13,8 +13,10 @@ public:
 	UDashGear();
 public:
 
-	void Initialize(class APlayerBase* Player, class UPlayerGearComponent* GearComponent)	override;
-	void Execute(int32 CurrentGearLevel)													override;
-	void Update(float DeltaTime)															override;
+	void Initialize(
+		class APlayerBase* Player,
+		class UPlayerGearComponent* GearComponent)	override;
+	void Execute(int32 CurrentGearLevel)			override;
+	void Update(float DeltaTime)					override;
 
 };
