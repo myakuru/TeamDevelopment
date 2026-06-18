@@ -4,34 +4,40 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../../../../Data/Result/ResultData/ResultData.h"
 #include "ResultWidget.generated.h"
 
-class UTextBlock;
-class UVerticalBox;
-class UResultAchievementWidget;
+class UCanvasPanel;
+class UWidgetSwitcher;
 
 /**
  * 
  */
+
+UENUM()
+enum class EResultPage : uint8
+{
+	Evaluation	= 0,
+	Reward		= 1
+};
+
 UCLASS(Blueprintable)
 class PROJECTNULL_API UResultWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
-	void NativeConstruct()override;
+
+	bool Initialize();
+
+	void NextPage();
+	void ShowPage(EResultPage Page);
 	
 private:
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ClearTime;
+	UPROPERTY()
+	EResultPage CurrentPage = EResultPage::Evaluation;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ReachedPhase;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UVerticalBox> AchieveList;
-
-	TArray<TObjectPtr<UResultAchievementWidget>> Achievements;
-
+	TObjectPtr<UWidgetSwitcher> ResultSwitcher;
 };

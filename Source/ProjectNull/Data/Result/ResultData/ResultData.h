@@ -14,8 +14,8 @@ struct FResultData {
 
 	TArray<FName> RewardWeaponIDs;
 
-	int32 ClearPhase = 0;
+	int32 ClearPhase = 7;
 	bool bReachedMidBossPhase = false;
 	bool bReachedFinalPhase = false;
-	float ClearTime = 0.0f;
+	float ClearTime = 600.0f;
 };

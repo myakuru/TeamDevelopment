@@ -14,7 +14,7 @@
 class UEffectPoolDataAsset;
 
 /** クリア時のスコアに応じて報酬を算出するクラス */
-UCLASS()
+UCLASS(Blueprintable)
 class PROJECTNULL_API UResultManager : public UObject
 {
 	GENERATED_BODY()
