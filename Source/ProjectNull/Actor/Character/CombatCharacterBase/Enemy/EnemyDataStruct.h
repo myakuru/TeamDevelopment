@@ -126,7 +126,7 @@ public:
 
 	/**	ステートタグ */
 	UPROPERTY(EditAnywhere, Category = "StateTag")
-	EEnemyState StateTag = EEnemyState::Idle;
+	EEnemyState StateTag = EEnemyState::Walk;
 
 	/** アニメーションブレンドにかける時間*/
 	UPROPERTY(EditAnywhere, Category = "AnimBlend")

@@ -26,9 +26,7 @@ EStateTreeRunStatus USTT_EnemyAttack::EnterState(FStateTreeExecutionContext& a_C
 	// 前ステートの終了フラグをリセット
 	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
 	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(static_cast<uint32>(EEnemyState::Attack), true, true);
-
-	OwnerEnemy->PlayAnimation(static_cast<uint32>(EEnemyState::Attack), true);
+	OwnerEnemy->PlayAnimation(static_cast<uint32>(EEnemyState::Attack), false);
 
 	if (auto AttackComponent = OwnerEnemy->GetEnemyAttackComponent())
 	{

@@ -9,7 +9,6 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
-#include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
@@ -30,9 +29,9 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	// 前ステートの終了フラグをリセット
 	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
 	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(static_cast<uint32>(EEnemyState::Death), true, true);
+	OwnerEnemy->PlayAnimation(static_cast<uint32>(EEnemyState::Death), false);
 
-	return EStateTreeRunStatus::Succeeded;
+	return EStateTreeRunStatus::Running;
 }
 
 EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)
@@ -42,10 +41,10 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 	Super::Tick(a_Context, a_DeltaTime);
 
 	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
-	/*if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
+	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
 	{
 		return EStateTreeRunStatus::Succeeded;
-	}*/
+	}
 
 	return EStateTreeRunStatus::Running;
 }

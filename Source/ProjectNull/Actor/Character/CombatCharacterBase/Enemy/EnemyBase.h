@@ -310,9 +310,6 @@ public:
 
 public:
 
-	/** アニメーション*/
-	//void PlayAnimationMontage();
-
 
 	/** ISMのどのインスタンスに対応するかを示すインデックス*/
 	int32 ISMInstanceIndex = INDEX_NONE;
