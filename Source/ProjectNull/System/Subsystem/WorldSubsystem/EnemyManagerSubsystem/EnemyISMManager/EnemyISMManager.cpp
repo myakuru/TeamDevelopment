@@ -96,11 +96,11 @@ void AEnemyISMManager::InitAnimStateTexture()
 			RT->RenderTargetFormat = RTF_RGBA16f;
 			// MipMap無効
 			// 画像ではなくてデータとして扱うため、値が保管されてしまうと壊れる
-			RT->bAutoGenerateMips = false;
-			RT->bCanCreateUAV = true;	// GPUから書き込み可能に
-			RT->Filter = TF_Nearest;	// Linearだと保管されるためNearest
+			RT->bAutoGenerateMips	= false;
+			RT->bCanCreateUAV		= true;			// GPUから書き込み可能に
+			RT->Filter				= TF_Nearest;	// Linearだと保管されるためNearest
 			RT->InitAutoFormat(MaxInstances, 2);	// MaxInstances列、2行のイメージ
-			RT->UpdateResourceImmediate(true);	// GPUリソース生成
+			RT->UpdateResourceImmediate(true);		// GPUリソース生成
 			return RT;
 		};
 
@@ -119,7 +119,7 @@ void AEnemyISMManager::InitAnimInfoTexture()
 
 	// Width = アニメ数、Height = 1でテクスチャーを生成
 	// PF_A32B32G32R32Fは1ピクセルに4つ分のfloatを入れれる
-	AnimInfoTexture = UTexture2D::CreateTransient(NumAnims, 1, PF_A32B32G32R32F);
+	AnimInfoTexture			= UTexture2D::CreateTransient(NumAnims, 1, PF_A32B32G32R32F);
 	AnimInfoTexture->Filter = TF_Nearest; // ポイントサンプリング（データなので補間しない）
 
 	// ロックして書き込み
@@ -186,10 +186,10 @@ void AEnemyISMManager::RequestAnimChange(int32 InstanceIndex, int32 NextAnimInde
 	// ゲームスレッドからリクエストをキューに積む
 	// DispatchAnimUpdateで一括処理する
 	FGPUAnimChangeRequest Req;
-	Req.InstanceIndex = InstanceIndex;
-	Req.NextAnimIndex = NextAnimIndex;
-	Req.bLooping = bLooping ? 1 : 0;
-	Req.BlendSpeed = BlendSpeed;
+	Req.InstanceIndex	= InstanceIndex;
+	Req.NextAnimIndex	= NextAnimIndex;
+	Req.bLooping		= bLooping ? 1 : 0;
+	Req.BlendSpeed		= BlendSpeed;
 	PendingChangeRequests.Add(Req);
 }
 
@@ -346,11 +346,11 @@ void AEnemyISMManager::DebugReadbackAnimStateRT()
 		const FFloat16Color Row1 = Pixels[0 + 1 * Width];
 
 		UE_LOG(LogTemp, Warning,
-			TEXT("[AnimStateRT] Inst0 Row0: R=%.2f G=%.2f B=%.2f A=%.2f"),
+			TEXT("[AnimStateRT] Inst0 Row0: R(CurrentFrame)=%.2f G(PrevFrame)=%.2f B(NextAnimFrame)=%.2f A(StartFrame)=%.2f"),
 			(float)Row0.R, (float)Row0.G, (float)Row0.B, (float)Row0.A);
 
 		UE_LOG(LogTemp, Warning,
-			TEXT("[AnimStateRT] Inst0 Row1: R=%.2f G=%.2f B=%.2f A=%.2f"),
+			TEXT("[AnimStateRT] Inst0 Row1: R(NumFrames)=%.2f G(BlendFlg)=%.2f B(NextStartFrame)=%.2f A(BlendWeight)=%.2f"),
 			(float)Row1.R, (float)Row1.G, (float)Row1.B, (float)Row1.A);
 	}
 
@@ -449,10 +449,10 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 					GraphBuilder.AllocParameters<FApplyChangeRequestCS::FParameters>();
 
 				// シェーダーに渡す値をセット
-				Pass1Params->GPUAnimStateBuffer = AnimStateUAV;				// 変更前の状態を読む用
-				Pass1Params->ChangeRequestBuffer = RequestSRV;					// 変更要求一覧
-				Pass1Params->ChangeRequestCount = (uint32)NumRequests;	// 変更要求数
-				Pass1Params->InstanceCount = (uint32)NumInstances;				// インスタンス総数
+				Pass1Params->GPUAnimStateBuffer		= AnimStateUAV;			// 変更前の状態を読む用
+				Pass1Params->ChangeRequestBuffer	= RequestSRV;			// 変更要求一覧
+				Pass1Params->ChangeRequestCount		= (uint32)NumRequests;	// 変更要求数
+				Pass1Params->InstanceCount			= (uint32)NumInstances;	// インスタンス総数
 
 				// Pass1のComputeShaderを指定
 				// FApplyChangeRequestCSというGlobalShaderを取得
@@ -495,13 +495,13 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 
 			FAnimUpdateCS::FParameters* Pass2Params = GraphBuilder.AllocParameters<FAnimUpdateCS::FParameters>();
 
-			Pass2Params->DeltaTime = DeltaTime;
-			Pass2Params->SampleRate = 30.0f;
-			Pass2Params->InstanceCount = (uint32)NumInstances;
-			Pass2Params->MaxInstances = (uint32)MaxInstances;
-			Pass2Params->AnimStateTextureReadWrite = AnimStateRTUAV;
-			Pass2Params->AnimInfoTexture = AnimInfoSRV;
-			Pass2Params->GPUAnimStateBuffer = AnimStateUAV;
+			Pass2Params->DeltaTime					= DeltaTime;
+			Pass2Params->SampleRate					= 30.0f;
+			Pass2Params->InstanceCount				= (uint32)NumInstances;
+			Pass2Params->MaxInstances				= (uint32)MaxInstances;
+			Pass2Params->AnimStateTextureReadWrite	= AnimStateRTUAV;
+			Pass2Params->AnimInfoTexture			= AnimInfoSRV;
+			Pass2Params->GPUAnimStateBuffer			= AnimStateUAV;
 
 			TShaderMapRef<FAnimUpdateCS> Pass2CS(GetGlobalShaderMap(GMaxRHIFeatureLevel));
 			const int32 Pass2Groups = FMath::CeilToInt((float)NumInstances / 64.0f);
