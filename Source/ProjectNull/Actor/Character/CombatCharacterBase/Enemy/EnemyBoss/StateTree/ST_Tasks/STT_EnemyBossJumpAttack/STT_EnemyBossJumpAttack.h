@@ -10,7 +10,7 @@
 class AEnemyBossBase;
 
 UENUM()
-enum class EBossJumpPhase : uint8 { Takeoff, Air, Land };
+enum class EBossJumpPhase : uint8 { Takeoff, WaitLiftOff, Air, Land };
 
 /*
 * 攻撃を選択するタスク
@@ -40,6 +40,9 @@ public:
 	/** 跳躍アークの高さ（0=直線的, 1=高く）*/
 	UPROPERTY(EditAnywhere, Category = "Input")
 	float ArcParam = 0.5f;
+
+	/**プレイヤーの方向を向いたらtrueにして攻撃モンタージュを開始する*/
+	bool bMontageStarted = false;
 
 private:
 	EBossJumpPhase Phase = EBossJumpPhase::Takeoff;

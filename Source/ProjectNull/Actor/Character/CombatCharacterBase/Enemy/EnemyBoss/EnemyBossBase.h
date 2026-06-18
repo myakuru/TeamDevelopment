@@ -5,6 +5,7 @@
 #include "../../CombatCharacterBase.h"
 #include "EnemyBossDataStruct.h"
 #include "EnemyBossDataAsset.h"
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyBossRuntimeData/EnemyBossRuntimeData.h>
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 #include "EnemyBossBase.generated.h"
 
@@ -37,9 +38,12 @@ public:
 	// ------------------------------------------------------------------------------------
 	virtual void Tick(float DeltaTime)			override;						/** 更新*/
 	virtual bool IsAlive()				const	override	{ return false; }	/** 生存確認*/
-	void AdvanceHitIndex()									{ HitIndex++; }		/** 連撃のインデックス増加*/
-	void ResetHitIndex()									{ HitIndex = 0; }	/** 連撃のインデックスを初期化*/
 	virtual void ReceiveDamage(float Damage)	override;						/** ダメージを受ける処理*/
+	virtual void RegisterDelegates();											/** デリゲートへの登録関数*/
+	void AdvanceHitIndex()			{ EnemyBossRuntimeData->HitIndex++; }		/** 連撃のインデックス増加*/
+	void ResetHitIndex()			{ EnemyBossRuntimeData->HitIndex = 0; }		/** 連撃のインデックスを初期化*/
+	void RequestFastFallOnNotify()	{ EnemyBossRuntimeData->bShouldFastFallOnNotify = true; }		/** 重力加速フラグをtrueにする関数*/
+	void TryConsumeFastFallRequest();
 	/** 視界にPawnが入った時に呼ばれる（PawnSensingのコールバック）*/
 	UFUNCTION()
 	void OnSeePlayer(APawn* Pawn);
@@ -67,23 +71,23 @@ public:
 	// ゲッター
 	// ------------------------------------------------------------------------------------
 	/** 次の攻撃アクション状態*/
-	const EBossActionType GetNextAction()			const	{ return CurrentAction; }
-	const EBossActionType GetActionPriority()		const	{ return ActionPriority; }	/** Decideがアクションを決める際に優先度が高いものを優先するようにするためのゲッター*/
-	int32 GetHitIndex()								const	{ return HitIndex; }		/** 連撃のインデックスのゲッター*/
+	const EBossActionType GetNextAction()			const	{ return EnemyBossRuntimeData->CurrentAction; }
+	const EBossActionType GetActionPriority()		const	{ return EnemyBossRuntimeData->ActionPriority; }	/** Decideがアクションを決める際に優先度が高いものを優先するようにするためのゲッター*/
+	int32 GetHitIndex()								const	{ return EnemyBossRuntimeData->HitIndex; }			/** 連撃のインデックスのゲッター*/
+	const FBossAttackPattern& GetCurrentAttack()	const	{ return EnemyBossRuntimeData->CurrentAttack; }		/** 現在の攻撃を取得*/
 	float GetNearRange()							const	{ return NearRange; }		/** 近距離攻撃範囲のゲッター*/
 	float GetStrafeChance()							const	{ return StrafeChance; }	/** 連撃確率のゲッター*/
 	float GetWalkSpeed()							const	{ return WalkSpeed; }		/** 歩く速度のゲッター*/
 	float GetRunSpeed()								const	{ return RunSpeed; }		/** 走る速度のゲッター*/
-	const FBossAttackPattern& GetCurrentAttack()	const	{ return CurrentAttack; }	/** 現在の攻撃を取得*/
 	AActor* GetTargetActor()						const	{ return TargetActor; }		/** 現在の追尾対象を取得（Evaluatorが毎フレーム読む） */
 
 
 	// ------------------------------------------------------------------------------------
 	// セッター
 	// ------------------------------------------------------------------------------------
-	void SetNextAction(EBossActionType InAction)		{ CurrentAction = InAction; }	/** 次の攻撃をいれる*/
-	void SetTargetActor(AActor* InTarget)				{ TargetActor = InTarget; }		/** 追尾対象を設定（nullptrでロスト扱い） */
-	void SetActionPriority(EBossActionType InAction)	{ ActionPriority = InAction; }	/** Decideがアクションを決める際に優先度付で使用する/
+	void SetNextAction(EBossActionType InAction)		{ EnemyBossRuntimeData->CurrentAction = InAction; }	/** 次の攻撃をいれる*/
+	void SetTargetActor(AActor* InTarget)				{ TargetActor = InTarget; }							/** 追尾対象を設定（nullptrでロスト扱い） */
+	void SetActionPriority(EBossActionType InAction)	{ EnemyBossRuntimeData->ActionPriority = InAction; }	/** Decideがアクションを決める際に優先度付で使用する/
 
 	/** 距離に応じて撃てる技を選ぶ。撃てる技がなければfalseを返す*/
 	bool SelectAttackByDistance(float Dist)
@@ -94,7 +98,7 @@ public:
 		for (const FBossAttackPattern& P : GetAttackPatterns())
 		{
 			const bool bRangeOK = (Dist >= P.MinRange && Dist <= P.MaxRange);	// 距離条件を満たすか
-			const bool bAttackTypeOK = (P.ActionType == CurrentAction);			// 攻撃タイプが今のアクションと同じか
+			const bool bAttackTypeOK = (P.ActionType == EnemyBossRuntimeData->CurrentAction);			// 攻撃タイプが今のアクションと同じか
 			if (bRangeOK && bAttackTypeOK) 
 			{ Cand.Add(&P); }
 		}
@@ -102,7 +106,7 @@ public:
 		if (Cand.Num() == 0) { return false; }
 
 		// 候補からランダムに一つ選んで、ボスの今の攻撃にセット
-		CurrentAttack = *Cand[FMath::RandRange(0, Cand.Num() - 1)];
+		EnemyBossRuntimeData->CurrentAttack = *Cand[FMath::RandRange(0, Cand.Num() - 1)];
 		//HitIndex = 0;
 		return true;
 	}
@@ -113,7 +117,7 @@ protected:
 	// protected method
 	// ------------------------------------------------------------------------------------
 	/** データアセットからデータを構造体に移す処理*/
-	//void SetEnemyBossStatusData(UEnemyDataAsset* InData);
+	void SetEnemyBossStatusData(UEnemyBossDataAsset* InData);
 
 	// ------------------------------------------------------------------------------------
 	// protected variables
@@ -126,9 +130,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	TObjectPtr<AActor> TargetActor = nullptr;							/** 追尾対象。視認/被弾で設定され、Evaluator経由でStateTree全体へ配布される */
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	int32 HitIndex = 0;													/** 攻撃が何連撃目か*/
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TObjectPtr<UEnemyBossAttackSet> AttackSet = nullptr;				/** このボスの攻撃セット（BPで割り当てる） */
@@ -145,16 +146,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	float StrafeChance = 0.4f;											/** 様子見確率*/
 
-	EBossActionType CurrentAction = EBossActionType::None;				/** Decideが決めたアクション*/
-	FBossAttackPattern CurrentAttack;									/** 現在選択中の攻撃と、連撃の何撃目か */
-	
-	EBossActionType ActionPriority = EBossActionType::None;				/** Decideがアクションを決める際に優先度が高いものを優先するようにする*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	float FastFallGravityScale = 5.0f;								/** 重力の追加加速度フラグ*/
 
-	///** 敵基本ステータス */
-	//UPROPERTY(EditAnywhere)
-	//FEnemyBossStatus EnemyBossStatus;
+	/** 敵基本ステータス */
+	UPROPERTY(EditAnywhere)
+	FEnemyBossStatus EnemyBossStatus;
 
-	//UPROPERTY(EditAnywhere)
-	//TObjectPtr<UBossEnemyDataAsset> EnemyDataAsset;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UEnemyBossDataAsset> EnemyDataAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
+	TObjectPtr<UEnemyBossRuntimeData> EnemyBossRuntimeData;
 
 };

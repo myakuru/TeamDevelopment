@@ -43,5 +43,5 @@ public:
 
 	/** 一定範囲外にターゲットが出たらステートを抜ける用*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	float GetOutDistance = 300.0f;
+	float GetOutDistance = 800.0f;
 };

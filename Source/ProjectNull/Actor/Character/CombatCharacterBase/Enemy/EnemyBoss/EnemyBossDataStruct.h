@@ -44,7 +44,7 @@ struct FBossAttackPattern
 /// 敵基本ステータス
 /// </summary>
 USTRUCT(BlueprintType)
-struct FBossEnemyStatus
+struct FEnemyBossStatus
 {
 	GENERATED_BODY()
 
