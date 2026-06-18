@@ -6,7 +6,6 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 #include "Kismet/GameplayStatics.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -15,6 +14,8 @@ USTT_EnemyBossApproachRun::USTT_EnemyBossApproachRun(const FObjectInitializer& a
 {
 	// Tick処理有効化
 	bShouldCallTick = true;
+
+	bJumpFlg = FRandomStream().FRand() < 0.5f; // ランダムでジャンプ攻撃に移行するか決める
 }
 
 EStateTreeRunStatus USTT_EnemyBossApproachRun::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
@@ -28,6 +29,17 @@ EStateTreeRunStatus USTT_EnemyBossApproachRun::Tick(FStateTreeExecutionContext& 
 
 	// 距離を算出
 	const float Distance = FVector::Dist(OwnerBoss->GetActorLocation(),TargetActor->GetActorLocation());
+
+	// ジャンプ攻撃に移行する距離を超えたらジャンプ攻撃に移行する
+	if (bJumpFlg)
+	{
+		if (Distance > JumpChangeDistance)
+		{
+			// ジャンプ攻撃の優先度をセット
+			Boss->SetActionPriority(EBossActionType::JumpAttack);
+			return EStateTreeRunStatus::Succeeded;
+		}
+	}
 
 	// 距離が攻撃範囲より狭ければ次のステートへ
 	if (Distance <= Boss->GetNearRange())

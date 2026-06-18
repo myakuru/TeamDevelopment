@@ -26,10 +26,6 @@ public:
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition);
 	virtual	void ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)override;
 
-	/** 現在の選択されている攻撃パターン*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	FBossAttackPattern CurrentAttack;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	float MoveSpeed = 200.0f;
 

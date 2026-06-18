@@ -29,4 +29,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	float MoveSpeed = 200.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	float ApproachChangeCount = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	float ApproachChangeDuration = 10.0f;
+
+private:
+
+	// ------------------------------------------------------------------------------------
+	// private method
+	// ------------------------------------------------------------------------------------
+	void NextApproachCurrentData();	/** データの初期化などを行い次のDecideステートに入る準備を行う*/
+
 };

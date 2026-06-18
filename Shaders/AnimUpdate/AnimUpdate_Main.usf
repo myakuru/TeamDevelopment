@@ -65,10 +65,10 @@ void MainCS(uint3 id : SV_DispatchThreadID)
     //uint Flags = (uint) row1.z;
     //float BlendSpeed = row1.w;
 
-    bool bLooping = (AnimState.Flags & FLAG_LOOPING) != 0;
-     float bBlending = (AnimState.Flags & FLAG_BLENDING) != 0 ? 1.0f : 0.0f;
-    float CurrentFrame = 0.0;
-    float PrevFrame = 0.0;
+    bool bLooping       = (AnimState.Flags & FLAG_LOOPING) != 0;
+    float bBlending     = (AnimState.Flags & FLAG_BLENDING) != 0 ? 1.0f : 0.0f;
+    float CurrentFrame  = 0.0;
+    float PrevFrame     = 0.0;
 
     //----------------------------------------------------------
     // アニメ時間の更新
@@ -81,10 +81,10 @@ void MainCS(uint3 id : SV_DispatchThreadID)
 
         // ループ終了検知
         float NumFrames = GetNumFrames(AnimState.AnimIndex);
-        float PrevRaw = AnimState.PrevAnimTime * SampleRate;
-        float CurrRaw = AnimState.AnimTime * SampleRate;
-        CurrentFrame = fmod(CurrRaw, NumFrames);
-        PrevFrame = fmod(PrevRaw, NumFrames);
+        float PrevRaw   = AnimState.PrevAnimTime * SampleRate;
+        float CurrRaw   = AnimState.AnimTime * SampleRate;
+        CurrentFrame    = fmod(CurrRaw, NumFrames);
+        PrevFrame       = fmod(PrevRaw, NumFrames);
 
         bool bLoopedOver = (int) (PrevRaw / NumFrames) < (int) (CurrRaw / NumFrames);
 
@@ -99,25 +99,26 @@ void MainCS(uint3 id : SV_DispatchThreadID)
     else
     {
         // ブレンド中
-        AnimState.NextAnimTime += DeltaTime;
-        AnimState.BlendWeight += DeltaTime / AnimState.BlendSpeed;
+        AnimState.NextAnimTime  += DeltaTime;
+        AnimState.BlendWeight   += DeltaTime / AnimState.BlendSpeed;
         
         float NumFrames = GetNumFrames(AnimState.AnimIndex);
-        float PrevRaw = AnimState.PrevAnimTime * SampleRate;
-        float CurrRaw = AnimState.AnimTime * SampleRate;
-        CurrentFrame = fmod(CurrRaw, NumFrames);
-        PrevFrame = fmod(PrevRaw, NumFrames);
+        float PrevRaw   = AnimState.PrevAnimTime * SampleRate;
+        float CurrRaw   = AnimState.AnimTime * SampleRate;
+        CurrentFrame    = fmod(CurrRaw, NumFrames);
+        PrevFrame       = fmod(PrevRaw, NumFrames);
         
         if (AnimState.BlendWeight >= 1.0f)
         {
             // ブレンド完了・アニメ切り替え
-            float NextLoopDuration = GetNumFrames(AnimState.NextAnimIndex) / SampleRate;
-            AnimState.BlendWeight = 0.0f;
-            AnimState.AnimIndex = AnimState.NextAnimIndex;
-            AnimState.AnimTime = fmod(AnimState.NextAnimTime, NextLoopDuration);
-            AnimState.NextAnimTime = 0.0f;
+            float NextLoopDuration  = GetNumFrames(AnimState.NextAnimIndex) / SampleRate;
+            AnimState.BlendWeight   = 0.0f;
+            AnimState.AnimIndex     = AnimState.NextAnimIndex;
+            AnimState.AnimTime      = fmod(AnimState.NextAnimTime, NextLoopDuration);
+            AnimState.NextAnimTime  = 0.0f;
             AnimState.Flags &= ~FLAG_BLENDING;
             //Flags &= ~FLAG_FINISHED;
+            
             bBlending = false;
         }
     }
@@ -127,10 +128,10 @@ void MainCS(uint3 id : SV_DispatchThreadID)
     //----------------------------------------------------------
     // テクスチャに書き戻す
     //----------------------------------------------------------
-    float StartFrame = GetStartFrames(AnimState.AnimIndex);
-    float NumFrames = GetNumFrames(AnimState.AnimIndex);
-    float NextStartFrame = GetStartFrames(AnimState.NextAnimIndex);
-    float NextNumFrames = GetNumFrames(AnimState.NextAnimIndex);
+    float StartFrame        = GetStartFrames(AnimState.AnimIndex);
+    float NumFrames         = GetNumFrames(AnimState.AnimIndex);
+    float NextStartFrame    = GetStartFrames(AnimState.NextAnimIndex);
+    float NextNumFrames     = GetNumFrames(AnimState.NextAnimIndex);
     
     AnimStateTextureReadWrite[uint2(idx, 0)] = float4(CurrentFrame, PrevFrame, AnimState.AnimIndex, GetStartFrames(AnimState.AnimIndex));
     AnimStateTextureReadWrite[uint2(idx, 1)] = float4(NumFrames, bBlending, NextStartFrame, AnimState.BlendWeight);
