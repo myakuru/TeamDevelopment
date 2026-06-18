@@ -7,6 +7,8 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
+#include <ProjectNull/Utility/GroundUtility/GroundUtility.h>
+
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -42,6 +44,7 @@ void UDashGearStateBase::Update(float DeltaTime)
 
 void UDashGearStateBase::End()
 {
+	if (!Player) { return; }
 	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
 	if (!PlayerAnimInstance) { return; }
 
@@ -52,7 +55,19 @@ void UDashGearStateBase::Dash()
 {
 	if (!Player) { return; }
 
+	FVector FloorNormal = FVector::ZeroVector;
+	if (!Player->GetCurrentFloorNormal(FloorNormal)) { return; }
+
+	if (FloorNormal.IsNearlyZero()) {
+		FloorNormal = FVector::UpVector;
+	}
+
+	const FQuat Quat = UGroundUtility::MakeRotationFromGroundNormal(
+		Player->GetActorTransform(),
+		FloorNormal);
+	
 	const FVector Dir = Player->GetActorForwardVector();
+	//const FVector Dir = Quat.ToRotationVector();
 	Player->LaunchCharacter(Dir * DashSpeed, true, true);
 
 	if (Owner) {
