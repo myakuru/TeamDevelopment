@@ -108,11 +108,12 @@ public:
 	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
 		SHADER_PARAMETER(float, DeltaTime)
 		SHADER_PARAMETER(float, SampleRate)
-		SHADER_PARAMETER(uint32, InstanceCount)
+		SHADER_PARAMETER(uint32, ActiveInstanceCount)
 		SHADER_PARAMETER(uint32, MaxInstances)
 		SHADER_PARAMETER_RDG_TEXTURE_UAV(RWTexture2D<float4>, AnimStateTextureReadWrite)
 		SHADER_PARAMETER_RDG_TEXTURE_SRV(Texture2D<float4>, AnimInfoTexture)
 		SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<FGPUAnimState>, GPUAnimStateBuffer)
+		SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<uint32>, ActiveInstanceIndexBuffer)
 	END_SHADER_PARAMETER_STRUCT()
 
 	static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& Params)

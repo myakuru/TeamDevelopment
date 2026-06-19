@@ -32,11 +32,6 @@ void UEnemyRuntimeData::UpdateAnimationMonitor(float DeltaTime)
 	if (CPUAnim.bLooping)	{ return; }
 	if (CPUAnim.bFinished)	{ return; }
 
-	UE_LOG(LogTemp, Warning, TEXT("NandeNandeNandeNande"));
-	UE_LOG(LogTemp, Warning, TEXT("NandeNandeNandeNande"));
-	UE_LOG(LogTemp, Warning, TEXT("NandeNandeNandeNande"));
-	UE_LOG(LogTemp, Warning, TEXT("NandeNandeNandeNande"));
-
 	CPUAnim.ElapsedTime += DeltaTime;
 
 	if (CPUAnim.ElapsedTime >= CPUAnim.Duration)

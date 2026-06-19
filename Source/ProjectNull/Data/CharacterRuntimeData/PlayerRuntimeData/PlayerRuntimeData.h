@@ -228,7 +228,7 @@ public:
 	 */
 	void LevelUp();
 
-	inline void SetIsInvincible(bool SetFlg) { bIsInvincible = SetFlg; }
+	inline void SetIsInvincible(bool bInIsInvincible) { bIsInvincible = bInIsInvincible; }
 
 	inline bool IsInvincible() const { return bIsInvincible; }
 	inline FGearRuntimeData& GetGearData() { return Gear; }

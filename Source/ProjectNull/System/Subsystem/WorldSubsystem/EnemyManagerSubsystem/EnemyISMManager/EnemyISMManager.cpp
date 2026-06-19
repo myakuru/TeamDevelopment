@@ -262,6 +262,9 @@ void AEnemyISMManager::RegisterEnemy(AEnemyBase* Enemy)
 		false	// MarkRenderStateDirtyをfalseにしてレンダリング状態の更新を遅延させる
 	);
 
+	ActiveIndices.Add(Index);
+	ActiveCount += 1;
+
 	Enemies.Add(Enemy);
 }
 
@@ -279,6 +282,10 @@ void AEnemyISMManager::UnregisterEnemy(AEnemyBase* Enemy)
 
 	// インスタンスをISMから解除してインデックスを解放する
 	ReleaseIndex(Enemy->ISMInstanceIndex);
+
+	ActiveIndices.Remove(Enemy->ISMInstanceIndex);
+
+	ActiveCount -= 1;
 
 	// インスタンスを解放してEnemyからインデックスをクリアする
 	Enemy->ISMInstanceIndex = INDEX_NONE;
@@ -403,6 +410,8 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 	// AnimInfoTexture用のRHIも受け取る
 	FTextureRHIRef AnimInfoTextureRHI = AnimInfoTexture->GetResource()->TextureRHI;
 
+	TArray<uint32> ActiveIndicesCopy = ActiveIndices;
+
 	// ここまでで、GPU側で処理を行うためのリソースの準備
 
 	// GameThreadで準備したTextureをRenderThreadに渡して
@@ -411,7 +420,7 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 	// このラムダ式の中身をRenderThreadに投げる
 	ENQUEUE_RENDER_COMMAND(AnimUpdate)(
 		[this, DeltaTime, NumInstances, NumRequests, RequestsCopy, AnimStateRTRHI,
-		AnimInfoTextureRHI](FRHICommandListImmediate& RHICmdList)
+		AnimInfoTextureRHI, ActiveIndicesCopy](FRHICommandListImmediate& RHICmdList)
 		{
 			// RDGBuilderを作成（Render Dependency Graph）
 			// GPU処理の依存関係、読み書き、同期、バリアをUEに管理させる仕組み
@@ -424,6 +433,18 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 
 			// UAVを作る
 			FRDGBufferUAVRef AnimStateUAV = GraphBuilder.CreateUAV(AnimStateBuf);
+
+			// ActiveIndexBufferをRDGに登録
+			FRDGBufferRef ActiveIndexBuffer = CreateStructuredBuffer(
+				GraphBuilder,
+				TEXT("ActiveInstanceIndexBuffer"),
+				sizeof(uint32),
+				ActiveCount,
+				ActiveIndicesCopy.GetData(),
+				sizeof(uint32) * ActiveCount
+			);
+			// SRVを作る
+			FRDGBufferSRVRef ActiveIndexSRV = GraphBuilder.CreateSRV(ActiveIndexBuffer);
 
 			// Pass 1: アニメ変更リクエストの適用（リクエストがある時だけ）
 			if (NumRequests > 0)
@@ -453,13 +474,13 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 				Pass1Params->ChangeRequestBuffer	= RequestSRV;			// 変更要求一覧
 				Pass1Params->ChangeRequestCount		= (uint32)NumRequests;	// 変更要求数
 				Pass1Params->InstanceCount			= (uint32)NumInstances;	// インスタンス総数
-				Pass1Params->MaxInstances			= MaxInstances;			// インスタンス総数
+				Pass1Params->MaxInstances			= (uint32)MaxInstances;
 
 				// Pass1のComputeShaderを指定
 				// FApplyChangeRequestCSというGlobalShaderを取得
 				TShaderMapRef<FApplyChangeRequestCS> Pass1CS(GetGlobalShaderMap(GMaxRHIFeatureLevel));
 				// スレッドグループ数を決定
-				const int32 Pass1Groups = FMath::CeilToInt((float)MaxInstances / 64.0f);
+				const int32 Pass1Groups = FMath::CeilToInt((float)NumRequests / 64.0f);
 
 				// RDGにこのComputeShaderを後で実行するように登録
 				// GraphBuilder.Execute()で実行
@@ -498,11 +519,12 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 
 			Pass2Params->DeltaTime					= DeltaTime;
 			Pass2Params->SampleRate					= 30.0f;
-			Pass2Params->InstanceCount				= (uint32)NumInstances;
+			Pass2Params->ActiveInstanceCount		= (uint32)NumInstances;
 			Pass2Params->MaxInstances				= (uint32)MaxInstances;
 			Pass2Params->AnimStateTextureReadWrite	= AnimStateRTUAV;
 			Pass2Params->AnimInfoTexture			= AnimInfoSRV;
 			Pass2Params->GPUAnimStateBuffer			= AnimStateUAV;
+			Pass2Params->ActiveInstanceIndexBuffer	= ActiveIndexSRV;
 
 			TShaderMapRef<FAnimUpdateCS> Pass2CS(GetGlobalShaderMap(GMaxRHIFeatureLevel));
 			const int32 Pass2Groups = FMath::CeilToInt((float)MaxInstances / 64.0f);

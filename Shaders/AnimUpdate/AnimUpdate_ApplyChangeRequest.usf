@@ -1,7 +1,7 @@
 #include "AnimUpdate_Common.ush"
 
-StructuredBuffer<FAnimChangeRequest> ChangeRequestBuffer;
-RWStructuredBuffer<FGPUAnimState> GPUAnimStateBuffer;
+StructuredBuffer<FAnimChangeRequest>    ChangeRequestBuffer;
+RWStructuredBuffer<FGPUAnimState>       GPUAnimStateBuffer;
 
 uint InstanceCount;
 uint ChangeRequestCount;
@@ -54,7 +54,7 @@ void ApplyChangeRequestCS(uint3 id : SV_DispatchThreadID)
     //);
     GPUAnimStateBuffer[idx].AnimIndex       = AnimState.AnimIndex;
     GPUAnimStateBuffer[idx].NextAnimIndex   = req.NextAnimIndex;
-    GPUAnimStateBuffer[idx].Flags           = (int) flags;
+    GPUAnimStateBuffer[idx].Flags           = flags;
     GPUAnimStateBuffer[idx].BlendSpeed      = req.BlendSpeed;
     GPUAnimStateBuffer[idx].BlendWeight     = 0.0f;
 }
