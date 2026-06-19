@@ -18,6 +18,8 @@ void UButtonBaseWidget::OnHoveredButton()
 
 void UButtonBaseWidget::DoHoveredButton()
 {
+	if (!OnHovered.IsBound())return;
+	OnHovered.Broadcast();
 }
 
 void UButtonBaseWidget::OnClickedButton()
@@ -27,4 +29,6 @@ void UButtonBaseWidget::OnClickedButton()
 
 void UButtonBaseWidget::DoClickedButton()
 {
+	if (!OnClicked.IsBound())return;
+	OnClicked.Broadcast();
 }

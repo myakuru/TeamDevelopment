@@ -6,6 +6,10 @@
 
 class UButton;
 
+/** デリゲート宣言(親デリゲート) */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClickedButton);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHoveredButton);
+
 /**
  * 
  */
@@ -31,4 +35,13 @@ protected:
 	void OnClickedButton();
 
 	virtual void DoClickedButton();
+
+public:
+
+	//デリゲートの宣言
+	UPROPERTY(BlueprintAssignable)
+	FOnClickedButton OnClicked;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHoveredButton OnHovered;
 };

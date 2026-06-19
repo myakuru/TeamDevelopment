@@ -37,6 +37,9 @@ void UStageSelectHUDWidget::NativeConstruct()
 
 	CreateStageButtons();
 
+	ReturnButton->OnClicked.AddUniqueDynamic
+	(this, &UStageSelectHUDWidget::ReturnButtonClicked);
+
 	//マウスカーソル表示
 	APlayerController* PC =
 		GetWorld()->GetFirstPlayerController();
@@ -90,10 +93,10 @@ void UStageSelectHUDWidget::CreateStageButtons()
 		ButtonWidget->Setup(i, bIsUnlocked);
 
 		//デリゲートのバインド
-		ButtonWidget->OnHovered.AddUniqueDynamic(
+		ButtonWidget->OnHoveredStage.AddUniqueDynamic(
 			this, &UStageSelectHUDWidget::OnHoveredStageButton);
 
-		ButtonWidget->OnClicked.AddUniqueDynamic(
+		ButtonWidget->OnClickedStage.AddUniqueDynamic(
 			this, &UStageSelectHUDWidget::OnClickedStageButton);
 
 		UCanvasPanelSlot* CanvasSlot =
@@ -147,6 +150,31 @@ void UStageSelectHUDWidget::OnHoveredStageButton(int32 InStageIndex)
 void UStageSelectHUDWidget::OpenCurrentSelectedStageLevel()
 {
 	UGameplayStatics::OpenLevel(this, FName(StageDataAsset->GetStageData()[CurrentSelectedStageIndex].LevelName));
+}
+
+void UStageSelectHUDWidget::ReturnButtonClicked()
+{
+	if (!FadeAnim || IsAnimationPlaying(FadeAnim))return;
+
+	//フェードアウトアニメーション再生
+	if (FadeAnim)
+	{
+		PlayAnimation(
+			FadeAnim, 0.f, 1,
+			EUMGSequencePlayMode::Reverse);
+
+		FWidgetAnimationDynamicEvent AnimationFinishedEvent;
+		AnimationFinishedEvent.BindDynamic(this, &UStageSelectHUDWidget::OpenReturnLevel);
+
+		BindToAnimationFinished(FadeAnim, AnimationFinishedEvent);
+
+		return;
+	}
+}
+
+void UStageSelectHUDWidget::OpenReturnLevel()
+{
+	UGameplayStatics::OpenLevel(this, ReturnButton->GetOpenLevelName());
 }
 
 int32 UStageSelectHUDWidget::ClampStageIndex(int32 InStageIndex)
