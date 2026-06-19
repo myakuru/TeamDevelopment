@@ -23,7 +23,7 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 	// 要素数分の初期化
 	for (const FName& RowName : CachedExpUpgradeTable->GetRowNames())
 	{
-		UpgradeStates.Add({ RowName, 0 });
+		UpgradeStates.Add({ RowName, "0"});
 	}
 
 }
@@ -100,6 +100,12 @@ void UPlayerRuntimeData::ApplyMovementSpeed()
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed.Final;
 }
 
+void UPlayerRuntimeData::SetPlayerAttackDamage(float InAttackMultiplier)
+{
+	// プレイヤーの攻撃力を計算するロジックをここに実装
+	Attack.Final = Attack.Base * InAttackMultiplier;
+}
+
 void UPlayerRuntimeData::LevelUp()
 {
 	Level++;
@@ -163,13 +169,15 @@ void UPlayerRuntimeData::UpdateUpgradeStates(FName Id)
 	{
 		if (UpgradeState.UpgradeId == Id)
 		{
-			UpgradeState.Level++;
+			int32 CurrentLevel = FCString::Atoi(*UpgradeState.Level.ToString());
+			CurrentLevel++;
+			UpgradeState.Level = FName(*FString::FromInt(CurrentLevel));
 			break;
 		}
 	}
 }
 
-int32 UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
+FName UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 {
 	for(const auto& UpgradeState : UpgradeStates)
 	{
@@ -178,5 +186,10 @@ int32 UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 			return UpgradeState.Level;
 		}
 	}
-	return 0;
+	return "0";
+}
+
+float UPlayerRuntimeData::GetUpgradeAttackMultiplier(FName Id) const
+{
+	return 0.0f;
 }

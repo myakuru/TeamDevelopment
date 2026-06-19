@@ -98,7 +98,7 @@ struct FUpgradeState
 {
 	FName UpgradeId;
 
-	int32 Level = 0;
+	FName Level = "0";
 
 };
 
@@ -224,6 +224,14 @@ public:
 	void CalculateInvincibilityTime(const FGearParameterData& Data);
 
 	/**
+	 * @brief プレイヤーの攻撃力を計算する
+	 * @return 計算された攻撃力
+	 */
+	void SetPlayerAttackDamage(float InAttackMultiplier);
+
+	float GetPlayerAttackDamage() const { return Attack.Final; }
+
+	/**
 	 * @brief レベルアップ処理
 	 */
 	void LevelUp();
@@ -251,7 +259,9 @@ public:
 	/** Widget側で呼び出す */
 	void UpdateUpgradeStates(FName Id);
 
-	int32 GetUpgradeLevel(FName Id) const;
+	FName GetUpgradeLevel(FName Id) const;
+
+	float GetUpgradeAttackMultiplier(FName Id) const;
 
 private:
 	/**

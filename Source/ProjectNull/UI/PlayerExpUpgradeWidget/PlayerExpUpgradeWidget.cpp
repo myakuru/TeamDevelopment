@@ -93,7 +93,8 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 	{
 		FName RowName;
 		FText Description;
-		int32 CurrentLevel;
+		float Multiplier;
+		FName CurrentLevel;
 	};
 	// 説明文の数
 	TArray<FValidUpgradeInfo> ValidUpgrades;
@@ -103,16 +104,21 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 		const FExpUpgradeRow* RowData = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(RowName, TEXT(""));
 		if (!RowData) continue;
 
-		int32 CurrentLevel = PlayerRuntimeData->GetUpgradeLevel(RowName);
+		FName CurrentLevel = PlayerRuntimeData->GetUpgradeLevel(RowName);
 
 		// 現在のレベルに対応する説明文があるかチェック
-		if (RowData->UpgradeTexts.IsValidIndex(CurrentLevel))
+		for (TPair<FName, float> Pair : RowData->AttackMultipliers)
 		{
-			FValidUpgradeInfo Info;
-			Info.RowName = RowName;
-			Info.Description = RowData->UpgradeTexts[CurrentLevel];
-			Info.CurrentLevel = CurrentLevel;
-			ValidUpgrades.Add(Info);
+			if (Pair.Key == CurrentLevel)
+			{
+				FValidUpgradeInfo Info;
+				Info.RowName = RowName;
+				Info.Description = FText::FromString(FString::Printf(TEXT("%s: 攻撃倍率 %.2f"), *RowName.ToString(), Pair.Value));
+				Info.Multiplier = Pair.Value;
+				Info.CurrentLevel = CurrentLevel;
+				ValidUpgrades.Add(Info);
+				break; // 説明文が見つかったらループを抜ける
+			}
 		}
 	}
 
@@ -129,8 +135,6 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 		Widgets[i]->SetUpgradeRowName(ValidUpgrades[i].RowName);
 		Widgets[i]->SetVisibility(ESlateVisibility::Visible);
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("ValidUpgrades.Num(): %d"), ValidUpgrades.Num());
 
 	if (ValidUpgrades.Num() <= 1)
 	{

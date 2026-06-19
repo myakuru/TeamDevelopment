@@ -14,11 +14,7 @@ struct PROJECTNULL_API FExpUpgradeRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	/** 各レベルの表示テキスト（Index == レベル） */
+	/** 攻撃倍率 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FText> UpgradeTexts;
-
-	/** ユーザー向け表示名 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText DisplayName;
+	TMap <FName, float> AttackMultipliers;
 };
