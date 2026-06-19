@@ -5,16 +5,19 @@
 #include "ReturnButtonWidget.generated.h"
 
 /**
- * 
+ *　共通のリターンボタン
  */
 UCLASS()
 class PROJECTNULL_API UReturnButtonWidget : public UButtonBaseWidget
 {
 	GENERATED_BODY()
 	
-protected:
+public:
 
-	virtual void DoClickedButton()override;
+	UFUNCTION()
+	FName GetOpenLevelName() const { return OpenLevelName; }
+
+protected:
 
 	UPROPERTY(EditAnywhere)
 	FName OpenLevelName = "";
