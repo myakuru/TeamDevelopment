@@ -32,7 +32,7 @@ EStateTreeRunStatus USTT_EnemyAnimation::EnterState(FStateTreeExecutionContext& 
 		);
 	
 		// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-		OwnerEnemy->PlayAnimation(static_cast<int32>(AnimationState), IsLooping);
+		OwnerEnemy->PlayAnimation(static_cast<int32>(AnimationState), IsLooping, BlendSpeed);
 	}
 
 	return EStateTreeRunStatus::Running;

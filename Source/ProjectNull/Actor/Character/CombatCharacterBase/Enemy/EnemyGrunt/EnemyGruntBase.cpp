@@ -14,9 +14,6 @@ AEnemyGruntBase::AEnemyGruntBase()
 void AEnemyGruntBase::BeginPlay()
 {
 	AEnemyBase::BeginPlay();
-
-	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	PlayAnimation(static_cast<uint32>(EEnemyState::Idle), false);
 }
 
 void AEnemyGruntBase::TransitionIdleToWalk()

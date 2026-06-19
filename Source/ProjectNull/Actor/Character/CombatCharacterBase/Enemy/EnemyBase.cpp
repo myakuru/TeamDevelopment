@@ -306,8 +306,7 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 
-	EnemyStatus.StateTag = EEnemyState::Idle;
-	EnemyRuntimeData->ChangedEnemyState(EEnemyState::Idle);
+	SetEnemyState(EEnemyState::Idle);
 
 	EnemyStatus.IsAlive = true;
 
@@ -443,7 +442,7 @@ float AEnemyBase::GetCapsuleHalfHeight()const
 	return CapsuleComponent->GetScaledCapsuleHalfHeight();
 }
 
-void AEnemyBase::PlayAnimation(int32 NextAnimIndex, bool bLoop)
+void AEnemyBase::PlayAnimation(int32 InNextAnimIndex, bool InbLoop,float InBlendSpeed)
 {
 	if (!EnemyManager)
 	{
@@ -471,10 +470,10 @@ void AEnemyBase::PlayAnimation(int32 NextAnimIndex, bool bLoop)
 		return;
 	}
 
-	if (!AnimData->Animations.IsValidIndex(NextAnimIndex))
+	if (!AnimData->Animations.IsValidIndex(InNextAnimIndex))
 	{
 		UE_LOG(LogTemp, Error, TEXT("Invalid AnimIndex: %d / Num: %d"),
-			NextAnimIndex, AnimData->Animations.Num());
+			InNextAnimIndex, AnimData->Animations.Num());
 		return;
 	}
 
@@ -485,13 +484,13 @@ void AEnemyBase::PlayAnimation(int32 NextAnimIndex, bool bLoop)
 	}
 
 	//const float Duration = AnimData->Animations[NextAnimIndex].NumFrames / 30.0f;
-	float Duration = (AnimData->Animations[NextAnimIndex].NumFrames - AnimData->Animations[NextAnimIndex].StartTime) / 30.0f;
+	float Duration = (AnimData->Animations[InNextAnimIndex].NumFrames - AnimData->Animations[InNextAnimIndex].StartTime) / 30.0f;
 
 	//EnemyRuntimeData->SetNextAnimData(NextAnimIndex, bLoop, true);
-	EnemyRuntimeData->StartAnimMonitor(NextAnimIndex, bLoop, Duration);
-	ISMManager->RequestAnimChange(ISMInstanceIndex, NextAnimIndex, bLoop, 1.2f);
+	EnemyRuntimeData->StartAnimMonitor(InNextAnimIndex, InbLoop, Duration);
+	ISMManager->RequestAnimChange(ISMInstanceIndex, InNextAnimIndex, InbLoop, InBlendSpeed);
 
-	if (!bLoop && GetWorld())
+	if (!InbLoop && GetWorld())
 	{
 		AnimFinishTime = GetWorld()->GetTimeSeconds() + Duration;
 	}

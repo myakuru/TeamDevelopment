@@ -293,7 +293,7 @@ public:
 	virtual void SpawnDeathExperience();
 
 	/** アニメーションの変更*/
-	virtual void PlayAnimation(int32 NextAnimIndex, bool bLoop);
+	virtual void PlayAnimation(int32 InNextAnimIndex, bool InbLoop,float InBlendSpeed);
 
 protected:
 

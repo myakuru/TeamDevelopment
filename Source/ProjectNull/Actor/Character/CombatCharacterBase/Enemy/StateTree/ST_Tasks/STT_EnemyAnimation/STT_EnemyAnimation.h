@@ -35,7 +35,7 @@ private:
 	/**
 	 * @brief 再生したいアニメーションのステート名
 	 */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Input")
 	EEnemyState AnimationState = EEnemyState::Idle;
 
 	/**
@@ -43,6 +43,12 @@ private:
 	 */
 	UPROPERTY(EditAnywhere)
 	float AnimationDuration = 1.f;
+
+	/**
+	 * @brief ブレンド速度
+	 */
+	UPROPERTY(EditAnywhere)
+	float BlendSpeed = 0.2f;
 
 	/**
 	 * @brief ループするか
