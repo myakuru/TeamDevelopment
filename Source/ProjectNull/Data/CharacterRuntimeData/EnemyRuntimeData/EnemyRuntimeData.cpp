@@ -17,6 +17,16 @@ void UEnemyRuntimeData::StartAnimMonitor(int32 a_AnimIndex, bool bLooping, float
 	CPUAnim.Duration	= Duration;
 }
 
+void UEnemyRuntimeData::SetFinalHP(float InFinalHP)
+{
+	Health.Max = Health.Current = InFinalHP;
+}
+
+void UEnemyRuntimeData::SetFinalAttack(float InFinalAttack)
+{
+	Attack.Final = InFinalAttack;
+}
+
 void UEnemyRuntimeData::UpdateAnimationMonitor(float DeltaTime)
 {
 	if (CPUAnim.bLooping)	{ return; }

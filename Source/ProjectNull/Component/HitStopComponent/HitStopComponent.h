@@ -9,10 +9,10 @@ class PROJECTNULL_API UHitStopComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-
-	UHitStopComponent() {}
-	virtual ~UHitStopComponent() {}
-
+	UHitStopComponent();
+protected:
+	virtual void BeginPlay() override;
+public:
 	/** 引数１が発生する時間、引数２がヒットストップの強さ*/
 	void StartHitStop(float Duration, float TimeDilation = 0.1f);
 

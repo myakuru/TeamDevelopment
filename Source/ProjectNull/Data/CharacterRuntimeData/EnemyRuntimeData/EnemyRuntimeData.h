@@ -79,6 +79,18 @@ public:
 
 	void UpdateAnimationMonitor(float DeltaTime);
 
+	/**
+	 * @brief 最終的なHP
+	 * @param InFinalHP 計算後の最終HP
+	 */
+	void SetFinalHP(float InFinalHP);
+
+	/**
+	 * @brief 最終的な攻撃力
+	 * @param InFinalAttack 計算後の最終攻撃力
+	 */
+	void SetFinalAttack(float InFinalAttack);
+
 	void NotifyAnimFinished()	{ CPUAnim.bFinished = true; }
 	void ResetAnimFinished()	{ CPUAnim.bFinished = false; }
 	bool GetAnimFinished()			const { return CPUAnim.bFinished; }

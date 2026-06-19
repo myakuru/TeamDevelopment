@@ -23,10 +23,15 @@ EStateTreeRunStatus USTT_EnemyAttack::EnterState(FStateTreeExecutionContext& a_C
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy)	{ return EStateTreeRunStatus::Failed; }
 
-	// 前ステートの終了フラグをリセット
-	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
+	if (auto EnemyRuntime = OwnerEnemy->GetEnemyRuntimeData())
+	{
+		// 前ステートの終了フラグをリセット
+		EnemyRuntime->ResetAnimFinished();
+		EnemyRuntime->StartAnimMonitor(static_cast<int32>(EEnemyState::Attack), false, 1.f);
+	}
+
 	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->PlayAnimation(static_cast<uint32>(EEnemyState::Attack), false);
+	OwnerEnemy->PlayAnimation(static_cast<int32>(EEnemyState::Attack), false);
 
 	if (auto AttackComponent = OwnerEnemy->GetEnemyAttackComponent())
 	{
