@@ -72,8 +72,9 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 		// 次のアニメーションがあり、flgがtrueなら次のアニメーションを実行
 		if (Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 		{
-			Anim->Montage_Play(Atk.AttackMontages[Boss->GetHitIndex()]);
-
+			bMontageStarted = false;
+			//Anim->Montage_Play(Atk.AttackMontages[Boss->GetHitIndex()]);
+			
 			return EStateTreeRunStatus::Running;
 		}
 		return EStateTreeRunStatus::Succeeded;
@@ -117,10 +118,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::EnterState(FStateTreeExecutionCont
 	bMontageStarted = false;
 
 	// 攻撃の瞬間に移動を止める（残った移動でクルッと回るのを防ぐ）
-	//if (AAIController* AICon = Cast<AAIController>(AIC))
-	{
-		AIC->StopMovement();
-	}
+	AIC->StopMovement();
 
 	Boss->ResetHitIndex();
 

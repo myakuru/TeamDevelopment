@@ -13,6 +13,14 @@ public:
 	/** このボスが使う攻撃パターン一覧 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 	TArray<FBossAttackPattern> Patterns;
+};
+
+UCLASS(BlueprintType)
+class PROJECTNULL_API UEnemyBossDataAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
 
 	// 移動方向
 	UPROPERTY(EditAnywhere)
@@ -52,12 +60,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	float GearEnergy = 0;
 
-	// プレイヤーとの距離
-	float DistancePlayer = 0.0f;
-
-	// 攻撃可能距離
-	UPROPERTY(EditAnywhere)
-	float AttackDistance = 20.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
+	int32 HitIndex = 0;													/** 攻撃が何連撃目か*/
 
 	// 攻撃可能フラグ
 	bool CanAttack = false;
@@ -65,4 +69,5 @@ public:
 	/** 生存フラグ*/
 	UPROPERTY(EditAnywhere)
 	bool IsAlive = true;
+
 };

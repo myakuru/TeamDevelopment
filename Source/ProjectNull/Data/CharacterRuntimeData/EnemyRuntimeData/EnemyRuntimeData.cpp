@@ -8,75 +8,31 @@ UEnemyRuntimeData::UEnemyRuntimeData()
 {
 }
 
-// 次のアニメーションに使用するデータをセット
-void UEnemyRuntimeData::SetNextAnimData(int32 NextIndex, bool RoopFlg, bool ChangeFlg)
+void UEnemyRuntimeData::StartAnimMonitor(int32 a_AnimIndex, bool bLooping, float Duration)
 {
-	NextAnimIndex = NextIndex;
-	AnimRoopFlg = RoopFlg;
-	AnimChangeFlg = ChangeFlg;
+	CPUAnim.AnimIndex	= a_AnimIndex;
+	CPUAnim.bLooping	= bLooping;
+	CPUAnim.bFinished	= false;
+	CPUAnim.ElapsedTime = 0.0f;
+	CPUAnim.Duration	= Duration;
 }
 
-void UEnemyRuntimeData::SetFinalHP(float InFinalHP)
+void UEnemyRuntimeData::UpdateAnimationMonitor(float DeltaTime)
 {
-	Health.Max = Health.Current = InFinalHP;
-}
+	if (CPUAnim.bLooping)	{ return; }
+	if (CPUAnim.bFinished)	{ return; }
 
-void UEnemyRuntimeData::SetFinalAttack(float InFinalAttack)
-{
-	Attack.Final = InFinalAttack;
-}
+	UE_LOG(LogTemp, Warning, TEXT("NandeNandeNandeNande"));
+	UE_LOG(LogTemp, Warning, TEXT("NandeNandeNandeNande"));
+	UE_LOG(LogTemp, Warning, TEXT("NandeNandeNandeNande"));
+	UE_LOG(LogTemp, Warning, TEXT("NandeNandeNandeNande"));
 
-void UEnemyRuntimeData::UpdateAnimation(float DeltaTime, float BlendSpeed)
-{
-	/* 備忘録 */
-	// アニメション進行度を知る
-	// Executeの度にAnimFrameを更新
-	// 
+	CPUAnim.ElapsedTime += DeltaTime;
 
-	PrevAnimTime = AnimTime;
-
-	// アニメーションブレンド中はCurrentAnimTimeを止めてブレンドするため
-	// アニメーションブレンド用のフラグがFalseの時のみAnimTimeを更新
-	if (!AnimChangeFlg)
+	if (CPUAnim.ElapsedTime >= CPUAnim.Duration)
 	{
-		AnimTime += DeltaTime;
+		CPUAnim.bFinished = true;
 	}
-	else
-	{
-		AnimBlendWeight += DeltaTime / BlendSpeed;
-		NextAnimTime += DeltaTime;
-		// 1.0fでクランプする
-		AnimBlendWeight = FMath::Min(AnimBlendWeight, 1.0f);
-	}
-}
-
-void UEnemyRuntimeData::ComplateAnimBlend()
-{
-	// ブレンド完了したら切り替える（最初ではなく最後）
-	//if (AnimBlendWeight >= 1.0f)
-	{
-		AnimBlendWeight = 0.0f;
-		AnimChangeFlg = false;
-
-		// ここで初めてアニメ切り替え
-		AnimIndex = NextAnimIndex;
-		AnimTime = NextAnimTime;	// 1回だけリセット
-		NextAnimTime = 0.0f;
-	}
-}
-
-void UEnemyRuntimeData::AnimationReset()
-{
-	AnimTime = 0.0f;
-	PrevAnimTime = 0.0f;
-
-	AnimIndex = 0;
-	NextAnimIndex = 0;
-	NextAnimTime = 0.0f;
-
-	AnimNumFrames = 0.0f;
-
-	AnimBlendWeight = 0.0f;
 }
 
 void UEnemyRuntimeData::CalcDistanceToTarget(const FVector& a_TargetPos, const FVector& a_OwnerPos)

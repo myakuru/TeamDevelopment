@@ -5,6 +5,7 @@
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
 #include "Perception/PawnSensingComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AEnemyBossBase::AEnemyBossBase()
@@ -16,6 +17,9 @@ AEnemyBossBase::AEnemyBossBase()
 	PawnSensingComp->SightRadius = 2000.0f;					// 視認距離
 	// PawnSensingComponentはデフォルトでbOnlySensePlayers = trueなので
 	// OnSeePawnはプレイヤーが視界・距離・視線条件を満たしたときだけ発火する
+
+	// 敵のランタイムパラメータ管理クラスの生成
+	EnemyBossRuntimeData = CreateDefaultSubobject<UEnemyBossRuntimeData>("EnemyBossRuntimeData");
 
 	StateTreeComp = CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
 }
@@ -34,6 +38,8 @@ void AEnemyBossBase::BeginPlay()
 	// 攻撃トリガー：ダメージを受けたら攻撃者を追尾対象に設定
 	OnTakeAnyDamage.AddDynamic(this, &AEnemyBossBase::HandleTakeAnyDamage);
 
+	RegisterDelegates();
+
 	//SetBossEnemyStatus();
 
 }
@@ -50,6 +56,21 @@ void AEnemyBossBase::Tick(float DeltaTime)
 void AEnemyBossBase::ReceiveDamage(float Damage)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Boss Receive Damage "));
+}
+
+void AEnemyBossBase::RegisterDelegates()
+{
+	// デリゲートへの登録はBeginPlayで行う
+}
+
+void AEnemyBossBase::TryConsumeFastFallRequest()
+{
+	if (!EnemyBossRuntimeData->bShouldFastFallOnNotify) return;
+
+	EnemyBossRuntimeData->bShouldFastFallOnNotify = false;
+
+	GetCharacterMovement()->GravityScale = FastFallGravityScale;
+
 }
 
 // ------------------------------------------------------------------------------------
@@ -88,16 +109,15 @@ void AEnemyBossBase::HandleTakeAnyDamage(AActor* DamagedActor, float Damage,
 	}
 }
 
-//void AEnemyBossBase::SetEnemyBossStatusData(UEnemyDataAsset* InData)
-//{
-//	if (!InData) { return; }
-//
-//	EnemyBossStatus.MoveSpeed = InData->MoveSpeed;
-//	EnemyBossStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
-//	EnemyBossStatus.FinalHP = InData->FinalHP;
-//	EnemyBossStatus.FinalAttack = InData->FinalAttack;
-//	EnemyBossStatus.KnockBackWeight = InData->KnockBackWeight;
-//	EnemyBossStatus.Exp = InData->Exp;
-//	EnemyBossStatus.GearEnergy = InData->GearEnergy;
-//	EnemyBossStatus.AttackDistance = InData->AttackDistance;
-//}
+void AEnemyBossBase::SetEnemyBossStatusData(UEnemyBossDataAsset* InData)
+{
+	if (!InData) { return; }
+
+	EnemyBossStatus.MoveSpeed			= InData->MoveSpeed;
+	EnemyBossStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
+	EnemyBossStatus.FinalHP				= InData->FinalHP;
+	EnemyBossStatus.FinalAttack			= InData->FinalAttack;
+	EnemyBossStatus.KnockBackWeight		= InData->KnockBackWeight;
+	EnemyBossStatus.Exp					= InData->Exp;
+	EnemyBossStatus.GearEnergy			= InData->GearEnergy;
+}

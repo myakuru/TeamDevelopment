@@ -29,4 +29,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	float MoveSpeed = 400.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	float JumpChangeDistance = 1000.0f;	/** ジャンプ攻撃に移行する距離*/
+
+	bool bJumpFlg = false;	/** 走り中にジャンプ攻撃に移行するかのフラグ*/
+
+private:
+
+	// ------------------------------------------------------------------------------------
+	// private method
+	// ------------------------------------------------------------------------------------
 };

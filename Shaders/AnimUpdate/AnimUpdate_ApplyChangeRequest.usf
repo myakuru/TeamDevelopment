@@ -51,9 +51,9 @@ void ApplyChangeRequestCS(uint3 id : SV_DispatchThreadID)
     //    (float) flags,
     //    req.BlendSpeed
     //);
-    GPUAnimStateBuffer[idx].AnimIndex = AnimState.AnimIndex;
-    GPUAnimStateBuffer[idx].NextAnimIndex = req.NextAnimIndex;
-    GPUAnimStateBuffer[idx].Flags = (int) flags;
-    GPUAnimStateBuffer[idx].BlendSpeed = req.BlendSpeed;
-    GPUAnimStateBuffer[idx].BlendWeight = 0.0f;
+    GPUAnimStateBuffer[idx].AnimIndex       = AnimState.AnimIndex;
+    GPUAnimStateBuffer[idx].NextAnimIndex   = req.NextAnimIndex;
+    GPUAnimStateBuffer[idx].Flags           = (int) flags;
+    GPUAnimStateBuffer[idx].BlendSpeed      = req.BlendSpeed;
+    GPUAnimStateBuffer[idx].BlendWeight     = 0.0f;
 }

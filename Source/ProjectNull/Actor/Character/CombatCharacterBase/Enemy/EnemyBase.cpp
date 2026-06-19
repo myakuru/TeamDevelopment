@@ -241,9 +241,9 @@ void AEnemyBase::FinalizeDeath()
 	}
 
 	{
-		//SpawnDeathEffect();
+		SpawnDeathEffect();
 
-		//SpawnDeathExperience();
+		SpawnDeathExperience();
 	}
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
@@ -484,9 +484,11 @@ void AEnemyBase::PlayAnimation(int32 NextAnimIndex, bool bLoop)
 		return;
 	}
 
-	const float Duration = AnimData->Animations[NextAnimIndex].NumFrames / 30.0f;
+	//const float Duration = AnimData->Animations[NextAnimIndex].NumFrames / 30.0f;
+	float Duration = (AnimData->Animations[NextAnimIndex].NumFrames - AnimData->Animations[NextAnimIndex].StartTime) / 30.0f;
 
-	EnemyRuntimeData->SetNextAnimData(NextAnimIndex, bLoop, true);
+	//EnemyRuntimeData->SetNextAnimData(NextAnimIndex, bLoop, true);
+	EnemyRuntimeData->StartAnimMonitor(NextAnimIndex, bLoop, Duration);
 	ISMManager->RequestAnimChange(ISMInstanceIndex, NextAnimIndex, bLoop, 1.2f);
 
 	if (!bLoop && GetWorld())

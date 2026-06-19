@@ -1,6 +1,5 @@
 ﻿#include "PlayerBase.h"
 
-#include "Camera/CameraComponent.h"
 #include "CineCameraComponent.h"
 
 #include <GameFramework/SpringArmComponent.h>
@@ -11,8 +10,10 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "Camera/CameraComponent.h"
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
+#include <ProjectNull/Component/HitStopComponent/HitStopComponent.h>
 
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
@@ -82,6 +83,11 @@ APlayerBase::APlayerBase():
 	// 対象検索コンポーネントの初期化
 	// ================================================================
 	TargetSearchComponent = CreateDefaultSubobject<UTargetSearchComponent>("TargetSearch");
+
+	// ================================================================
+	// 対象検索コンポーネントの初期化
+	// ================================================================
+	HitStopComponent = CreateDefaultSubobject<UHitStopComponent>("HitStop");
 
 	// Material Parameter Collectionの更新処理クラスの生成
 	MaterialCollectionUpdater = NewObject<UPlayerMaterialCollectionUpdater>();
