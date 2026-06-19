@@ -67,18 +67,18 @@ void UFloatingWeaponAttack::Update(float DeltaTime)
 void UFloatingWeaponAttack::Execute()
 {
 	auto Owner = GetOwnerActor();
-	if (!Owner) { return; }
+	if (!Owner)					{ return; }
 
 	SetIsActive(true);
 	CurrentAngle	= StartAngle;
 	ElapsedTime		= 0.0f;
 
-	if (!AutoAttackHitActor) { return; }
+	if (!AutoAttackHitActor)	{ return; }
 	AutoAttackHitActor->SetHitEnabled(true);
 
 	// 自身のRoot取得
 	const auto RootComp = GetRootComponent();
-	if (!RootComp) { return; }
+	if (!RootComp)				{ return; }
 
 	for (auto& SlashEffect : SlashEffectArray)
 	{

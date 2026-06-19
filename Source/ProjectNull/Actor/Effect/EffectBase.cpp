@@ -1,18 +1,21 @@
 ﻿
 #include "EffectBase.h"
 
-
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
-UEffectBase::UEffectBase()
+UEffectBase::UEffectBase():
+	OwnerActor(nullptr),
+	EffectSystem(nullptr),
+	EffectComponent(nullptr),
+	RelativeTransform(FTransform())
 {
 }
 
 void UEffectBase::Start(USceneComponent* RootComponent)
 {
-	//if (!RootComponent || !EffectSystem) { return; }
+	if (!EffectSystem) { return; }
 
 	EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		EffectSystem,
@@ -25,4 +28,11 @@ void UEffectBase::Start(USceneComponent* RootComponent)
 
 	if (!EffectComponent) { return; }
 	EffectComponent->SetRelativeTransform(RelativeTransform);
+}
+
+void UEffectBase::DeactivateEffect()
+{
+	if (!EffectComponent) { return; }
+	EffectComponent->Deactivate();
+	EffectComponent = nullptr;
 }
