@@ -14,13 +14,15 @@
 //   各テクセル : float4(StartFrame, NumFrames, AnimNum, 0)
 //=============================================================
 
-RWTexture2D<float4> AnimStateTextureReadWrite;
-Texture2D<float4> AnimInfoTexture;
-RWStructuredBuffer<FGPUAnimState> GPUAnimStateBuffer;
+RWTexture2D<float4>                 AnimStateTextureReadWrite;
+Texture2D<float4>                   AnimInfoTexture;
+RWStructuredBuffer<FGPUAnimState>   GPUAnimStateBuffer;
+StructuredBuffer<uint>              ActiveInstanceIndexBuffer;
 
-float DeltaTime;
-float SampleRate;
-uint InstanceCount;
+float   DeltaTime;
+float   SampleRate;
+uint    ActiveInstanceCount;
+uint    MaxInstances;
 
 //=============================================================
 // ヘルパー関数
@@ -44,8 +46,13 @@ float GetStartFrames(int AnimIndex)
 [numthreads(64, 1, 1)]
 void MainCS(uint3 id : SV_DispatchThreadID)
 {
+    // アクティブなインスタンスIDを取得
+    uint activeSlot = id.x;
+    
+    // 実際に更新するインスタンスのIDをActiveInstanceIndexBufferから取得
+    //uint idx = ActiveInstanceIndexBuffer[id.x];
     uint idx = id.x;
-    if (idx >= InstanceCount)
+    if (idx >= MaxInstances)
     {
         return;
     }
@@ -136,7 +143,7 @@ void MainCS(uint3 id : SV_DispatchThreadID)
             AnimState.AnimIndex         = AnimState.NextAnimIndex;
             AnimState.AnimTime          = fmod(AnimState.NextAnimTime, NextLoopDuration);
             AnimState.NextAnimTime      = 0.0f;
-            //AnimState.Flags &= ~FLAG_BLENDING;
+            AnimState.Flags &= ~FLAG_BLENDING;
             //Flags &= ~FLAG_FINISHED;
             
             bBlending = 0.0f;

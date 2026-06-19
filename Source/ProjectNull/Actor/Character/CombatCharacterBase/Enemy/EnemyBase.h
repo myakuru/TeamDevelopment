@@ -164,6 +164,12 @@ public:
 		return EnemyAttackComponent;
 	}
 
+	/** ISMInstanceIndexを返す*/
+	uint32 GetISMInstanceIndex() const
+	{
+		return ISMInstanceIndex;
+	}
+
 	/** ターゲットとの距離を返す*/
 	float GetTargetDistanceSqr()const { return EnemyStatus.TargetDistanceSqr; }
 
