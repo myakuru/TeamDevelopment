@@ -9,6 +9,9 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
+#include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
+
+
 #include <ProjectNull/Utility/GroundUtility/GroundUtility.h>
 
 #include "NiagaraSystem.h"
@@ -67,21 +70,16 @@ void UDashGearStateBase::End()
 
 void UDashGearStateBase::Dash()
 {
-	if (!Player) { return; }
+	if (!Player)				{ return; }
 
-	FVector FloorNormal = FVector::ZeroVector;
-	if (!Player->GetCurrentFloorNormal(FloorNormal)) { return; }
+	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
+	if (!GroundAlignmentComp)	{ return; }
 
-	if (FloorNormal.IsNearlyZero()) {
-		FloorNormal = FVector::UpVector;
-	}
+	auto RootComp = GroundAlignmentComp->GetRootComponent();
+	if (!RootComp)				{ return; }
 
-	const FQuat Quat = UGroundUtility::MakeRotationFromGroundNormal(
-		Player->GetActorTransform(),
-		FloorNormal);
-	
-	const FVector Dir = Player->GetActorForwardVector();
-	//const FVector Dir = Quat.ToRotationVector();
+	//const FVector Dir = Player->GetActorForwardVector();
+	const FVector Dir = RootComp->GetForwardVector();
 	Player->LaunchCharacter(Dir * DashSpeed, true, true);
 
 	if (Owner) {

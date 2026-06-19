@@ -118,7 +118,7 @@ public:
 	 * @brief ルートを取得
 	 * @return ルートコンポーネント
 	 */
-	TObjectPtr<USceneComponent> GetRootComponent()const { return RootComponent; }
+	inline USceneComponent* GetRootComponent()const { return RootComponent; }
 
 	/**
 	 * @brief 攻撃を当てたアクターリストを取得
