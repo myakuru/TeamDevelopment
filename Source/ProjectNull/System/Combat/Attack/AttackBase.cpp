@@ -24,7 +24,8 @@ void UAttackBase::Initialize(const TObjectPtr<AActor>& Owner)
 
 	RootComponent->AttachToComponent(
 			Owner->GetRootComponent(),
-			FAttachmentTransformRules::KeepRelativeTransform);
+			FAttachmentTransformRules::KeepRelativeTransform
+	);
 
 	RootComponent->SetAbsolute(bAbsoluteLocation, bAbsoluteRotation, bAbsoluteScale);
 }

@@ -1,6 +1,9 @@
 ﻿
 #include "DashGearStateBase.h"
 
+
+
+#include <ProjectNull/Actor/Effect/EffectBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
@@ -19,7 +22,8 @@
 #include "NiagaraFunctionLibrary.h"
 
 UDashGearStateBase::UDashGearStateBase():
-	DashAttackRangeSquared(30000.0f),
+	DashDir(FVector::ZeroVector),
+	StartQuat(FQuat::Identity),
 	DashSpeed(2000.0f),
 	DashEffectDuration(0.3f)
 {
@@ -29,14 +33,33 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 {
 	UGearStateBase::Execute(CurrentGearLevel);
 
-	
+	if (!Player)				{ return; }
+
+	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
+	if (!GroundAlignmentComp)	{ return; }
+
+	auto RootComp = GroundAlignmentComp->GetRootComponent();
+	if (!RootComp)				{ return; }
+
+	DashDir = RootComp->GetForwardVector();
+	StartQuat = RootComp->GetComponentQuat();
+
+	if (DashEffect) {
+		DashEffect->Start(RootComp);
+		// 位置だけ親に追従
+		DashEffect->SetAbsolute(false, true, true);
+	}
+
+	auto EffectComp = DashEffect->GetEffectComponent();
+	if (!EffectComp) { return; }
+
+	EffectComp->SetWorldRotation(StartQuat);
 
 	PlayDashEffect();
 
-	if (!Player) { return; }
 	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
-
 	if (!PlayerAnimInstance) { return; }
+
 	PlayerAnimInstance->Montage_Play(DashAnimMontage);
 
 	auto DashGear = Cast<UDashGear>(Owner);
@@ -62,6 +85,10 @@ void UDashGearStateBase::End()
 
 	PlayerAnimInstance->Montage_Stop(0.2f);
 
+	if (DashEffect) {
+		DashEffect->DeactivateEffect();
+	}
+
 	auto DashGear = Cast<UDashGear>(Owner);
 	if (!DashGear) { return; }
 
@@ -72,15 +99,8 @@ void UDashGearStateBase::Dash()
 {
 	if (!Player)				{ return; }
 
-	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
-	if (!GroundAlignmentComp)	{ return; }
-
-	auto RootComp = GroundAlignmentComp->GetRootComponent();
-	if (!RootComp)				{ return; }
-
-	//const FVector Dir = Player->GetActorForwardVector();
-	const FVector Dir = RootComp->GetForwardVector();
-	Player->LaunchCharacter(Dir * DashSpeed, true, true);
+	Player->LaunchCharacter(DashDir * DashSpeed, true, true);
+	//UE_LOG(LogTemp, Display, TEXT("DashDir X%.2f Y%.2f Z%.2f"), DashDir.X,DashDir.Y,DashDir.Z);
 
 	if (Owner) {
 		Owner->SetBlocksMovement(true);
@@ -91,14 +111,19 @@ void UDashGearStateBase::Dash()
 
 void UDashGearStateBase::PlayDashEffect()
 {
-	UNiagaraComponent* NiagaraComp = nullptr;
-	if (!Player) { return; }
+	if (!Player ||
+		!DashEffect) { return; }
 
-	if (DashEffect)
+	auto EffectComp = DashEffect->GetEffectComponent();
+	if (!EffectComp) { return; }
+
+	EffectComp->SetWorldRotation(StartQuat);
+
+	/*if (DashEffect)
 	{
 		NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
 			DashEffect,
-			Player->GetRootComponent(),
+			RootComp,
 			NAME_None,
 			FVector::ZeroVector,
 			FRotator::ZeroRotator,
@@ -107,6 +132,12 @@ void UDashGearStateBase::PlayDashEffect()
 		);
 	}
 
+	if (NiagaraComp)
+	{
+		NiagaraComp->;
+	}
+
+	NiagaraComp->SetWorldRotation(StartQuat);
 
 	if (NiagaraComp)
 	{
@@ -125,7 +156,7 @@ void UDashGearStateBase::PlayDashEffect()
 			DashEffectDuration,
 			false
 		);
-	}
+	}*/
 }
 
 void UDashGearStateBase::UpdateDashAttack()

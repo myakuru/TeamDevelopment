@@ -10,7 +10,6 @@ UGroundAlignmentComponent::UGroundAlignmentComponent():
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	RootComp = CreateDefaultSubobject<USceneComponent>("Root");
-	//SetRootComponent(RootComp);
 
 }
 
@@ -19,7 +18,15 @@ void UGroundAlignmentComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	const auto Owner = GetOwner();
+	if (!RootComp || 
+		!Owner)	{ return; }
+
+	RootComp->AttachToComponent(
+		Owner->GetRootComponent(),
+		FAttachmentTransformRules::KeepRelativeTransform
+	);
+
 }
 
 

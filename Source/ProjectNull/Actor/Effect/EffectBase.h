@@ -27,6 +27,13 @@ public:
 
 	void DeactivateEffect();
 
+	void SetAbsolute(
+		bool bNewAbsoluteLocation,
+		bool bNewAbsoluteRotation,
+		bool bNewAbsoluteScale);
+
+	inline UNiagaraComponent* GetEffectComponent() const { return EffectComponent; }
+
 protected:
 
 	/** 持ち主のクラス */
