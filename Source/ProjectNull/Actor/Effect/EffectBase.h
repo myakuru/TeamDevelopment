@@ -2,7 +2,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "UObject/Object.h"
+
 #include "EffectBase.generated.h"
 
 /** Niagaraエフェクトクラス */
@@ -17,14 +19,13 @@ UCLASS()
 class PROJECTNULL_API UEffectBase : public UObject
 {
 	GENERATED_BODY()
-
 public:
-
 	UEffectBase();
-
 public:
 
 	void Start(USceneComponent* RootComponent);
+
+	void DeactivateEffect();
 
 protected:
 

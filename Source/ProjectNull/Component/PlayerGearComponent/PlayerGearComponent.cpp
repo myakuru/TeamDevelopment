@@ -2,9 +2,13 @@
 
 #include "Components/SphereComponent.h"
 
+#include <ProjectNull/Component/HitStopComponent/HitStopComponent.h>
+
 #include <ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+
+#include <ProjectNull/Actor/Effect/EffectBase.h>
 
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 
@@ -17,8 +21,15 @@
 
 UPlayerGearComponent::UPlayerGearComponent():
 		OwnerPlayer(nullptr),
-		PlayerGears(TArray<UGearBase*>()),
-		CurrentGearLevel(1)
+		PlayerRuntimeData(nullptr),
+		PlayerParameterData(nullptr),
+		PlayerGears(TArray<TObjectPtr<UGearBase>>()),
+		SphereCollision(nullptr),
+		SphereCollisionClass(nullptr),
+		CurrentGearLevel(1),
+		HitStopDuration(0.f),
+		HitStopTimeDilation(0.f),
+		InvincibilityTimerHandle(FTimerHandle())
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -30,16 +41,17 @@ void UPlayerGearComponent::BeginPlay()
 
 	OwnerPlayer = Cast<APlayerBase>(GetOwner());
 
-	auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	auto SuperGameInstance	= GetWorld()->GetGameInstance<USuperGameInstance>();
 	if (!SuperGameInstance)		{ return; }
 
-	PlayerParameterData = SuperGameInstance->GetPlayerParameterData();
+	PlayerParameterData		= SuperGameInstance->GetPlayerParameterData();
 	if (!PlayerParameterData)	{ return; }
 
-	PlayerRuntimeData	= SuperGameInstance->GetPlayerRuntimeData();
+	PlayerRuntimeData		= SuperGameInstance->GetPlayerRuntimeData();
 	if (!PlayerRuntimeData)		{ return; }
 
-	
+	InitializeSphereCollision();
+
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
 		if (!PlayerGears[Index]) { continue; }
@@ -55,6 +67,7 @@ void UPlayerGearComponent::TickComponent(
 	ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
+	
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	UpdateGearWidget(DeltaTime);
@@ -65,6 +78,9 @@ void UPlayerGearComponent::TickComponent(
 	}
 
 	UpdateCollisionByInvincibility();
+
+	/*if (!PlayerRuntimeData) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("hi IsInvincible %d"), PlayerRuntimeData->IsInvincible());*/
 
 }
 
@@ -106,6 +122,7 @@ void UPlayerGearComponent::ChangeGear()
 	//UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
 
 	OnInvincibilityStart();
+
 }
 
 void UPlayerGearComponent::OnGearBeginOverlap(
@@ -116,13 +133,22 @@ void UPlayerGearComponent::OnGearBeginOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (!OwnerPlayer) { return; }
+	if (!OwnerPlayer)	{ return; }
 	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
 
 	auto Interface = Cast<ICharacterInterface>(OtherActor);
-	if (!Interface) { return; }
+	if (!Interface)		{ return; }
 	Interface->ApplyDamaged();
 	Interface->ApplyKnockBack(PlayerLocation);
+	
+	auto HitStopComp = OwnerPlayer->GetHitStopComponent();
+	if (!HitStopComp)	{ return; }
+
+	HitStopComp->StartHitStop(
+		HitStopDuration,
+		HitStopTimeDilation
+	);
+
 }
 
 void UPlayerGearComponent::InitializeSphereCollision()
@@ -178,6 +204,15 @@ void UPlayerGearComponent::SetIsInvincible(bool bInIsInvincible)
 	ECollisionEnabled::Type CollisionType
 		= bInIsInvincible ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision;
 
+
+	if (bInIsInvincible)
+	{
+		StartInvincibleEffect();
+	}
+	else {
+		DeactivateEffect();
+	}
+
 	SphereCollision->SetCollisionEnabled(CollisionType);
 }
 
@@ -221,6 +256,7 @@ void UPlayerGearComponent::UpdateCollisionByInvincibility()
 		!PlayerRuntimeData)					{ return; }
 
 	if (!PlayerRuntimeData->IsInvincible()) { return; }
+	//UE_LOG(LogTemp, Warning, TEXT("hi addmove"));
 	
 	const FRotator	YawRotation	= { 0.f, OwnerPlayer->GetControlRotation().Yaw, 0.f };
 	const FVector	Forward		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
@@ -234,5 +270,22 @@ void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
 	{
 		UpdateSkillCooldown(Index, PlayerGears[Index]);
 	}
+}
+
+void UPlayerGearComponent::StartInvincibleEffect()
+{
+	if (!InvincibleEffect ||
+		!OwnerPlayer)		{ return; }
+
+	const auto RootComp = OwnerPlayer->GetRootComponent();
+	if (!RootComp)			{ return; }
+
+	InvincibleEffect->Start(RootComp);
+}
+
+void UPlayerGearComponent::DeactivateEffect()
+{
+	if (!InvincibleEffect) { return; }
+	InvincibleEffect->DeactivateEffect();
 }
 
