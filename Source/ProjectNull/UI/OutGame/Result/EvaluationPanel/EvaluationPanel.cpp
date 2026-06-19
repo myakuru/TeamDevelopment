@@ -4,9 +4,11 @@
 #include "EvaluationPanel.h"
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/System/Result/ResultManager/ResultManager.h>
+#include <ProjectNull/UI/OutGame/Result/ResultWidget/ResultWidget.h>
 #include <ProjectNull/UI/OutGame/Result/EvaluationPanel/ResultAcievementWidget/ResultAchievementWidget.h>
 #include "Components/VerticalBox.h"
 #include "Components/TextBlock.h"
+#include "Components/Button.h"
 
 void UEvaluationPanel::NativeConstruct()
 {
@@ -18,13 +20,12 @@ void UEvaluationPanel::NativeConstruct()
 	UResultManager* resultManager = gameInstance->GetResultManager();
 	if (!resultManager)return;
 
+	// クリアデータ取得
 	ResultData = resultManager->GetResultData();
-
-	TargetTime = ResultData.ClearTime;
-	TargetPhase = ResultData.ClearPhase;
 
 	if (!ResultAchievementWidgetClass || !AchieveList) return;
 
+	// 全てのクリア条件を取得してUIとリストにセット
 	for (const FClearRankData& clearRankData : resultManager->GetSortedClearRankDatas()) {
 		UResultAchievementWidget* newItem = CreateWidget<UResultAchievementWidget>(GetWorld(), ResultAchievementWidgetClass);
 		newItem->Initialize(clearRankData.ConditionData);
@@ -33,9 +34,19 @@ void UEvaluationPanel::NativeConstruct()
 		AchieveList->AddChild(newItem);
 	}
 
+	// アニメーションフラグ初期化
 	bPlayingClearTimeAnimation = true;
 	bPlayingReachedPhaseAnimation = true;
 	bPlayingAchievemtsCheckAnimation = true;
+
+	// 報酬画面移行ボタンのクリックイベントにページ進行関数をセット
+	if (ToRewardButton) {
+		ToRewardButton->OnClicked.AddDynamic(
+			this,
+			&UEvaluationPanel::OnToRewardButtonClicked
+		);
+	}
+
 }
 
 void UEvaluationPanel::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -58,12 +69,17 @@ void UEvaluationPanel::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	}
 }
 
+void UEvaluationPanel::OnToRewardButtonClicked()
+{
+	OnNextPageRequested.Broadcast();
+}
+
 void UEvaluationPanel::ClearTimeAnimation(float InDeltaTime)
 {
 	ElapsedTime += InDeltaTime;
 	float Alpha = FMath::Clamp(ElapsedTime / AnimationDuration, 0.0f, 1.0f);
 
-	CurrentDisplayTime = FMath::Lerp(0.0f, TargetTime, Alpha);
+	CurrentDisplayTime = FMath::Lerp(0.0f, ResultData.ClearTime, Alpha);
 
 	int32 Minutes = static_cast<int32>(CurrentDisplayTime) / 60;
 	int32 Seconds = static_cast<int32>(CurrentDisplayTime) % 60;
@@ -87,7 +103,7 @@ void UEvaluationPanel::ReachedPhaseAnimation(float InDeltaTime)
 	float Alpha = FMath::Clamp(ElapsedTime / AnimationDuration, 0.0f, 1.0f);
 
 	CurrentDisplayPhase = FMath::RoundToInt(
-		FMath::Lerp(0.0f, static_cast<float>(TargetPhase), Alpha)
+		FMath::Lerp(0.0f, static_cast<float>(ResultData.ClearPhase), Alpha)
 	);
 
 	ReachedPhase->SetText(FText::FromString(FString::FromInt(CurrentDisplayPhase)));
@@ -107,6 +123,7 @@ void UEvaluationPanel::AchievementAnimation(float InDeltaTime)
 		return;
 	}
 
+	// クリアチェックの猶予時間が経ったらQueue配列前方から要素を取り出してクリアチェック
 	if (ElapsedTime >= AchievementClearCheckDuration) {
 		ElapsedTime = 0.0f;
 		TObjectPtr<UResultAchievementWidget> achievement;

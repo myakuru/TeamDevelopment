@@ -18,6 +18,7 @@ void UResultAchievementWidget::Initialize(URankConditionData* InRankConditionDat
 
 void UResultAchievementWidget::ClearCheck(const FResultData& ResultData)
 {
+	// 達成条件が達成されているかによって背景色を変更する
 	if (RankConditionData->IsConditionMet(ResultData)) BackGround->SetBrushColor(ClearColor);
 	else BackGround->SetBrushColor(FailedColor);
 }

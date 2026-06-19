@@ -7,13 +7,14 @@
 #include "../../../../Data/Result/ResultData/ResultData.h"
 #include "ResultWidget.generated.h"
 
-class UCanvasPanel;
 class UWidgetSwitcher;
+class UEvaluationPanel;
 
 /**
  * 
  */
 
+ /** リザルト画面ページEnum */
 UENUM()
 enum class EResultPage : uint8
 {
@@ -28,16 +29,29 @@ class PROJECTNULL_API UResultWidget : public UUserWidget
 
 public:
 
-	bool Initialize();
+	void NativeConstruct()override;
+	bool Initialize()override;
 
+	/** ページを進める */
 	void NextPage();
-	void ShowPage(EResultPage Page);
-	
+
 private:
 
-	UPROPERTY()
 	EResultPage CurrentPage = EResultPage::Evaluation;
 
+	/** リザルトページスイッチャー */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UWidgetSwitcher> ResultSwitcher;
+
+	/** 評価ページ */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UEvaluationPanel> EvaluationPanel;
+
+	/** 指定したページに切り替える */
+	void ShowPage(EResultPage Page);
+
+	/** 子ウィジェットのイベントに登録するページ進行関数 */
+	UFUNCTION()
+	void OnChildNextPageRequested();
+
 };
