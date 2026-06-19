@@ -404,11 +404,20 @@ void AEnemyBase::SpawnDeathEffect()
 	// 敵が死んだ際にパーティクルを出す
 	if (EnemyParticle.DeathEffect)
 	{
+		FTransform AdjustedTransform = GetActorTransform();
+		FRotator Rot = AdjustedTransform.GetRotation().Rotator();
+		Rot.Yaw -= 90.0f;
+		AdjustedTransform.SetRotation(Rot.Quaternion());
+
+		FVector Loc = AdjustedTransform.GetLocation();
+		Loc.Z -= 90.0f;
+		AdjustedTransform.SetLocation(Loc);
+
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			EnemyParticle.DeathEffect,
-			GetActorLocation(),
-			GetActorRotation(),
+			AdjustedTransform.GetLocation(),
+			AdjustedTransform.GetRotation().Rotator(),
 			FVector(1.0f),
 			true,   // bAutoDestroy
 			true,   // bAutoActivate
