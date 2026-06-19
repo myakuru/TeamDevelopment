@@ -60,15 +60,6 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 		return;
 	}*/
 
-	
-	
-	Test += DeltaTime;
-	if (Test > 3.f && !bTest)
-	{
-		bTest = true;
-		PlayAnimation(static_cast<int32>(EEnemyState::Death), true);
-	}
-
 	// 攻撃可能か判断
 	CheckCanAttack();
 	
