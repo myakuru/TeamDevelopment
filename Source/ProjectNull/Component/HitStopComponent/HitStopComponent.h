@@ -3,7 +3,6 @@
 #include "HitStopComponent.generated.h"
 
 /** ヒットストップを行う用のコンポーネント*/
-
 UCLASS( ClassGroup = (Custom), meta = (BlueprintSpawnableComponent) )
 class PROJECTNULL_API UHitStopComponent : public UActorComponent
 {

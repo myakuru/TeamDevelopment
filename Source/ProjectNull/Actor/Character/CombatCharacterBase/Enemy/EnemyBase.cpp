@@ -65,15 +65,6 @@ void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Chann
 	CapsuleComponent->SetCollisionResponseToChannel(Channel, NewResponse);
 }
 
-void AEnemyBase::OnEnterSlope()
-{
-	/* 備忘録 */
-	// 坂道の範囲内に入った場合
-	// １．フラグを立てる
-	// ２．移動処理内で坂道移動処理を実行
-	// ３．判定処理をタイマーに格納して毎フレーム計算を回避
-}
-
 void AEnemyBase::BeginPlay()
 {
 	AActor::BeginPlay();
@@ -118,6 +109,12 @@ void AEnemyBase::RegisterDelegates()
 
 	// ステートEnum切り替え
 	EnemyRuntimeData->OnStateEnumChanged.AddUObject(this, &AEnemyBase::SetEnemyState);
+
+	// 計算後の最終的なHPをセット
+	EnemyRuntimeData->SetFinalAttack(EnemyStatus.FinalHP);
+
+	// 計算後の最終的な攻撃力をセット
+	EnemyRuntimeData->SetFinalAttack(EnemyStatus.FinalAttack);
 
 	EnemyRuntimeData->OnIsAliveChanged.AddUObject(this, &AEnemyBase::SetIsAlive);
 }
@@ -244,9 +241,9 @@ void AEnemyBase::FinalizeDeath()
 	}
 
 	{
-		//SpawnDeathEffect();
+		SpawnDeathEffect();
 
-		//SpawnDeathExperience();
+		SpawnDeathExperience();
 	}
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
@@ -487,9 +484,11 @@ void AEnemyBase::PlayAnimation(int32 NextAnimIndex, bool bLoop)
 		return;
 	}
 
-	const float Duration = AnimData->Animations[NextAnimIndex].NumFrames / 30.0f;
+	//const float Duration = AnimData->Animations[NextAnimIndex].NumFrames / 30.0f;
+	float Duration = (AnimData->Animations[NextAnimIndex].NumFrames - AnimData->Animations[NextAnimIndex].StartTime) / 30.0f;
 
-	EnemyRuntimeData->SetNextAnimData(NextAnimIndex, bLoop, true);
+	//EnemyRuntimeData->SetNextAnimData(NextAnimIndex, bLoop, true);
+	EnemyRuntimeData->StartAnimMonitor(NextAnimIndex, bLoop, Duration);
 	ISMManager->RequestAnimChange(ISMInstanceIndex, NextAnimIndex, bLoop, 1.2f);
 
 	if (!bLoop && GetWorld())
