@@ -25,23 +25,7 @@ public:
 
 private:
 
-	void OnDeath();
-
-private:
-
 	/** @brief 持ち主のアドレス*/
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<AEnemyBase> OwnerEnemy = nullptr;
-
-	/**	内部状態*/
-	
-	/** 死亡アニメーションが終わったか*/
-	bool bIsDeathAnimFinished = false;
-
-	/** 経過時間*/
-	float ElapsedTime = 0.0f;
-	
-	/** 死亡アニメーションの長さ*/
-	UPROPERTY(EditAnywhere, Category = "Dead")
-	float DeathAnimDuration = 1.0f;
 };

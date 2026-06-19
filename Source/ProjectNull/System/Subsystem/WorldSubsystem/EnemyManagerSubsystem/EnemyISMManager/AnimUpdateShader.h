@@ -73,6 +73,7 @@ public:
 		SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<FGPUAnimState>, GPUAnimStateBuffer)
 		SHADER_PARAMETER(uint32, ChangeRequestCount)
 		SHADER_PARAMETER(uint32, InstanceCount)
+		SHADER_PARAMETER(uint32, MaxInstances)
 	END_UNIFORM_BUFFER_STRUCT()
 
 	/** 

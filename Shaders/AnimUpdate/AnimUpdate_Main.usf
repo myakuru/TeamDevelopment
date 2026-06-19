@@ -21,6 +21,7 @@ RWStructuredBuffer<FGPUAnimState> GPUAnimStateBuffer;
 float DeltaTime;
 float SampleRate;
 uint InstanceCount;
+uint MaxInstances;
 
 //=============================================================
 // ƒwƒ‹ƒp[ŠÖ”
@@ -45,7 +46,7 @@ float GetStartFrames(int AnimIndex)
 void MainCS(uint3 id : SV_DispatchThreadID)
 {
     uint idx = id.x;
-    if (idx >= InstanceCount)
+    if (idx >= MaxInstances)
     {
         return;
     }
@@ -136,7 +137,7 @@ void MainCS(uint3 id : SV_DispatchThreadID)
             AnimState.AnimIndex         = AnimState.NextAnimIndex;
             AnimState.AnimTime          = fmod(AnimState.NextAnimTime, NextLoopDuration);
             AnimState.NextAnimTime      = 0.0f;
-            //AnimState.Flags &= ~FLAG_BLENDING;
+            AnimState.Flags             &= ~FLAG_BLENDING;
             //Flags &= ~FLAG_FINISHED;
             
             bBlending = 0.0f;

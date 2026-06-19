@@ -26,15 +26,6 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
-	if (auto EnemyRuntime = OwnerEnemy->GetEnemyRuntimeData())
-	{
-		// 前ステートの終了フラグをリセット
-		EnemyRuntime->ResetAnimFinished();
-		EnemyRuntime->StartAnimMonitor(static_cast<int32>(EEnemyState::Death), false, DeathAnimDuration);
-	}
-	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->PlayAnimation(static_cast<int32>(EEnemyState::Death), false);
-
 	return EStateTreeRunStatus::Running;
 }
 
@@ -46,12 +37,9 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 
 	if (auto EnemyRuntime = OwnerEnemy->GetEnemyRuntimeData())
 	{
-		EnemyRuntime->UpdateAnimationMonitor(a_DeltaTime);
-
 		// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
 		if (EnemyRuntime->GetAnimFinished())
 		{
-			OwnerEnemy->FinalizeDeath();
 			return EStateTreeRunStatus::Succeeded;
 		}
 	}
@@ -61,9 +49,9 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 
 void USTT_EnemyDead::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
-	if (!OwnerEnemy) { return; }
-
 	Super::ExitState(a_Context, a_Transition);
+	
+	if (!OwnerEnemy) { return; }
 
 	// 死亡処理の実行
 	OwnerEnemy->FinalizeDeath();

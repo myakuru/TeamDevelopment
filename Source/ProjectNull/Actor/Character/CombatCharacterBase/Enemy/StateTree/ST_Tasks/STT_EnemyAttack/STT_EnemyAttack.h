@@ -36,10 +36,4 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AEnemyBase>	OwnerEnemy;
 
-	/**
-	 * @brief 攻撃対象となるアクター
-	 */
-	UPROPERTY()
-	TObjectPtr<APawn>		TargetActor;
-
 };

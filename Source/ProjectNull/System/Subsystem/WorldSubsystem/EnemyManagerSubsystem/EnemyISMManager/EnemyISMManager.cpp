@@ -453,12 +453,13 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 				Pass1Params->ChangeRequestBuffer	= RequestSRV;			// 変更要求一覧
 				Pass1Params->ChangeRequestCount		= (uint32)NumRequests;	// 変更要求数
 				Pass1Params->InstanceCount			= (uint32)NumInstances;	// インスタンス総数
+				Pass1Params->MaxInstances			= MaxInstances;			// インスタンス総数
 
 				// Pass1のComputeShaderを指定
 				// FApplyChangeRequestCSというGlobalShaderを取得
 				TShaderMapRef<FApplyChangeRequestCS> Pass1CS(GetGlobalShaderMap(GMaxRHIFeatureLevel));
 				// スレッドグループ数を決定
-				const int32 Pass1Groups = FMath::CeilToInt((float)NumRequests / 64.0f);
+				const int32 Pass1Groups = FMath::CeilToInt((float)MaxInstances / 64.0f);
 
 				// RDGにこのComputeShaderを後で実行するように登録
 				// GraphBuilder.Execute()で実行
@@ -504,7 +505,7 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 			Pass2Params->GPUAnimStateBuffer			= AnimStateUAV;
 
 			TShaderMapRef<FAnimUpdateCS> Pass2CS(GetGlobalShaderMap(GMaxRHIFeatureLevel));
-			const int32 Pass2Groups = FMath::CeilToInt((float)NumInstances / 64.0f);
+			const int32 Pass2Groups = FMath::CeilToInt((float)MaxInstances / 64.0f);
 			{
 				/* CeilToInt()・小数点以下を切り上げる */
 				// 0.1->1, 0.5->1, 1.0->1, 1.1->2, 3.9->4

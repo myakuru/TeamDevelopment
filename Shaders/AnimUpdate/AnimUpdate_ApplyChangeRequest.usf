@@ -5,6 +5,7 @@ RWStructuredBuffer<FGPUAnimState> GPUAnimStateBuffer;
 
 uint InstanceCount;
 uint ChangeRequestCount;
+uint MaxInstances;
 
 //=============================================================
 // Pass 1: アニメ変更リクエストの適用
@@ -22,7 +23,7 @@ void ApplyChangeRequestCS(uint3 id : SV_DispatchThreadID)
 
     FAnimChangeRequest req = ChangeRequestBuffer[reqIdx];
     uint idx = (uint) req.InstanceIndex;
-    if (idx >= InstanceCount)
+    if (idx >= MaxInstances)
     {
         return;
     }
