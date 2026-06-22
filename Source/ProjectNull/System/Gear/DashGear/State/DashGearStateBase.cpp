@@ -2,8 +2,8 @@
 #include "DashGearStateBase.h"
 
 
-
 #include <ProjectNull/Actor/Effect/EffectBase.h>
+#include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
@@ -68,6 +68,10 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 
 	DashGear->SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
+	auto ModelAfterimageTrailEffect = Player->GetModelAfterimageTrailEffect();
+	if (!ModelAfterimageTrailEffect) { return; }
+	ModelAfterimageTrailEffect->SetEnableSpawn(true);
+
 }
 
 void UDashGearStateBase::Update(float DeltaTime)
@@ -94,6 +98,11 @@ void UDashGearStateBase::End()
 	if (!DashGear) { return; }
 
 	DashGear->SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	auto ModelAfterimageTrailEffect = Player->GetModelAfterimageTrailEffect();
+	if (!ModelAfterimageTrailEffect) { return; }
+	ModelAfterimageTrailEffect->SetEnableSpawn(false);
+
 }
 
 void UDashGearStateBase::Dash()
