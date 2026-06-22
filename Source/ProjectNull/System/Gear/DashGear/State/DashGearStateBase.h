@@ -55,4 +55,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float DashEffectDuration;
+
+	UPROPERTY(EditAnywhere)
+	float MontageBlendOutTime;
 };

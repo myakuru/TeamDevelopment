@@ -25,7 +25,8 @@ UDashGearStateBase::UDashGearStateBase():
 	DashDir(FVector::ZeroVector),
 	StartQuat(FQuat::Identity),
 	DashSpeed(2000.0f),
-	DashEffectDuration(0.3f)
+	DashEffectDuration(0.3f),
+	MontageBlendOutTime(0.2f)
 {
 }
 
@@ -83,7 +84,7 @@ void UDashGearStateBase::End()
 	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
 	if (!PlayerAnimInstance) { return; }
 
-	PlayerAnimInstance->Montage_Stop(0.2f);
+	PlayerAnimInstance->Montage_Stop(MontageBlendOutTime);
 
 	if (DashEffect) {
 		DashEffect->DeactivateEffect();
@@ -119,44 +120,6 @@ void UDashGearStateBase::PlayDashEffect()
 
 	EffectComp->SetWorldRotation(StartQuat);
 
-	/*if (DashEffect)
-	{
-		NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			DashEffect,
-			RootComp,
-			NAME_None,
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::KeepRelativeOffset,
-			true
-		);
-	}
-
-	if (NiagaraComp)
-	{
-		NiagaraComp->;
-	}
-
-	NiagaraComp->SetWorldRotation(StartQuat);
-
-	if (NiagaraComp)
-	{
-		NiagaraComp->SetAutoDestroy(true);
-
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle,
-			[NiagaraComp]()
-			{
-				if (NiagaraComp)
-				{
-					NiagaraComp->Deactivate();
-				}
-			},
-			DashEffectDuration,
-			false
-		);
-	}*/
 }
 
 void UDashGearStateBase::UpdateDashAttack()
