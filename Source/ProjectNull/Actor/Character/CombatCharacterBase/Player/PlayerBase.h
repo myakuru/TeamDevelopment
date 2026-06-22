@@ -22,6 +22,9 @@ class UTargetSearchComponent;
 /** ヒットストップを行う用のコンポーネント*/
 class UHitStopComponent;
 
+/** 地面の法線に合わせてRootComponentの姿勢を更新するコンポーネント */
+class UGroundAlignmentComponent;
+
 class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
@@ -75,14 +78,15 @@ public:
 	void StartCutscene();
 
 	/** Getter */
-	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
-	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
-	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
-	inline UTargetSearchComponent*			GetTargetSearchComponent() const	{ return TargetSearchComponent; }
-	inline UHitStopComponent*				GetHitStopComponent() const			{ return HitStopComponent; }
-	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
-	inline UCineCameraComponent*			GetCineCameraComponent() const		{ return CineCameraComponent; }
-	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent() const	{ return CutsceneComponent; }
+	inline UCameraComponent*				GetCameraComponent()			const	{ return CameraComponent; }
+	inline USpringArmComponent*				GetSpringArmComponent()			const	{ return SpringArmComponent; }
+	inline UPlayerGearComponent*			GetGearComponent()				const	{ return GearComponent; }
+	inline UTargetSearchComponent*			GetTargetSearchComponent()		const	{ return TargetSearchComponent; }
+	inline UHitStopComponent*				GetHitStopComponent()			const	{ return HitStopComponent; }
+	inline UGroundAlignmentComponent*		GetGroundAlignmentComponent()	const	{ return GroundAlignmentComponent; }
+	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance()			const	{ return SuperGameInstance; }
+	inline UCineCameraComponent*			GetCineCameraComponent()		const	{ return CineCameraComponent; }
+	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent()	const	{ return CutsceneComponent; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
@@ -119,6 +123,10 @@ private:
 	/** ヒットストップを行う用のコンポーネント*/
 	UPROPERTY(VisibleAnywhere, Category = "HitStopComponent")
 	TObjectPtr<UHitStopComponent> HitStopComponent;
+
+	/** 地面の法線に合わせてRootComponentの姿勢を更新するコンポーネント */
+	UPROPERTY(VisibleAnywhere, Category = "GroundAlignment")
+	TObjectPtr<UGroundAlignmentComponent> GroundAlignmentComponent;
 
 	/** 自動攻撃クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")

@@ -36,3 +36,15 @@ void UEffectBase::DeactivateEffect()
 	EffectComponent->Deactivate();
 	EffectComponent = nullptr;
 }
+
+void UEffectBase::SetAbsolute(
+	bool bNewAbsoluteLocation,
+	bool bNewAbsoluteRotation,
+	bool bNewAbsoluteScale)
+{
+	if (!EffectComponent) { return; }
+	EffectComponent->SetAbsolute(
+		bNewAbsoluteLocation,
+		bNewAbsoluteRotation,
+		bNewAbsoluteScale);
+}
