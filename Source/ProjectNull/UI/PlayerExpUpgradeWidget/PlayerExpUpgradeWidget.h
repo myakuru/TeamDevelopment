@@ -13,6 +13,18 @@ class UPlayerRuntimeData;
 
 class UImage;
 
+/** 1レベル分の強化情報 */
+USTRUCT(BlueprintType)
+struct FValidUpgradeInfo
+{
+	GENERATED_BODY()
+
+	FName RowName;
+	FText Description;
+	float Multiplier;
+	FName CurrentLevel;
+};
+
 /**
  * 経験値がレベルアップしたら呼ばれるクラス
  */
@@ -47,6 +59,8 @@ protected:
 	void BackgroundImageFadeIn();
 
 	void InitUpgradeWidget();
+
+	void SetAttackMultiplier(float Multiplier);
 
 	/** 背景の黒い画像 */
 	UPROPERTY(meta = (BindWidget))
@@ -104,4 +118,8 @@ protected:
 
 	/** DataTable のロード（内部でキャッシュ） */
 	UDataTable* GetExpUpgradeTable();
+
+private:
+	// 説明文の数
+	TArray<FValidUpgradeInfo> ValidUpgrades;
 };

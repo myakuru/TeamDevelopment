@@ -29,16 +29,6 @@ EStateTreeRunStatus USTT_EnemyWalk::EnterState(FStateTreeExecutionContext& a_Con
 	// パラメータの初期化
 	InitializeWalkParams();
 
-	if (auto EnemyRuntime = OwnerEnemy->GetEnemyRuntimeData())
-	{
-		// 前ステートの終了フラグをリセット
-		EnemyRuntime->ResetAnimFinished();
-		EnemyRuntime->StartAnimMonitor(static_cast<int32>(EEnemyState::Walk), true, 1.f);
-	}
-
-	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->PlayAnimation(static_cast<int32>(EEnemyState::Walk), true);
-
 	return EStateTreeRunStatus::Running;
 }
 

@@ -135,9 +135,9 @@ void MainCS(uint3 id : SV_DispatchThreadID)
         if (AnimState.BlendWeight >= 1.0f)
         {
             // ブレンド完了・アニメ切り替え
-            //float NextStartFrame        = GetStartFrames(AnimState.NextAnimIndex);
-            //float NextEndFrame          = GetNumFrames(AnimState.NextAnimIndex);
-            //float NextActualNumFrames   = NextEndFrame - NextStartFrame;
+            CurrentFrame                = NextFrame;
+            PrevFrame                   = NextFrame;
+            EndFrames                   = GetNumFrames(AnimState.NextAnimIndex);
             float NextLoopDuration      = NextActualNumFrames / SampleRate;
             AnimState.BlendWeight       = 0.0f;
             AnimState.AnimIndex         = AnimState.NextAnimIndex;
