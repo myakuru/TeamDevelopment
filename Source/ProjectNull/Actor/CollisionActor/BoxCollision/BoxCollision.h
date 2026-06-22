@@ -54,8 +54,8 @@ public:
 	/* End Setters~ */
 
 	/* ~Begin Getters */
-	/**　球状当たり判定コンポーネントの取得 */
-	TObjectPtr<UBoxComponent> GetSphereComponent()const
+	/**　Box状当たり判定コンポーネントの取得 */
+	TObjectPtr<UBoxComponent> GetBoxComponent()const
 	{
 		return BoxComponent;
 	}

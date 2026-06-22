@@ -73,15 +73,6 @@ public:
 	virtual void Deactivate();
 
 	//~ Begin Setter
-
-	/**
-	 * @brief 敵（自身）が吹き飛ばされる処理
-	 * @param playerLocation プレイヤーの座標
-	 * @param AttackPower 攻撃力
-	 * @param EnemyWeight 敵の重さ
-	 */
-	virtual void SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight);
-
 	/**
 	 * @brief 移動方向のセット
 	 * @param MoveDir 移動方向
@@ -187,6 +178,17 @@ public:
 	//~ End Getter
 
 	/* Begin Character Interface.*/
+	
+	/**
+	* @brief 攻撃に必要なデータ(倍率・攻撃力)を取得
+	* @return 攻撃データ
+	*/
+	virtual FCharacterAttackData GetAttackData()const override { return AttackData; }
+
+	/**
+	 * @brief ダメージを受ける処理
+	 * @param Damage ダメージ量
+	 */
 	virtual void ApplyDamaged(float InDamaged = 1.f)override;
 
 	/* End Character Interface.*/
@@ -210,9 +212,6 @@ protected:
 	/** 敵のStateTree*/
 	UPROPERTY(VisibleAnywhere, Category = "StateTree")
 	TObjectPtr<UStateTreeComponent> StateTreeComponent;
-
-	/** 敵が吹き飛ばされている状態の処理 */
-	virtual void MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime);
 
 	/** DataTable 参照 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "KnockBack")
@@ -245,6 +244,10 @@ protected:
 	/** 死んだ時のエフェクト（パーティクル）*/
 	UPROPERTY(EditAnywhere)
 	FEnemyParticle EnemyParticle;
+
+	/** 攻撃に関する要素(倍率・攻撃力) */
+	UPROPERTY(EditAnywhere)
+	FCharacterAttackData AttackData;
 
 	FVector LanchVelocity;
 
@@ -286,10 +289,10 @@ public:
 	/// </summary>
 	virtual void CheckCanAttack();
 
-	/** 敵が死んださいにパーティクルを出すだけ*/
+	/** 敵が死んだ際にパーティクルを出すだけ*/
 	virtual void SpawnDeathEffect();
 
-	/** 敵が死んださいに経験値を出す*/
+	/** 敵が死んだ際に経験値を出す*/
 	virtual void SpawnDeathExperience();
 
 	/** アニメーションの変更*/

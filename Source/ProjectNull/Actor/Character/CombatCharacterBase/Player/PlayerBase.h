@@ -46,11 +46,20 @@ public:
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/* Begin Character Interface.*/	
 	/**
-	 * @brief ダメージを受ける
-	 * @param Damage 受けるダメージ量
+	 * @brief 攻撃に必要なデータ(倍率・攻撃力)を取得
+	 * @return 攻撃データ
 	 */
+	virtual FCharacterAttackData GetAttackData()const override { return AttackData; }
+
+	/**
+	* @brief ダメージを受ける処理
+	* @param Damage ダメージ量
+	*/
 	virtual void ApplyDamaged(float InDamage = 1.f)override;
+	
+	/* End Character Interface.*/
 
 	/**
 	 * @brief 移動処理
@@ -126,4 +135,8 @@ private:
 	/** ゲーム全体で共有されるデータや機能を管理するクラス */
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
+
+	/** 攻撃に関する要素(倍率・攻撃力) */
+	UPROPERTY(EditAnywhere, Category = "AttackData")
+	FCharacterAttackData AttackData;
 };

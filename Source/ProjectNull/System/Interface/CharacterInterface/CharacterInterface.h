@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "ProjectNull\Utility\Common\GameTypes\GameTypes.h"
 #include "CharacterInterface.generated.h"
 
 // This class does not need to be modified.
@@ -19,6 +20,12 @@ class PROJECTNULL_API ICharacterInterface
 	GENERATED_BODY()
 
 public:
+
+	/**
+	 * @brief 攻撃に必要なデータ(倍率・攻撃力)を取得
+	 * @return 攻撃データ
+	 */
+	virtual FCharacterAttackData GetAttackData()const { return FCharacterAttackData(); }
 
 	/**
 	 * @brief ダメージを受ける処理
