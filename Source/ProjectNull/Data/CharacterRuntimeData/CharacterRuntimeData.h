@@ -15,12 +15,14 @@ struct FAttackRuntimeData
 public:
 
 	FAttackRuntimeData() :
-		Final(0.0f)
+		Final(0.0f),
+		Base(0.0f)
 	{
 	}
 
-	/** 最終的な攻撃力 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	float Base;
+
 	float Final;
 };
 

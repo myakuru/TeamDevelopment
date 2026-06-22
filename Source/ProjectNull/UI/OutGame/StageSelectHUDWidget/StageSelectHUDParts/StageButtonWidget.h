@@ -5,7 +5,7 @@
 #include "Delegates/DelegateCombinations.h"
 #include "StageButtonWidget.generated.h"
 
-/** デリゲート宣言 */
+/** デリゲート宣言(子デリゲート) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedStageButton, int32, InStageIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHoveredStageButton, int32, InStageIndex);
 
@@ -18,10 +18,17 @@ class PROJECTNULL_API UStageButtonWidget : public UButtonBaseWidget
 	GENERATED_BODY()
 	
 protected:
+	virtual void NativeConstruct()override;
 
 	virtual void DoHoveredButton() override;
 
 	virtual void DoClickedButton() override;
+
+	UFUNCTION()
+	void DoHoveredStageButton();
+
+	UFUNCTION()
+	void DoClickedStageButton();
 
 	UPROPERTY()
 	int32	StageIndex	= 1;
@@ -37,8 +44,8 @@ public:
 
 	//デリゲートの宣言
 	UPROPERTY(BlueprintAssignable)
-	FOnClickedStageButton OnClicked;
+	FOnClickedStageButton OnClickedStage;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnHoveredStageButton OnHovered;
+	FOnHoveredStageButton OnHoveredStage;
 };
