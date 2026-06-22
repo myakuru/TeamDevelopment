@@ -25,7 +25,6 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 	{
 		UpgradeStates.Add({ RowName, "0"});
 	}
-
 }
 
 void UPlayerRuntimeData::Initialize()
@@ -38,12 +37,6 @@ void UPlayerRuntimeData::Initialize()
 	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn))
 	{
 		Owner = PlayerBase;
-	}
-
-
-	if (!RobotController)
-	{
-		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
 	}
 
 	UpdateStatus();
@@ -100,10 +93,14 @@ void UPlayerRuntimeData::ApplyMovementSpeed()
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed.Final;
 }
 
-void UPlayerRuntimeData::SetPlayerAttackDamage(float InAttackMultiplier)
+float UPlayerRuntimeData::GetPlayerAttackDamage()
 {
 	// プレイヤーの攻撃力を計算するロジックをここに実装
-	Attack.Final = Attack.Base * InAttackMultiplier;
+	Attack.Final = Attack.Base * AttackMultiplier;
+
+	UE_LOG(LogTemp, Error, TEXT("%f:Attack.Final"), Attack.Final);
+
+	return Attack.Final;
 }
 
 void UPlayerRuntimeData::LevelUp()
@@ -111,6 +108,11 @@ void UPlayerRuntimeData::LevelUp()
 	Level++;
 
 	UpdateStatus();
+
+	if (!RobotController)
+	{
+		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
+	}
 
 	if (RobotController)
 	{
@@ -186,10 +188,25 @@ FName UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 			return UpgradeState.Level;
 		}
 	}
-	return "0";
+	return "null";
 }
 
-float UPlayerRuntimeData::GetUpgradeAttackMultiplier(FName Id) const
+void UPlayerRuntimeData::UpgradeAttackMultiplier(FName Id, float InMultiplier)
 {
-	return 0.0f;
+	for (auto& UpgradeState : UpgradeStates)
+	{
+		if (UpgradeState.UpgradeId == Id)
+		{
+			if (Id == "0")
+			{
+				float Multiplier = InMultiplier;
+
+				UE_LOG(LogTemp, Error, TEXT("%f:Multiplier"), Multiplier);
+
+				// 強化画面での攻撃倍率の更新処理
+				SetPlayerAttackDamage(Multiplier);
+				break;
+			}
+		}
+	}
 }

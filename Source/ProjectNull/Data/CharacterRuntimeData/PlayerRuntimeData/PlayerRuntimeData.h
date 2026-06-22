@@ -227,9 +227,9 @@ public:
 	 * @brief プレイヤーの攻撃力を計算する
 	 * @return 計算された攻撃力
 	 */
-	void SetPlayerAttackDamage(float InAttackMultiplier);
+	float GetPlayerAttackDamage();
 
-	float GetPlayerAttackDamage() const { return Attack.Final; }
+	void SetPlayerAttackDamage(float OutAttackMultiplier) { AttackMultiplier = OutAttackMultiplier; }
 
 	/**
 	 * @brief レベルアップ処理
@@ -261,7 +261,7 @@ public:
 
 	FName GetUpgradeLevel(FName Id) const;
 
-	float GetUpgradeAttackMultiplier(FName Id) const;
+	void UpgradeAttackMultiplier(FName Id,float InMultiplier);
 
 private:
 	/**
@@ -321,5 +321,8 @@ private:
 	/** 行名 -> 現在の強化レベル（配列インデックス） */
 	UPROPERTY()
 	TMap<FName, int32> UpgradeLevels;
+
+	/** 攻撃力の倍率 */
+	float AttackMultiplier = 1.0f;
 
 };

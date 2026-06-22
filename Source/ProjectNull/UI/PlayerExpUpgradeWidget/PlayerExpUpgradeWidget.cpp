@@ -88,39 +88,32 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 		AllRowNames.RemoveAt(index);
 	}
 
-	// 有効な選択肢を詰める
-	struct FValidUpgradeInfo
-	{
-		FName RowName;
-		FText Description;
-		float Multiplier;
-		FName CurrentLevel;
-	};
-	// 説明文の数
-	TArray<FValidUpgradeInfo> ValidUpgrades;
+	ValidUpgrades.Empty(); // 既存の情報をクリア
 
 	for (const FName& RowName : SelectedRowNames)
 	{
 		const FExpUpgradeRow* RowData = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(RowName, TEXT(""));
 		if (!RowData) continue;
 
-		FName CurrentLevel = PlayerRuntimeData->GetUpgradeLevel(RowName);
-
 		// 現在のレベルに対応する説明文があるかチェック
-		for (TPair<FName, float> Pair : RowData->AttackMultipliers)
+		FName CurrentLevel = PlayerRuntimeData->GetUpgradeLevel(RowName);
+		const int32 LevelIndex = FCString::Atoi(*CurrentLevel.ToString());
+
+		if (RowData->UpgradeLevels.IsValidIndex(LevelIndex))
 		{
-			if (Pair.Key == CurrentLevel)
-			{
-				FValidUpgradeInfo Info;
-				Info.RowName = RowName;
-				Info.Description = FText::FromString(FString::Printf(TEXT("%s: 攻撃倍率 %.2f"), *RowName.ToString(), Pair.Value));
-				Info.Multiplier = Pair.Value;
-				Info.CurrentLevel = CurrentLevel;
-				ValidUpgrades.Add(Info);
-				break; // 説明文が見つかったらループを抜ける
-			}
+			FValidUpgradeInfo Info;
+
+			Info.RowName = RowName;
+			Info.Multiplier = RowData->UpgradeLevels[LevelIndex].AttackMultiplier;
+			Info.Description = RowData->UpgradeLevels[LevelIndex].Description;
+
+			UE_LOG(LogTemp, Warning, TEXT("RowName: %s, CurrentLevel: %s, LevelIndex: %d"), *RowName.ToString(), *CurrentLevel.ToString(), LevelIndex);
+			UE_LOG(LogTemp, Warning, TEXT("Description: %s"), *Info.Description.ToString());
+
+			Info.CurrentLevel = CurrentLevel;
+			ValidUpgrades.Add(Info);
 		}
-	}
+	};
 
 	TArray<UExpUpgradeWidgetBase*> Widgets = { UpgradeWidget_0, UpgradeWidget_1, UpgradeWidget_2 };
 
@@ -133,6 +126,7 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 	{
 		Widgets[i]->SetDescriptionText(ValidUpgrades[i].Description);
 		Widgets[i]->SetUpgradeRowName(ValidUpgrades[i].RowName);
+		Widgets[i]->SetValidUpgradesMultiplier(ValidUpgrades[i].Multiplier);
 		Widgets[i]->SetVisibility(ESlateVisibility::Visible);
 	}
 
@@ -172,14 +166,23 @@ FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 		if (UpgradeWidget_0->IsMouseOver())
 		{
 			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_0->GetUpgradeRowName());
+
+			// ここで攻撃力の乗数をプレイヤーのランタイムデータに渡す
+			PlayerRuntimeData->UpgradeAttackMultiplier(UpgradeWidget_0->GetUpgradeRowName(), UpgradeWidget_0->GetValidUpgradesMultiplier());
 		}
 		else if (UpgradeWidget_1->IsMouseOver())
 		{
 			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_1->GetUpgradeRowName());
+
+			// ここで攻撃力の乗数をプレイヤーのランタイムデータに渡す
+			PlayerRuntimeData->UpgradeAttackMultiplier(UpgradeWidget_1->GetUpgradeRowName(), UpgradeWidget_1->GetValidUpgradesMultiplier());
 		}
 		else if (UpgradeWidget_2->IsMouseOver())
 		{
 			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_2->GetUpgradeRowName());
+
+			// ここで攻撃力の乗数をプレイヤーのランタイムデータに渡す
+			PlayerRuntimeData->UpgradeAttackMultiplier(UpgradeWidget_2->GetUpgradeRowName(), UpgradeWidget_2->GetValidUpgradesMultiplier());
 		}
 
 		CloseWidget();
@@ -267,5 +270,10 @@ void UPlayerExpUpgradeWidget::InitUpgradeWidget()
 	{
 		UpgradeWidget_2->InitExpUpgradeWidget();
 	}
+
+}
+
+void UPlayerExpUpgradeWidget::SetAttackMultiplier(float Multiplier)
+{
 
 }
