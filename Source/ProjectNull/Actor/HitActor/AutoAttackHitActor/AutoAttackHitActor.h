@@ -8,6 +8,8 @@
 #include "AutoAttackHitActor.generated.h"
 
 class UBoxComponent;
+class USuperGameInstance;
+class UPlayerRuntimeData;
 
 UCLASS()
 class PROJECTNULL_API AAutoAttackHitActor : public AActor
@@ -39,6 +41,8 @@ private:
 
 	void PerformHitSweep();
 
+	float SetAttackDamage();
+
 
 	UPROPERTY()
 	TSet<TObjectPtr<AActor>> HitActors;
@@ -47,4 +51,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> BoxComp;
+
+	/** ゲームインスタンスへの参照 */
+	TObjectPtr<USuperGameInstance> GameInstance;
+
+	/** プレイヤーのランタイムデータへの参照 */
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 };

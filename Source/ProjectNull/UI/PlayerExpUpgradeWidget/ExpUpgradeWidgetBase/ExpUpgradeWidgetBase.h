@@ -43,6 +43,10 @@ public:
 
 	FName GetUpgradeRowName() const { return UpgradeRowName; }
 
+	void SetValidUpgradesMultiplier(float InMultiplier) { ValidUpgradesMultiplier = InMultiplier; }
+
+	float GetValidUpgradesMultiplier() const { return ValidUpgradesMultiplier; }
+
 protected:
 	/** テキストを表示するためのウィジェット */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -91,4 +95,6 @@ private:
 	UDataTable* GetExpUpgradeTable();
 
 	FName UpgradeRowName = NAME_None;
+
+	float ValidUpgradesMultiplier = 1.0f;
 };

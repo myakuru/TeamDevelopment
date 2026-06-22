@@ -5,6 +5,8 @@
 
 #include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 AAutoAttackHitActor::AAutoAttackHitActor()
 {
@@ -31,6 +33,10 @@ AAutoAttackHitActor::AAutoAttackHitActor()
 void AAutoAttackHitActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// ゲームインスタンス取得
+	GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
+
 	if (!BoxComp) { return; }
 	PreviousLocation = BoxComp->GetComponentLocation();
 }
@@ -123,9 +129,28 @@ void AAutoAttackHitActor::PerformHitSweep()
 		auto* Interface = Cast<ICharacterInterface>(HitActor);
 		if (!Interface) { continue; }
 
-		Interface->ApplyDamaged();
+		Interface->ApplyDamaged(SetAttackDamage());
 		Interface->ApplyKnockBack(GetActorLocation(),100.f);
 		UE_LOG(LogTemp, Display, TEXT("当たった"));
 	}
+}
+
+float AAutoAttackHitActor::SetAttackDamage()
+{
+	if (GameInstance)
+	{
+		PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+
+		if (PlayerRuntimeData)
+		{
+			float AttackDamage = PlayerRuntimeData->GetPlayerAttackDamage();
+
+			UE_LOG(LogTemp, Error, TEXT("%f AttackDamage"), AttackDamage);
+
+			return AttackDamage;
+		}
+	}
+
+	return 1.0f;
 }
 
