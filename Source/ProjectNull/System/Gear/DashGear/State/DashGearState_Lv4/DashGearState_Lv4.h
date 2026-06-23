@@ -148,4 +148,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	float StanceAnimBlendOutTime;
+
+	bool bExecuteFinalDash;
 };

@@ -20,7 +20,8 @@ UDashGearState_Lv4::UDashGearState_Lv4():
 	CameraData(TArray<FCameraSequenceData>()),
 	StartPlayerTransform(FTransform()),
 	StanceAnimMontage(TObjectPtr<UAnimMontage>()),
-	StanceAnimBlendOutTime(0.2f)
+	StanceAnimBlendOutTime(0.2f),
+	bExecuteFinalDash(false)
 {
 }
 
@@ -53,6 +54,7 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	// ダッシュギアのレベル4状態クラスの初期化
 	// ================================================================
 	StartPlayerTransform = Player->GetTransform();
+	bExecuteFinalDash = false;
 
 	// ギアスキル発動前のカメラステータスを保存
 	SaveCameraStatus();
@@ -94,11 +96,14 @@ void UDashGearState_Lv4::End()
 {
 	if (!Player || !RobotController) { return; }
 
+	EndDash();
+
 	// 入力を有効化
 	RobotController->SetCanReceiveInput(true);
 
 	// プレイヤーのスケルタルメッシュ描画有効化
 	Player->GetMesh()->SetHiddenInGame(false);
+
 }
 
 void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
@@ -219,9 +224,20 @@ void UDashGearState_Lv4::UpdateTargetArmLength(
 		InLerpAlpha);
 }
 
-void UDashGearState_Lv4::UpdateFinalDash(float DeltaTime, float ElapsedTime)
+void UDashGearState_Lv4::UpdateFinalDash(
+	float DeltaTime,
+	float ElapsedTime)
 {
-	if (!DashTime.IsWithinRange(ElapsedTime) || !Player || !Player->GetMesh()) { return; }
+	if (!DashTime.IsWithinRange(ElapsedTime) ||
+		!Player || 
+		!Player->GetMesh()) { return; }
+
+	if (!bExecuteFinalDash)
+	{
+		ExecuteDash();
+	}
+
+	bExecuteFinalDash = true;
 
 	// プレイヤースケルタルメッシュの描画無効にする
 	Player->GetMesh()->SetHiddenInGame(false);
@@ -264,7 +280,7 @@ void UDashGearState_Lv4::InitializeGearDuration()
 	}
 
 	TotalDuration += GetCameraRestoreDuration();
-
+	//UE_LOG(LogTemp, Display, TEXT("TotalDuration %.2f"), TotalDuration);
 	// ギア発動時間を更新
 	Owner->SetGearDuration(TotalDuration, kLv4Index);
 }
