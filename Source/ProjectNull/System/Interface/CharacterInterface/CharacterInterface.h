@@ -21,12 +21,12 @@ class PROJECTNULL_API ICharacterInterface
 
 public:
 
-	/**
-	 * @brief 攻撃に必要なデータ(倍率・攻撃力)を取得
-	 * @return 攻撃データ
-	 */
-	virtual FCharacterAttackData GetAttackData()const { return FCharacterAttackData(); }
+	/**~Begin Getters */
+	/** 最終的な攻撃力を取得 */
+	virtual float GetFinalAttackPower()const { return 1.f; }
+	/** End Getters~*/
 
+	/**~Begin Setters */
 	/**
 	 * @brief ダメージを受ける処理
 	 * @param Damage ダメージ量
@@ -39,4 +39,5 @@ public:
 	 * @param AttackPower	攻撃力
 	 */
 	virtual void ApplyKnockBack(const FVector& a_OwnerLocation, float a_AttackPower=1.f) { return; }
+	/** End Setters~*/
 };

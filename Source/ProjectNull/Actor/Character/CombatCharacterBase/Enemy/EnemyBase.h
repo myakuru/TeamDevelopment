@@ -113,6 +113,9 @@ public:
 
 
 	//~ Begin Getter
+	
+	/**	最終的を取得 */
+	float GetFinalAttackPower()const override;
 
 	/** ノックバック時の重さを取得 */
 	float GetKnockBackWeight()const { return EnemyStatus.KnockBackWeight; }
@@ -177,20 +180,13 @@ public:
 
 	//~ End Getter
 
-	/* Begin Character Interface.*/
-	
-	/**
-	* @brief 攻撃に必要なデータ(倍率・攻撃力)を取得
-	* @return 攻撃データ
-	*/
-	virtual FCharacterAttackData GetAttackData()const override { return AttackData; }
 
+	/* Begin Character Interface.*/
 	/**
 	 * @brief ダメージを受ける処理
 	 * @param Damage ダメージ量
 	 */
 	virtual void ApplyDamaged(float InDamaged = 1.f)override;
-
 	/* End Character Interface.*/
 
 protected:
@@ -244,10 +240,6 @@ protected:
 	/** 死んだ時のエフェクト（パーティクル）*/
 	UPROPERTY(EditAnywhere)
 	FEnemyParticle EnemyParticle;
-
-	/** 攻撃に関する要素(倍率・攻撃力) */
-	UPROPERTY(EditAnywhere)
-	FCharacterAttackData AttackData;
 
 	FVector LanchVelocity;
 

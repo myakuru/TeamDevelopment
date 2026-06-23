@@ -66,6 +66,12 @@ void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Chann
 	CapsuleComponent->SetCollisionResponseToChannel(Channel, NewResponse);
 }
 
+float AEnemyBase::GetFinalAttackPower() const
+{
+	if (!EnemyRuntimeData) { return 1.f; }
+	return EnemyRuntimeData->GetCharacterAttackPower();
+}
+
 void AEnemyBase::BeginPlay()
 {
 	AActor::BeginPlay();
