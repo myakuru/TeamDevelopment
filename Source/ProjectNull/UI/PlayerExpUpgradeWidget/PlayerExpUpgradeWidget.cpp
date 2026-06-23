@@ -106,11 +106,8 @@ void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 			Info.RowName = RowName;
 			Info.Multiplier = RowData->UpgradeLevels[LevelIndex].AttackMultiplier;
 			Info.Description = RowData->UpgradeLevels[LevelIndex].Description;
-
-			UE_LOG(LogTemp, Warning, TEXT("RowName: %s, CurrentLevel: %s, LevelIndex: %d"), *RowName.ToString(), *CurrentLevel.ToString(), LevelIndex);
-			UE_LOG(LogTemp, Warning, TEXT("Description: %s"), *Info.Description.ToString());
-
 			Info.CurrentLevel = CurrentLevel;
+
 			ValidUpgrades.Add(Info);
 		}
 	};
