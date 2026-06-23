@@ -10,12 +10,18 @@ UDashGearState_Lv2::UDashGearState_Lv2():
 
 void UDashGearState_Lv2::Initialize(APlayerBase* InPlayer, UPlayerGearComponent* InGearComponent, UGearBase* InOwner)
 {
-	UGearStateBase::Initialize(InPlayer, InGearComponent, InOwner);
+	UDashGearStateBase::Initialize(InPlayer, InGearComponent, InOwner);
 }
 
 void UDashGearState_Lv2::Execute(int32 CurrentGearLevel)
 {
-	UGearStateBase::Execute(CurrentGearLevel);
+	UDashGearStateBase::Execute(CurrentGearLevel);
+
+	/*GetWorld()->GetTimerManager().SetTimer(
+		FirstDashTimerHandle,
+		);*/
+
+
 	ElapsedTime = 0.0f;
 }
 
@@ -42,7 +48,7 @@ void UDashGearState_Lv2::Update(float DeltaTime)
 	{
 		if (bShouldDash) 
 		{
-			PlayDashEffect();
+			//PlayDashEffect();
 		}
 	}
 

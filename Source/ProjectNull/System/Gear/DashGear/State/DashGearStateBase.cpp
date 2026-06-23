@@ -2,8 +2,8 @@
 #include "DashGearStateBase.h"
 
 
-
 #include <ProjectNull/Actor/Effect/EffectBase.h>
+#include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
@@ -14,7 +14,6 @@
 
 #include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
 
-
 #include <ProjectNull/Utility/GroundUtility/GroundUtility.h>
 
 #include "NiagaraSystem.h"
@@ -24,10 +23,25 @@
 UDashGearStateBase::UDashGearStateBase():
 	DashDir(FVector::ZeroVector),
 	StartQuat(FQuat::Identity),
+	DashGear(nullptr),
 	DashSpeed(2000.0f),
 	DashEffectDuration(0.3f),
 	MontageBlendOutTime(0.2f)
 {
+}
+
+void UDashGearStateBase::Initialize(
+	APlayerBase* InPlayer, 
+	UPlayerGearComponent* InGearComponent,
+	UGearBase* InOwner)
+{
+	UGearStateBase::Initialize(
+		InPlayer,
+		InGearComponent,
+		InOwner
+	);
+
+	DashGear = Cast<UDashGear>(Owner);
 }
 
 void UDashGearStateBase::Execute(int32 CurrentGearLevel)
@@ -40,60 +54,37 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 	if (!GroundAlignmentComp)	{ return; }
 
 	auto RootComp = GroundAlignmentComp->GetRootComponent();
-	if (!RootComp)				{ return; }
+	if (!RootComp)	{ return; }
 
-	DashDir = RootComp->GetForwardVector();
-	StartQuat = RootComp->GetComponentQuat();
-
-	if (DashEffect) {
-		DashEffect->Start(RootComp);
-		// 位置だけ親に追従
-		DashEffect->SetAbsolute(false, true, true);
-	}
-
-	auto EffectComp = DashEffect->GetEffectComponent();
-	if (!EffectComp) { return; }
-
-	EffectComp->SetWorldRotation(StartQuat);
-
-	PlayDashEffect();
-
-	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
-	if (!PlayerAnimInstance) { return; }
-
-	PlayerAnimInstance->Montage_Play(DashAnimMontage);
-
-	auto DashGear = Cast<UDashGear>(Owner);
-	if (!DashGear) { return; }
-
-	DashGear->SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-
+	InitializeStartDashData(RootComp);
+	PlayDashNiagaraEffect(RootComp);
+	PlayDashAnimation();
+	SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	SetEnableSpawnAfterimage(true);
 }
 
 void UDashGearStateBase::Update(float DeltaTime)
 {
-	if (!Owner || !Player) { return; }
+	UGearStateBase::Update(DeltaTime);
 
 	Dash();
 }
 
 void UDashGearStateBase::End()
 {
-	if (!Player) { return; }
+	UGearStateBase::End();
 
-	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
-	if (!PlayerAnimInstance) { return; }
+	BlendOutDashAnimation();
+	DeactivateNiagaraEffect();
+	SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetEnableSpawnAfterimage(false);
+}
 
-	PlayerAnimInstance->Montage_Stop(MontageBlendOutTime);
-
-	if (DashEffect) {
-		DashEffect->DeactivateEffect();
-	}
-
-	auto DashGear = Cast<UDashGear>(Owner);
-	if (!DashGear) { return; }
-
-	DashGear->SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
+void UDashGearStateBase::InitializeStartDashData(USceneComponent* InGroundAlignmentComp)
+{
+	if (!InGroundAlignmentComp) { return; }
+	DashDir		= InGroundAlignmentComp->GetForwardVector();
+	StartQuat	= InGroundAlignmentComp->GetComponentQuat();
 }
 
 void UDashGearStateBase::Dash()
@@ -107,26 +98,58 @@ void UDashGearStateBase::Dash()
 		Owner->SetBlocksMovement(true);
 	}
 
-	UpdateDashAttack();
 }
 
-void UDashGearStateBase::PlayDashEffect()
+void UDashGearStateBase::PlayDashNiagaraEffect(USceneComponent* InGroundAlignmentComp)
 {
-	if (!Player ||
-		!DashEffect) { return; }
+	if (!DashEffect) { return; }
+	DashEffect->Start(InGroundAlignmentComp);
+	// 位置だけ親に追従
+	DashEffect->SetAbsolute(false, true, true);
 
 	auto EffectComp = DashEffect->GetEffectComponent();
 	if (!EffectComp) { return; }
 
 	EffectComp->SetWorldRotation(StartQuat);
-
 }
 
-void UDashGearStateBase::UpdateDashAttack()
+void UDashGearStateBase::DeactivateNiagaraEffect()
+{
+	if (DashEffect) { return; }
+	DashEffect->DeactivateEffect();
+}
+
+void UDashGearStateBase::PlayDashAnimation()
 {
 	if (!Player) { return; }
 
-	
+	auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
+	if (!PlayerAnimInstance) { return; }
+
+	PlayerAnimInstance->Montage_Play(DashAnimMontage);
 }
 
+void UDashGearStateBase::BlendOutDashAnimation()
+{
+	if (!Player) { return; }
 
+	auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
+	if (!PlayerAnimInstance) { return; }
+
+	PlayerAnimInstance->Montage_Stop(MontageBlendOutTime);
+}
+
+void UDashGearStateBase::SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnabled)
+{
+	if (!DashGear) { return; }
+	DashGear->SetSphereCollisionEnabled(InEnabled);
+}
+
+void UDashGearStateBase::SetEnableSpawnAfterimage(bool bInEnableSpawn)
+{
+	if (!Player) { return; }
+	auto ModelAfterimageTrailEffect = Player->GetModelAfterimageTrailEffect();
+
+	if (!ModelAfterimageTrailEffect) { return; }
+	ModelAfterimageTrailEffect->SetEnableSpawn(bInEnableSpawn);
+}

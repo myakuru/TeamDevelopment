@@ -11,11 +11,8 @@ UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UDashGearState_Lv1 final : public UDashGearStateBase
 {
 	GENERATED_BODY()
-
 public:
-
 	UDashGearState_Lv1();
-
 public:
 
 };

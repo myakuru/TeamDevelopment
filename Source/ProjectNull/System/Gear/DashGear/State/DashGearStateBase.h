@@ -14,6 +14,8 @@ class UAnimMontage;
 
 class UEffectBase;
 
+class UDashGear;
+
 UCLASS()
 class PROJECTNULL_API UDashGearStateBase : public UGearStateBase
 {
@@ -22,16 +24,29 @@ public:
 	UDashGearStateBase();
 public:
 
+	virtual void Initialize(
+		class APlayerBase* InPlayer,
+		class UPlayerGearComponent* InGearComponent,
+		class UGearBase* InOwner) override;
 	virtual void Execute(int32 CurrentGearLevel)		override;
 	virtual void Update(float DeltaTime)				override;
 	virtual void End()									override;
 
 protected:
 	
+	void InitializeStartDashData(USceneComponent* InGroundAlignmentComp);
 
 	void Dash();
 
-	void PlayDashEffect();
+	void PlayDashNiagaraEffect(USceneComponent* InGroundAlignmentComp);
+	void DeactivateNiagaraEffect();
+
+	void PlayDashAnimation();
+	void BlendOutDashAnimation();
+
+	void SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnabled);
+
+	void SetEnableSpawnAfterimage(bool bInEnableSpawn);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> DashAnimMontage;
@@ -42,7 +57,8 @@ protected:
 
 private:
 
-	void UpdateDashAttack();
+	UPROPERTY()
+	TObjectPtr<UDashGear> DashGear;
 
 	UPROPERTY()
 	FVector DashDir;
