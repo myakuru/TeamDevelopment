@@ -34,6 +34,9 @@ public:
 
 protected:
 	
+	void ExecuteDash();
+	void EndDash();
+
 	void InitializeStartDashData(USceneComponent* InGroundAlignmentComp);
 
 	void Dash();

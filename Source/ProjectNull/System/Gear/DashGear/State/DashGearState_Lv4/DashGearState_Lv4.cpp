@@ -18,7 +18,9 @@ UDashGearState_Lv4::UDashGearState_Lv4():
 	StanceTime(FThresholdRange()),
 	DashTime(FThresholdRange()),
 	CameraData(TArray<FCameraSequenceData>()),
-	StartPlayerTransform(FTransform())
+	StartPlayerTransform(FTransform()),
+	StanceAnimMontage(TObjectPtr<UAnimMontage>()),
+	StanceAnimBlendOutTime(0.2f)
 {
 }
 
@@ -62,11 +64,7 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	if (!AfterImageAttackEffect) { return; }
 	AfterImageAttackEffect->Start(Player->GetTransform());
 
-	auto* PlayerAnimInstance = Player->GetPlayerAnimInstance();
-	if (!PlayerAnimInstance) { return; }
-
-	// アニメーションを構え状態にする
-	PlayerAnimInstance->bIsCombatStance = true;
+	PlayStanceAnimation();
 
 	// 入力を無効化
 	RobotController->SetCanReceiveInput(false);
@@ -105,17 +103,12 @@ void UDashGearState_Lv4::End()
 
 void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 {	
-	if (!Player || !Player->GetMesh() || !RobotController)	{ return; }
+	if (!Player || !Player->GetMesh())	{ return; }
 
 	// 構え状態なら解除処理を行わない
 	if (StanceTime.IsWithinRange(ElapsedTime))	{ return; }
 
-	// プレイヤーのアニメーションインスタンス取得
-	auto* PlayerAnimInstance = Player->GetPlayerAnimInstance();
-	if (!PlayerAnimInstance) { return; }
-
-	// 構え状態を解除
-	PlayerAnimInstance->bIsCombatStance = false;
+	BlendOutStanceAnimation();
 
 	// プレイヤーのスケルタルメッシュ描画無効化
 	Player->GetMesh()->SetHiddenInGame(true);
@@ -325,6 +318,26 @@ float UDashGearState_Lv4::GetElapsedTimeToIndex(int32 InTargetIndex)
 	}
 
 	return ResultTime;
+}
+
+void UDashGearState_Lv4::PlayStanceAnimation()
+{
+	if (!Player) { return; }
+
+	auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
+	if (!PlayerAnimInstance) { return; }
+
+	PlayerAnimInstance->Montage_Play(StanceAnimMontage);
+}
+
+void UDashGearState_Lv4::BlendOutStanceAnimation()
+{
+	if (!Player) { return; }
+
+	auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
+	if (!PlayerAnimInstance) { return; }
+
+	PlayerAnimInstance->Montage_Stop(StanceAnimBlendOutTime);
 }
 
  
