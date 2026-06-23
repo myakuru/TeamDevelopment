@@ -145,8 +145,6 @@ float AAutoAttackHitActor::SetAttackDamage()
 		{
 			float AttackDamage = PlayerRuntimeData->GetPlayerAttackDamage();
 
-			UE_LOG(LogTemp, Error, TEXT("%f AttackDamage"), AttackDamage);
-
 			return AttackDamage;
 		}
 	}
