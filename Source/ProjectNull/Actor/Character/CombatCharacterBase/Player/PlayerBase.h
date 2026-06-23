@@ -1,8 +1,11 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+
 #include "../CombatCharacterBase.h"
-#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
+
+#include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
+
 #include "PlayerBase.generated.h"
 
 class USpringArmComponent;
@@ -15,6 +18,12 @@ class USphereComponent;
 
 /** 対象検索コンポーネント */
 class UTargetSearchComponent;
+
+/** ヒットストップを行う用のコンポーネント*/
+class UHitStopComponent;
+
+/** 地面の法線に合わせてRootComponentの姿勢を更新するコンポーネント */
+class UGroundAlignmentComponent;
 
 class UAttackBase;
 class UAutoAttack;
@@ -40,11 +49,20 @@ public:
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/* Begin Character Interface.*/	
 	/**
-	 * @brief ダメージを受ける
-	 * @param Damage 受けるダメージ量
+	 * @brief 攻撃に必要なデータ(倍率・攻撃力)を取得
+	 * @return 攻撃データ
 	 */
+	virtual FCharacterAttackData GetAttackData()const override { return AttackData; }
+
+	/**
+	* @brief ダメージを受ける処理
+	* @param Damage ダメージ量
+	*/
 	virtual void ApplyDamaged(float InDamage = 1.f)override;
+	
+	/* End Character Interface.*/
 
 	/**
 	 * @brief 移動処理
@@ -60,13 +78,15 @@ public:
 	void StartCutscene();
 
 	/** Getter */
-	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
-	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
-	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
-	inline UTargetSearchComponent*			GetTargetSearchComponent() const	{ return TargetSearchComponent; }
-	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
-	inline UCineCameraComponent*			GetCineCameraComponent() const		{ return CineCameraComponent; }
-	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent() const	{ return CutsceneComponent; }
+	inline UCameraComponent*				GetCameraComponent()			const	{ return CameraComponent; }
+	inline USpringArmComponent*				GetSpringArmComponent()			const	{ return SpringArmComponent; }
+	inline UPlayerGearComponent*			GetGearComponent()				const	{ return GearComponent; }
+	inline UTargetSearchComponent*			GetTargetSearchComponent()		const	{ return TargetSearchComponent; }
+	inline UHitStopComponent*				GetHitStopComponent()			const	{ return HitStopComponent; }
+	inline UGroundAlignmentComponent*		GetGroundAlignmentComponent()	const	{ return GroundAlignmentComponent; }
+	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance()			const	{ return SuperGameInstance; }
+	inline UCineCameraComponent*			GetCineCameraComponent()		const	{ return CineCameraComponent; }
+	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent()	const	{ return CutsceneComponent; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
@@ -79,10 +99,6 @@ private:
 	 * @return 動けるならtrue 動けないならfalse
 	 */
 	bool CanMove();
-
-	void AlignFloor();
-
-	FTimerHandle AlignFloorTimerHandle;
 
 	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
@@ -104,6 +120,14 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "TargetSearch")
 	TObjectPtr<UTargetSearchComponent> TargetSearchComponent;
 
+	/** ヒットストップを行う用のコンポーネント*/
+	UPROPERTY(VisibleAnywhere, Category = "HitStopComponent")
+	TObjectPtr<UHitStopComponent> HitStopComponent;
+
+	/** 地面の法線に合わせてRootComponentの姿勢を更新するコンポーネント */
+	UPROPERTY(VisibleAnywhere, Category = "GroundAlignment")
+	TObjectPtr<UGroundAlignmentComponent> GroundAlignmentComponent;
+
 	/** 自動攻撃クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
 	TObjectPtr<UAutoAttack> AutoAttack;
@@ -120,29 +144,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
 
-	UPROPERTY()
-	FVector CurrentGroundNormal = FVector::UpVector;
-
-	UPROPERTY(EditAnywhere)
-	float GroundTraceLength = 200.0f;
-
-	UPROPERTY(EditAnywhere)
-	float NormalInterpSpeed = 10.0f;
-
-	UPROPERTY(EditAnywhere)
-	float RotationInterpSpeed = 8.0f;
-
-	UPROPERTY(EditAnywhere)
-	float MaxGroundAngle = 45.f;
-	UPROPERTY(EditAnywhere)
-	float EnterGroundAngle = 45.f;
-
-	UPROPERTY(EditAnywhere)
-	float ExitGroundAngle = 50.f;
-
-	UPROPERTY(EditAnywhere)
-	float SlideSpeed = 1500.f;
-
-	UPROPERTY()
-	float CurrentGroundTraceLength = 1500.f;
+	/** 攻撃に関する要素(倍率・攻撃力) */
+	UPROPERTY(EditAnywhere, Category = "AttackData")
+	FCharacterAttackData AttackData;
 };

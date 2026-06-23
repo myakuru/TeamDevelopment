@@ -1,16 +1,30 @@
 ﻿#include "HitStopComponent.h"
 
+UHitStopComponent::UHitStopComponent():
+	OriginalDilation(1.f)
+{
+}
+
+void UHitStopComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	auto* Owner = GetOwner();
+	if (!Owner) { return; }
+	OriginalDilation = Owner->CustomTimeDilation;
+}
+
 void UHitStopComponent::StartHitStop(float Duration, float TimeDilation)
 {
-	AActor* Owner = GetOwner();
+	auto* Owner = GetOwner();
 	if (!Owner) { return; }
 
-	GetWorld()->GetTimerManager().ClearTimer(HitStopTimerHandle);
+	auto& TimerManager = GetWorld()->GetTimerManager();
 
-	OriginalDilation = Owner->CustomTimeDilation;
+	TimerManager.ClearTimer(HitStopTimerHandle);
 	Owner->CustomTimeDilation = TimeDilation;
 
-	GetWorld()->GetTimerManager().SetTimer(
+	TimerManager.SetTimer(
 		HitStopTimerHandle,
 		this,
 		&UHitStopComponent::EndHitStop,
@@ -21,7 +35,7 @@ void UHitStopComponent::StartHitStop(float Duration, float TimeDilation)
 
 void UHitStopComponent::EndHitStop()
 {
-	if (AActor* Owner = GetOwner())
+	if (auto* Owner = GetOwner())
 	{
 		Owner->CustomTimeDilation = OriginalDilation;
 	}

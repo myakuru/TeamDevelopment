@@ -23,9 +23,8 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 	// 要素数分の初期化
 	for (const FName& RowName : CachedExpUpgradeTable->GetRowNames())
 	{
-		UpgradeStates.Add({ RowName, 0 });
+		UpgradeStates.Add({ RowName, "0"});
 	}
-
 }
 
 void UPlayerRuntimeData::Initialize()
@@ -38,12 +37,6 @@ void UPlayerRuntimeData::Initialize()
 	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn))
 	{
 		Owner = PlayerBase;
-	}
-
-
-	if (!RobotController)
-	{
-		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
 	}
 
 	UpdateStatus();
@@ -100,11 +93,26 @@ void UPlayerRuntimeData::ApplyMovementSpeed()
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed.Final;
 }
 
+float UPlayerRuntimeData::GetPlayerAttackDamage()
+{
+	// プレイヤーの攻撃力を計算するロジックをここに実装
+	Attack.Final = Attack.Base * AttackMultiplier;
+
+	UE_LOG(LogTemp, Error, TEXT("%f:Attack.Final"), Attack.Final);
+
+	return Attack.Final;
+}
+
 void UPlayerRuntimeData::LevelUp()
 {
 	Level++;
 
 	UpdateStatus();
+
+	if (!RobotController)
+	{
+		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
+	}
 
 	if (RobotController)
 	{
@@ -163,13 +171,15 @@ void UPlayerRuntimeData::UpdateUpgradeStates(FName Id)
 	{
 		if (UpgradeState.UpgradeId == Id)
 		{
-			UpgradeState.Level++;
+			int32 CurrentLevel = FCString::Atoi(*UpgradeState.Level.ToString());
+			CurrentLevel++;
+			UpgradeState.Level = FName(*FString::FromInt(CurrentLevel));
 			break;
 		}
 	}
 }
 
-int32 UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
+FName UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 {
 	for(const auto& UpgradeState : UpgradeStates)
 	{
@@ -178,5 +188,25 @@ int32 UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 			return UpgradeState.Level;
 		}
 	}
-	return 0;
+	return "null";
+}
+
+void UPlayerRuntimeData::UpgradeAttackMultiplier(FName Id, float InMultiplier)
+{
+	for (auto& UpgradeState : UpgradeStates)
+	{
+		if (UpgradeState.UpgradeId == Id)
+		{
+			if (Id == "0")
+			{
+				float Multiplier = InMultiplier;
+
+				UE_LOG(LogTemp, Error, TEXT("%f:Multiplier"), Multiplier);
+
+				// 強化画面での攻撃倍率の更新処理
+				SetPlayerAttackDamage(Multiplier);
+				break;
+			}
+		}
+	}
 }

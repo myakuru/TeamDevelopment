@@ -5,7 +5,7 @@
 
 UModelAfterimageTrailEffect::UModelAfterimageTrailEffect():
 	bEnableSpawn(false),
-	GhostActors(TArray<AGhostActor*>()),
+	GhostActors(TArray<TWeakObjectPtr<AGhostActor>>()),
 	TrailAddTimer(0.0f),
 	SpawnInterval(1.0f),
 	TrailMaxLength(1),
@@ -48,9 +48,9 @@ void UModelAfterimageTrailEffect::Update(
 
 void UModelAfterimageTrailEffect::AllDestroy()
 {
-	for (auto* Data : GhostActors)
+	for (auto& Data : GhostActors)
 	{
-		if (!Data) { continue; }
+		if (!Data.IsValid()) { continue; }
 		Data->Destroy();
 	}
 
@@ -114,7 +114,7 @@ void UModelAfterimageTrailEffect::DestroyOverflowTrail()
 	// ※ワールドからも削除を行う
 	while (GhostActors.Num() > TrailMaxLength)
 	{
-		auto* PopData = GhostActors.Pop();
+		auto* PopData = GhostActors.Pop().Get();
 		
 		if (PopData)
 		{

@@ -6,7 +6,6 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 #include "Kismet/GameplayStatics.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -32,6 +31,13 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Conte
 	if (Elapsed >= StrafeTime)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Strafe Tick End"));
+		AIC->StopMovement();
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	// 距離が離れていればDicideステートに戻る
+	if (GetOutDistance <= FVector::DistSquared(TargetActor->GetActorLocation(), Boss->GetActorLocation()))
+	{
 		AIC->StopMovement();
 		return EStateTreeRunStatus::Succeeded;
 	}

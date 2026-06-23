@@ -56,7 +56,7 @@ void UStageManager::SaveToData(UMySaveGame* inSaveGame)
 	inSaveGame->StageProgressList = *StageProgressList;
 }
 
-void UStageManager::StageStart(int32 inNowStageIndex)
+void UStageManager::InGameInitialize(int32 inNowStageIndex)
 {
 	NowStageIndex = inNowStageIndex;
 
@@ -73,7 +73,7 @@ void UStageManager::StageStart(int32 inNowStageIndex)
 	PC->SetInputMode(InputMode);
 }
 
-void UStageManager::StageClear()
+void UStageManager::InGameFinalize()
 {
 	if (NowStageIndex < StageDefinition::OutGameStageIndex)return;
 
@@ -92,6 +92,10 @@ void UStageManager::StageClear()
 	UGameplayStatics::OpenLevel(this, "StageSelectLevel");
 }
 
+void UStageManager::OutGameInitialize()
+{
+}
+
 void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 {
 	//レベルの名前が設定されているステージのレベル名と一致するか
@@ -105,6 +109,8 @@ void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 			true
 		));
 
+	bool isInGame = false;
+
 	//データアセットを探索
 	for (int i = 0; i < StageDataAsset->GetStageData().Num(); i++)
 	{
@@ -113,9 +119,13 @@ void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 		if (StageData.LevelName == LevelName)
 		{
 			//ステージ開始(マウスが持ってかれるぞ！！)
-			StageStart(i + StageDefinition::FirstStageIndex);
+			InGameInitialize(i + StageDefinition::FirstStageIndex);
+
+			isInGame = true;
 		}
 	}
+
+	if (!isInGame) OutGameInitialize();
 
 	//ログ
 	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));

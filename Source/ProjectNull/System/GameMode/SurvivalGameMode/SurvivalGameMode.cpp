@@ -4,7 +4,6 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
-#include <ProjectNull/Actor/MyCineCameraActor/MyCineCameraActor.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
@@ -16,10 +15,6 @@ ASurvivalGameMode::ASurvivalGameMode()
 void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void ASurvivalGameMode::OnCutsceneFinished()
-{
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)

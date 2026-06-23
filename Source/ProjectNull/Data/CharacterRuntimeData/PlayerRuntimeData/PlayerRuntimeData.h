@@ -98,7 +98,7 @@ struct FUpgradeState
 {
 	FName UpgradeId;
 
-	int32 Level = 0;
+	FName Level = "0";
 
 };
 
@@ -224,11 +224,19 @@ public:
 	void CalculateInvincibilityTime(const FGearParameterData& Data);
 
 	/**
+	 * @brief プレイヤーの攻撃力を計算する
+	 * @return 計算された攻撃力
+	 */
+	float GetPlayerAttackDamage();
+
+	void SetPlayerAttackDamage(float OutAttackMultiplier) { AttackMultiplier = OutAttackMultiplier; }
+
+	/**
 	 * @brief レベルアップ処理
 	 */
 	void LevelUp();
 
-	inline void SetIsInvincible(bool SetFlg) { bIsInvincible = SetFlg; }
+	inline void SetIsInvincible(bool bInIsInvincible) { bIsInvincible = bInIsInvincible; }
 
 	inline bool IsInvincible() const { return bIsInvincible; }
 	inline FGearRuntimeData& GetGearData() { return Gear; }
@@ -251,12 +259,11 @@ public:
 	/** Widget側で呼び出す */
 	void UpdateUpgradeStates(FName Id);
 
-	int32 GetUpgradeLevel(FName Id) const;
+	FName GetUpgradeLevel(FName Id) const;
+
+	void UpgradeAttackMultiplier(FName Id,float InMultiplier);
 
 private:
-
-	
-
 	/**
 	 * @brief HPの更新処理
 	 * @param NewHealth 初期値はPlayerParameterDataから受け取る。
@@ -273,8 +280,6 @@ private:
 	 * @brief 最終的な速度計算処理
 	 */
 	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
-
-	
 
 	/**
 	 * @brief 計算済みの速度をCharacterMovementに適用する
@@ -316,5 +321,8 @@ private:
 	/** 行名 -> 現在の強化レベル（配列インデックス） */
 	UPROPERTY()
 	TMap<FName, int32> UpgradeLevels;
+
+	/** 攻撃力の倍率 */
+	float AttackMultiplier = 1.0f;
 
 };

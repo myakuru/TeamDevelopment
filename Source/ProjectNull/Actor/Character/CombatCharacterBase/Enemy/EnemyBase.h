@@ -5,8 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
-#include "../../../../System/Interface/CharacterInterface/CharacterInterface.h"
-#include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
+#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
@@ -74,15 +73,6 @@ public:
 	virtual void Deactivate();
 
 	//~ Begin Setter
-
-	/**
-	 * @brief 敵（自身）が吹き飛ばされる処理
-	 * @param playerLocation プレイヤーの座標
-	 * @param AttackPower 攻撃力
-	 * @param EnemyWeight 敵の重さ
-	 */
-	virtual void SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight);
-
 	/**
 	 * @brief 移動方向のセット
 	 * @param MoveDir 移動方向
@@ -165,6 +155,12 @@ public:
 		return EnemyAttackComponent;
 	}
 
+	/** ISMInstanceIndexを返す*/
+	uint32 GetISMInstanceIndex() const
+	{
+		return ISMInstanceIndex;
+	}
+
 	/** ターゲットとの距離を返す*/
 	float GetTargetDistanceSqr()const { return EnemyStatus.TargetDistanceSqr; }
 
@@ -177,36 +173,23 @@ public:
 		return GameProgress;
 	}
 
-	/**
-	 * @brief 汎用的なEnumビット(uint8型)上昇処理
-	 * @tparam T クラス(Enum Class名etc)
-	 * @param a_currentBit  元のBit
-	 * @param a_targetBit	上げたいBit
-	 */
-	template<typename T>
-	void UpEnumBit(uint8 a_CurrentBit, T a_TargetBit)
-	{
-		a_CurrentBit |= static_cast<uint8>(a_TargetBit);
-	}
-
-	/**
-	 * @brief 汎用的なEnumビット(uint8型)下降処理
-	 * @tparam T クラス(Enum Class名etc)
-	 * @param a_currentBit  元のBit
-	 * @param a_targetBit	下げたいBit
-	 */
-	template<typename T>
-	void DownEnumBit(uint8 a_CurrentBit, T a_TargetBit)
-	{
-		a_CurrentBit &= ~static_cast<uint8>(a_TargetBit);
-	}
-
 	bool GetAliveFlg() { return EnemyStatus.IsAlive; }
 
 	//~ End Getter
 
 	/* Begin Character Interface.*/
-	virtual void ApplyDamaged(float a_Damage = 1.f)override;
+	
+	/**
+	* @brief 攻撃に必要なデータ(倍率・攻撃力)を取得
+	* @return 攻撃データ
+	*/
+	virtual FCharacterAttackData GetAttackData()const override { return AttackData; }
+
+	/**
+	 * @brief ダメージを受ける処理
+	 * @param Damage ダメージ量
+	 */
+	virtual void ApplyDamaged(float InDamaged = 1.f)override;
 
 	/* End Character Interface.*/
 
@@ -229,9 +212,6 @@ protected:
 	/** 敵のStateTree*/
 	UPROPERTY(VisibleAnywhere, Category = "StateTree")
 	TObjectPtr<UStateTreeComponent> StateTreeComponent;
-
-	/** 敵が吹き飛ばされている状態の処理 */
-	virtual void MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime);
 
 	/** DataTable 参照 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "KnockBack")
@@ -264,6 +244,10 @@ protected:
 	/** 死んだ時のエフェクト（パーティクル）*/
 	UPROPERTY(EditAnywhere)
 	FEnemyParticle EnemyParticle;
+
+	/** 攻撃に関する要素(倍率・攻撃力) */
+	UPROPERTY(EditAnywhere)
+	FCharacterAttackData AttackData;
 
 	FVector LanchVelocity;
 
@@ -305,21 +289,16 @@ public:
 	/// </summary>
 	virtual void CheckCanAttack();
 
-	/** 敵が死んださいにパーティクルを出すだけ*/
+	/** 敵が死んだ際にパーティクルを出すだけ*/
 	virtual void SpawnDeathEffect();
 
-	/** 敵が死んださいに経験値を出す*/
+	/** 敵が死んだ際に経験値を出す*/
 	virtual void SpawnDeathExperience();
 
 	/** アニメーションの変更*/
-	virtual void PlayAnimation(int32 NextAnimIndex, bool bLoop);
+	virtual void PlayAnimation(int32 InNextAnimIndex, bool InbLoop,float InBlendSpeed);
 
 protected:
-
-	/**
-	 * @brief 坂道範囲内に入った時の通知処理
-	 */
-	virtual void OnEnterSlope()/*override*/;
 
 	float AnimFinishTime = 0.0f;
 
@@ -334,9 +313,6 @@ public:
 	void SetAnimSequence(UAnimSequence* InAnimSequence, bool LoopFlg);
 
 public:
-
-	/** アニメーション*/
-	//void PlayAnimationMontage();
 
 
 	/** ISMのどのインスタンスに対応するかを示すインデックス*/
