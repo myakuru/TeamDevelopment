@@ -33,6 +33,10 @@ class UPlayerMaterialCollectionUpdater;
 class UCineCameraComponent;
 class UPlayerCutsceneComponent;
 
+/** モデル残像エフェクトクラス
+	残像を連続的に描画するエフェクトクラス */
+class UModelAfterimageTrailEffect;
+
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
 								  , public ICharacterInterface
@@ -86,6 +90,7 @@ public:
 	inline UGroundAlignmentComponent*		GetGroundAlignmentComponent()	const	{ return GroundAlignmentComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance()			const	{ return SuperGameInstance; }
 	inline UCineCameraComponent*			GetCineCameraComponent()		const	{ return CineCameraComponent; }
+	inline UModelAfterimageTrailEffect*		GetModelAfterimageTrailEffect()	const	{ return ModelAfterimageTrailEffect; }
 	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent()	const	{ return CutsceneComponent; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
@@ -99,6 +104,8 @@ private:
 	 * @return 動けるならtrue 動けないならfalse
 	 */
 	bool CanMove();
+
+	void UpdateModelAfterimageTrailEffect(float DeltaTime);
 
 	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
@@ -135,6 +142,11 @@ private:
 	/** プレイヤークラスからMaterial Parameter Collectionへの更新処理クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "MaterialCollection")
 	TObjectPtr<UPlayerMaterialCollectionUpdater> MaterialCollectionUpdater;
+
+	/** モデル残像エフェクトクラス
+		残像を連続的に描画するエフェクトクラス */
+	UPROPERTY(EditAnywhere, Instanced, Category = "ModelAfterimageTrailEffect")
+	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;
 
 	/** カットシーンの再生用 */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Cutscene")
