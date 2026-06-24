@@ -21,12 +21,15 @@
 #include "NiagaraFunctionLibrary.h"
 
 UDashGearStateBase::UDashGearStateBase():
+	DashAnimMontage(nullptr),
+	DashEffect(nullptr),
+	DashGear(nullptr),
 	DashDir(FVector::ZeroVector),
 	StartQuat(FQuat::Identity),
-	DashGear(nullptr),
 	DashSpeed(2000.0f),
 	DashEffectDuration(0.3f),
-	MontageBlendOutTime(0.2f)
+	MontageBlendOutTime(0.2f),
+	DashSphereRadius(200.f)
 {
 }
 
@@ -48,19 +51,8 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 {
 	UGearStateBase::Execute(CurrentGearLevel);
 
-	if (!Player)				{ return; }
+	ExecuteDash();
 
-	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
-	if (!GroundAlignmentComp)	{ return; }
-
-	auto RootComp = GroundAlignmentComp->GetRootComponent();
-	if (!RootComp)	{ return; }
-
-	InitializeStartDashData(RootComp);
-	PlayDashNiagaraEffect(RootComp);
-	PlayDashAnimation();
-	SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	SetEnableSpawnAfterimage(true);
 }
 
 void UDashGearStateBase::Update(float DeltaTime)
@@ -73,7 +65,31 @@ void UDashGearStateBase::Update(float DeltaTime)
 void UDashGearStateBase::End()
 {
 	UGearStateBase::End();
+	EndDash();
+}
 
+void UDashGearStateBase::ExecuteDash()
+{
+	if (!Player || 
+		!DashGear) { return; }
+
+	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
+	if (!GroundAlignmentComp) { return; }
+
+	auto RootComp = GroundAlignmentComp->GetRootComponent();
+	if (!RootComp) { return; }
+
+	DashGear->SetSphereRadius(DashSphereRadius);
+
+	InitializeStartDashData(RootComp);
+	PlayDashNiagaraEffect(RootComp);
+	PlayDashAnimation();
+	SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	SetEnableSpawnAfterimage(true);
+}
+
+void UDashGearStateBase::EndDash()
+{
 	BlendOutDashAnimation();
 	DeactivateNiagaraEffect();
 	SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -97,7 +113,7 @@ void UDashGearStateBase::Dash()
 	if (Owner) {
 		Owner->SetBlocksMovement(true);
 	}
-
+	
 }
 
 void UDashGearStateBase::PlayDashNiagaraEffect(USceneComponent* InGroundAlignmentComp)
@@ -115,7 +131,7 @@ void UDashGearStateBase::PlayDashNiagaraEffect(USceneComponent* InGroundAlignmen
 
 void UDashGearStateBase::DeactivateNiagaraEffect()
 {
-	if (DashEffect) { return; }
+	if (!DashEffect) { return; }
 	DashEffect->DeactivateEffect();
 }
 

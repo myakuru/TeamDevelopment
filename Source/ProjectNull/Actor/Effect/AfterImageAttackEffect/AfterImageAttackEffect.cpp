@@ -55,7 +55,10 @@ float UAfterImageAttackEffect::GetMaxTime()
 	return MaxTime;
 }
 
-void UAfterImageAttackEffect::UpdateAfterimageAttackData(float DeltaTime, float ElapsedTime, FAfterImageAttackData& Data)
+void UAfterImageAttackEffect::UpdateAfterimageAttackData(
+	float DeltaTime,
+	float ElapsedTime,
+	FAfterImageAttackData& Data)
 {
 	// 残像を追加
 	Data.SetEnableSpawn(true);
@@ -88,7 +91,12 @@ void UAfterImageAttackEffect::UpdateAfterimageAttackData(float DeltaTime, float 
 
 	if (!Data.ModelAfterimageTrailEffect) { return; }
 
-	Data.ModelAfterimageTrailEffect->Update(DeltaTime, Data.Transform, SkeletalMesh, AnimationAsset, Data.PoseTime);
+	Data.ModelAfterimageTrailEffect->Update(
+		DeltaTime,
+		Data.Transform,
+		SkeletalMesh,
+		AnimationAsset,
+		Data.PoseTime);
 }
 
 void FAfterImageAttackData::SetEnableSpawn(bool bInEnableSpawn) const

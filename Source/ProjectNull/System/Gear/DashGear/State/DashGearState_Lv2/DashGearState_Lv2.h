@@ -23,20 +23,28 @@ public:
 
 	void Execute(int32 CurrentGearLevel)	override;
 	void Update(float DeltaTime)			override;
+	void End()								override;
 
 private:
 
+	void InitializeGearDuration();
 
-	void FirstDashEnd();
+	void EndFirstDash();
+	void StartSecondDash();
+
+	
+	UPROPERTY(EditAnywhere)
+	float FirstDashDuration;
 
 	UPROPERTY(EditAnywhere)
-	FThresholdRange FirstDashThresholdRange;
+	float FirstDashToDelay;
 
 	UPROPERTY(EditAnywhere)
-	FThresholdRange SecondDashThresholdRange;
+	float SecondDashDuration;
 
-	float ElapsedTime;
+	bool bShouldDash;
 
 	FTimerHandle FirstDashTimerHandle;
+	FTimerHandle FirstDashToDelayTimerHandle;
 
 };

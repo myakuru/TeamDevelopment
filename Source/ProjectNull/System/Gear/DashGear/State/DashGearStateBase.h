@@ -34,6 +34,9 @@ public:
 
 protected:
 	
+	void ExecuteDash();
+	void EndDash();
+
 	void InitializeStartDashData(USceneComponent* InGroundAlignmentComp);
 
 	void Dash();
@@ -55,10 +58,10 @@ protected:
 	UPROPERTY(EditAnywhere, Instanced, Category = "Effect")
 	TObjectPtr<UEffectBase> DashEffect;
 
-private:
-
 	UPROPERTY()
 	TObjectPtr<UDashGear> DashGear;
+
+private:
 
 	UPROPERTY()
 	FVector DashDir;
@@ -74,4 +77,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float MontageBlendOutTime;
+
+	UPROPERTY(EditAnywhere)
+	float DashSphereRadius;
 };
