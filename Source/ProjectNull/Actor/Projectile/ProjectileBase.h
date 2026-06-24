@@ -65,7 +65,8 @@ private:
 	UFUNCTION()
 	void OnProjectileStop(const FHitResult& Hit);
 
-	
+	void ActorDestroy();
+
 	/** ルートコンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
@@ -81,4 +82,9 @@ private:
 	/** 飛び道具移動専用コンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+	FTimerHandle AliveTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float AliveTime;
 };
