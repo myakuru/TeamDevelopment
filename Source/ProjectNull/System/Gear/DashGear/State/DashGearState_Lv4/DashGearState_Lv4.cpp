@@ -12,6 +12,10 @@
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
+#include <ProjectNull/System/Gear/DashGear/DashGear.h>
+
+#include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
+
 UDashGearState_Lv4::UDashGearState_Lv4():
 	RobotController(nullptr),
 	AfterImageAttackEffect(nullptr),
@@ -21,7 +25,8 @@ UDashGearState_Lv4::UDashGearState_Lv4():
 	StartPlayerTransform(FTransform()),
 	StanceAnimMontage(TObjectPtr<UAnimMontage>()),
 	StanceAnimBlendOutTime(0.2f),
-	bExecuteFinalDash(false)
+	bExecuteFinalDash(false),
+	SpecialAttackSphereRadius(200.f)
 {
 }
 
@@ -30,7 +35,10 @@ void UDashGearState_Lv4::Initialize(
 	UPlayerGearComponent* InGearComponent,
 	UGearBase* InOwner)
 {
-	UDashGearStateBase::Initialize(InPlayer, InGearComponent, InOwner);
+	UDashGearStateBase::Initialize(
+		InPlayer,
+		InGearComponent,
+		InOwner);
 
 	// ギア発動時間初期化
 	InitializeGearDuration();
@@ -48,7 +56,9 @@ void UDashGearState_Lv4::Initialize(
 
 void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 {
-	if (!Player || !RobotController) { return; }
+	if (!Player || 
+		!RobotController ||
+		!DashGear) { return; }
 
 	// ================================================================
 	// ダッシュギアのレベル4状態クラスの初期化
@@ -62,22 +72,35 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	// 復元する際の開始データ初期化
 	InitializeRestoreStartData();
 
+	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
+	if (!GroundAlignmentComp) { return; }
+
+	auto RootComp = GroundAlignmentComp->GetRootComponent();
+	if (!RootComp) { return; }
+
 	// 残像攻撃クラスの実行
 	if (!AfterImageAttackEffect) { return; }
-	AfterImageAttackEffect->Start(Player->GetTransform());
+	AfterImageAttackEffect->Start(RootComp->GetComponentTransform());
 
 	PlayStanceAnimation();
 
 	// 入力を無効化
 	RobotController->SetCanReceiveInput(false);
+
+	DashGear->SetSphereRadius(SpecialAttackSphereRadius);
+
 }
 
 void UDashGearState_Lv4::Update(float DeltaTime)
 {
-	if (!Player || !Owner || !AfterImageAttackEffect) { return; }
+	if (!Player || 
+		!AfterImageAttackEffect) { return; }
 
 	// 経過時間取得
 	const float ElapsedTime = Owner->GetElapsedTime();
+
+	// 攻撃用スフィア判定更新
+	UpdateAttackSphereCollision(ElapsedTime);
 
 	// 戦闘構え状態を更新
 	UpdateCombatStance(ElapsedTime);
@@ -94,21 +117,27 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 
 void UDashGearState_Lv4::End()
 {
-	if (!Player || !RobotController) { return; }
+	if (!Player || 
+		!RobotController) { return; }
 
 	EndDash();
 
 	// 入力を有効化
 	RobotController->SetCanReceiveInput(true);
 
-	// プレイヤーのスケルタルメッシュ描画有効化
-	Player->GetMesh()->SetHiddenInGame(false);
+	auto Mesh = Player->GetMesh();
+	if (!Mesh) { return; }
 
+	// プレイヤーのスケルタルメッシュ描画有効化
+	Mesh->SetHiddenInGame(false);
 }
 
 void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 {	
-	if (!Player || !Player->GetMesh())	{ return; }
+	if (!Player)	{ return; }
+
+	auto Mesh = Player->GetMesh();
+	if (!Mesh)		{ return; }
 
 	// 構え状態なら解除処理を行わない
 	if (StanceTime.IsWithinRange(ElapsedTime))	{ return; }
@@ -116,7 +145,24 @@ void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 	BlendOutStanceAnimation();
 
 	// プレイヤーのスケルタルメッシュ描画無効化
-	Player->GetMesh()->SetHiddenInGame(true);
+	Mesh->SetHiddenInGame(true);
+}
+
+void UDashGearState_Lv4::UpdateAttackSphereCollision(float ElapsedTime)
+{
+	if(	!StanceTime.IsWithinRange(ElapsedTime) &&
+		!DashTime.IsWithinRange(ElapsedTime)) { return; }
+
+	SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
+	if (!GroundAlignmentComp) { return; }
+
+	auto RootComp = GroundAlignmentComp->GetRootComponent();
+	if (!RootComp) { return; }
+
+	if (!DashGear) { return; }
+	DashGear->SetSphereTransform(RootComp->GetComponentTransform());
 }
 
 void UDashGearState_Lv4::UpdateCameraData(
@@ -157,12 +203,12 @@ void UDashGearState_Lv4::UpdateCameraRotation(
 	int32 DataIndex,
 	float InLerpAlpha)
 {
-	if (!RobotController) { return; }
-	if (!CameraData.IsValidIndex(DataIndex)) { return; }
+	if (!RobotController)						{ return; }
+	if (!CameraData.IsValidIndex(DataIndex))	{ return; }
 
 	const FCameraSequenceData& Data = CameraData[DataIndex];
 
-	if (Data.bPause) { return; }
+	if (Data.bPause)							{ return; }
 
 	// ギアスキル発動開始時のプレイヤーYaw回転
 	const float BaseYaw = StartPlayerTransform.GetRotation().Rotator().Yaw;
@@ -199,14 +245,16 @@ void UDashGearState_Lv4::UpdateTargetArmLength(
 	int32 DataIndex,
 	float InLerpAlpha)
 {
-	auto* SpringArm = Player->GetSpringArmComponent();
+	if (!Player)								{ return; }
 
-	if (!SpringArm) { return; }
-	if (!CameraData.IsValidIndex(DataIndex)) { return; }
+	auto SpringArm = Player->GetSpringArmComponent();
+	if (!SpringArm)								{ return; }
+
+	if (!CameraData.IsValidIndex(DataIndex))	{ return; }
 
 	const FCameraSequenceData& Data = CameraData[DataIndex];
 
-	if (Data.bPause) { return; }
+	if (Data.bPause)							{ return; }
 
 	// 区間開始のカメラとプレイヤーの距離
 	float StartArmLength = StartTargetArmLength;
@@ -228,9 +276,12 @@ void UDashGearState_Lv4::UpdateFinalDash(
 	float DeltaTime,
 	float ElapsedTime)
 {
-	if (!DashTime.IsWithinRange(ElapsedTime) ||
-		!Player || 
-		!Player->GetMesh()) { return; }
+	if (!Player)	{ return; }
+
+	auto Mesh = Player->GetMesh();
+	if (!Mesh)		{ return; }
+
+	if (!DashTime.IsWithinRange(ElapsedTime)) { return; }
 
 	if (!bExecuteFinalDash)
 	{
@@ -240,7 +291,7 @@ void UDashGearState_Lv4::UpdateFinalDash(
 	bExecuteFinalDash = true;
 
 	// プレイヤースケルタルメッシュの描画無効にする
-	Player->GetMesh()->SetHiddenInGame(false);
+	Mesh->SetHiddenInGame(false);
 
 	// ダッシュ処理
 	Dash();
@@ -353,7 +404,7 @@ void UDashGearState_Lv4::BlendOutStanceAnimation()
 	auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
 	if (!PlayerAnimInstance) { return; }
 
-	PlayerAnimInstance->Montage_Stop(StanceAnimBlendOutTime);
+	PlayerAnimInstance->Montage_Stop(StanceAnimBlendOutTime, StanceAnimMontage);
 }
 
  

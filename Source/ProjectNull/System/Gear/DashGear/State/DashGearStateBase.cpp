@@ -28,7 +28,8 @@ UDashGearStateBase::UDashGearStateBase():
 	StartQuat(FQuat::Identity),
 	DashSpeed(2000.0f),
 	DashEffectDuration(0.3f),
-	MontageBlendOutTime(0.2f)
+	MontageBlendOutTime(0.2f),
+	DashSphereRadius(200.f)
 {
 }
 
@@ -69,13 +70,16 @@ void UDashGearStateBase::End()
 
 void UDashGearStateBase::ExecuteDash()
 {
-	if (!Player) { return; }
+	if (!Player || 
+		!DashGear) { return; }
 
 	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
 	if (!GroundAlignmentComp) { return; }
 
 	auto RootComp = GroundAlignmentComp->GetRootComponent();
 	if (!RootComp) { return; }
+
+	DashGear->SetSphereRadius(DashSphereRadius);
 
 	InitializeStartDashData(RootComp);
 	PlayDashNiagaraEffect(RootComp);
@@ -109,7 +113,7 @@ void UDashGearStateBase::Dash()
 	if (Owner) {
 		Owner->SetBlocksMovement(true);
 	}
-
+	
 }
 
 void UDashGearStateBase::PlayDashNiagaraEffect(USceneComponent* InGroundAlignmentComp)

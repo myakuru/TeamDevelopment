@@ -54,6 +54,12 @@ private:
 	void UpdateCombatStance(float ElapsedTime);
 
 	/**
+	 * @brief 攻撃用スフィア判定更新
+	 * @param ElapsedTime 経過時間
+	 */
+	void UpdateAttackSphereCollision(float ElapsedTime);
+
+	/**
 	 * @brief カメラデータ更新処理
 	 * @param DeltaTime デルタタイム
 	 * @param ElapsedTime 経過時間
@@ -150,4 +156,7 @@ private:
 	float StanceAnimBlendOutTime;
 
 	bool bExecuteFinalDash;
+
+	UPROPERTY(EditAnywhere)
+	float SpecialAttackSphereRadius;
 };
