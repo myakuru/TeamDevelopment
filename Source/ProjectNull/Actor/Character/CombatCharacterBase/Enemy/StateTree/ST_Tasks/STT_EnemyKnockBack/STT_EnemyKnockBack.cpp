@@ -2,18 +2,19 @@
 #include "StateTreeExecutionContext.h"
 
 #include <ProjectNull\Utility\Common\Definitions\CollisionChannels.h>
-#include <ProjectNull\System\DataTable\KnockBackData\KnockBackData.h>
+#include <ProjectNull\System\DataAssets\KnockBackData\KnockBackData.h>
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyBase.h>
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
 
 USTT_EnemyKnockBack::USTT_EnemyKnockBack(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
 	,	OwnerEnemy(nullptr)
-	,	KnockBackDataTable(nullptr)
+	,	KnockBackData(nullptr)
 	,	KnockBackVelocity(FVector::ZeroVector)
 	,	MoveDir(FVector::ZeroVector)
-	,	ReceivedAttackPower(0.0f)
+	,	TargetLocation(FVector::ZeroVector)
 	,	EnemyWeight(0.0f)
+	,	DamageRatio(0.0f)
 {
 	// Tick処理有効化
 	bShouldCallTick = true;
@@ -28,7 +29,7 @@ EStateTreeRunStatus USTT_EnemyKnockBack::EnterState(FStateTreeExecutionContext& 
 
 	// ノックバックに必要な情報を取得・設定
 	SetKnockBackData();
-	
+
 	// 敵同士の当たり判定を一時的に消す
 	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECC_Enemy, ECollisionResponse::ECR_Ignore);
 
@@ -42,7 +43,13 @@ EStateTreeRunStatus USTT_EnemyKnockBack::Tick(FStateTreeExecutionContext& a_Cont
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
 	// ノックバックが停止したらステート終了
-	if (MoveToKnockBack(a_DeltaTime)) { return EStateTreeRunStatus::Succeeded; }
+	if (MoveToKnockBack(a_DeltaTime)) 
+	{
+		// ステートタイプを切り替え
+		OwnerEnemy->NotifyChangedStateEnum(EEnemyState::Idle);
+
+		return EStateTreeRunStatus::Succeeded; 
+	}
 
 	return EStateTreeRunStatus::Running;
 }
@@ -53,46 +60,43 @@ void USTT_EnemyKnockBack::ExitState(FStateTreeExecutionContext& a_Context, const
 
 	if (!OwnerEnemy) { return; }
 
-	// ステートタイプを切り替え
-	OwnerEnemy->NotifyChangedStateEnum(EEnemyState::Idle);
-
 	// 敵同士の当たり判定を戻す
 	OwnerEnemy->NotifyChangedCollisionResponseToChannel(ECC_Enemy, ECollisionResponse::ECR_Block);
 }
 
 void USTT_EnemyKnockBack::SetKnockBackData()
 {
-	// 吹き飛ばしに使う数値を決定
-	int32 KnockBackPowerLevel = ReceivedAttackPower - EnemyWeight;
-	if (KnockBackPowerLevel < 0)
-	{
-		KnockBackPowerLevel = 0;
-	}
+	if (!OwnerEnemy) { return; }
 
-	const FName RowName = FName(*FString::FromInt(KnockBackPowerLevel));
-
-	// RowNameから型付きでで取得
-	const FKnockBackData* KnockBackData =
-		KnockBackDataTable->FindRow<FKnockBackData>(RowName, TEXT("KnockBack"));
+	// データアセットを取得
 	if (!KnockBackData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("KnockBack row not found: %s"), *RowName.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("KnockBackデータに必要なデータアセットがありません!!"));
 		return;
 	}
 
+	// ノックバック速度をダメージ割合により算出
+	float KnockBackSpeed = KnockBackData->KnockBackSpeed * DebugDamageRatio;
+
 	// 水平方向(移動方向を反転)
-	FVector HorizontalDir = -MoveDir;
+	FVector HorizontalDir = OwnerEnemy->GetActorLocation() - TargetLocation;
 	HorizontalDir.Z = 0;
 	HorizontalDir.Normalize();
 
-	// 吹き飛び角度
-	const float Rad = FMath::DegreesToRadians(KnockBackData->LaunchAngleDeg);
-	// 水平方向の角度とラジアン角を基に上向きの角度を作る
-	FVector LanchDir = HorizontalDir * FMath::Cos(Rad) + FVector::UpVector * FMath::Sin(Rad);
-	LanchDir.Normalize();
+	// 水平方向へのノックバック速度
+	const FVector HorizontalVelocity = HorizontalDir * KnockBackSpeed;
 
-	// 速度をセット
-	KnockBackVelocity = LanchDir * KnockBackData->LaunchSpeed;
+	// 上方向へのノックバック速度
+	const FVector VerticalVelocity = FVector::UpVector * KnockBackSpeed;
+
+	//// 吹き飛び角度
+	//const float Rad = FMath::DegreesToRadians(KnockBackData->LaunchAngleDeg);
+	//// 水平方向の角度とラジアン角を基に上向きの角度を作る
+	//FVector LanchDir = HorizontalDir * FMath::Cos(Rad) + FVector::UpVector * FMath::Sin(Rad);
+	//LanchDir.Normalize();
+
+	// 速度を合成
+	KnockBackVelocity = HorizontalVelocity + VerticalVelocity;
 }
 
 bool USTT_EnemyKnockBack::MoveToKnockBack(const float a_DeltaTime)

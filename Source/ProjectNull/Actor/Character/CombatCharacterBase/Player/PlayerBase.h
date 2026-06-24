@@ -54,6 +54,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/* Begin Character Interface.*/
+
+	/**	最終的を取得 */
+	float GetFinalAttackPower()const override;
+
 	/**
 	* @brief ダメージを受ける処理
 	* @param Damage ダメージ量

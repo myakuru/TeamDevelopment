@@ -64,14 +64,20 @@ void USTE_EnemyBase::RegisterDelegate()
 	// EnemyDestroyした後、残存しても呼ばれない
 
 	// 移動方向
-	EnemyRuntimeData->OnMoveDirChanged.AddUObject(this, &USTE_EnemyBase::SetMoveDir);
+	EnemyRuntimeData->OnMoveDirChanged.AddUObject(this, &ThisClass::SetMoveDir);
+
+	// ターゲットの座標
+	EnemyRuntimeData->OnTargetLocationChanged.AddUObject(this, &ThisClass::SetTargetLocation);
+
+	// 受けたダメージが最大体力に対してどれくらいの割合か
+	EnemyRuntimeData->OnDamageRatioChanged.AddUObject(this, &ThisClass::SetDamageRatio);
 
 	// 距離の二乗値
-	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &USTE_EnemyBase::SetTargetDistanceSqr);
+	EnemyRuntimeData->OnTargetDistChanged.AddUObject(this, &ThisClass::SetTargetDistanceSqr);
 
 	// ステートEnumを切り替える
-	EnemyRuntimeData->OnStateEnumChanged.AddUObject(this, &USTE_EnemyBase::SetEnemyState);
+	EnemyRuntimeData->OnStateEnumChanged.AddUObject(this, &ThisClass::SetEnemyState);
 
 	// 死んでいるかどうか
-	EnemyRuntimeData->OnIsAliveChanged.AddUObject(this, &USTE_EnemyBase::SetIsAlive);
+	EnemyRuntimeData->OnIsAliveChanged.AddUObject(this, &ThisClass::SetIsAlive);
 }

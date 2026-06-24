@@ -23,7 +23,6 @@ AEnemyBase::AEnemyBase()
 	,	GameProgress(nullptr)
 	,	EnemyRuntimeData(nullptr)
 	,	EnemyStatus(FEnemyStatus())
-	,	AttackData(FCharacterAttackData())
 	,	LanchVelocity(FVector::ZeroVector)
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -108,40 +107,48 @@ void AEnemyBase::RegisterDelegates()
 	// ステートEnum切り替え
 	EnemyRuntimeData->OnStateEnumChanged.AddUObject(this, &AEnemyBase::SetEnemyState);
 
-	// 計算後の最終的なHPをセット
-	EnemyRuntimeData->SetFinalAttack(EnemyStatus.FinalHP);
-
-	// 計算後の最終的な攻撃力をセット
-	EnemyRuntimeData->SetFinalAttack(EnemyStatus.FinalAttack);
-
 	EnemyRuntimeData->OnIsAliveChanged.AddUObject(this, &AEnemyBase::SetIsAlive);
 }
 
 void AEnemyBase::UpdateParams()
 {
-	if (!GameProgress) { return; }
+	if (!GameProgress||!EnemyRuntimeData) { return; }
 
 	// 倒した敵数を元に
 	const int32 killCount = GameProgress->GetKillCount();
 
 	// ヒットポイントの更新
-	EnemyStatus.FinalHP = EnemyStatus.HPScaling.GetFinalValue(killCount);
+	{
+		// 計算後の最終的なHPをセット
+		EnemyRuntimeData->SetFinalHP(EnemyStatus.HPScaling.GetFinalValue(killCount));
+	}
 
-	// 攻撃力の更新
-	EnemyStatus.FinalAttack = EnemyStatus.AttackScaling.GetFinalValue(killCount);
+	// 攻撃パラメータの更新
+	{
+		// 最終的な攻撃倍率の更新
+		float AttackScale =
+			EnemyStatus.AttackScaling.CalculateFinalScaling(killCount);
+
+		// 基礎攻撃力と倍率をセット
+		EnemyRuntimeData->SetBaseAttackPower(EnemyStatus.AttackScaling.Base);
+		EnemyRuntimeData->SetAttackScaling(AttackScale);
+	}
 }
 
 void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
 {
 	EnemyStatus.StateTag = a_TargetState;
-
-	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
 }
 
 void AEnemyBase::ApplyDamaged(float InDamaged)
 {
-	// 渡された値分、FinalHPを減算
-	EnemyRuntimeData->AddHealth(-InDamaged);
+	if (!EnemyRuntimeData) { return; }
+
+	EnemyRuntimeData->AddHealth(-InDamaged);		// 渡された値分、FinalHPを減算
+	UE_LOG(LogTemp, Error, TEXT("Damage : %f"),InDamaged);
+
+	EnemyRuntimeData
+		->CalclateDamageToMaxHealthRatio(InDamaged);// 受けたダメージが最大体力に対して何割かを算出
 	OnHit();
 
 	// 体力が0以下なら死亡フラグを立てる
@@ -151,6 +158,12 @@ void AEnemyBase::ApplyDamaged(float InDamaged)
 		EnemyRuntimeData->ChangedIsAlive(EnemyStatus.IsAlive);
 		OnDeath();
 	}
+}
+
+void AEnemyBase::ApplyKnockBack(const FVector& InOwnerLocation)
+{
+	if (!EnemyRuntimeData) { return; }
+	EnemyRuntimeData->SetTargetLocation(InOwnerLocation);
 }
 
 void AEnemyBase::FinalizeDeath()
@@ -245,6 +258,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 
+	// ゲーム進行管理クラスの情報取得
+	GameProgress = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
 
 	// 敵が生成された際に敵管理クラス経由でリストへ登録する
 	if (EnemyManager) {

@@ -39,19 +39,12 @@ EStateTreeRunStatus USTT_EnemyAttack::Tick(FStateTreeExecutionContext& a_Context
 		// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
 		if (EnemyRuntime->GetAnimFinished())
 		{
+			// ステートタイプを切り替え
+			OwnerEnemy->NotifyChangedStateEnum(EEnemyState::Idle);
+
 			return EStateTreeRunStatus::Succeeded;
 		}
 	}
 	
 	return EStateTreeRunStatus::Running;
-}
-
-void USTT_EnemyAttack::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
-{
-	Super::ExitState(a_Context, a_Transition);
-
-	if (!OwnerEnemy) { return; }
-
-	// ステートタイプを切り替え
-	OwnerEnemy->NotifyChangedStateEnum(EEnemyState::Idle);
 }

@@ -15,9 +15,9 @@ struct FAttackRuntimeData
 public:
 
 	FAttackRuntimeData() :
-		Final(0.0f),
 		Base(0.0f),
-		Scaling(0.0f)
+		Scaling(1.0f),
+		Final(0.0f)
 	{
 	}
 
@@ -106,6 +106,9 @@ public:
 
 	/** 体力の最大値を取得 */
 	float GetMaxHealth() const { return Health.Max; }
+
+	/** 攻撃の倍率を取得 */
+	float GetAttackScaling()const { return Attack.Scaling; }
 
 	/** 基礎攻撃力とスケール値から最終的な攻撃力を算出 */
 	float GetCharacterAttackPower(){ return Attack.GetFinalPower(); }

@@ -143,6 +143,16 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 }
 
+float APlayerBase::GetFinalAttackPower() const
+{
+	auto GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
+
+	if (!GameInstance || !GameInstance->GetPlayerRuntimeData()) { return 1.f; }
+	auto PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+
+	return PlayerRuntimeData->GetCharacterAttackPower();
+}
+
 void APlayerBase::ApplyDamaged(float InDamage)
 {
 	auto GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());

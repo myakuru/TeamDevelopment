@@ -25,7 +25,6 @@ public:
 
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)	override;
 	virtual EStateTreeRunStatus Tick(FStateTreeExecutionContext& a_Context, const float a_DeltaTime)								override;
-	virtual void ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)					override;
 
 private:
 
@@ -82,6 +81,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	FVector MoveDir = FVector::ZeroVector;
 
+	/**	重力の速度 */
+	UPROPERTY()
+	FVector GravityVelocity = FVector::ZeroVector;
+
+	/** 以前触れた地面の法線 */
+	UPROPERTY()
+	FVector AfterGroundNormal = FVector::ZeroVector;
+
 	/**	移動速度 */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	float MoveSpeed = 600.f;
@@ -102,13 +109,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	float CapsuleHalfHeight = 88.f;
 
-	/**	重力の速度 */
-	UPROPERTY()
-	FVector GravityVelocity = FVector::ZeroVector;
-
-	/** 以前触れた地面の法線 */
-	UPROPERTY()
-	FVector AfterGroundNormal = FVector::ZeroVector;
 
 	/**	接地フラグ */
 	UPROPERTY()

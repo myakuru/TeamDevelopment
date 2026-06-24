@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
-#include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
 #include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
 #include "EnemyDataStruct.h"
 #include "../CombatCharacterBase.h"
@@ -113,10 +112,6 @@ public:
 
 
 	//~ Begin Getter
-	
-	/**	最終的を取得 */
-	float GetFinalAttackPower()const override;
-
 	/** ノックバック時の重さを取得 */
 	float GetKnockBackWeight()const { return EnemyStatus.KnockBackWeight; }
 
@@ -182,11 +177,20 @@ public:
 
 
 	/* Begin Character Interface.*/
+	/**	最終的を取得 */
+	virtual float GetFinalAttackPower()const override;
+
 	/**
 	 * @brief ダメージを受ける処理
 	 * @param Damage ダメージ量
 	 */
 	virtual void ApplyDamaged(float InDamaged = 1.f)override;
+
+	/**
+	 * @brief ノックバックを受ける処理
+	 * @param OwnerLocation 攻撃者の位置
+	 */
+	virtual void ApplyKnockBack(const FVector& InOwnerLocation)override;
 	/* End Character Interface.*/
 
 protected:
@@ -264,12 +268,12 @@ public:
 	/// <summary>
 	/// 自身が死んだ際の処理
 	/// </summary>
-	virtual void OnDeath(){ SetEnemyState(EEnemyState::Death); }
+	virtual void OnDeath(){ NotifyChangedStateEnum(EEnemyState::Death); }
 
 	/**
 	 * @brief 被弾時にステートを切り替える
 	 */
-	virtual void OnHit(){ SetEnemyState(EEnemyState::Hit); }
+	virtual void OnHit(){ NotifyChangedStateEnum(EEnemyState::Hit); }
 
 	/**
 	 * @brief 死亡を確定させる処理(StateTree側から呼ぶ)

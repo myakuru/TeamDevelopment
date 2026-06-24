@@ -6,6 +6,9 @@
 
 class AEnemyBase;
 
+/** ノックバックに必要な要素 */
+class UKnockBackData;
+
 /**
  * 敵のノックバックステート
  */
@@ -42,9 +45,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AEnemyBase>	OwnerEnemy = nullptr;
 
-	/**	ノックバックに必要な情報を格納しているデータテーブル */
+	/**	ノックバックに必要な情報を格納しているデータアセット */
 	UPROPERTY(EditAnywhere, Category = "Data")
-	TObjectPtr<UDataTable> KnockBackDataTable = nullptr;
+	TObjectPtr<UKnockBackData> KnockBackData = nullptr;
 
 	/**	ノックバック速度 */
 	UPROPERTY()
@@ -54,11 +57,23 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	FVector MoveDir = FVector::ZeroVector;
 
+	/**	ターゲットの座標 */
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	FVector TargetLocation = FVector::ZeroVector;
+
 	/**	敵の重量 */
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	float	EnemyWeight = 1.0f;
 
-	/**	受けた攻撃力 */
+	/**	最大体力に対する受けたダメージの割合 */
 	UPROPERTY()
-	float	ReceivedAttackPower = 0.0f;
+	float	DamageRatio = 0.0f;
+
+private:
+
+	/**
+	 * @brief デバッグ用攻撃倍率
+	 */
+	UPROPERTY(EditAnywhere)
+	float DebugDamageRatio = 1.f;
 };
