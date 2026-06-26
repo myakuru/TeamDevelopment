@@ -25,10 +25,13 @@ public:
 	void SaveToData(UMySaveGame* inSaveGame);
 
 	UFUNCTION()
-	void StageStart(int32 inNowStageIndex);
+	void InGameInitialize(int32 inNowStageIndex);
 
 	UFUNCTION()
-	void StageClear();
+	void InGameFinalize();
+
+	UFUNCTION()
+	void OutGameInitialize();
 
 	UFUNCTION()
 	void AddAcquiredWeapon(const FText& WeaponName) {

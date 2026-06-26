@@ -24,6 +24,8 @@ public:
 	void Update(float DeltaTime)					override;
 
 	void SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnabled);
+	void SetSphereTransform(const FTransform& Transform);
+	void SetSphereRadius(float Radius);
 
 private:
 

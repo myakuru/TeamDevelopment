@@ -36,7 +36,6 @@ void USuperGameInstance::Init()
 	}
 
 	LoadGameData();
-
 }
 
 void USuperGameInstance::LoadGameData()

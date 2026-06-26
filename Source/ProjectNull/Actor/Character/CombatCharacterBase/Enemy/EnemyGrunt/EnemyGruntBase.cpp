@@ -14,9 +14,6 @@ AEnemyGruntBase::AEnemyGruntBase()
 void AEnemyGruntBase::BeginPlay()
 {
 	AEnemyBase::BeginPlay();
-
-	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	PlayAnimation(static_cast<uint32>(EEnemyState::Idle), false);
 }
 
 void AEnemyGruntBase::TransitionIdleToWalk()
@@ -42,26 +39,9 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	/*PrevAnimTime = AnimTime;
-	AnimTime += DeltaTime;
-
-	if (AnimChangeFlg)
-	{
-		PlayAnimation(0,true);
-	}*/
-
-	//EnemyRuntimeData->UpdateAnimation(DeltaTime, EnemyStatus.BlendSpeed);
-
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
-
 	EnemyRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
-
-	/*if (EnemyStatus.StateTag == EEnemyState::Hit)
-	{
-		MoveToKnockBack(FVector::ZeroVector, 0, DeltaTime);
-		return;
-	}*/
 
 	// 攻撃可能か判断
 	CheckCanAttack();

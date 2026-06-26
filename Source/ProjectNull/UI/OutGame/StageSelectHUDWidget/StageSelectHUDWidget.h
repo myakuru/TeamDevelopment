@@ -36,6 +36,13 @@ protected:
 	UFUNCTION()
 	void OpenCurrentSelectedStageLevel();
 
+	/** 戻る */
+	UFUNCTION()
+	void ReturnButtonClicked();
+
+	UFUNCTION()
+	void OpenReturnLevel();
+
 	/** ステージ番号をクランプ */
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	int32 ClampStageIndex(int32 InStageIndex);

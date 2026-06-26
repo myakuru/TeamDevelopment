@@ -82,6 +82,36 @@ public:
 	bool bPause;
 };
 
+/**
+ * @brief プレイヤー・敵が持つ攻撃力に関する要素
+ */
+USTRUCT(BlueprintType)
+struct FCharacterAttackData
+{
+	GENERATED_BODY()
+public:
+
+	/**
+	 * @brief 最終的な攻撃力を算出
+	 * @param InSkillPower 攻撃そのもの威力
+	 * @return 最終的な攻撃力 
+	 */
+	float GetFinalAttackPower(const float InSkillPower)
+	{
+		return InSkillPower + AttackPowner * PowerScaling;
+	}
+
+public:
+
+	/**	攻撃力 */
+	UPROPERTY(EditAnywhere)
+	float AttackPowner = 1.f;
+
+	/**	倍率 */
+	UPROPERTY(EditAnywhere)
+	float PowerScaling = 1.f;
+};
+
 USTRUCT(BlueprintType)
 struct FEnemyDistanceData
 {

@@ -14,6 +14,7 @@
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
 #include <ProjectNull/Component/HitStopComponent/HitStopComponent.h>
+#include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
 
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
@@ -35,6 +36,8 @@ APlayerBase::APlayerBase():
 		CineCameraComponent(nullptr),
 		GearComponent(nullptr),
 		TargetSearchComponent(nullptr),
+		HitStopComponent(nullptr),
+		GroundAlignmentComponent(nullptr),
 		AutoAttack(nullptr),
 		MaterialCollectionUpdater(nullptr),
 		CutsceneComponent(nullptr),
@@ -85,9 +88,14 @@ APlayerBase::APlayerBase():
 	TargetSearchComponent = CreateDefaultSubobject<UTargetSearchComponent>("TargetSearch");
 
 	// ================================================================
-	// 対象検索コンポーネントの初期化
+	// ヒットストップコンポーネントの初期化
 	// ================================================================
 	HitStopComponent = CreateDefaultSubobject<UHitStopComponent>("HitStop");
+
+	// ================================================================
+	// 地面の法線に合わせてRootComponentの姿勢を更新するコンポーネント初期化
+	// ================================================================
+	GroundAlignmentComponent = CreateDefaultSubobject<UGroundAlignmentComponent>("GroundAlignment");
 
 	// Material Parameter Collectionの更新処理クラスの生成
 	MaterialCollectionUpdater = NewObject<UPlayerMaterialCollectionUpdater>();
@@ -126,6 +134,7 @@ void APlayerBase::Tick(float DeltaTime)
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
 
+	UpdateModelAfterimageTrailEffect(DeltaTime);
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -220,6 +229,21 @@ bool APlayerBase::CanMove()
 	}
 
 	return true;
+}
+
+void APlayerBase::UpdateModelAfterimageTrailEffect(float DeltaTime)
+{
+	if (!ModelAfterimageTrailEffect || 
+		!GetMesh()) { return; }
+
+	const auto PlayerAnimInstance = GetPlayerAnimInstance();
+	if (!PlayerAnimInstance) { return; }
+
+	ModelAfterimageTrailEffect->Update(
+		DeltaTime,
+		GetActorTransform(),
+		GetMesh()->GetSkeletalMeshAsset(),
+		PlayerAnimInstance->GetPlayerPoseSnapshot());
 }
 
 

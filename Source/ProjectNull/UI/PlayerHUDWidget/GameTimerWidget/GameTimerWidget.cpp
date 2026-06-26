@@ -22,7 +22,7 @@ void UGameTimerWidget::CountDownTimer()
 		TimerText = TEXT("Time's Up!");
 
 		//StageManagerSubsystem：ステージクリア(StageManagerにどうにか移して東堂葵)
-		GetWorld()->GetGameInstance<USuperGameInstance>()->GetStageManagerSubsystem()->StageClear();
+		GetWorld()->GetGameInstance<USuperGameInstance>()->GetStageManagerSubsystem()->InGameFinalize();
 	}
 	else
 	{

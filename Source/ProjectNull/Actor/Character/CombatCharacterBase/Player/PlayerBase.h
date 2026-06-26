@@ -22,6 +22,9 @@ class UTargetSearchComponent;
 /** ヒットストップを行う用のコンポーネント*/
 class UHitStopComponent;
 
+/** 地面の法線に合わせてRootComponentの姿勢を更新するコンポーネント */
+class UGroundAlignmentComponent;
+
 class UAttackBase;
 class UAutoAttack;
 class USuperGameInstance;
@@ -29,6 +32,10 @@ class UPlayerAnimInstance;
 class UPlayerMaterialCollectionUpdater;
 class UCineCameraComponent;
 class UPlayerCutsceneComponent;
+
+/** モデル残像エフェクトクラス
+	残像を連続的に描画するエフェクトクラス */
+class UModelAfterimageTrailEffect;
 
 UCLASS()
 class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
@@ -46,11 +53,20 @@ public:
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/* Begin Character Interface.*/	
 	/**
-	 * @brief ダメージを受ける
-	 * @param Damage 受けるダメージ量
+	 * @brief 攻撃に必要なデータ(倍率・攻撃力)を取得
+	 * @return 攻撃データ
 	 */
+	virtual FCharacterAttackData GetAttackData()const override { return AttackData; }
+
+	/**
+	* @brief ダメージを受ける処理
+	* @param Damage ダメージ量
+	*/
 	virtual void ApplyDamaged(float InDamage = 1.f)override;
+	
+	/* End Character Interface.*/
 
 	/**
 	 * @brief 移動処理
@@ -66,14 +82,16 @@ public:
 	void StartCutscene();
 
 	/** Getter */
-	inline UCameraComponent*				GetCameraComponent() const			{ return CameraComponent; }
-	inline USpringArmComponent*				GetSpringArmComponent() const		{ return SpringArmComponent; }
-	inline UPlayerGearComponent*			GetGearComponent() const			{ return GearComponent; }
-	inline UTargetSearchComponent*			GetTargetSearchComponent() const	{ return TargetSearchComponent; }
-	inline UHitStopComponent*				GetHitStopComponent() const			{ return HitStopComponent; }
-	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance() const		{ return SuperGameInstance; }
-	inline UCineCameraComponent*			GetCineCameraComponent() const		{ return CineCameraComponent; }
-	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent() const	{ return CutsceneComponent; }
+	inline UCameraComponent*				GetCameraComponent()			const	{ return CameraComponent; }
+	inline USpringArmComponent*				GetSpringArmComponent()			const	{ return SpringArmComponent; }
+	inline UPlayerGearComponent*			GetGearComponent()				const	{ return GearComponent; }
+	inline UTargetSearchComponent*			GetTargetSearchComponent()		const	{ return TargetSearchComponent; }
+	inline UHitStopComponent*				GetHitStopComponent()			const	{ return HitStopComponent; }
+	inline UGroundAlignmentComponent*		GetGroundAlignmentComponent()	const	{ return GroundAlignmentComponent; }
+	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance()			const	{ return SuperGameInstance; }
+	inline UCineCameraComponent*			GetCineCameraComponent()		const	{ return CineCameraComponent; }
+	inline UModelAfterimageTrailEffect*		GetModelAfterimageTrailEffect()	const	{ return ModelAfterimageTrailEffect; }
+	inline UPlayerCutsceneComponent*		GetPlayerCutsceneComponent()	const	{ return CutsceneComponent; }
 	UPlayerAnimInstance*					GetPlayerAnimInstance() const;
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
@@ -86,6 +104,8 @@ private:
 	 * @return 動けるならtrue 動けないならfalse
 	 */
 	bool CanMove();
+
+	void UpdateModelAfterimageTrailEffect(float DeltaTime);
 
 	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
@@ -111,6 +131,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "HitStopComponent")
 	TObjectPtr<UHitStopComponent> HitStopComponent;
 
+	/** 地面の法線に合わせてRootComponentの姿勢を更新するコンポーネント */
+	UPROPERTY(VisibleAnywhere, Category = "GroundAlignment")
+	TObjectPtr<UGroundAlignmentComponent> GroundAlignmentComponent;
+
 	/** 自動攻撃クラス */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Attack")
 	TObjectPtr<UAutoAttack> AutoAttack;
@@ -119,6 +143,11 @@ private:
 	UPROPERTY(EditAnywhere, Instanced, Category = "MaterialCollection")
 	TObjectPtr<UPlayerMaterialCollectionUpdater> MaterialCollectionUpdater;
 
+	/** モデル残像エフェクトクラス
+		残像を連続的に描画するエフェクトクラス */
+	UPROPERTY(EditAnywhere, Instanced, Category = "ModelAfterimageTrailEffect")
+	TObjectPtr<UModelAfterimageTrailEffect> ModelAfterimageTrailEffect;
+
 	/** カットシーンの再生用 */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Cutscene")
 	TObjectPtr<UPlayerCutsceneComponent> CutsceneComponent;
@@ -126,4 +155,8 @@ private:
 	/** ゲーム全体で共有されるデータや機能を管理するクラス */
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
+
+	/** 攻撃に関する要素(倍率・攻撃力) */
+	UPROPERTY(EditAnywhere, Category = "AttackData")
+	FCharacterAttackData AttackData;
 };

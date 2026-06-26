@@ -1,16 +1,42 @@
 ﻿#include "StageButtonWidget.h"
 #include "Components/Button.h"
 
+void UStageButtonWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+
+	//Baseが持ているホバー・クリックデリゲートに、
+	//ステージボタン用のデリゲートを登録する
+	OnHovered.AddUniqueDynamic
+	(this, &UStageButtonWidget::DoHoveredStageButton);
+
+	OnClicked.AddUniqueDynamic
+	(this, &UStageButtonWidget::DoClickedStageButton);
+}
+
 void UStageButtonWidget::DoHoveredButton()
 {
-	if (!OnHovered.IsBound() || !bUnlocked)return;
-	OnHovered.Broadcast(StageIndex);
+	if (!bUnlocked)return;
+	Super::DoHoveredButton();
 }
 
 void UStageButtonWidget::DoClickedButton()
 {
-	if (!OnClicked.IsBound() || !bUnlocked)return;
-	OnClicked.Broadcast(StageIndex);
+	if (!bUnlocked)return;
+	Super::DoClickedButton();
+}
+
+void UStageButtonWidget::DoHoveredStageButton()
+{
+	if (!OnHoveredStage.IsBound() || !bUnlocked)return;
+	OnHoveredStage.Broadcast(StageIndex);
+}
+
+void UStageButtonWidget::DoClickedStageButton()
+{
+	if (!OnClickedStage.IsBound() || !bUnlocked)return;
+	OnClickedStage.Broadcast(StageIndex);
 }
 
 void UStageButtonWidget::Setup(int32 InStageIndex,bool bInUnlocked)
