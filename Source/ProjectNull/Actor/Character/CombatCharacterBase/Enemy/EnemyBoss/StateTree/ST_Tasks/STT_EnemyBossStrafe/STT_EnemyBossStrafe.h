@@ -33,7 +33,7 @@ public:
 	float Elapsed = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	float StrafeTime = 3.0f;
+	float StrafeTime = 10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "Input")
 	float StrafeSpeed = 100.0f;

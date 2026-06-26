@@ -142,7 +142,7 @@ void AEnemySpawner::SpawnEnemy()
 						{
 							if (poolSubSystem->IsPoolFull(Unit.PoolConfig))
 							{
-								UE_LOG(LogTemp, Warning, TEXT("[Spawner] Pool is full. Skip spawn: %s"), *Unit.PoolConfig->GetName());
+								//UE_LOG(LogTemp, Warning, TEXT("[Spawner] Pool is full. Skip spawn: %s"), *Unit.PoolConfig->GetName());
 								continue;
 							}
 

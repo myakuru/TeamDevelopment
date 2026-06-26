@@ -5,6 +5,7 @@
 #include "Blueprint/StateTreeTaskBlueprintBase.h"
 #include "../../../EnemyBossDataStruct.h"
 #include "../STT_EnemyBossTaskBase.h"
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossActionTableDataAsset.h>
 #include "STT_EnemyBossDecide.generated.h"
 
 class AEnemyBossBase;
@@ -26,4 +27,11 @@ public:
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition);
 	virtual	void ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)override;
 
+	/** 重み付き攻撃選択*/
+	static EBossActionType SelectWeightedRandom(const TArray<FBossActionEntry>& Entries);
+
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UBossActionTableDataAsset> ActionTable;
 };

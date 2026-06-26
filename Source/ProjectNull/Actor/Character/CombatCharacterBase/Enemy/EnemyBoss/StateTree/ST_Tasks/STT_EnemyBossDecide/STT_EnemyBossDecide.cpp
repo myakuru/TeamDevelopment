@@ -42,56 +42,72 @@ EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext&
 	// 優先度の高いものがある場合それを選択する
 	if (Boss->GetActionPriority() != EBossActionType::None)
 	{
-		if (Boss->SelectAttackByDistance(Dist))
+		Boss->SetNextAction(Boss->GetActionPriority());
+		Boss->SelectNextAttack(Boss->GetActionPriority());
+		/*if (Boss->SelectAttackByDistance(Dist))
 		{
 			BossAction = Boss->GetActionPriority();
-			Boss->SetNextAction(Boss->GetActionPriority());
-		}
+		}*/
 	}
 	else
 	{
 		// ボスの攻撃範囲と距離を比較
-		if (Dist <= Boss->GetNearRange())
-		{
-			// 近距離
-			if (FMath::FRand() < Boss->GetStrafeChance())
-			{
-				UE_LOG(LogTemp, Warning, TEXT("BossAction Strafe"));
-				BossAction = EBossActionType::Strafe;		// 様子見
-			}
-			else if (Boss->SelectAttackByDistance(Dist))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("BossAction Attack"));
-				BossAction = EBossActionType::PlayAttack;	// 攻撃
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("BossAction Strafe"));
-				BossAction = EBossActionType::Strafe;		// 条件に合致しなければ様子見
-			}
-		}
-		else
-		{
-			// 遠距離
-			// 歩く、走る、ジャンプ攻撃、遠距離攻撃から選ぶ
-			// とりあえずランダムで作る
-			const EBossActionType Far[] =
-			{
-				EBossActionType::ApproachWalk,
-				EBossActionType::ApproachRun,
-				EBossActionType::JumpAttack,
-				EBossActionType::RangedAttack
-			};
-			BossAction = Far[FMath::RandRange(0, 3)];
-			if (BossAction == EBossActionType::JumpAttack || BossAction == EBossActionType::RangedAttack)
-			{
-				Boss->SelectAttackByDistance(Dist);
-			}
-			UE_LOG(LogTemp, Warning, TEXT("BossAction Range"));
-		}
-	}
+		bool DistRange = (Dist <= Boss->GetNearRange());
 
-	Boss->SetNextAction(BossAction);
+		TArray<FBossActionEntry>& ActionEntry =
+			DistRange ? ActionTable->NearActions
+			: ActionTable->FarActions;
+
+		BossAction = SelectWeightedRandom(ActionEntry);
+		Boss->SetNextAction(BossAction);
+		Boss->SelectNextAttack(BossAction);
+
+		/*if (BossAction == EBossActionType::Strafe || BossAction == EBossActionType::PlayAttack ||
+			BossAction == EBossActionType::JumpAttack || BossAction == EBossActionType::Breath)
+		{
+			Boss->SelectAttackByDistance(Dist);
+		}*/
+
+		//if (Dist <= Boss->GetNearRange())
+		//{
+
+		//	// 近距離
+		//	if (FMath::FRand() < Boss->GetStrafeChance())
+		//	{
+		//		UE_LOG(LogTemp, Warning, TEXT("BossAction Strafe"));
+		//		BossAction = EBossActionType::Strafe;		// 様子見
+		//	}
+		//	else if (Boss->SelectAttackByDistance(Dist))
+		//	{
+		//		UE_LOG(LogTemp, Warning, TEXT("BossAction Attack"));
+		//		BossAction = EBossActionType::PlayAttack;	// 攻撃
+		//	}
+		//	else
+		//	{
+		//		UE_LOG(LogTemp, Warning, TEXT("BossAction Strafe"));
+		//		BossAction = EBossActionType::Strafe;		// 条件に合致しなければ様子見
+		//	}
+		//}
+		//else
+		//{
+		//	// 遠距離
+		//	// 歩く、走る、ジャンプ攻撃、遠距離攻撃から選ぶ
+		//	// とりあえずランダムで作る
+		//	const EBossActionType Far[] =
+		//	{
+		//		EBossActionType::ApproachWalk,
+		//		EBossActionType::ApproachRun,
+		//		EBossActionType::JumpAttack,
+		//		EBossActionType::RangedAttack
+		//	};
+		//	BossAction = Far[FMath::RandRange(0, 3)];
+		//	if (BossAction == EBossActionType::JumpAttack || BossAction == EBossActionType::RangedAttack)
+		//	{
+		//		Boss->SelectAttackByDistance(Dist);
+		//	}
+		//	UE_LOG(LogTemp, Warning, TEXT("BossAction Range"));
+		//}
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Decide EnterState Out"));
 
@@ -101,4 +117,31 @@ EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext&
 void USTT_EnemyBossDecide::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::ExitState(Context, Transition);
+}
+
+
+EBossActionType USTT_EnemyBossDecide::SelectWeightedRandom(const TArray<FBossActionEntry>& Entries)
+{
+	// EntriesがなければWalkを返す
+	if (Entries.IsEmpty()) return EBossActionType::ApproachWalk;
+
+	// 配列のWeightを足してトータルWeightを作る
+	float TotalWeight = 0.0f;
+	for (const auto& E : Entries) TotalWeight += E.Weight;
+
+	// 0からTotalWeightから値を乱数で出力
+	float Rand = FMath::FRandRange(0.0f, TotalWeight);
+	float Cumulative = 0.0f;
+
+	// Weightをもとに選択
+	for (const auto& E : Entries)
+	{
+		// CumulativeにWeightを順番にタス
+		Cumulative += E.Weight;
+		// Cumulativeの値が算出した乱数を上回ったらそのActionTypeを返す
+		if (Rand <= Cumulative) return E.ActionType;
+	}
+
+	// 配列からはみ出したらWalkを返す
+	return EBossActionType::ApproachWalk;
 }

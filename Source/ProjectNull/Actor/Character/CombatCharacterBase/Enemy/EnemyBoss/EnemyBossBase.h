@@ -5,6 +5,9 @@
 #include "../../CombatCharacterBase.h"
 #include "EnemyBossDataStruct.h"
 #include "EnemyBossDataAsset.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
 #include <ProjectNull/Data/CharacterRuntimeData/EnemyBossRuntimeData/EnemyBossRuntimeData.h>
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 #include "EnemyBossBase.generated.h"
@@ -43,6 +46,7 @@ public:
 	void AdvanceHitIndex()			{ EnemyBossRuntimeData->HitIndex++; }		/** 連撃のインデックス増加*/
 	void ResetHitIndex()			{ EnemyBossRuntimeData->HitIndex = 0; }		/** 連撃のインデックスを初期化*/
 	void RequestFastFallOnNotify()	{ EnemyBossRuntimeData->bShouldFastFallOnNotify = true; }		/** 重力加速フラグをtrueにする関数*/
+	void ResetGravity();
 	void TryConsumeFastFallRequest();
 	/** 視界にPawnが入った時に呼ばれる（PawnSensingのコールバック）*/
 	UFUNCTION()
@@ -71,23 +75,35 @@ public:
 	// ゲッター
 	// ------------------------------------------------------------------------------------
 	/** 次の攻撃アクション状態*/
-	const EBossActionType GetNextAction()			const	{ return EnemyBossRuntimeData->CurrentAction; }
-	const EBossActionType GetActionPriority()		const	{ return EnemyBossRuntimeData->ActionPriority; }	/** Decideがアクションを決める際に優先度が高いものを優先するようにするためのゲッター*/
-	int32 GetHitIndex()								const	{ return EnemyBossRuntimeData->HitIndex; }			/** 連撃のインデックスのゲッター*/
-	const FBossAttackPattern& GetCurrentAttack()	const	{ return EnemyBossRuntimeData->CurrentAttack; }		/** 現在の攻撃を取得*/
-	float GetNearRange()							const	{ return NearRange; }		/** 近距離攻撃範囲のゲッター*/
-	float GetStrafeChance()							const	{ return StrafeChance; }	/** 連撃確率のゲッター*/
-	float GetWalkSpeed()							const	{ return WalkSpeed; }		/** 歩く速度のゲッター*/
-	float GetRunSpeed()								const	{ return RunSpeed; }		/** 走る速度のゲッター*/
-	AActor* GetTargetActor()						const	{ return TargetActor; }		/** 現在の追尾対象を取得（Evaluatorが毎フレーム読む） */
-
+	const EBossActionType GetNextAction()				const	{ return EnemyBossRuntimeData->CurrentAction; }
+	const EBossActionType GetActionPriority()			const	{ return EnemyBossRuntimeData->ActionPriority; }	/** Decideがアクションを決める際に優先度が高いものを優先するようにするためのゲッター*/
+	int32 GetHitIndex()									const	{ return EnemyBossRuntimeData->HitIndex; }			/** 連撃のインデックスのゲッター*/
+	const FBossAttackPattern& GetCurrentAttack()		const	{ return EnemyBossRuntimeData->CurrentAttack; }		/** 現在の攻撃を取得*/
+	float GetNearRange()								const	{ return NearRange; }		/** 近距離攻撃範囲のゲッター*/
+	float GetStrafeChance()								const	{ return StrafeChance; }	/** 連撃確率のゲッター*/
+	float GetWalkSpeed()								const	{ return WalkSpeed; }		/** 歩く速度のゲッター*/
+	float GetRunSpeed()									const	{ return RunSpeed; }		/** 走る速度のゲッター*/
+	AActor* GetTargetActor()							const	{ return TargetActor; }		/** 現在の追尾対象を取得（Evaluatorが毎フレーム読む） */
+	TObjectPtr<UNiagaraComponent> GetBreathNiagara()	const	{ return BreathEffect; }
 
 	// ------------------------------------------------------------------------------------
 	// セッター
 	// ------------------------------------------------------------------------------------
 	void SetNextAction(EBossActionType InAction)		{ EnemyBossRuntimeData->CurrentAction = InAction; }	/** 次の攻撃をいれる*/
 	void SetTargetActor(AActor* InTarget)				{ TargetActor = InTarget; }							/** 追尾対象を設定（nullptrでロスト扱い） */
-	void SetActionPriority(EBossActionType InAction)	{ EnemyBossRuntimeData->ActionPriority = InAction; }	/** Decideがアクションを決める際に優先度付で使用する/
+	void SetActionPriority(EBossActionType InAction)	{ EnemyBossRuntimeData->ActionPriority = InAction; }	/** Decideがアクションを決める際に優先度付で使用する*/
+	void SetNextAttack(EBossActionType InAttack)		{ EnemyBossRuntimeData->CurrentAttack = AttackSet->Patterns[static_cast<int>(InAttack)]; }
+	void SelectNextAttack(EBossActionType InAction)
+	{
+		for (const FBossAttackPattern& P : GetAttackPatterns())
+		{
+			if (P.ActionType == InAction)
+			{
+				EnemyBossRuntimeData->CurrentAttack = P;
+				return;
+			}
+		}
+	}
 
 	/** 距離に応じて撃てる技を選ぶ。撃てる技がなければfalseを返す*/
 	bool SelectAttackByDistance(float Dist)
@@ -107,6 +123,13 @@ public:
 
 		// 候補からランダムに一つ選んで、ボスの今の攻撃にセット
 		EnemyBossRuntimeData->CurrentAttack = *Cand[FMath::RandRange(0, Cand.Num() - 1)];
+
+		UE_LOG(LogTemp, Warning, TEXT("CurrentAction = %s"),
+			*UEnum::GetValueAsString(EnemyBossRuntimeData->CurrentAction));
+
+		UE_LOG(LogTemp, Warning, TEXT("CurrentAttack.ActionType = %s"),
+			*UEnum::GetValueAsString(EnemyBossRuntimeData->CurrentAttack.ActionType));
+
 		//HitIndex = 0;
 		return true;
 	}
@@ -158,5 +181,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
 	TObjectPtr<UEnemyBossRuntimeData> EnemyBossRuntimeData;
+
+	UPROPERTY(EditAnywhere, Category = "VFX")
+	TObjectPtr<UNiagaraComponent> BreathEffect;
 
 };

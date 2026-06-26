@@ -1,4 +1,4 @@
-﻿#include "STT_EnemyBossJumpAttack.h"
+﻿#include "STT_EnemyBossBreath.h"
 
 #include "GameFramework/Actor.h"
 #include "StateTreeExecutionContext.h"
@@ -9,16 +9,16 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-USTT_EnemyBossJumpAttack::USTT_EnemyBossJumpAttack(const FObjectInitializer& a_ObjInit)
+USTT_EnemyBossBreath::USTT_EnemyBossBreath(const FObjectInitializer& a_ObjInit)
 	: Super(a_ObjInit)
 {
 	// Tick処理有効化
 	bShouldCallTick = true;
 }
 
-EStateTreeRunStatus USTT_EnemyBossJumpAttack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
+EStateTreeRunStatus USTT_EnemyBossBreath::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("JumpAttack Tick In"));
+	UE_LOG(LogTemp, Warning, TEXT("Breath Tick In"));
 
 	AEnemyBossBase* Boss = GetBoss();
 	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }
@@ -51,26 +51,12 @@ EStateTreeRunStatus USTT_EnemyBossJumpAttack::Tick(FStateTreeExecutionContext& C
 
 			// 挙動を停止させてからアニメーション再生
 			AIC->StopMovement();
-			Phase = EBossJumpPhase::Takeoff;
-			bLeftGround = false;
-			bLandMontagePlayed = false;
-
+			Phase = EBossBreathPhase::Start;
 			// アニメ再生
 			//if (UAnimInstance* Anim = Boss->GetMesh() ? Boss->GetMesh()->GetAnimInstance() : nullptr)
 			{
 				// 踏み切りmontage再生
 				Anim->Montage_Play(Atk.AttackMontages[0]);
-				FVector OutVel;
-				const FVector Start = Boss->GetActorLocation();
-				const FVector End = TargetActor->GetActorLocation();
-				if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(Boss, OutVel, Start, End, 0.0f, ArcParam))
-				{
-					Boss->LaunchCharacter(OutVel, true, true);
-				}
-				else
-				{
-					Boss->LaunchCharacter({ 0,0,600 }, true, true);
-				}
 			}
 		}
 		return EStateTreeRunStatus::Running;   // 向き直り中
@@ -78,51 +64,54 @@ EStateTreeRunStatus USTT_EnemyBossJumpAttack::Tick(FStateTreeExecutionContext& C
 
 	switch (Phase)
 	{
-	case EBossJumpPhase::Takeoff:
+	case EBossBreathPhase::Start:
 		// 踏み切りmontageが終わったら、ターゲットへ向けて射出 → 落下攻撃montageへ
 		if (!Anim->Montage_IsPlaying(Atk.AttackMontages[0]))
 		{
-			Phase = EBossJumpPhase::WaitLiftOff;
+			Phase = EBossBreathPhase::Loop;
+			Anim->Montage_Play(Atk.AttackMontages[1]);
+
+			Anim->Montage_JumpToSection(
+				BreathLoopSectionName,
+				Atk.AttackMontages[1]);
+
+			Anim->Montage_SetNextSection(
+				BreathLoopSectionName,
+				BreathLoopSectionName,
+				Atk.AttackMontages[1]);
 		}
 		return EStateTreeRunStatus::Running;
+		break;
 		case
-			EBossJumpPhase::WaitLiftOff:
-				UE_LOG(LogTemp, Warning, TEXT("GravityScale = %f"), Move->GravityScale);
-				UE_LOG(LogTemp, Warning, TEXT("JumpZVelocity = %f"), Move->JumpZVelocity);
-				UE_LOG(LogTemp, Warning, TEXT("MovementMode = %d"), (int32)Move->MovementMode);
-				UE_LOG(LogTemp, Warning, TEXT("IsMovingOnGround = %s, Velocity.Z = %f"),
-					Move->IsMovingOnGround() ? TEXT("true") : TEXT("false"),
-					Boss->GetVelocity().Z);
-				//if (!Move->IsMovingOnGround())
-				{
-					// 離陸を確認したら落下攻撃Montage再生
-					bLeftGround = true;
-					Anim->Montage_Play(Atk.AttackMontages[1]); // 落下～着地攻撃
-					Phase = EBossJumpPhase::Air;
-				}
-				break;
-	case EBossJumpPhase::Air:
-		// 落下攻撃montageが流れている間は待つ。
-		// 「一度離陸して着地した」or「montageが再生終了した」で終わる
+		EBossBreathPhase::Loop:
+			// ループ時間をカウント
+			BreathCount += DeltaTime;
+			if (BreathCount >= BreathDuration)
+			{
+				Phase = EBossBreathPhase::End;
+				BreathCount = 0.0f;
+				Anim->Montage_Stop(BreathEndBlend, Atk.AttackMontages[1]);
+			}
+			break;
+		case EBossBreathPhase::End:
+			// アニメーションブレンド
 		{
-			const bool bLanded = bLeftGround && Move->IsMovingOnGround();
-			const bool bAnimDone = !Anim->Montage_IsPlaying(Atk.AttackMontages[1]);
-			if (bLanded && bAnimDone)
+			BreathCount += DeltaTime;
+			if (BreathCount >= BreathEndBlend)
 			{
 				Boss->SetActionPriority(EBossActionType::None);
 				AIC->StopMovement();
 				return EStateTreeRunStatus::Succeeded;
 			}
 		}
-		return EStateTreeRunStatus::Running;
-		break;
+			return EStateTreeRunStatus::Running;
 	}
 
 	return EStateTreeRunStatus::Running;
 }
 
 // タスク開始時の処理
-EStateTreeRunStatus USTT_EnemyBossJumpAttack::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
+EStateTreeRunStatus USTT_EnemyBossBreath::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::EnterState(Context, Transition);
 
@@ -132,14 +121,12 @@ EStateTreeRunStatus USTT_EnemyBossJumpAttack::EnterState(FStateTreeExecutionCont
 	const FBossAttackPattern& Atk = Boss->GetCurrentAttack();
 	if (!Atk.AttackMontages.IsValidIndex(1)) { return EStateTreeRunStatus::Failed; } // 2つ必須
 
-	Boss->RequestFastFallOnNotify();   // 落下時に重力加速するようにフラグを立てる
-	Phase = EBossJumpPhase::Takeoff;
-	bMontageStarted = false;
+	BreathCount = 0.0f;
 
 	return EStateTreeRunStatus::Running;
 }
 
-void USTT_EnemyBossJumpAttack::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
+void USTT_EnemyBossBreath::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::ExitState(Context, Transition);
 }
