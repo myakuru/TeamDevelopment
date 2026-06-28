@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Effect/EffectBase.h>
 
 
 AProjectileBase::AProjectileBase():
@@ -78,8 +79,8 @@ void AProjectileBase::BeginPlay()
 		AliveTime,
 		false);
 
-	//UE_LOG(LogTemp, Display, TEXT("呼!"));
-
+	if (!ProjectileEffect) { return; }
+	ProjectileEffect->Start(Root);
 }
 
 void AProjectileBase::HandleCollision(AActor* OtherActor)

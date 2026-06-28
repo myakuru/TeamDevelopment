@@ -19,6 +19,7 @@ class UStaticMeshComponent;
 /** 飛び道具移動専用コンポーネント */
 class UProjectileMovementComponent;
 
+class UEffectBase;
 
 /** 発射物の中間基底クラス */
 UCLASS(Blueprintable)
@@ -82,6 +83,9 @@ private:
 	/** 飛び道具移動専用コンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+	UPROPERTY(EditAnywhere,Instanced)
+	TObjectPtr<UEffectBase> ProjectileEffect;
 
 	FTimerHandle AliveTimerHandle;
 
