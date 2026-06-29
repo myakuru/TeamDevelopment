@@ -3,9 +3,9 @@
 
 #include "CoreMinimal.h"
 
-#include "UObject/Object.h"
+#include "GameFramework/Actor.h"
 
-#include "EffectBase.generated.h"
+#include "NiagaraEffectBase.generated.h"
 
 /** Niagaraエフェクトクラス */
 class UNiagaraSystem;
@@ -14,16 +14,18 @@ class UNiagaraSystem;
 class UNiagaraComponent;
 
 
-/** エフェクト中間基底クラス */
-UCLASS(Blueprintable, EditInlineNew)
-class PROJECTNULL_API UEffectBase : public UObject
+UCLASS(Blueprintable)
+class PROJECTNULL_API ANiagaraEffectBase : public AActor
 {
 	GENERATED_BODY()
-public:
-	UEffectBase();
-public:
+public:	
+	ANiagaraEffectBase();
+protected:
+	virtual void BeginPlay() override;
+public:	
+	virtual void Tick(float DeltaTime) override;
 
-	void Start(USceneComponent* RootComponent);
+	void Start(USceneComponent* InRootComponent);
 
 	void DeactivateEffect();
 

@@ -7,7 +7,8 @@
 
 #include "CrossLaserbeam.generated.h"
 
-class UBoxComponent;
+
+class ALaserbeam;
 
 UCLASS(Blueprintable)
 class PROJECTNULL_API ACrossLaserbeam : public AActor
@@ -27,30 +28,7 @@ public:
 	
 private:
 
-	UFUNCTION()
-	void OnLaserBeginOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
-	
-	UFUNCTION()
-	void OnLaserEndOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex);
+	UPROPERTY(EditAnywhere,Instanced)
+	TArray<TObjectPtr<ALaserbeam>> Laserbeams;
 
-	void OnHit(const TObjectPtr<AActor>& Actor);
-
-
-	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<UBoxComponent>> LaserBoxes;
-
-	FTimerHandle HitIntervalTimerHandle;
-
-	UPROPERTY(EditAnywhere)
-	float HitInterval;
 };
