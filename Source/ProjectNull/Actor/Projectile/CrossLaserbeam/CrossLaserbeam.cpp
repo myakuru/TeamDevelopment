@@ -1,7 +1,11 @@
 ﻿
 #include "CrossLaserbeam.h"
 
-#include <ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.h>
+
+#include "Components/BoxComponent.h"
+
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Effect/EffectBase.h>
 
 ACrossLaserbeam::ACrossLaserbeam()
 {
@@ -9,13 +13,36 @@ ACrossLaserbeam::ACrossLaserbeam()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(RootComponent);
 
-	
+	BoxCompArray.SetNum(LaserbeamNum);
+
+	for (int32 Index = 0; Index < LaserbeamNum; ++Index)
+	{
+		auto& BoxComp = BoxCompArray[Index];
+
+		FString Name = FString::Printf(
+			TEXT("LaserBox_%d"),
+			Index);
+
+		BoxComp = CreateDefaultSubobject<UBoxComponent>(*Name);
+		if (!BoxComp) { continue; }
+		BoxComp->SetupAttachment(RootComponent);
+		BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		BoxComp->SetGenerateOverlapEvents(true);
+		BoxComp->SetCollisionResponseToChannel(
+			ECC_GameTraceChannel1,
+			ECR_Overlap);
+
+		BoxComp->OnComponentBeginOverlap.AddDynamic(
+			this,
+			&ACrossLaserbeam::OnLaserBeginOverlap);
+	}
+
 }
 
 void ACrossLaserbeam::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 void ACrossLaserbeam::Tick(float DeltaTime)
@@ -31,11 +58,47 @@ void ACrossLaserbeam::SetLaserEnabled(bool bEnabled)
 		? ECollisionEnabled::QueryOnly
 		: ECollisionEnabled::NoCollision;
 
-	for (auto& Laserbeam : Laserbeams)
+	for (auto& BoxComp : BoxCompArray)
 	{
-		if (!Laserbeam) { continue; }
+		if (!BoxComp) { continue; }
 
-		Laserbeam->SetCollisionEnabled(CollisionType);
+		BoxComp->SetCollisionEnabled(CollisionType);
+	}
+
+	
+
+	for (auto& Effect : NiagaraEffectArray)
+	{
+		if (bEnabled)
+		{
+			Effect->Start(RootComponent);
+		}
+		else 
+		{
+			Effect->DeactivateEffect();
+		}
+	}
+}
+
+
+void ACrossLaserbeam::OnLaserBeginOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	if (!OtherActor ||
+		OtherActor == this) {
+		return;
+	}
+
+	// キャラクターインターフェースを実装しているか
+	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
+	{
+		Interface->ApplyDamaged();
+		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }
 
