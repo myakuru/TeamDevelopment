@@ -14,6 +14,8 @@
 
 #include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
 
+#include <GameFramework/CharacterMovementComponent.h>
+
 #include <ProjectNull/Utility/GroundUtility/GroundUtility.h>
 
 #include "NiagaraSystem.h"
@@ -29,7 +31,8 @@ UDashGearStateBase::UDashGearStateBase():
 	DashSpeed(2000.0f),
 	DashEffectDuration(0.3f),
 	MontageBlendOutTime(0.2f),
-	DashSphereRadius(200.f)
+	DashSphereRadius(200.f),
+	MaxDashSlopeAngle(30.f)
 {
 }
 
@@ -79,6 +82,27 @@ void UDashGearStateBase::ExecuteDash()
 	auto RootComp = GroundAlignmentComp->GetRootComponent();
 	if (!RootComp) { return; }
 
+	auto CharacterMovementComp = Player->GetCharacterMovement();
+	if (!CharacterMovementComp) { return; }
+
+	FVector CurrentFloorNormal = FVector::ZeroVector;
+	float SlopeAngle = 0.f;
+	if (Player->GetCurrentFloorNormal(CurrentFloorNormal))
+	{
+		float Dot = FVector::DotProduct(CurrentFloorNormal.GetSafeNormal(), FVector::UpVector);
+		Dot = FMath::Clamp(Dot, -1.0f, 1.0f);
+		SlopeAngle = FMath::RadiansToDegrees(FMath::Acos(Dot));
+	}
+	//UE_LOG(LogTemp, Display, TEXT("SlopeAngle X%.2f"), SlopeAngle);
+
+	const bool IsOnGround = CharacterMovementComp->IsMovingOnGround();
+
+	if (MaxDashSlopeAngle <= SlopeAngle && IsOnGround)
+	{
+		DashGear->ForceStop();
+		return;
+	}
+
 	DashGear->SetSphereRadius(DashSphereRadius);
 
 	InitializeStartDashData(RootComp);
@@ -105,7 +129,8 @@ void UDashGearStateBase::InitializeStartDashData(USceneComponent* InGroundAlignm
 
 void UDashGearStateBase::Dash()
 {
-	if (!Player)				{ return; }
+	if (!Player ||
+		!Owner)				{ return; }
 
 	Player->LaunchCharacter(DashDir * DashSpeed, true, true);
 	//UE_LOG(LogTemp, Display, TEXT("DashDir X%.2f Y%.2f Z%.2f"), DashDir.X,DashDir.Y,DashDir.Z);

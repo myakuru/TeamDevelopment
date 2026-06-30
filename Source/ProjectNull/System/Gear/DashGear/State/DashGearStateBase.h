@@ -80,4 +80,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float DashSphereRadius;
+
+	/** ダッシュ可能な地面の最大傾斜角度（度）*/
+	UPROPERTY(EditAnywhere)
+	float MaxDashSlopeAngle;
 };

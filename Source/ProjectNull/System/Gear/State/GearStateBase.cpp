@@ -32,7 +32,8 @@ void UGearStateBase::Initialize(
 
 void UGearStateBase::SaveCameraStatus()
 {
-	if (!Player || !Player->GetSpringArmComponent() || !Player->GetController()) { return; }
+	if (!Player ||
+		!Player->GetSpringArmComponent() || !Player->GetController()) { return; }
 
 	StartTargetArmLength = Player->GetSpringArmComponent()->TargetArmLength;
 	StartControlRotation = Player->GetController()->GetControlRotation();
