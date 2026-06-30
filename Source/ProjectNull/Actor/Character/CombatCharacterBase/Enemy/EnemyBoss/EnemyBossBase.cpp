@@ -22,6 +22,10 @@ AEnemyBossBase::AEnemyBossBase()
 	EnemyBossRuntimeData = CreateDefaultSubobject<UEnemyBossRuntimeData>("EnemyBossRuntimeData");
 
 	StateTreeComp = CreateDefaultSubobject<UStateTreeComponent>("StateTreeComponent");
+
+	BreathEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BreathNiagara"));
+	BreathEffect->SetupAttachment(GetMesh(), FName("tongue_05"));
+	BreathEffect->SetAutoActivate(false);
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +52,19 @@ void AEnemyBossBase::BeginPlay()
 void AEnemyBossBase::Tick(float DeltaTime)
 {
 	ACombatCharacterBase::Tick(DeltaTime);
+	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	if (IsValid(Anim))
+	{
+		UAnimMontage* CurrentMontage = Anim->GetCurrentActiveMontage();
+		if (IsValid(CurrentMontage))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CurrentMontage = %s"), *CurrentMontage->GetName());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CurrentMontage = None"));
+		}
+	}
 }
 
 // ------------------------------------------------------------------------------------
@@ -61,6 +78,11 @@ void AEnemyBossBase::ReceiveDamage(float Damage)
 void AEnemyBossBase::RegisterDelegates()
 {
 	// デリゲートへの登録はBeginPlayで行う
+}
+
+void AEnemyBossBase::ResetGravity()
+{
+	GetCharacterMovement()->GravityScale = 1.0f;
 }
 
 void AEnemyBossBase::TryConsumeFastFallRequest()
@@ -83,7 +105,7 @@ void AEnemyBossBase::OnSeePlayer(APawn* Pawn)
 	SetTargetActor(Pawn);
 
 	// 視野に入ったら画面に"See"と表示
-	UKismetSystemLibrary::PrintString(this, "See", true, true, FColor::Blue, 2.0f);
+	//UKismetSystemLibrary::PrintString(this, "See", true, true, FColor::Blue, 2.0f);
 }
 
 // ------------------------------------------------------------------------------------

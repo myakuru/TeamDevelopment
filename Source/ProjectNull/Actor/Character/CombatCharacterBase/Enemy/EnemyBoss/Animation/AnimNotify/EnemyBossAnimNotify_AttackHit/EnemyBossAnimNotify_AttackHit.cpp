@@ -93,6 +93,11 @@ void UEnemyBossAnimNotify_AttackHit::NotifyEnd(USkeletalMeshComponent* MeshComp,
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
 
+	AActor* Owner = MeshComp->GetOwner();			// メッシュの持ち主（Actor）を取得
+	AEnemyBossBase* Boss = Cast<AEnemyBossBase>(Owner);
+
+	Boss->ResetGravity();
+
 	// 振り終わり：リストをクリア
 	HitActors.Empty();
 }

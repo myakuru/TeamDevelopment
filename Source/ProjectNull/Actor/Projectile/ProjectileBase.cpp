@@ -6,9 +6,16 @@
 #include "Components/StaticMeshComponent.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Effect/EffectBase.h>
 
 
-AProjectileBase::AProjectileBase()
+AProjectileBase::AProjectileBase():
+	Root(nullptr),
+	SphereCollision(nullptr),
+	StaticMesh(nullptr),
+	ProjectileMovement(nullptr),
+	AliveTimerHandle(FTimerHandle()),
+	AliveTime(2.f)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
@@ -31,14 +38,6 @@ AProjectileBase::AProjectileBase()
 	SphereCollision->SetCollisionResponseToChannel(
 		ECC_GameTraceChannel1,
 		ECR_Overlap);
-
-	/*SphereCollision->SetCollisionResponseToChannel(
-		ECC_WorldStatic,
-		ECR_Block);
-
-	SphereCollision->SetCollisionResponseToChannel(
-		ECC_WorldDynamic,
-		ECR_Block);*/
 
 	// ================================================================
 	// スケルタルメッシュの初期化
@@ -73,19 +72,28 @@ void AProjectileBase::BeginPlay()
 		this,
 		&AProjectileBase::OnProjectileStop);
 
-	//UE_LOG(LogTemp, Display, TEXT("呼!"));
+	GetWorld()->GetTimerManager().SetTimer(
+		AliveTimerHandle,
+		this,
+		&AProjectileBase::ActorDestroy,
+		AliveTime,
+		false);
 
+	if (!ProjectileEffect) { return; }
+	ProjectileEffect->Start(Root);
 }
 
 void AProjectileBase::HandleCollision(AActor* OtherActor)
 {
-	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
+	if (!OtherActor || 
+		OtherActor == this ||
+		!OwnerActor) { return; }
 
 	// キャラクターインターフェースを実装しているか
-	if (auto* interface = Cast<ICharacterInterface>(OtherActor))
+	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		interface->ApplyDamaged();
-		interface->ApplyKnockBack(OwnerActor->GetActorLocation());
+		Interface->ApplyDamaged();
+		Interface->ApplyKnockBack(OwnerActor->GetActorLocation());
 	}
 
 	Destroy();
@@ -109,6 +117,12 @@ void AProjectileBase::OnCollisionOverlap(
 }
 
 void AProjectileBase::OnProjectileStop(const FHitResult& Hit)
+{
+	Destroy();
+
+}
+
+void AProjectileBase::ActorDestroy()
 {
 	Destroy();
 

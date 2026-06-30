@@ -1,5 +1,13 @@
 ﻿#include "EnemyISMManager.h"
 
+#include "Stats/Stats.h"
+
+DECLARE_CYCLE_STAT(
+	TEXT("Enemy Update"),
+	STAT_EnemyUpdate,
+	STATGROUP_Game
+);
+
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/Texture2D.h"
 #include "RenderGraphUtils.h"
@@ -296,6 +304,8 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 {
 	if (Enemies.Num() == 0) { return; }
 
+	
+
 	// ② CSをDispatchしてGPU側のAnimStateRTを更新
 	DispatchAnimUpdate(DeltaTime);
 
@@ -348,19 +358,19 @@ void AEnemyISMManager::DebugReadbackAnimStateRT()
 	const int32 Width = AnimStateRT->SizeX;
 	const int32 Height = AnimStateRT->SizeY;
 
-	if (Pixels.Num() >= Width * Height && Height > 1)
-	{
-		const FFloat16Color Row0 = Pixels[0 + 0 * Width];
-		const FFloat16Color Row1 = Pixels[0 + 1 * Width];
+	//if (Pixels.Num() >= Width * Height && Height > 1)
+	//{
+	//	const FFloat16Color Row0 = Pixels[0 + 0 * Width];
+	//	const FFloat16Color Row1 = Pixels[0 + 1 * Width];
 
-		UE_LOG(LogTemp, Warning,
-			TEXT("[AnimStateRT] Inst0 Row0: R(CurrentFrame)=%.2f G(PrevFrame)=%.2f B(NextAnimFrame)=%.2f A(StartFrame)=%.2f"),
-			(float)Row0.R, (float)Row0.G, (float)Row0.B, (float)Row0.A);
+	//	UE_LOG(LogTemp, Warning,
+	//		TEXT("[AnimStateRT] Inst0 Row0: R(CurrentFrame)=%.2f G(PrevFrame)=%.2f B(NextAnimFrame)=%.2f A(StartFrame)=%.2f"),
+	//		(float)Row0.R, (float)Row0.G, (float)Row0.B, (float)Row0.A);
 
-		UE_LOG(LogTemp, Warning,
-			TEXT("[AnimStateRT] Inst0 Row1: R(NumFrames)=%.2f G(BlendFlg)=%.2f B(NextStartFrame)=%.2f A(BlendWeight)=%.2f"),
-			(float)Row1.R, (float)Row1.G, (float)Row1.B, (float)Row1.A);
-	}
+	//	UE_LOG(LogTemp, Warning,
+	//		TEXT("[AnimStateRT] Inst0 Row1: R(NumFrames)=%.2f G(BlendFlg)=%.2f B(NextStartFrame)=%.2f A(BlendWeight)=%.2f"),
+	//		(float)Row1.R, (float)Row1.G, (float)Row1.B, (float)Row1.A);
+	//}
 
 	static int kari = 0;
 	if (kari > 1) { return; }
@@ -372,14 +382,14 @@ void AEnemyISMManager::DebugReadbackAnimStateRT()
 		Mip.BulkData.Lock(LOCK_READ_ONLY));
 
 	const int32 NumAnims = AnimDataAsset->Animations.Num();
-	for (int32 i = 0; i < NumAnims; ++i)
+	/*for (int32 i = 0; i < NumAnims; ++i)
 	{
 		UE_LOG(LogTemp, Warning,
 			TEXT("[AnimInfoTexture] Anim[%d]: StartTime=%.2f NumFrames=%.2f"),
 			i,
 			(float)Data[i].R,
 			(float)Data[i].G);
-	}
+	}*/
 
 
 
@@ -390,6 +400,8 @@ void AEnemyISMManager::DebugReadbackAnimStateRT()
 void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 {
 	if (!AnimStateRT) { return; }
+
+	SCOPE_CYCLE_COUNTER(STAT_EnemyUpdate);
 
 	const int32 NumInstances = Enemies.Num();
 	const int32 NumRequests = PendingChangeRequests.Num();

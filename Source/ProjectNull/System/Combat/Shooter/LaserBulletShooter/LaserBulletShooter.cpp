@@ -42,7 +42,8 @@ void ULaserBulletShooter::Reset()
 
 void ULaserBulletShooter::ShotTargetedLaserBullets(const FVector& InStartLocation)
 {
-	if (!Owner || !Player) { return; }
+	if (!Owner || 
+		!Player) { return; }
 
 	StartLocation = InStartLocation;
 
@@ -61,13 +62,9 @@ void ULaserBulletShooter::ShotTargetedLaserBullets(const FVector& InStartLocatio
 		= TargetSearch->FindEnemiesSortedByDistance(TargetableDistSq,InStartLocation);
 
 	InitVelocityArray(Player->GetActorForwardVector());
-
+	//UE_LOG(LogTemp, Display, TEXT("hi Enemies %d"), Enemies.Num());
 	//※発射する瞬間に座標やベクトル知りたい
 
-	/*for (int32 Index = 0; Index < BulletNum && Index < Enemies.Num(); ++Index)
-	{
-		StartVelocityArray[Index] = Enemies[Index].ToEnemyVector;
-	}*/
 	TargetArray.SetNum(BulletNum);
 
 	for (int32 Index = 0; Index < BulletNum && Index < Enemies.Num(); ++Index)
@@ -84,14 +81,14 @@ void ULaserBulletShooter::ShotLaserBulletAndIncrementCount()
 	if (ShotCount + 1 >= BulletNum) { return; }
 	ShotCount++;
 
-	UE_LOG(LogTemp, Display, TEXT("Add処理 cnt %d"), ShotCount);
+	//UE_LOG(LogTemp, Display, TEXT("Add処理 cnt %d"), ShotCount);
 	ShotLaserBullet();
 }
 
 void ULaserBulletShooter::ShotLaserBullet()
 {
-	auto LaserBullet = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass);
 	if (!Owner) { return; }
+	auto LaserBullet = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass);
 	if (!LaserBullet) { return; }
 
 	const FVector Location = Owner->GetActorLocation();
@@ -103,7 +100,8 @@ void ULaserBulletShooter::ShotLaserBullet()
 	FVector StartVelocity = Owner->GetActorForwardVector();
 
 
-	if (TargetArray.IsValidIndex(ShotCount) && TargetArray[ShotCount].IsValid())
+	if (TargetArray.IsValidIndex(ShotCount) &&
+		TargetArray[ShotCount].IsValid())
 	{
 		const auto Target = TargetArray[ShotCount].Get();
 		TargetLocation = Target->GetActorLocation();
@@ -114,14 +112,6 @@ void ULaserBulletShooter::ShotLaserBullet()
 	auto ProjectileMovement = LaserBullet->GetProjectileMovement();
 
 	if (!ProjectileMovement)	{ return; }
-	
-
-	/*if (StartVelocityArray.IsValidIndex(ShotCount))
-	{
-		StartVelocity = StartVelocityArray[ShotCount];
-	}*/
-
-
-
 	ProjectileMovement->Velocity = StartVelocity * BulletSpeed;
+	//UE_LOG(LogTemp, Display, TEXT("hi tooooo"));
 }

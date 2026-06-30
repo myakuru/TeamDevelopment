@@ -1,6 +1,12 @@
 ﻿
 #include "EnemyManagerSubsystem.h"
 
+DECLARE_CYCLE_STAT(
+	TEXT("Enemy Manager Update"),
+	STAT_EnemyUpdateManager,
+	STATGROUP_Game
+);
+
 #include "Kismet/GameplayStatics.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManagerConfig.h>
@@ -69,6 +75,8 @@ void UEnemyManagerSubsystem::RemoveEnemy(AEnemyBase* Enemy)
 
 void UEnemyManagerSubsystem::UpdateEnemies(float DeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_EnemyUpdateManager);
+
 	FrameCount++;
 
 	// 定期的にカウントリセット

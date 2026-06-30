@@ -67,7 +67,27 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::EnterState(FStateTreeExecutionContext&
 
 	Elapsed = 0.0f;
 
-	StrifeDir = (FMath::RandBool()) ? 1.0f : -1.0f;
+	int flg = FMath::RandBool();
+	int SelectAttack = 0;
+	if (flg)
+	{
+		StrifeDir = 1.0f;
+		SelectAttack = 1;
+	}
+	else
+	{
+		StrifeDir = -1.0f;
+		SelectAttack = 0;
+	}
+	//StrifeDir = (FMath::RandBool()) ? 1.0f : -1.0f;
+
+	AEnemyBossBase* Boss = GetBoss();
+	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }
+
+	UAnimInstance* Anim = Boss->GetMesh() ? Boss->GetMesh()->GetAnimInstance() : nullptr;
+	if (!IsValid(Anim)) { return EStateTreeRunStatus::Failed; }
+
+	Anim->Montage_Play(Boss->GetCurrentAttack().AttackMontages[SelectAttack]);
 
 	UE_LOG(LogTemp, Warning, TEXT(">>> Strafe ENTER"));
 

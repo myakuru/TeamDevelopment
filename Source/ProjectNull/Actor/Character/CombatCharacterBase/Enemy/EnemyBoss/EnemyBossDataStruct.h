@@ -13,8 +13,19 @@ enum class EBossActionType : uint8
 	ApproachWalk,		// 歩いて近づく
 	ApproachRun,		// 走って近づく
 	JumpAttack,			// 跳びかかる
-	RangedAttack		// 遠距離攻撃
+	RangedAttack,		// 遠距離攻撃
+	Breath				// ブレス
 };
+
+//USTRUCT(BlueprintType)
+//struct FBossActionType
+//{
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	EBossActionType ActionType = EBossActionType::None;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	bool PlayMontage = false;
+//};
 
 USTRUCT(BlueprintType)
 struct FBossAttackPattern
@@ -28,6 +39,9 @@ struct FBossAttackPattern
 	/** 攻撃パターンEnum*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EBossActionType ActionType = EBossActionType::None;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FBossActionType ActionType;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinRange = 0.0f;

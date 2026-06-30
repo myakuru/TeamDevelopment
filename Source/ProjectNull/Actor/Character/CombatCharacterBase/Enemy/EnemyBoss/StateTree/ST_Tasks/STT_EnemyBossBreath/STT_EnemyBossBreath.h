@@ -5,48 +5,48 @@
 #include "Blueprint/StateTreeTaskBlueprintBase.h"
 #include "../../../EnemyBossDataStruct.h"
 #include "../STT_EnemyBossTaskBase.h"
-#include "STT_EnemyBossJumpAttack.generated.h"
+#include "STT_EnemyBossBreath.generated.h"
 
 class AEnemyBossBase;
 
 UENUM()
-enum class EBossJumpPhase : uint8 { Takeoff, WaitLiftOff, Air, Land };
+enum class EBossBreathPhase : uint8 { Start, Loop, End };
 
 /*
 * 攻撃を選択するタスク
 */
 UCLASS()
-class PROJECTNULL_API USTT_EnemyBossJumpAttack : public USTT_EnemyBossTaskBase
+class PROJECTNULL_API USTT_EnemyBossBreath : public USTT_EnemyBossTaskBase
 {
 	GENERATED_BODY()
 
 public:
 
-	USTT_EnemyBossJumpAttack(const FObjectInitializer& a_ObjInit);
+	USTT_EnemyBossBreath(const FObjectInitializer& a_ObjInit);
 
 	/** タスク系*/
 	virtual EStateTreeRunStatus Tick(FStateTreeExecutionContext& Context, const float DeltaTime);
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition);
 	virtual	void ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)override;
 
-	///** 跳躍の水平速度 */
-	//UPROPERTY(EditAnywhere, Category = "Parameter")
-	//float LaunchHorizontal = 900.0f;
-
-	///** 跳躍の垂直速度 */
-	//UPROPERTY(EditAnywhere, Category = "Parameter")
-	//float LaunchVertical = 600.0f;
-
-	/** 跳躍アークの高さ（0=直線的, 1=高く）*/
+	/** ブレスの継続時間*/
 	UPROPERTY(EditAnywhere, Category = "Input")
-	float ArcParam = 0.5f;
+	float BreathDuration	= 5.0f;
+
+	/** ループ終了後のブレンド時間*/
+	UPROPERTY(EditAnywhere, Category = "Input")
+	float BreathEndBlend	= 0.25f;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	float BreathCount		= 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	FName BreathLoopSectionName = TEXT("Loop");
 
 	/**プレイヤーの方向を向いたらtrueにして攻撃モンタージュを開始する*/
 	bool bMontageStarted = false;
 
-private:
-	EBossJumpPhase Phase = EBossJumpPhase::Takeoff;
-	bool bLeftGround		= false;   // 一度地面を離れたか（着地誤検出防止）
-	bool bLandMontagePlayed = false;
+	UPROPERTY(Transient)
+	EBossBreathPhase Phase = EBossBreathPhase::Start;
 
 };
