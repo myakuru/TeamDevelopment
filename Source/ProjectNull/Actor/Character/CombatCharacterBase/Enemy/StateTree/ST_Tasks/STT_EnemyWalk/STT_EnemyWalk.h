@@ -109,7 +109,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	float CapsuleHalfHeight = 88.f;
 
-
 	/**	接地フラグ */
 	UPROPERTY()
 	bool isGround = false;

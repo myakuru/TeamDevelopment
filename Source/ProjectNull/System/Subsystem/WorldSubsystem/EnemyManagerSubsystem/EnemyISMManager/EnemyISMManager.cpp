@@ -330,7 +330,8 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 	// ④ 処理済みのリクエストをクリア
 	PendingChangeRequests.Reset();
 
-	DebugReadbackAnimStateRT();
+	// デバッグ : GPU結果表示
+	//DebugReadbackAnimStateRT();
 }
 
 // デバッグ用：AnimStateRTの中身をCPUに読み戻してログに出す

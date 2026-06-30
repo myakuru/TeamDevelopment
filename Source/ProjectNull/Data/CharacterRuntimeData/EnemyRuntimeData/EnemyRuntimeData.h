@@ -90,13 +90,35 @@ public:
 		bool bLooping,
 		float Duration);
 
+	/**
+	 * @brief 攻撃が終了した瞬間の時間をセット
+	 * @param InLastTime 時間(秒)
+	 */
+	void SetAttackFinishTime(float InLastTime);
+
+	/**
+	 * @brief 攻撃のインターバル(秒)をセット
+	 * @param InAttackInterval インターバル(秒)
+	 */
+	void SetAttackInterval(float InAttackInterval) { AttackInterval = InAttackInterval; }
+
 	void UpdateAnimationMonitor(float DeltaTime);
 	void NotifyAnimFinished()	{ CPUAnim.bFinished = true; }
 	void ResetAnimFinished()	{ CPUAnim.bFinished = false; }
-	bool GetAnimFinished()			const { return CPUAnim.bFinished; }
+	bool GetAnimFinished()const { return CPUAnim.bFinished; }
 
-	//~ Start Setter
+	//~ End Setter
 	
+	//~ Begin Getter
+	
+	/**
+	 * @brief 最後に攻撃が終了した時間から攻撃クールタイム分経過したか
+	 * @return クールタイム分経過していたらtrue
+	 */
+	bool CanAttack()const;
+
+	//~ End Getter
+
 	/**
 	 * @brief ターゲットの座標をセット
 	 * @param InTargetLocation ターゲットの座標
@@ -171,6 +193,14 @@ private:
 	/**	最大HPに対して受けたダメージ割合 */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	float	DamageToMaxHealthRatio = 0.f;
+
+	/**	攻撃のインターバル(秒) */
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	float AttackInterval = 1.f;
+
+	/**	攻撃が終了した瞬間の時間(秒) */
+	UPROPERTY()
+	float AttackFinishTime = 0.f;
 
 	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")

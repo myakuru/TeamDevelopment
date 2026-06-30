@@ -16,13 +16,6 @@ void AEnemyGruntBase::BeginPlay()
 	AEnemyBase::BeginPlay();
 }
 
-void AEnemyGruntBase::TransitionIdleToWalk()
-{
-	if (EnemyStatus.StateTag != EEnemyState::Idle) { return; }
-
-	NotifyChangedStateEnum(EEnemyState::Walk);
-}
-
 // Called every frame
 void AEnemyGruntBase::Tick(float DeltaTime)
 {
@@ -45,7 +38,14 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 
 	// 攻撃可能か判断
 	CheckCanAttack();
-	
+
 	// IdleステートからWalkステートへの切り替え処理
 	TransitionIdleToWalk();
+}
+
+void AEnemyGruntBase::TransitionIdleToWalk()
+{
+	if (EnemyStatus.StateTag != EEnemyState::Idle) { return; }
+
+	NotifyChangedStateEnum(EEnemyState::Walk);
 }

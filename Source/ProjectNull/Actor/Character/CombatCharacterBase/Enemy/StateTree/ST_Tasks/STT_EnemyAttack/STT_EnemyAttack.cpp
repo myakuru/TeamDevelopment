@@ -41,6 +41,9 @@ EStateTreeRunStatus USTT_EnemyAttack::Tick(FStateTreeExecutionContext& a_Context
 		{
 			// ステートタイプを切り替え
 			OwnerEnemy->NotifyChangedStateEnum(EEnemyState::Idle);
+			
+			// 攻撃が終了した瞬間の時間を登録
+			OwnerEnemy->NotfyAttackFinishTime();
 
 			return EStateTreeRunStatus::Succeeded;
 		}

@@ -114,6 +114,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AttackDistance = 20.0f;
 
+	/**	攻撃のインターバル(秒) */
+	UPROPERTY(EditAnywhere)
+	float AttackInterval = 1.f;
+
 	// パーティクルのサイズ
 	UPROPERTY(EditAnywhere, Category = "Experience")
 	float ExpSize = 1.0f;

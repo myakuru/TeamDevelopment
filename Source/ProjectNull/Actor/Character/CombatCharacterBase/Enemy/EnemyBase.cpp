@@ -76,11 +76,9 @@ void AEnemyBase::BeginPlay()
 	AActor::BeginPlay();
 
 	// コンポーネントに自身の参照を渡す
+	if (EnemyAttackComponent)
 	{
-		if (EnemyAttackComponent)
-		{
-			EnemyAttackComponent->SetOwnerEnemy(this);
-		}
+		EnemyAttackComponent->SetOwnerEnemy(this);
 	}
 
 	// ゲームの進行に合わせて敵パラメータを設定
@@ -132,12 +130,21 @@ void AEnemyBase::UpdateParams()
 		// 基礎攻撃力と倍率をセット
 		EnemyRuntimeData->SetBaseAttackPower(EnemyStatus.AttackScaling.Base);
 		EnemyRuntimeData->SetAttackScaling(AttackScale);
+
+		// 攻撃のインターバル(秒)をセット
+		EnemyRuntimeData->SetAttackInterval(EnemyStatus.AttackInterval);
 	}
 }
 
 void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
 {
 	EnemyStatus.StateTag = a_TargetState;
+}
+
+void AEnemyBase::NotfyAttackFinishTime()
+{
+	if (!EnemyRuntimeData) { return; }
+	EnemyRuntimeData->SetAttackFinishTime(GetWorld()->GetTimeSeconds());
 }
 
 void AEnemyBase::ApplyDamaged(float InDamaged)
@@ -203,9 +210,13 @@ void AEnemyBase::FinalizeDeath()
 
 void AEnemyBase::CheckCanAttack()
 {
+	if (!EnemyRuntimeData||
+		!EnemyRuntimeData->CanAttack()) { return; }
+
 	// 既に攻撃中なら処理を飛ばす
 	if (EnemyStatus.StateTag == EEnemyState::Attack||
 		EnemyStatus.StateTag == EEnemyState::Death) { return; }
+
 
 	// プレイヤーとの距離が攻撃可能距離内か
 	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))

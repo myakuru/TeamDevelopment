@@ -96,6 +96,11 @@ public:
 	virtual void SetEnemyState(EEnemyState a_TargetState);
 
 	/**
+	 * @brief 攻撃が終了した瞬間の時間を登録
+	 */
+	virtual void NotfyAttackFinishTime();
+
+	/**
 	 * @brief 外部からステートEnum変更を通知
 	 * @param a_TargetState 変更先ステート
 	 */

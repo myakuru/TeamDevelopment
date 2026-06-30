@@ -9,7 +9,6 @@ class AEnemyBase;
 
 /**
  * 敵の攻撃ステートタスク
- * どんな攻撃にするかはエディター側で編集
  */
 UCLASS()
 class PROJECTNULL_API USTT_EnemyAttack : public UStateTreeTaskBlueprintBase

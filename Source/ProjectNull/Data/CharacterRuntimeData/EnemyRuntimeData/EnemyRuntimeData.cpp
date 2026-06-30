@@ -17,6 +17,16 @@ void UEnemyRuntimeData::StartAnimMonitor(int32 a_AnimIndex, bool bLooping, float
 	CPUAnim.Duration	= Duration;
 }
 
+void UEnemyRuntimeData::SetAttackFinishTime(float InLastTime)
+{
+	AttackFinishTime = InLastTime;
+}
+
+bool UEnemyRuntimeData::CanAttack()const 
+{
+	return GetWorld()->GetTimeSeconds() >= AttackInterval + AttackFinishTime;
+}
+
 void UEnemyRuntimeData::SetTargetLocation(const FVector& InTargetLocation)
 {
 	TargetLocation = InTargetLocation;
