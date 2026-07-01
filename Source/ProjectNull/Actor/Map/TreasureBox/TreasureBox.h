@@ -56,8 +56,8 @@ public:
 	UGetGearHUDWidget* CreateDropItemWidget(const FName& itemName);
 
 	/** ID */
-	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
-	FName TreasureID = NAME_None;
+	//UPROPERTY(EditInstanceOnly, Category = "Params|ID")
+	//FName TreasureID = NAME_None;
 
 	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
 	bool DestroyedFromSaveData = true;
