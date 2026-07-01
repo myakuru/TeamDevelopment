@@ -17,6 +17,7 @@ struct FWeaponInstance;
 struct FWeaponData;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnWeaponListItemClicked,const FWeaponInstance&,InWeaponInstance,const FWeaponData&, InWeaponData, UWeaponListItemWidget*,ClickedItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponListItemHovered,const FWeaponInstance&,InWeaponInstance,const FWeaponData&, InWeaponData);
 
 /**
  * 
@@ -43,11 +44,16 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponListItemClicked OnWeaponListItemClicked;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponListItemHovered OnWeaponListItemHovered;
 
 private:
 
 	UFUNCTION()
 	void OnButtonClicked();
+
+	UFUNCTION()
+	void OnButtonHovered();
 
 	UPROPERTY(meta =(BindWidget))
 	TObjectPtr<UTextBlock> WeaponName;

@@ -8,14 +8,22 @@
 /**
  * 
  */
+
+UENUM()
+enum class EResultFlag : uint8
+{
+	ReachedMidBoss,
+	ReachedFinalBoss,
+};
+
 USTRUCT()
 struct FResultData {
 	GENERATED_BODY()
 
 	TArray<FName> RewardWeaponIDs;
 
-	int32 ClearPhase = 7;
-	bool bReachedMidBossPhase = false;
-	bool bReachedFinalPhase = false;
+	int32 ClearPhase = 10;
 	float ClearTime = 600.0f;
+	TSet<EResultFlag> ResultFlags;
+
 };

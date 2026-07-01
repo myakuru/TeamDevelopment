@@ -14,16 +14,33 @@ void UEvaluationPanel::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	// 報酬画面移行ボタンのクリックイベントにページ進行関数をセット
+	if (ToRewardButton) {
+		ToRewardButton->OnClicked.AddUniqueDynamic(
+			this,
+			&UEvaluationPanel::OnToRewardButtonClicked
+		);
+	}
+
+}
+
+bool UEvaluationPanel::Initialize()
+{
+	Super::Initialize();
+
+	AchieveList->ClearChildren();
+	Achievements.Empty();
+
 	USuperGameInstance* gameInstance = GetGameInstance<USuperGameInstance>();
-	if (!gameInstance)return;
+	if (!gameInstance)return false;
 
 	UResultManager* resultManager = gameInstance->GetResultManager();
-	if (!resultManager)return;
+	if (!resultManager)return false;
 
 	// クリアデータ取得
 	ResultData = resultManager->GetResultData();
 
-	if (!ResultAchievementWidgetClass || !AchieveList) return;
+	if (!ResultAchievementWidgetClass || !AchieveList) return false;
 
 	// 全てのクリア条件を取得してUIとリストにセット
 	for (const FClearRankData& clearRankData : resultManager->GetSortedClearRankDatas()) {
@@ -39,14 +56,8 @@ void UEvaluationPanel::NativeConstruct()
 	bPlayingReachedPhaseAnimation = true;
 	bPlayingAchievemtsCheckAnimation = true;
 
-	// 報酬画面移行ボタンのクリックイベントにページ進行関数をセット
-	if (ToRewardButton) {
-		ToRewardButton->OnClicked.AddDynamic(
-			this,
-			&UEvaluationPanel::OnToRewardButtonClicked
-		);
-	}
 
+	return false;
 }
 
 void UEvaluationPanel::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

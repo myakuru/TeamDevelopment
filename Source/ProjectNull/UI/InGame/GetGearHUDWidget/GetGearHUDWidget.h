@@ -18,7 +18,7 @@ class PROJECTNULL_API UGetGearHUDWidget : public UUserWidget
 
 public:
 
-	void SetGearData(const FText& inGearName);
+	void SetGearData(const FName& inGearName);
 
 	UFUNCTION()
 	void OpenUI();

@@ -53,7 +53,7 @@ public:
 	)override;
 
 	UFUNCTION()
-	UGetGearHUDWidget* CreateDropItemWidget(const FText& itemName);
+	UGetGearHUDWidget* CreateDropItemWidget(const FName& itemName);
 
 	/** ID */
 	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
@@ -85,7 +85,7 @@ public:
 
 	/** ドロップギア */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params|DropItem")
-	FText DropGearName = FText::FromString("");
+	FName DropGearName = FName();
 
 	/** ドロップアイテムのパラメータ */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params|DropItem")

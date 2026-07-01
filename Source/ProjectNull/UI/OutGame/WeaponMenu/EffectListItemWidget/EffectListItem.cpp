@@ -5,16 +5,10 @@
 #include <Components/Button.h>
 #include <Components/TextBlock.h>
 #include <ProjectNull/Weapon/Data/EffectData.h>
-#include <Kismet\KismetSystemLibrary.h>
 
 bool UEffectListItem::Initialize()
 {
 	Super::Initialize();
-
-	UKismetSystemLibrary::PrintString(
-		this,
-		TEXT("Initialize")
-	);
 
 	EffectName->SetText(FText());
 	EffectLevel->SetText(FText());
@@ -28,11 +22,6 @@ bool UEffectListItem::Initialize()
 void UEffectListItem::SetEffectInstance(FEffectInstance InEffectInstance)
 {
 	EffectInstance = InEffectInstance;
-
-	UKismetSystemLibrary::PrintString(
-		this,
-		EffectInstance.Data->Name.ToString()
-	);
 
 	EffectName->SetText(InEffectInstance.Data->Name);
 

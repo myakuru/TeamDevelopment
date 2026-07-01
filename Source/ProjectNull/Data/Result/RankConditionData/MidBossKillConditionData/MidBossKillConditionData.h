@@ -17,7 +17,7 @@ class PROJECTNULL_API UMidBossKillConditionData : public URankConditionData
 public:
 
 	bool IsConditionMet(const FResultData& ClearData) const override {
-		return ClearData.bReachedMidBossPhase;
+		return ClearData.ResultFlags.Contains(EResultFlag::ReachedMidBoss);
 	}
 	
 };

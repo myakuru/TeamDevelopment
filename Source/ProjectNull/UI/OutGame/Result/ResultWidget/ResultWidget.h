@@ -9,6 +9,7 @@
 
 class UWidgetSwitcher;
 class UEvaluationPanel;
+class URewardPanel;
 
 /**
  * 
@@ -46,6 +47,9 @@ private:
 	/** 評価ページ */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UEvaluationPanel> EvaluationPanel;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<URewardPanel> RewardPanel;
 
 	/** 指定したページに切り替える */
 	void ShowPage(EResultPage Page);

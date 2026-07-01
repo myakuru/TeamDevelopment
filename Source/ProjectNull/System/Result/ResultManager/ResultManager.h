@@ -22,7 +22,7 @@ class PROJECTNULL_API UResultManager : public UObject
 public:
 
 	void Initialize();
-	void SetResultData(const FResultData& ResultData);
+	void SetResultData(FResultData ResultData);
 	TArray<FWeaponInstance> GetRewardWeapons() { return RewardWeapons; }
 
 	FResultData GetResultData() { return CurrentResultData; }

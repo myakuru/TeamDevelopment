@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include <ProjectNull/SaveGame/StageProgressData.h>
+
+#include <ProjectNull/Data/Result/ResultData/ResultData.h>
 #include "StageManager.generated.h"
 
 class UStageDataAsset;
@@ -34,7 +36,7 @@ public:
 	void OutGameInitialize();
 
 	UFUNCTION()
-	void AddAcquiredWeapon(const FText& WeaponName) {
+	void AddAcquiredWeapon(const FName& WeaponName) {
 		AcquiredWeapons.Add(WeaponName);
 
 		//ログ出力
@@ -55,6 +57,11 @@ public:
 	int32 GetNowStageIndex() const { return NowStageIndex; }
 
 	/* セッター */
+	/* 指定したクリア条件フラグを立てる */
+	void SetResultFlag(EResultFlag ClearFlag) {
+		ResultData.ResultFlags.Add(ClearFlag);
+	}
+
 
 private:
 
@@ -73,5 +80,8 @@ private:
 
 	/** プレイ中に取得した武器の一時保持用配列 */
 	UPROPERTY()
-	TArray<FText> AcquiredWeapons;
+	TArray<FName> AcquiredWeapons;
+
+	/** クリア時にResultManagerに渡す情報 */
+	FResultData ResultData;
 };

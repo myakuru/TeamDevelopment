@@ -50,7 +50,7 @@ void UWeaponDetailWidget::SetWeaponData(const FWeaponData& InWeaponData)
 
 	for (int i = 0; i < 6; i++) {
 		UEffectListItem* newItem = CreateWidget<UEffectListItem>(GetWorld(), EffectListItemClass);
-		newItem->OnEffectListItemClicked.AddDynamic(this, &UWeaponDetailWidget::ListEffectOnClicked);
+		newItem->OnEffectListItemClicked.AddUniqueDynamic(this, &UWeaponDetailWidget::ListEffectOnClicked);
 		//newItem->Initialize();
 		int32 row = i % 3;
 		int32 column = i / 3;

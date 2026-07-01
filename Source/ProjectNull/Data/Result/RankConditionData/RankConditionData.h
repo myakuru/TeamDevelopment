@@ -18,7 +18,7 @@ class PROJECTNULL_API URankConditionData : public UDataAsset
 public:
 
 
-	virtual bool IsConditionMet(const FResultData& ClearData) const { return false; };
+	virtual bool IsConditionMet(const FResultData& ClearData) const { return true; };
 
 	UFUNCTION(BlueprintCallable)
 	virtual FText GetConditionText() const { return ConditionText; };

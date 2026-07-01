@@ -15,7 +15,9 @@ bool UWeaponListItemWidget::Initialize()
 	WeaponName->SetText(FText());
 
 	if (Button) {
-		Button->OnClicked.AddDynamic(this, &UWeaponListItemWidget::OnButtonClicked);
+		Button->OnClicked.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonClicked);
+		Button->OnHovered.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonHovered);
+
 	}
 
 	return false;
@@ -36,7 +38,7 @@ void UWeaponListItemWidget::SetWeaponInstance(const FWeaponInstance& InWeaponIns
 	UWeaponManager* weaponManager = gameInstance->GetWeaponManager();
 	if (!weaponManager)return;
 
-	if (weaponManager->GetWeaponMaster(WeaponInstance.WeaponId, WeaponData)) {
+	if (weaponManager->GetWeaponMaster(InWeaponInstance.WeaponId, WeaponData)) {
 		WeaponName->SetText(WeaponData.DisplayName);
 	}
 
@@ -51,4 +53,9 @@ void UWeaponListItemWidget::SetWeaponData(const FWeaponData& InWeaponData)
 void UWeaponListItemWidget::OnButtonClicked()
 {
 	OnWeaponListItemClicked.Broadcast(WeaponInstance, WeaponData, this);
+}
+
+void UWeaponListItemWidget::OnButtonHovered()
+{
+	OnWeaponListItemHovered.Broadcast(WeaponInstance, WeaponData);
 }

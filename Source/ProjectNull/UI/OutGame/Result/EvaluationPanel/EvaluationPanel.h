@@ -25,6 +25,7 @@ class PROJECTNULL_API UEvaluationPanel : public UUserWidget
 
 public:
 	void NativeConstruct()override;
+	bool Initialize()override;
 
 	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime)override;
 

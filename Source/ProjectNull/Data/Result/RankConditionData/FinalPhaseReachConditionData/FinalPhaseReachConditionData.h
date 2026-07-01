@@ -17,7 +17,7 @@ class PROJECTNULL_API UFinalPhaseReachConditionData : public URankConditionData
 public:
 
 	bool IsConditionMet(const FResultData& ClearData) const override {
-		return ClearData.bReachedFinalPhase;
+		return ClearData.ResultFlags.Contains(EResultFlag::ReachedFinalBoss);
 	}
 
 };

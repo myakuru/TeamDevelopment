@@ -5,6 +5,8 @@
 #include <ProjectNull/Data/Result/RewardData/RewardData.h>
 #include <ProjectNull/Weapon/Data/EffectPoolDataAsset/EffectPoolDataAsset.h>
 #include <ProjectNull/Data/Result/RankConditionData/RankConditionData.h>
+#include <ProjectNull/Weapon/Manager/WeaponManager.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
 
 void UResultManager::Initialize()
 {
@@ -32,7 +34,7 @@ void UResultManager::Initialize()
 	}
 }
 
-void UResultManager::SetResultData(const FResultData& ResultData)
+void UResultManager::SetResultData(FResultData ResultData)
 {
 	CurrentResultData = ResultData;
 	RewardWeapons.Empty();
@@ -61,6 +63,15 @@ void UResultManager::EvoluteReward()
 	for (FName weaponID : CurrentResultData.RewardWeaponIDs) {
 		GenerateWeapon(weaponID, data);
 	}
+
+	USuperGameInstance* gameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!gameInstance)return;
+
+	UWeaponManager* weaponManager = gameInstance->GetWeaponManager();
+	if (!weaponManager)return;
+	for (FWeaponInstance weapon : RewardWeapons) {
+		weaponManager->AddWeapon(weapon);
+	}
 }
 
 void UResultManager::GenerateWeapon(FName WeaponID, FRewardData* RewardData)
@@ -81,6 +92,7 @@ void UResultManager::GenerateWeapon(FName WeaponID, FRewardData* RewardData)
 
 			if (randomValue < currentWeight) {
 				effectCount = weightedEffectCount.EffectCount;
+				break;
 			}
 		}
 	}
@@ -112,6 +124,7 @@ void UResultManager::GenerateWeapon(FName WeaponID, FRewardData* RewardData)
 
 			if (randomValue < currentWeight) {
 				effect.Level = weightedEffectLevel.EffectLevel;
+				break;
 			}
 		}
 
