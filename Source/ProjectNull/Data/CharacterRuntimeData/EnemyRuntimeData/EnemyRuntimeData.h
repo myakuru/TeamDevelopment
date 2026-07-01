@@ -8,11 +8,17 @@
 /** 進行ベクトルが変更された時に呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoveDirChanged,		const FVector&	/*MoveDir*/);
 
+/** ノックバック時に呼び出される */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetLocationChanged,const FVector&/*TargetLocation*/);
+
 /** ステートEnumが変更された時に呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnStateEnumChanged,	EEnemyState		/*StateEnum*/);
 
 /** ターゲットとの距離が変更された時にに呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetDistChanged,	float			/*DistSqr*/);
+
+/** ダメージを受けたときに呼び出される */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDamageRatioChanged,	float			/*DamageRatio*/);
 
 /** 敵のHPが0を下回った時に呼び出される*/
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsAliveChanged,		bool			/*IsKnockBack*/);
@@ -59,6 +65,13 @@ public:
 	void CalcDistanceToTarget(const FVector& a_TargetPos, const FVector& a_OwnerPos);
 
 	/**
+	 * @brief 受けたダメージを最大体力に対する割合として算出する
+	 * @param InReciveDamage 受けたダメージ量
+	 */
+	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
+	void CalclateDamageToMaxHealthRatio(const float InReciveDamage);
+
+	/**
 	 * @brief				ステートタイプを切り替える
 	 * @param a_StateEnum 切り替え先のステートへ変更
 	 */
@@ -77,7 +90,40 @@ public:
 		bool bLooping,
 		float Duration);
 
+	/**
+	 * @brief 攻撃が終了した瞬間の時間をセット
+	 * @param InLastTime 時間(秒)
+	 */
+	void SetAttackFinishTime(float InLastTime);
+
+	/**
+	 * @brief 攻撃のインターバル(秒)をセット
+	 * @param InAttackInterval インターバル(秒)
+	 */
+	void SetAttackInterval(float InAttackInterval) { AttackInterval = InAttackInterval; }
+
 	void UpdateAnimationMonitor(float DeltaTime);
+	void NotifyAnimFinished()	{ CPUAnim.bFinished = true; }
+	void ResetAnimFinished()	{ CPUAnim.bFinished = false; }
+	bool GetAnimFinished()const { return CPUAnim.bFinished; }
+
+	//~ End Setter
+	
+	//~ Begin Getter
+	
+	/**
+	 * @brief 最後に攻撃が終了した時間から攻撃クールタイム分経過したか
+	 * @return クールタイム分経過していたらtrue
+	 */
+	bool CanAttack()const;
+
+	//~ End Getter
+
+	/**
+	 * @brief ターゲットの座標をセット
+	 * @param InTargetLocation ターゲットの座標
+	 */
+	void SetTargetLocation(const FVector& InTargetLocation);
 
 	/**
 	 * @brief 最終的なHP
@@ -86,15 +132,10 @@ public:
 	void SetFinalHP(float InFinalHP);
 
 	/**
-	 * @brief 最終的な攻撃力
-	 * @param InFinalAttack 計算後の最終攻撃力
+	 * @brief 基礎攻撃力のセット
+	 * @param InBasePower 基礎攻撃力
 	 */
-	void SetFinalAttack(float InFinalAttack);
-
-	void NotifyAnimFinished()	{ CPUAnim.bFinished = true; }
-	void ResetAnimFinished()	{ CPUAnim.bFinished = false; }
-	bool GetAnimFinished()			const { return CPUAnim.bFinished; }
-
+	void SetBaseAttackPower(float InBasePower);
 	//~ End Setter
 
 	//~ Start Getter
@@ -120,8 +161,14 @@ public:
 	/** 進行方向が変更された時に呼び出される */
 	FOnMoveDirChanged		OnMoveDirChanged;
 
+	/**	 */
+	FOnTargetLocationChanged OnTargetLocationChanged;
+
 	/** ターゲットとの距離が変更された時に呼び出される */
 	FOnTargetDistChanged	OnTargetDistChanged;
+
+	/** ダメージを受けたときに呼び出される */
+	FOnDamageRatioChanged	OnDamageRatioChanged;
 
 	/**	ノックバック状態が変更された時に呼び出される */
 	FOnStateEnumChanged		OnStateEnumChanged;
@@ -135,9 +182,25 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	FVector	MoveDir = FVector::ZeroVector;
 
+	/**	ターゲットの座標 */
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	FVector TargetLocation = FVector::ZeroVector;
+
 	/** ターゲットとの距離の二乗値 */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	float	TargetDistanceSqr = 0.0f;
+
+	/**	最大HPに対して受けたダメージ割合 */
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	float	DamageToMaxHealthRatio = 0.f;
+
+	/**	攻撃のインターバル(秒) */
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	float AttackInterval = 1.f;
+
+	/**	攻撃が終了した瞬間の時間(秒) */
+	UPROPERTY()
+	float AttackFinishTime = 0.f;
 
 	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")

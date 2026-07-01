@@ -58,25 +58,43 @@ public:
 	 * @brief 移動方向のセット
 	 * @param a_MoveDir 移動方向
 	 */
-	virtual void SetMoveDir(const FVector& a_MoveDir) { MoveDir = a_MoveDir; }
+	virtual void SetMoveDir(const FVector& InMoveDir) 
+	{ MoveDir = InMoveDir; }
+
+	/**
+	 * @brief ターゲット座標のセット
+	 * @param InTargetLocation ターゲットの座標
+	 */
+	virtual void SetTargetLocation(const FVector& InTargetLocation) 
+	{ TargetLocation = InTargetLocation; }
+
+	/**
+	 * @brief 最大体力に対するダメージ割合のセット
+	 * @param InDamageRatio 計算後のダメージ割合
+	 */
+	virtual void SetDamageRatio(float InDamageRatio) 
+	{ DamageRatio = InDamageRatio; }
 
 	/**
 	 * @brief ターゲットとの距離の二乗値セット
 	 * @param a_DistSqr 距離の二乗値
 	 */
-	virtual void SetTargetDistanceSqr(float a_DistSqr) { TargetDistanceSqr = a_DistSqr; }
+	virtual void SetTargetDistanceSqr(float InDistSqr) 
+	{ TargetDistanceSqr = InDistSqr; }
 
 	/**
 	 * @brief ステートEnumをセット
 	 * @param a_TargetState 切り替え先ステート
 	 */
-	virtual void SetEnemyState(EEnemyState a_TargetState) { EnemyState = a_TargetState; }
+	virtual void SetEnemyState(EEnemyState InTargetState)
+	{ EnemyState = InTargetState; }
 
 	/**
 	* @brief 生存状態のセット
 	* @param IsAliveがtrueで生存
 	*/
-	virtual void SetIsAlive(bool a_IsAlive) { IsAlive = a_IsAlive; }
+	virtual void SetIsAlive(bool InIsAlive) 
+	{ IsAlive = InIsAlive; }
 
 	//~ End Setter
 
@@ -94,10 +112,18 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Output",meta = (AllowPrivateAccess = "true"))
 	FVector MoveDir = FVector::ZeroVector;
 
+	/** ターゲットの座標 */
+	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
+	FVector TargetLocation = FVector::ZeroVector;
+
 	/** ターゲットとの距離の二乗値 */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
 	float TargetDistanceSqr = 0.f;
 	
+	/**	最大体力に対する受けたダメージの割合 */
+	UPROPERTY(VisibleAnywhere, Category = "OutPut",meta=(AllowPrivateAcces="true"))
+	float DamageRatio = 1.f;
+
 	/** ノックバック時の重さ */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
 	float KnockBackWeight = 0.f;

@@ -117,7 +117,7 @@ void AAutoAttackHitActor::PerformHitSweep()
 	{
 		AActor* HitActor = Hit.GetActor();
 		if (!HitActor) { continue; }
-
+		
 		// 既に当たった敵は除外
 		if (HitActors.Contains(HitActor))
 		{
@@ -130,7 +130,7 @@ void AAutoAttackHitActor::PerformHitSweep()
 		if (!Interface) { continue; }
 
 		Interface->ApplyDamaged(SetAttackDamage());
-		Interface->ApplyKnockBack(GetActorLocation(),100.f);
+		Interface->ApplyKnockBack(GetActorLocation());
 		UE_LOG(LogTemp, Display, TEXT("当たった"));
 	}
 }
@@ -143,7 +143,7 @@ float AAutoAttackHitActor::SetAttackDamage()
 
 		if (PlayerRuntimeData)
 		{
-			float AttackDamage = PlayerRuntimeData->GetPlayerAttackDamage();
+			float AttackDamage = PlayerRuntimeData->GetCharacterAttackPower();
 
 			return AttackDamage;
 		}

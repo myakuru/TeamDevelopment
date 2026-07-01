@@ -30,8 +30,11 @@ AReflectiveLaser::AReflectiveLaser(int32 InReflectionCount):
 
 void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 {
-	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
+	if (!OtherActor || 
+		OtherActor == this || 
+		!OwnerActor) { return; }
 
+	
 	auto Enemy = Cast<AEnemyBase>(OtherActor);
 	if (!Enemy) { return; }
 
@@ -41,6 +44,14 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 	{
 		Destroy();
 		return;
+	}
+
+
+	// キャラクターインターフェースを実装しているか
+	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
+	{
+		Interface->ApplyDamaged();
+		Interface->ApplyKnockBack(OwnerActor->GetActorLocation());
 	}
 
 	ReflectionCount--;
