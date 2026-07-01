@@ -1,6 +1,6 @@
 ﻿#include "TreasureBox.h"
 
-#include <ProjectNull/Actor/Map/MapActorManager.h>
+//#include <ProjectNull/Actor/Map/MapActorManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Stage/Manager/StageManager.h>
