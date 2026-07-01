@@ -81,6 +81,12 @@ void AEnemyBase::BeginPlay()
 		EnemyAttackComponent->SetOwnerEnemy(this);
 	}
 
+	if (CapsuleComponent)
+	{
+		// プレイヤーなどPawnとの物理的なぶつかりを無視
+		CapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	}
+
 	// ゲームの進行に合わせて敵パラメータを設定
 	UpdateParams();
 

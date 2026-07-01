@@ -5,6 +5,7 @@
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
 #include "Perception/PawnSensingComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -44,6 +45,20 @@ void AEnemyBossBase::BeginPlay()
 	OnTakeAnyDamage.AddDynamic(this, &AEnemyBossBase::HandleTakeAnyDamage);
 
 	RegisterDelegates();
+
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (MeshComp)
+	{
+		MeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+		MeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	}
+
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	if (Capsule)
+	{
+		Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+		Capsule->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	}
 
 	//SetBossEnemyStatus();
 
