@@ -32,7 +32,8 @@ UDashGearStateBase::UDashGearStateBase():
 	DashEffectDuration(0.3f),
 	MontageBlendOutTime(0.2f),
 	DashSphereRadius(200.f),
-	MaxDashSlopeAngle(30.f)
+	MaxDashSlopeAngle(30.f),
+	TargetCameraLagSpeed(10.f)
 {
 }
 
@@ -110,6 +111,8 @@ void UDashGearStateBase::ExecuteDash()
 	PlayDashAnimation();
 	SetSphereCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetEnableSpawnAfterimage(true);
+
+	Player->SetTargetCameraLagSpeed(TargetCameraLagSpeed);
 }
 
 void UDashGearStateBase::EndDash()
@@ -118,6 +121,9 @@ void UDashGearStateBase::EndDash()
 	DeactivateNiagaraEffect();
 	SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetEnableSpawnAfterimage(false);
+
+	if (!Player) { return; }
+	Player->ResetTargetCameraLagSpeed();
 }
 
 void UDashGearStateBase::InitializeStartDashData(USceneComponent* InGroundAlignmentComp)
