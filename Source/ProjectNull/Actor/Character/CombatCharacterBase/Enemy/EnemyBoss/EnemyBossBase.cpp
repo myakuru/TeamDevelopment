@@ -26,6 +26,7 @@ AEnemyBossBase::AEnemyBossBase()
 	BreathEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BreathNiagara"));
 	BreathEffect->SetupAttachment(GetMesh(), FName("tongue_05"));
 	BreathEffect->SetAutoActivate(false);
+	BreathEffect->SetRelativeRotation(NiagaraRotOffset);
 }
 
 // Called when the game starts or when spawned

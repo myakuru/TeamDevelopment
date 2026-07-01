@@ -75,8 +75,9 @@ public:
 	// ゲッター
 	// ------------------------------------------------------------------------------------
 	/** 次の攻撃アクション状態*/
-	const EBossActionType GetNextAction()				const	{ return EnemyBossRuntimeData->CurrentAction; }
+	const EBossActionType GetCurrentAction()			const	{ return EnemyBossRuntimeData->CurrentAction; }
 	const EBossActionType GetActionPriority()			const	{ return EnemyBossRuntimeData->ActionPriority; }	/** Decideがアクションを決める際に優先度が高いものを優先するようにするためのゲッター*/
+	const EBossActionType GetPrevAction()				const	{ return PrevAction; }
 	int32 GetHitIndex()									const	{ return EnemyBossRuntimeData->HitIndex; }			/** 連撃のインデックスのゲッター*/
 	const FBossAttackPattern& GetCurrentAttack()		const	{ return EnemyBossRuntimeData->CurrentAttack; }		/** 現在の攻撃を取得*/
 	float GetNearRange()								const	{ return NearRange; }		/** 近距離攻撃範囲のゲッター*/
@@ -89,7 +90,8 @@ public:
 	// ------------------------------------------------------------------------------------
 	// セッター
 	// ------------------------------------------------------------------------------------
-	void SetNextAction(EBossActionType InAction)		{ EnemyBossRuntimeData->CurrentAction = InAction; }	/** 次の攻撃をいれる*/
+	void SetCurrentAction(EBossActionType InAction)		{ EnemyBossRuntimeData->CurrentAction = InAction; }	/** 次の攻撃をいれる*/
+	void SetPrevAction(EBossActionType InAction)		{ PrevAction = InAction; }
 	void SetTargetActor(AActor* InTarget)				{ TargetActor = InTarget; }							/** 追尾対象を設定（nullptrでロスト扱い） */
 	void SetActionPriority(EBossActionType InAction)	{ EnemyBossRuntimeData->ActionPriority = InAction; }	/** Decideがアクションを決める際に優先度付で使用する*/
 	void SetNextAttack(EBossActionType InAttack)		{ EnemyBossRuntimeData->CurrentAttack = AttackSet->Patterns[static_cast<int>(InAttack)]; }
@@ -113,9 +115,9 @@ public:
 		// 全パターンをみて、今の距離で撃てるものだけ候補に入れる
 		for (const FBossAttackPattern& P : GetAttackPatterns())
 		{
-			const bool bRangeOK = (Dist >= P.MinRange && Dist <= P.MaxRange);	// 距離条件を満たすか
+			//const bool bRangeOK = (Dist >= P.MinRange && Dist <= P.MaxRange);	// 距離条件を満たすか
 			const bool bAttackTypeOK = (P.ActionType == EnemyBossRuntimeData->CurrentAction);			// 攻撃タイプが今のアクションと同じか
-			if (bRangeOK && bAttackTypeOK) 
+			if (/*bRangeOK && */bAttackTypeOK) 
 			{ Cand.Add(&P); }
 		}
 		// 撃てる技が1つもなければ失敗
@@ -151,6 +153,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TObjectPtr<UStateTreeComponent> StateTreeComp;						/** StateTree実行コンポーネント（StateTreeアセットはこの詳細で割り当てる） */
 
+	UPROPERTY(EditAnywhere, Category = "AI")
+	EBossActionType PrevAction = EBossActionType::ApproachWalk;			/** 前に行動したときのアクションを保存しておく*/
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	TObjectPtr<AActor> TargetActor = nullptr;							/** 追尾対象。視認/被弾で設定され、Evaluator経由でStateTree全体へ配布される */
 
@@ -171,6 +176,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	float FastFallGravityScale = 5.0f;								/** 重力の追加加速度フラグ*/
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	FRotator NiagaraRotOffset = { -10.0f,0.0f,0.0f };
 
 	/** 敵基本ステータス */
 	UPROPERTY(EditAnywhere)

@@ -18,7 +18,7 @@ USTT_EnemyBossJumpAttack::USTT_EnemyBossJumpAttack(const FObjectInitializer& a_O
 
 EStateTreeRunStatus USTT_EnemyBossJumpAttack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("JumpAttack Tick In"));
+	//UE_LOG(LogTemp, Warning, TEXT("JumpAttack Tick In"));
 
 	AEnemyBossBase* Boss = GetBoss();
 	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }
@@ -87,12 +87,12 @@ EStateTreeRunStatus USTT_EnemyBossJumpAttack::Tick(FStateTreeExecutionContext& C
 		return EStateTreeRunStatus::Running;
 		case
 			EBossJumpPhase::WaitLiftOff:
-				UE_LOG(LogTemp, Warning, TEXT("GravityScale = %f"), Move->GravityScale);
+				/*UE_LOG(LogTemp, Warning, TEXT("GravityScale = %f"), Move->GravityScale);
 				UE_LOG(LogTemp, Warning, TEXT("JumpZVelocity = %f"), Move->JumpZVelocity);
 				UE_LOG(LogTemp, Warning, TEXT("MovementMode = %d"), (int32)Move->MovementMode);
 				UE_LOG(LogTemp, Warning, TEXT("IsMovingOnGround = %s, Velocity.Z = %f"),
 					Move->IsMovingOnGround() ? TEXT("true") : TEXT("false"),
-					Boss->GetVelocity().Z);
+					Boss->GetVelocity().Z);*/
 				//if (!Move->IsMovingOnGround())
 				{
 					// 離陸を確認したら落下攻撃Montage再生
@@ -142,4 +142,9 @@ EStateTreeRunStatus USTT_EnemyBossJumpAttack::EnterState(FStateTreeExecutionCont
 void USTT_EnemyBossJumpAttack::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::ExitState(Context, Transition);
+	AEnemyBossBase* Boss = GetBoss();
+	if (!IsValid(Boss)) 
+	{ return; }
+
+	Boss->SetPrevAction(Boss->GetCurrentAction());
 }

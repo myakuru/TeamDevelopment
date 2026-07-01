@@ -66,4 +66,12 @@ EStateTreeRunStatus USTT_EnemyBossRangedAttack::EnterState(FStateTreeExecutionCo
 void USTT_EnemyBossRangedAttack::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::ExitState(Context, Transition);
+
+	AEnemyBossBase* Boss = GetBoss();
+	if (!IsValid(Boss))
+	{
+		return;
+	}
+
+	Boss->SetPrevAction(Boss->GetCurrentAction());
 }

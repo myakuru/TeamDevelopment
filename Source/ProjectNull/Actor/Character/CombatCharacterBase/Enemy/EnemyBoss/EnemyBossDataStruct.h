@@ -10,6 +10,7 @@ enum class EBossActionType : uint8
 	None,
 	PlayAttack,			// 近接攻撃を出す
 	Strafe,				// プレイヤーの周りを回って様子見
+	Idle,				// その場で様子見
 	ApproachWalk,		// 歩いて近づく
 	ApproachRun,		// 走って近づく
 	JumpAttack,			// 跳びかかる

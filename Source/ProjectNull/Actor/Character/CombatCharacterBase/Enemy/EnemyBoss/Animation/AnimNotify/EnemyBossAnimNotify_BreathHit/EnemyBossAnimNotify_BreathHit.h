@@ -36,7 +36,7 @@ public:
 
 	/** ブレスの最大射程*/
 	UPROPERTY(EditAnywhere, Category = "Breath")
-	float Range = 50.0f;
+	float Range = 500.0f;
 
 	/** 連続ヒットのインターバル*/
 	UPROPERTY(EditAnywhere, Category = "Breath")
@@ -49,6 +49,13 @@ public:
 	/** デバッグ表示*/
 	UPROPERTY(EditAnywhere, Category = "Breath")
 	bool bDrawDebug = true;
+
+	/** ナイアガラを出す時間*/
+	UPROPERTY(EditAnywhere, Category = "Breath")
+	float BreathDuration = 5.0f;
+
+	/** ナイアガラを出す時間のカウンタ*/
+	float BreathCount = 0.0f;
 
 private:
 

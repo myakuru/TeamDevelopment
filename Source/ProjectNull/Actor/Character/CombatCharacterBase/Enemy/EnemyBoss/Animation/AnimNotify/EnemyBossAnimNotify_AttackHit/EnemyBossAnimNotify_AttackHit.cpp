@@ -32,12 +32,8 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 	if (!IsValid(MeshComp)) { return; }
 
 	AActor* Owner = MeshComp->GetOwner();			// メッシュの持ち主（Actor）を取得
-	AEnemyBossBase* Boss = Cast<AEnemyBossBase>(Owner);
 	UWorld* World = MeshComp->GetWorld();			// メッシュのレベル空間のポインタを取得
 	if (!IsValid(Owner) || !IsValid(World)) { return; }
-	if (!IsValid(Boss)) {return;}
-
-	Boss->TryConsumeFastFallRequest(); // 落下中の攻撃であれば、落下中フラグを消費する
 
 	// ソケットの現在位置を取得 → ここに当たり判定を出す
 	const FVector HitCenter = MeshComp->GetSocketLocation(SocketName) + SphereOffset;
@@ -84,6 +80,11 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 	{
 		DrawDebugSphere(World, HitCenter, Radius, 12, FColor::Red, false, 0.05f);
 	}
+
+	AEnemyBossBase* Boss = Cast<AEnemyBossBase>(Owner);
+	if (!IsValid(Boss)) { return; }
+
+	Boss->TryConsumeFastFallRequest(); // 落下中の攻撃であれば、落下中フラグを消費する
 }
 
 // ------------------------------------------------------------------------------------
@@ -96,7 +97,10 @@ void UEnemyBossAnimNotify_AttackHit::NotifyEnd(USkeletalMeshComponent* MeshComp,
 	AActor* Owner = MeshComp->GetOwner();			// メッシュの持ち主（Actor）を取得
 	AEnemyBossBase* Boss = Cast<AEnemyBossBase>(Owner);
 
-	Boss->ResetGravity();
+	if (Boss != nullptr)
+	{
+		Boss->ResetGravity();
+	}
 
 	// 振り終わり：リストをクリア
 	HitActors.Empty();

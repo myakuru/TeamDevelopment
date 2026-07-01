@@ -18,7 +18,7 @@ USTT_EnemyBossBreath::USTT_EnemyBossBreath(const FObjectInitializer& a_ObjInit)
 
 EStateTreeRunStatus USTT_EnemyBossBreath::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Breath Tick In"));
+	//UE_LOG(LogTemp, Warning, TEXT("Breath Tick In"));
 
 	AEnemyBossBase* Boss = GetBoss();
 	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }
@@ -55,7 +55,7 @@ EStateTreeRunStatus USTT_EnemyBossBreath::Tick(FStateTreeExecutionContext& Conte
 			// アニメ再生
 			//if (UAnimInstance* Anim = Boss->GetMesh() ? Boss->GetMesh()->GetAnimInstance() : nullptr)
 			{
-				// 踏み切りmontage再生
+				// montage再生
 				Anim->Montage_Play(Atk.AttackMontages[0]);
 			}
 		}
@@ -65,7 +65,6 @@ EStateTreeRunStatus USTT_EnemyBossBreath::Tick(FStateTreeExecutionContext& Conte
 	switch (Phase)
 	{
 	case EBossBreathPhase::Start:
-		// 踏み切りmontageが終わったら、ターゲットへ向けて射出 → 落下攻撃montageへ
 		if (!Anim->Montage_IsPlaying(Atk.AttackMontages[0]))
 		{
 			Phase = EBossBreathPhase::Loop;
@@ -121,6 +120,11 @@ EStateTreeRunStatus USTT_EnemyBossBreath::EnterState(FStateTreeExecutionContext&
 	const FBossAttackPattern& Atk = Boss->GetCurrentAttack();
 	if (!Atk.AttackMontages.IsValidIndex(1)) { return EStateTreeRunStatus::Failed; } // 2つ必須
 
+	if (IsValid(AIC))
+	{
+		AIC->StopMovement();
+	}
+
 	BreathCount = 0.0f;
 
 	return EStateTreeRunStatus::Running;
@@ -129,4 +133,12 @@ EStateTreeRunStatus USTT_EnemyBossBreath::EnterState(FStateTreeExecutionContext&
 void USTT_EnemyBossBreath::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::ExitState(Context, Transition);
+
+	AEnemyBossBase* Boss = GetBoss();
+	if (!IsValid(Boss))
+	{
+		return;
+	}
+
+	Boss->SetPrevAction(Boss->GetCurrentAction());
 }
