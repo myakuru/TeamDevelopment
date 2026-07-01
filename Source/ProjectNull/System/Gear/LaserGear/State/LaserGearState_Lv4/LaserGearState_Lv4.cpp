@@ -1,8 +1,11 @@
 ﻿
 #include "LaserGearState_Lv4.h"
 
+
 #include <ProjectNull/Actor/Effect/EffectBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+
+#include <ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.h>
 
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
@@ -13,6 +16,7 @@ ULaserGearState_Lv4::ULaserGearState_Lv4():
 	SpellAnimMontage(nullptr),
 	SpellAnimBlendOutTime(0.2f)
 {
+	
 }
 
 void ULaserGearState_Lv4::Initialize(
@@ -24,6 +28,22 @@ void ULaserGearState_Lv4::Initialize(
 		InPlayer,
 		InGearComponent,
 		InOwner);
+
+	Laserbeam = GetWorld()->SpawnActor<ALaserbeam>(LaserbeamClass);
+	if (!Laserbeam) { return; }
+
+	if (!InPlayer) { return; }
+
+	auto GroundAlignmentComp = InPlayer->GetGroundAlignmentComponent();
+	if (!GroundAlignmentComp) { return; }
+
+	auto RootComp = GroundAlignmentComp->GetRootComponent();
+	if (!RootComp) { return; }
+
+	Laserbeam->AttachToComponent(
+		RootComp,
+		FAttachmentTransformRules::KeepRelativeTransform);
+	Laserbeam->SetLaserEnabled(false);
 }
 
 void ULaserGearState_Lv4::Execute(int32 CurrentGearLevel)
@@ -37,13 +57,9 @@ void ULaserGearState_Lv4::Execute(int32 CurrentGearLevel)
 
 	PlayerAnimInstance->Montage_Play(SpellAnimMontage);
 
-	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
-	if (!GroundAlignmentComp) { return; }
+	if (!Laserbeam) { return; }
+	Laserbeam->SetLaserEnabled(true);
 
-	auto RootComp = GroundAlignmentComp->GetRootComponent();
-	if (!RootComp) { return; }
-
-	if (Laserbeam) { Laserbeam->Start(RootComp); }
 }
 
 void ULaserGearState_Lv4::Update(float DeltaTime)
@@ -55,7 +71,6 @@ void ULaserGearState_Lv4::Update(float DeltaTime)
 void ULaserGearState_Lv4::End()
 {
 	ULaserGearStateBase::End();
-	if (Laserbeam) { Laserbeam->DeactivateEffect(); }
 
 	if (!Player) { return; }
 
@@ -63,5 +78,8 @@ void ULaserGearState_Lv4::End()
 	if (!PlayerAnimInstance) { return; }
 
 	PlayerAnimInstance->Montage_Stop(SpellAnimBlendOutTime);
+
+	if (!Laserbeam) { return; }
+	Laserbeam->SetLaserEnabled(false);
 
 }

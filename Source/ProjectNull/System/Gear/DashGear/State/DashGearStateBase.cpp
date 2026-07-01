@@ -108,7 +108,7 @@ void UDashGearStateBase::ExecuteDash()
 	InitializeStartDashData(RootComp);
 	PlayDashNiagaraEffect(RootComp);
 	PlayDashAnimation();
-	SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	SetSphereCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetEnableSpawnAfterimage(true);
 }
 

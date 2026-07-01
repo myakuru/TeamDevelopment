@@ -45,7 +45,8 @@ void UCrossLaserAttack::Execute()
 
 void UCrossLaserAttack::Update(float DeltaTime)
 {
-	if (!IsActive() || !CrossLaserbeam) { return; }
+	if (!IsActive() || 
+		!CrossLaserbeam) { return; }
 
 	CurrentAngle += RotationSpeed * DeltaTime;
 

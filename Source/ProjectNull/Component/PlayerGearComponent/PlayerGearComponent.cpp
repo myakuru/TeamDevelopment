@@ -176,7 +176,8 @@ void UPlayerGearComponent::InitializeSphereCollision()
 	// 攻撃用球アクターに親をアタッチ
 	SphereCollision->AttachToActor(
 		OwnerPlayer,
-		FAttachmentTransformRules::KeepRelativeTransform
+		FAttachmentTransformRules::KeepRelativeTransform,
+		TEXT("GearSphere")
 	);
 
 	auto SphereComponent = SphereCollision->GetSphereComponent();

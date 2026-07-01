@@ -12,6 +12,8 @@ class UAnimMontage;
 
 class UEffectBase;
 
+class ALaserbeam;
+
 /**
  * 
  */
@@ -37,8 +39,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> SpellAnimMontage;
 
-	UPROPERTY(EditAnywhere,Instanced)
-	TObjectPtr<UEffectBase> Laserbeam;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<ALaserbeam> Laserbeam;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ALaserbeam> LaserbeamClass;
 
 	UPROPERTY(EditAnywhere)
 	float SpellAnimBlendOutTime;
