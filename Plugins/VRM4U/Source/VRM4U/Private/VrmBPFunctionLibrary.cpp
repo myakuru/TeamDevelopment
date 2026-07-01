@@ -1,4 +1,4 @@
-// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
+// VRM4U Copyright (c) 2021-2026 Haruyoshi Yamamoto. This software is released under the MIT License.
 
 #include "VrmBPFunctionLibrary.h"
 #include "Materials/MaterialInterface.h"
@@ -1449,8 +1449,9 @@ namespace {
 		}
 		BOOL b = SetLayeredWindowAttributes(h, cr, a, dwFlags);
 		return b != 0;
-#endif
+#else
 		return false;
+#endif
 	}
 	void setDefaultWindow(const bool) {
 		setTransParent(false, FLinearColor(1, 1, 1, 1));
