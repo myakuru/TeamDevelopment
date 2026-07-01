@@ -142,10 +142,7 @@ void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
 {
 	if (!bIsUpgradeWidgetUse) return;
 
-	if(!bIsUpgradeWidgetFilledArray)
-	{
-		return;
-	}
+	if (!bIsUpgradeWidgetFilledArray) return;
 
 	// UI表示させる
 	OpenWidget();
