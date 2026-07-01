@@ -7,7 +7,6 @@
 
 #include "ReflectiveLaser.generated.h"
 
-
 /** 敵の中間基底クラス */
 class AEnemyBase;
 

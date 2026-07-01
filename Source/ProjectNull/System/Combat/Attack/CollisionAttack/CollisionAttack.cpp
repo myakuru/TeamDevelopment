@@ -56,7 +56,7 @@ void UCollisionAttack::OnSphericalBeginOverlap(
 		// キャラクターインターフェースを実装しているか
 		if (auto* interface = Cast<ICharacterInterface>(OtherActor))
 		{
-			interface->ApplyDamaged();
+			interface->ApplyDamaged(GetFinalDamage());
 			interface->ApplyKnockBack(GetOwnerActor()->GetActorLocation());
 			AddHitActors(OtherActor);
 		}

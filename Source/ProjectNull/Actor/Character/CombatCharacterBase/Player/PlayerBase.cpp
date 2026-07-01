@@ -134,12 +134,23 @@ void APlayerBase::Tick(float DeltaTime)
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
 
+	UpdateModelAfterimageTrailEffect(DeltaTime);
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	ACombatCharacterBase::SetupPlayerInputComponent(PlayerInputComponent);
 	
+}
+
+float APlayerBase::GetFinalAttackPower() const
+{
+	auto GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
+
+	if (!GameInstance || !GameInstance->GetPlayerRuntimeData()) { return 1.f; }
+	auto PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+
+	return PlayerRuntimeData->GetCharacterAttackPower();
 }
 
 void APlayerBase::ApplyDamaged(float InDamage)
@@ -228,6 +239,21 @@ bool APlayerBase::CanMove()
 	}
 
 	return true;
+}
+
+void APlayerBase::UpdateModelAfterimageTrailEffect(float DeltaTime)
+{
+	if (!ModelAfterimageTrailEffect || 
+		!GetMesh()) { return; }
+
+	const auto PlayerAnimInstance = GetPlayerAnimInstance();
+	if (!PlayerAnimInstance) { return; }
+
+	ModelAfterimageTrailEffect->Update(
+		DeltaTime,
+		GetActorTransform(),
+		GetMesh()->GetSkeletalMeshAsset(),
+		PlayerAnimInstance->GetPlayerPoseSnapshot());
 }
 
 

@@ -46,7 +46,7 @@ public:
 
 private:
 	EBossJumpPhase Phase = EBossJumpPhase::Takeoff;
-	bool bLeftGround = false;   // 一度地面を離れたか（着地誤検出防止）
+	bool bLeftGround		= false;   // 一度地面を離れたか（着地誤検出防止）
 	bool bLandMontagePlayed = false;
 
 };

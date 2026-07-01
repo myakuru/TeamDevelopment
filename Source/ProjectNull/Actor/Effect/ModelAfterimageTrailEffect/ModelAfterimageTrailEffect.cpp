@@ -94,7 +94,8 @@ void UModelAfterimageTrailEffect::AddAfterimageTrail(
 	const FTransform& InTransform,
 	TFunction<void(AGhostActor*)> InitializeFunc)
 {
-	if (!bEnableSpawn) { return; }
+	if (!bEnableSpawn ||
+		!GhostClass) { return; }
 
 	// 残像をワールドにスポーン
 	auto* Ghost = GetWorld()->SpawnActor<AGhostActor>(GhostClass);

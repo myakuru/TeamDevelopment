@@ -10,7 +10,6 @@
 UPlayerAnimInstance::UPlayerAnimInstance():
 	bShouldMove(false),
 	bIsFalling(false),
-	bIsCombatStance(false),
 	bIsDecelerating(false),
 	Velocity(FVector::ZeroVector),
 	GroundSpeed(0.f),

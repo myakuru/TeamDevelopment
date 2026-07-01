@@ -31,10 +31,6 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsFalling;
 
-	/** 戦闘構え状態か */
-	UPROPERTY(BlueprintReadOnly)
-	bool bIsCombatStance;
-
 	/** 減速中か */
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsDecelerating;

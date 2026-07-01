@@ -77,6 +77,22 @@ void UDashGear::SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnable
 	SphereCollision->SetCollisionEnabled(InEnabled);
 }
 
+void UDashGear::SetSphereTransform(const FTransform& Transform)
+{
+	if (!SphereCollision) { return; }
+	SphereCollision->SetActorTransform(Transform);
+}
+
+void UDashGear::SetSphereRadius(float Radius)
+{
+	if (!SphereCollision) { return; }
+
+	auto SphereComp = SphereCollision->GetSphereComponent();
+	if (!SphereComp) { return; }
+
+	SphereComp->SetSphereRadius(Radius);
+}
+
 void UDashGear::OnDashGearAttackBeginOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,

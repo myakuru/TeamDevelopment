@@ -15,14 +15,29 @@ struct FAttackRuntimeData
 public:
 
 	FAttackRuntimeData() :
-		Final(0.0f),
-		Base(0.0f)
+		Base(0.0f),
+		Scaling(1.0f),
+		Final(0.0f)
 	{
 	}
 
+	/** 基礎攻撃力とスケール値から最終的な攻撃力を算出 */
+	float GetFinalPower()
+	{
+		Final = Base * Scaling;
+		return Final;
+	}
+
+	/**	基礎攻撃力 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 	float Base;
 
+	/**	倍率 */
+	UPROPERTY()
+	float Scaling;
+
+	/** 最終的な攻撃力 */
+	UPROPERTY()
 	float Final;
 };
 
@@ -68,19 +83,36 @@ public:
 public:
 	virtual void Initialize() { return; }
 
-	/** ゲッター */
+	/** 体力を加算する処理 */
+	void AddHealth(float Amount) { SetHealth(Health.Current + Amount); }
+
+public:
+
+	/*~Begin Setters */
+	/**
+	 * @brief 攻撃倍率のセット
+	 * @param InScaling セットする倍率
+	 */
+	void SetAttackScaling(float InScaling) { Attack.Scaling = InScaling; }
+	
+	/** 体力を固定値にセットする処理 */
+	void SetHealth(float InCurrentHealth) { Health.SetCurrent(InCurrentHealth); }
+	/* End Setters~*/
+
+
+	/*~Begin Getters */
 	/** 体力を取得する処理 */
 	float GetHealth() const { return Health.Current; }
 
 	/** 体力の最大値を取得 */
 	float GetMaxHealth() const { return Health.Max; }
 
-	/** セッター */
-	/** 体力を固定値にセットする処理 */
-	void SetHealth(float inCurrentHealth) { Health.SetCurrent(inCurrentHealth); }
+	/** 攻撃の倍率を取得 */
+	float GetAttackScaling()const { return Attack.Scaling; }
 
-	/** 体力を加算する処理 */
-	void AddHealth(float Amount) { SetHealth(Health.Current + Amount); }
+	/** 基礎攻撃力とスケール値から最終的な攻撃力を算出 */
+	float GetCharacterAttackPower(){ return Attack.GetFinalPower(); }
+	/* End Getters~*/
 
 protected:
 

@@ -12,6 +12,8 @@ class ARobotController;
 /** 残像攻撃エフェクトクラス */
 class UAfterImageAttackEffect;
 
+/** アニメーションモンタージュ */
+class UAnimMontage;
 
 /** ダッシュギアのレベル4状態クラス */
 UCLASS(EditInlineNew, Blueprintable)
@@ -50,6 +52,12 @@ private:
 	 * @param ElapsedTime 経過時間
 	 */
 	void UpdateCombatStance(float ElapsedTime);
+
+	/**
+	 * @brief 攻撃用スフィア判定更新
+	 * @param ElapsedTime 経過時間
+	 */
+	void UpdateAttackSphereCollision(float ElapsedTime);
 
 	/**
 	 * @brief カメラデータ更新処理
@@ -107,6 +115,16 @@ private:
 	 */
 	float GetElapsedTimeToIndex(int32 InTargetIndex);
 	
+	/**
+	 * @brief 構え状態のアニメーション再生
+	 */
+	void PlayStanceAnimation();
+
+	/**
+	 * @brief 構え状態のアニメーションブレンドアウト
+	 */
+	void BlendOutStanceAnimation();
+
 	/** ロボットコントローラークラス */
 	UPROPERTY()
 	TObjectPtr<ARobotController> RobotController;
@@ -130,4 +148,15 @@ private:
 	/** ギアスキル開始時プレイヤーのTransform */
 	FTransform StartPlayerTransform;
 
+	/** 構え状態のアニメーションモンタージュ */
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> StanceAnimMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	float StanceAnimBlendOutTime;
+
+	bool bExecuteFinalDash;
+
+	UPROPERTY(EditAnywhere)
+	float SpecialAttackSphereRadius;
 };

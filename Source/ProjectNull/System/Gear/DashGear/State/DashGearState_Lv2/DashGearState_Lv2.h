@@ -12,11 +12,8 @@ UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UDashGearState_Lv2 final : public UDashGearStateBase
 {
 	GENERATED_BODY()
-
 public:
-
 	UDashGearState_Lv2();
-
 public:
 
 	void Initialize(
@@ -26,16 +23,28 @@ public:
 
 	void Execute(int32 CurrentGearLevel)	override;
 	void Update(float DeltaTime)			override;
-
+	void End()								override;
 
 private:
 
+	void InitializeGearDuration();
+
+	void EndFirstDash();
+	void StartSecondDash();
+
+	
 	UPROPERTY(EditAnywhere)
-	FThresholdRange FirstDashThresholdRange;
+	float FirstDashDuration;
 
 	UPROPERTY(EditAnywhere)
-	FThresholdRange SecondDashThresholdRange;
+	float FirstDashToDelay;
 
-	float ElapsedTime;
+	UPROPERTY(EditAnywhere)
+	float SecondDashDuration;
+
+	bool bShouldDash;
+
+	FTimerHandle FirstDashTimerHandle;
+	FTimerHandle FirstDashToDelayTimerHandle;
 
 };

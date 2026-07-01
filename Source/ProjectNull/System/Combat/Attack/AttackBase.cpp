@@ -17,10 +17,16 @@ UAttackBase::UAttackBase():
 void UAttackBase::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	OwnerActor		= Owner;
-	RootComponent	= NewObject<USceneComponent>(Owner);
+	if (!OwnerActor) { return; }
+	
+	// キャラクターインターフェースを実装しているか
+	if (auto* Interface = Cast<ICharacterInterface>(OwnerActor))
+	{
+		// 最終的なダメージ量を算出
+		FinalDamage = AttackPower + Interface->GetFinalAttackPower();
+	}
 
-
-
+	RootComponent	= NewObject<USceneComponent>(OwnerActor);
 	if (!RootComponent) { return; }
 	RootComponent->RegisterComponent();
 

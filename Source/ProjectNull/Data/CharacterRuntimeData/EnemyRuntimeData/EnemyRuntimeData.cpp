@@ -17,14 +17,30 @@ void UEnemyRuntimeData::StartAnimMonitor(int32 a_AnimIndex, bool bLooping, float
 	CPUAnim.Duration	= Duration;
 }
 
+void UEnemyRuntimeData::SetAttackFinishTime(float InLastTime)
+{
+	AttackFinishTime = InLastTime;
+}
+
+bool UEnemyRuntimeData::CanAttack()const 
+{
+	return GetWorld()->GetTimeSeconds() >= AttackInterval + AttackFinishTime;
+}
+
+void UEnemyRuntimeData::SetTargetLocation(const FVector& InTargetLocation)
+{
+	TargetLocation = InTargetLocation;
+	OnTargetLocationChanged.Broadcast(TargetLocation);
+}
+
 void UEnemyRuntimeData::SetFinalHP(float InFinalHP)
 {
 	Health.Max = Health.Current = InFinalHP;
 }
 
-void UEnemyRuntimeData::SetFinalAttack(float InFinalAttack)
+void UEnemyRuntimeData::SetBaseAttackPower(float InBasePower)
 {
-	Attack.Final = InFinalAttack;
+	Attack.Base = InBasePower;
 }
 
 void UEnemyRuntimeData::UpdateAnimationMonitor(float DeltaTime)
@@ -60,6 +76,12 @@ void UEnemyRuntimeData::CalcDistanceToTarget(const FVector& a_TargetPos, const F
 		TargetDistanceSqr = NewTargetDistSqr;
 		OnTargetDistChanged.Broadcast(TargetDistanceSqr);
 	}
+}
+
+void UEnemyRuntimeData::CalclateDamageToMaxHealthRatio(const float InReciveDamage)
+{
+	DamageToMaxHealthRatio = InReciveDamage / Health.Max;
+	OnDamageRatioChanged.Broadcast(DamageToMaxHealthRatio);
 }
 
 void UEnemyRuntimeData::ChangedEnemyState(EEnemyState a_StateEnum)

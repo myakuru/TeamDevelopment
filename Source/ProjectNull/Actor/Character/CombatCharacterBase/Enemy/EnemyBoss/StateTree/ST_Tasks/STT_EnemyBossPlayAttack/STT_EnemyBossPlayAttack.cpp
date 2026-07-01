@@ -18,7 +18,7 @@ USTT_EnemyBossPlayAttack::USTT_EnemyBossPlayAttack(const FObjectInitializer& a_O
 
 EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick In"));
+	//UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick In"));
 
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
@@ -60,7 +60,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 	// 指定した配列内にアニメーションがあるかチェック
 	if (!Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick AnimEnd"));
+		//UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick AnimEnd"));
 		return EStateTreeRunStatus::Succeeded;
 	}
 	// 現在のアニメーションモンタージュを取得
@@ -80,7 +80,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 		return EStateTreeRunStatus::Succeeded;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick Out"));
+	//UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick Out"));
 
 	return EStateTreeRunStatus::Running;
 
@@ -97,7 +97,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 // タスク開始時の処理
 EStateTreeRunStatus USTT_EnemyBossPlayAttack::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
-	UE_LOG(LogTemp, Warning, TEXT("PlayAttack EnterState In"));
+	//UE_LOG(LogTemp, Warning, TEXT("PlayAttack EnterState In"));
 
 	Super::EnterState(Context, Transition);
 
@@ -128,4 +128,12 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::EnterState(FStateTreeExecutionCont
 void USTT_EnemyBossPlayAttack::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::ExitState(Context, Transition);
+
+	AEnemyBossBase* Boss = GetBoss();
+	if (!IsValid(Boss))
+	{
+		return;
+	}
+
+	Boss->SetPrevAction(Boss->GetCurrentAction());
 }
