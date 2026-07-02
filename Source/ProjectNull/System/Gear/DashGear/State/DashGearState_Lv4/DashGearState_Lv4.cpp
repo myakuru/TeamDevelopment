@@ -14,6 +14,8 @@
 
 #include <ProjectNull/System/Gear/DashGear/DashGear.h>
 
+#include <ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.h>
+
 #include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
 
 UDashGearState_Lv4::UDashGearState_Lv4():
@@ -40,6 +42,8 @@ void UDashGearState_Lv4::Initialize(
 		InGearComponent,
 		InOwner);
 
+	//GearSpecialAction = NewObject<UGearSpecialAction>(InOwner);
+
 	// ギア発動時間初期化
 	InitializeGearDuration();
 
@@ -58,7 +62,8 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 {
 	if (!Player || 
 		!RobotController ||
-		!DashGear) { return; }
+		!DashGear ||
+		!GearSpecialAction) { return; }
 
 	// ================================================================
 	// ダッシュギアのレベル4状態クラスの初期化
@@ -67,7 +72,7 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	bExecuteFinalDash = false;
 
 	// ギアスキル発動前のカメラステータスを保存
-	SaveCameraStatus();
+	GearSpecialAction->SaveCameraStatus(Player);
 
 	// 復元する際の開始データ初期化
 	InitializeRestoreStartData();
@@ -169,11 +174,17 @@ void UDashGearState_Lv4::UpdateCameraData(
 	float DeltaTime,
 	float InElapsedTime)
 {
+	if (!GearSpecialAction) { return; }
+
 	// カメラ復帰処理更新
-	UpdateCameraRestoreInterpolation(DeltaTime);
+	GearSpecialAction->UpdateCameraRestoreInterpolation(
+		Player,
+		Owner,
+		GetGearLevelIndex(),
+		GetCameraRestoreDuration(), DeltaTime);
 
 	// 復元補間中は処理を行わない
-	if (GetCameraRestoreElapsedTime() >= 0.0f) { return; }
+	if (GearSpecialAction->GetCameraRestoreElapsedTime() >= 0.0f) { return; }
 
 	// 現在の区間インデックス取得
 	const int32 CurrentIndex = GetCurrentSectionIndex(InElapsedTime);
@@ -203,7 +214,8 @@ void UDashGearState_Lv4::UpdateCameraRotation(
 	int32 DataIndex,
 	float InLerpAlpha)
 {
-	if (!RobotController)						{ return; }
+	if (!RobotController ||
+		!GearSpecialAction)						{ return; }
 	if (!CameraData.IsValidIndex(DataIndex))	{ return; }
 
 	const FCameraSequenceData& Data = CameraData[DataIndex];
@@ -214,7 +226,7 @@ void UDashGearState_Lv4::UpdateCameraRotation(
 	const float BaseYaw = StartPlayerTransform.GetRotation().Rotator().Yaw;
 
 	// 区間開始の回転
-	FRotator StartRotator = StartControlRotation;
+	FRotator StartRotator = GearSpecialAction->StartControlRotation;
 
 	// 前区間のカメラデータ取得
 	if (const FCameraSequenceData* PrevData = GetPreviousValidCameraData(DataIndex))
@@ -245,7 +257,8 @@ void UDashGearState_Lv4::UpdateTargetArmLength(
 	int32 DataIndex,
 	float InLerpAlpha)
 {
-	if (!Player)								{ return; }
+	if (!Player ||
+		!GearSpecialAction)						{ return; }
 
 	auto SpringArm = Player->GetSpringArmComponent();
 	if (!SpringArm)								{ return; }
@@ -257,7 +270,7 @@ void UDashGearState_Lv4::UpdateTargetArmLength(
 	if (Data.bPause)							{ return; }
 
 	// 区間開始のカメラとプレイヤーの距離
-	float StartArmLength = StartTargetArmLength;
+	float StartArmLength = GearSpecialAction->StartTargetArmLength;
 
 	// 前区間のカメラデータ取得
 	if (const FCameraSequenceData* PrevData = GetPreviousValidCameraData(DataIndex))
@@ -338,6 +351,8 @@ void UDashGearState_Lv4::InitializeGearDuration()
 
 void UDashGearState_Lv4::InitializeRestoreStartData()
 {
+	if (!GearSpecialAction) { return; }
+
 	// 最後の要素番号を取り出す
 	const int32 MaxIndex = CameraData.Num() - 1;
 
@@ -349,11 +364,11 @@ void UDashGearState_Lv4::InitializeRestoreStartData()
 	const float BaseYaw = StartPlayerTransform.GetRotation().Rotator().Yaw;
 
 	// 最後の要素データを取得
-	RestoreStartTargetArmLength = Data.TargetArmLength;
-	RestoreStartControlRotation = Data.TargetRotator;
+	GearSpecialAction->RestoreStartTargetArmLength = Data.TargetArmLength;
+	GearSpecialAction->RestoreStartControlRotation = Data.TargetRotator;
 
 	// オフセット考慮して計算
-	RestoreStartControlRotation.Yaw += BaseYaw;
+	GearSpecialAction->RestoreStartControlRotation.Yaw += BaseYaw;
 }
 
 int32 UDashGearState_Lv4::GetCurrentSectionIndex(float InElapsedTime)

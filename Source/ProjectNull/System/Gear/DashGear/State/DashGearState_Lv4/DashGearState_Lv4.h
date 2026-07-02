@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include <ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h>
+#include <ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.h>
 
 #include "DashGearState_Lv4.generated.h"
 
@@ -159,4 +160,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float SpecialAttackSphereRadius;
+
+	UPROPERTY(EditAnywhere,Instanced)
+	TObjectPtr<UGearSpecialAction> GearSpecialAction;
 };
