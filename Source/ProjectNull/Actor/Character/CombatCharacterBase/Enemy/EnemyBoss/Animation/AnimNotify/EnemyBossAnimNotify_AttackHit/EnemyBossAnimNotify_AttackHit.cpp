@@ -10,6 +10,9 @@
 #include "DrawDebugHelpers.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 // ------------------------------------------------------------------------------------
 // 当たり判定の開始処理
@@ -20,6 +23,10 @@ void UEnemyBossAnimNotify_AttackHit::NotifyBegin(USkeletalMeshComponent* MeshCom
 
 	// 振り始め：ヒット済みリストをクリア
 	HitActors.Empty();
+
+	// 地面エフェクト用
+	bGroundImpactEffect = false;
+	ElapsedTime = 0.0f;
 }
 
 // ------------------------------------------------------------------------------------
@@ -37,6 +44,18 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 
 	// ソケットの現在位置を取得 → ここに当たり判定を出す
 	const FVector HitCenter = MeshComp->GetSocketLocation(SocketName) + SphereOffset;
+
+	// Notifyからの経過時間を取得
+	ElapsedTime += FrameDeltaTime;
+
+	// 一度だけ地面エフェクトを出す
+	if (ElapsedTime >= GroundImpactDelay && !bGroundImpactEffect && bSpawnGroundImpactEffect)
+	{
+		if(TrySpawnGroundImpactEffect(MeshComp, HitCenter))
+		{
+			bGroundImpactEffect = true;
+		}
+	}
 
 	// スフィアで重なり判定
 	TArray<FOverlapResult> Overlaps;
@@ -104,4 +123,116 @@ void UEnemyBossAnimNotify_AttackHit::NotifyEnd(USkeletalMeshComponent* MeshComp,
 
 	// 振り終わり：リストをクリア
 	HitActors.Empty();
+}
+
+bool UEnemyBossAnimNotify_AttackHit::TrySpawnGroundImpactEffect(USkeletalMeshComponent* MeshComp, const FVector& TraceCenter)
+{
+	if (!IsValid(MeshComp)) 
+	{ return false; }
+
+	UWorld* World = MeshComp->GetWorld();
+	AActor* Owner = MeshComp->GetOwner();
+
+	if (!IsValid(World) || !IsValid(Owner)) { return false; }
+
+	const FVector Start = TraceCenter + FVector(0.0f, 0.0f, GroundTraceUpDistance);
+	const FVector End	= TraceCenter - FVector(0.0f, 0.0f, GroundTraceDownDistance);
+
+	FHitResult Hit;
+
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(BossGroundImpactEffect), true);
+	Params.AddIgnoredActor(Owner);
+
+	// これがないと Physical Material が取れない
+	Params.bReturnPhysicalMaterial = true;
+
+	const bool bHit = World->LineTraceSingleByChannel(
+		Hit,
+		Start,
+		End,
+		ECC_Visibility,
+		Params
+	);
+
+	if (bDrawGroundImpactDebug)
+	{
+		DrawDebugLine(
+			World,
+			Start,
+			End,
+			bHit ? FColor::Green : FColor::Red,
+			false,
+			2.0f,
+			0,
+			2.0f
+		);
+
+		if (bHit)
+		{
+			DrawDebugSphere(
+				World,
+				Hit.ImpactPoint,
+				20.0f,
+				12,
+				FColor::Blue,
+				false,
+				2.0f
+			);
+		}
+	}
+
+	if (!bHit)
+	{
+		return false;
+	}
+
+	EPhysicalSurface SurfaceType = SurfaceType_Default;
+
+	if (Hit.PhysMaterial.IsValid())
+	{
+		SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+	}
+
+	UNiagaraSystem* Effect = GetGroundImpactEffect(SurfaceType);
+
+	if (!Effect)
+	{
+		return false;
+	}
+
+	const FVector SpawnLocation = Hit.ImpactPoint + Hit.ImpactNormal * 2.0f;
+
+	// NiagaraのZ方向を地面の法線に合わせる
+	const FRotator SpawnRotation = FRotationMatrix::MakeFromZ(Hit.ImpactNormal).Rotator();
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		World,
+		Effect,
+		SpawnLocation,
+		SpawnRotation,
+		FVector(1.0f),
+		true,
+		true,
+		ENCPoolMethod::AutoRelease,
+		true
+	);
+
+	UE_LOG(LogTemp, Warning, TEXT("Ground Impact Surface: %d / PhysMat: %s / HitActor: %s"),
+		static_cast<int32>(SurfaceType),
+		*GetNameSafe(Hit.PhysMaterial.Get()),
+		*GetNameSafe(Hit.GetActor())
+	);
+
+
+	return true;
+}
+
+UNiagaraSystem* UEnemyBossAnimNotify_AttackHit::GetGroundImpactEffect(EPhysicalSurface SurfaceType) const
+{
+	if (const TObjectPtr<UNiagaraSystem>* FoundEffect = GroundImpactEffects.Find(SurfaceType))
+	{
+		return FoundEffect->Get();
+	}
+
+	return DefaultGroundImpactEffect.Get();
 }
