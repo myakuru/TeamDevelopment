@@ -11,6 +11,7 @@
 class UTextBlock;
 class UButton;
 class UBorder;
+class UImage;
 class UWeaponListItemWidget;
 
 struct FWeaponInstance;
@@ -55,6 +56,9 @@ private:
 	UFUNCTION()
 	void OnButtonHovered();
 
+	UFUNCTION()
+	void OnButtonUnHovered();
+
 	UPROPERTY(meta =(BindWidget))
 	TObjectPtr<UTextBlock> WeaponName;
 
@@ -66,6 +70,15 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UBorder> Overlay;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> Icon;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor HoveredOverlayColor;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor UnHoveredOverlayColor;
 
 	UPROPERTY(EditAnywhere)
 	FLinearColor SelectedBackGroundColor;
