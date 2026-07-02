@@ -60,8 +60,10 @@ TArray<FEnemyDistanceData> UTargetSearchComponent::FindEnemiesSortedByDistanceIn
 
 	for (const auto& Enemy : EnemyManager->GetEnemyList())
 	{
-		if (!Enemy) { continue; }
-
+		if (!IsValid(Enemy))
+		{
+			continue;
+		}
 		// 敵座標取得
 		const FVector EnemyLocation = Enemy->GetActorLocation();
 

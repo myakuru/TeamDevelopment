@@ -13,7 +13,8 @@ public:
 
 	FGearStatus():
 		Duration(0.f),
-		CoolTime(0.f)
+		CoolTime(0.f),
+		SimultaneousActivationCoolTime(0.f)
 	{
 	}
 
@@ -26,6 +27,10 @@ public:
 	/* ギアクールタイム */
 	UPROPERTY(EditAnywhere)
 	float CoolTime;
+
+	/** ギアの同時発動を許可するまでのクールタイム */
+	UPROPERTY(EditAnywhere)
+	float SimultaneousActivationCoolTime;
 };
 
 /** プレイヤーギアコンポーネントクラス */
@@ -71,6 +76,8 @@ public:
 	 */
 	virtual void Update(float DeltaTime);
 
+	void ForceStop();
+
 	/** Getter */
 	inline float GetElapsedTime()		const		{ return ElapsedTime; }
 	inline bool CanExecute()			const		{ return bCanExecute; }
@@ -78,6 +85,7 @@ public:
 	inline bool IsActive()				const		{ return bIsActive; }
 	inline bool IsMovementBlocked()		const		{ return bBlocksMovement; }
 	inline FTimerHandle GetCoolTimerHandle() const	{ return CoolTimerHandle; }
+	inline bool AllowOtherGearActivation()	const	{ return bAllowOtherGearActivation; }
 
 	float GetGearDuration(int32 Index) const;
 	float GetGearCoolTime(int32 Index) const;
@@ -129,6 +137,9 @@ private:
 	/** ギアスキル発動時間 */
 	float Duration;
 
+	/** ギアの同時発動を許可するまでのクールタイム */
+	float SimultaneousActivationCoolTime;
+
 	/** ギアスキルが実行されているかどうか */
 	bool bIsActive;
 
@@ -140,4 +151,7 @@ private:
 
 	/** ギアの装備インデックス */
 	int32 GearIndex;
+
+	/** このギアの動作中に、他のギアの発動を許可するか */
+	bool bAllowOtherGearActivation;
 };

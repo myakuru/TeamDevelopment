@@ -97,11 +97,26 @@ bool UPlayerGearComponent::IsMovementBlockedByGear() const
 
 void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 {
-	if (PlayerGears.IsValidIndex(GearIndex)) {
-		if (PlayerGears[GearIndex]) {
-			PlayerGears[GearIndex]->Execute(CurrentGearLevel);
+	if (!PlayerGears.IsValidIndex(GearIndex) || 
+		!PlayerGears[GearIndex]) { return; }
+
+	bool bShouldExecute = true;
+
+	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
+	{
+		auto& Gear = PlayerGears[Index];
+		if(!IsValid(Gear) ||
+			Index == GearIndex) { continue; }
+
+		if (!Gear->AllowOtherGearActivation())
+		{
+			bShouldExecute = false;
+			break;
 		}
 	}
+
+	if (!bShouldExecute) { return; }
+	PlayerGears[GearIndex]->Execute(CurrentGearLevel);
 }
 
 void UPlayerGearComponent::ChangeGear()
@@ -161,7 +176,8 @@ void UPlayerGearComponent::InitializeSphereCollision()
 	// 攻撃用球アクターに親をアタッチ
 	SphereCollision->AttachToActor(
 		OwnerPlayer,
-		FAttachmentTransformRules::KeepRelativeTransform
+		FAttachmentTransformRules::KeepRelativeTransform,
+		TEXT("GearSphere")
 	);
 
 	auto SphereComponent = SphereCollision->GetSphereComponent();

@@ -116,7 +116,7 @@ bool UWeaponManager::GetWeaponMaster(FName a_WeaponId, FWeaponData& a_OutData) c
     if (!m_WeaponDataTable)return false;
     FWeaponData* FoundData = m_WeaponDataTable->FindRow<FWeaponData>(a_WeaponId, TEXT(""));
 
-    if (!FoundData)return false;
+	if (!FoundData) return false;
     a_OutData = *FoundData;
     return true;
 }

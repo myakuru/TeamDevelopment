@@ -8,14 +8,14 @@
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 #include <ProjectNull/Weapon/Data/WeaponData.h>
 
-void UGetGearHUDWidget::SetGearData(const FText& inGearName)
+void UGetGearHUDWidget::SetGearData(const FName& inGearName)
 {
 	UWeaponManager* weaponMan =
 		GetWorld()->GetGameInstance<USuperGameInstance>()
 		->GetWeaponManager();
 
 	FWeaponData weaponData;
-	if (!weaponMan->GetWeaponMaster(FName(*inGearName.ToString()), weaponData))return;
+	if (!weaponMan->GetWeaponMaster(inGearName, weaponData))return;
 
 	if (GearName) {
 		GearName->SetText(weaponData.DisplayName);

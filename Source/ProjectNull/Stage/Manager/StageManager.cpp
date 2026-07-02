@@ -8,6 +8,11 @@
 
 #include <ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
 
+#include <ProjectNull/System/Result/ResultManager/ResultManager.h>
+#include <ProjectNull/Data/Result/ClearRankData/ClearRankData.h>
+#include <ProjectNull/Data/Result/RankConditionData/RankConditionData.h>
+
+
 void UStageManager::Initialize() {
 
 	NowStageIndex = StageDefinition::OutGameStageIndex;
@@ -34,20 +39,21 @@ void UStageManager::LoadFromSaveData(UMySaveGame* inSaveGame)
 	if (StageProgressList->Num() < StageCount)
 	{
 		StageProgressList->SetNum(StageCount);
-	}
 
-	// 最初のステージは解放しておく
-	if (StageCount > 0) {
+		// 最初のステージは解放しておく
+		if (StageCount > 0) {
 
-		//ステージのクリア状況を初期化(デバッグ用)
-		//for(int i = 0; i < StageCount; i++)
-		//{
-		//	CurrentSaveData->StageProgressList[i].MissionClears.SetNum(3);
+			//ステージのクリア状況を初期化(デバッグ用)
+			for (int i = 0; i < StageCount; i++)
+			{
+				(*StageProgressList)[i].MissionClears.SetNum(3);
 
-		//	CurrentSaveData->StageProgressList[i].bUnlocked = false;
-		//}
+				(*StageProgressList)[i].bUnlocked = false;
+			}
 
-		(*StageProgressList)[0].bUnlocked = true;
+			(*StageProgressList)[0].bUnlocked = true;
+		}
+
 	}
 }
 
@@ -62,6 +68,9 @@ void UStageManager::InGameInitialize(int32 inNowStageIndex)
 
 	//取得ギアのリセット
 	AcquiredWeapons.Reset();
+
+	// クリア状況を初期化
+	ResultData = FResultData();
 
 	//マウスを隠す
 	APlayerController* PC =
@@ -86,10 +95,34 @@ void UStageManager::InGameFinalize()
 	//セーブ
 	GetWorld()->GetGameInstance<USuperGameInstance>()->SaveGameData();
 
-	//取得ギアのリセット
-	AcquiredWeapons.Reset();
+	//クリア情報反映処理
+	USuperGameInstance* gameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (gameInstance) {
 
-	UGameplayStatics::OpenLevel(this, "StageSelectLevel");
+		UResultManager* resultManager = gameInstance->GetResultManager();
+		if (resultManager && !resultManager->GetSortedClearRankDatas().IsEmpty()) {
+
+			// デバッグ用にクリア条件を満たす
+			SetResultFlag(EResultFlag::ReachedFinalBoss);
+			SetResultFlag(EResultFlag::ReachedMidBoss);
+
+			// ResultDataに取得した武器のリストをセットしてResultManagerに渡す
+			ResultData.RewardWeaponIDs = AcquiredWeapons;
+			resultManager->SetResultData(ResultData);
+
+			// クリア条件をチェックしてデータに反映
+			TArray<FClearRankData> clearRankDatas = resultManager->GetSortedClearRankDatas();
+			//sortedClearRankDatasはただのクリアも含めているため1つ飛ばす
+			for (int i = 1; i < clearRankDatas.Num(); i++) { 
+				(*StageProgressList)[NowStageIndex].MissionClears[i - 1] =
+					(*StageProgressList)[NowStageIndex].MissionClears[i - 1] ||
+					clearRankDatas[i].ConditionData->IsConditionMet(ResultData);
+			}
+
+		}
+	}
+	AcquiredWeapons.Reset();
+	UGameplayStatics::OpenLevel(this, "ResultLevel");
 }
 
 void UStageManager::OutGameInitialize()
