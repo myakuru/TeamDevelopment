@@ -9,8 +9,7 @@
 UGearStateBase::UGearStateBase():
 	Player(nullptr),
 	GearComponent(nullptr),
-	Owner(nullptr),
-	CameraRestoreDuration(0.f)
+	Owner(nullptr)
 {
 	
 }

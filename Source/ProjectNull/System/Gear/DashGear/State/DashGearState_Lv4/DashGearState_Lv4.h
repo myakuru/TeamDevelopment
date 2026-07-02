@@ -128,11 +128,11 @@ private:
 
 	/** ロボットコントローラークラス */
 	UPROPERTY()
-	TObjectPtr<ARobotController> RobotController;
+	TObjectPtr<ARobotController>			RobotController;
 
 	/** 残像攻撃エフェクトクラス */
 	UPROPERTY(EditAnywhere,Instanced,Category = "Ghost")
-	TObjectPtr<UAfterImageAttackEffect>  AfterImageAttackEffect;
+	TObjectPtr<UAfterImageAttackEffect>		AfterImageAttackEffect;
 
 	/** 構えアニメーションの時間閾値 */
 	UPROPERTY(EditAnywhere)

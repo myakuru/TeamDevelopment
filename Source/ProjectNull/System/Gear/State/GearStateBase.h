@@ -59,8 +59,9 @@ public:
 	virtual void End() { return; }
 
 	/** Getter */
-	inline virtual const int32 GetGearLevelIndex() const	{ return kLv1Index; }
-	inline float GetCameraRestoreDuration()		const { return CameraRestoreDuration; }
+	inline virtual const int32 GetGearLevelIndex()	const	{ return kLv1Index; }
+	inline APlayerBase* GetPlayer()					const	{ return Player; }
+	inline UGearBase*	GetGear()					const	{ return Owner; }
 
 	/** ギアレベルの配列インデックス */
 	static const int32 kLv1Index = 0;
@@ -84,9 +85,4 @@ protected:
 
 private:
 
-	/** カメラを元に戻すまでの時間 */
-	UPROPERTY(EditAnywhere)
-	float CameraRestoreDuration;
-
-	
 };

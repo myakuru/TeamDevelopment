@@ -42,8 +42,6 @@ void UDashGearState_Lv4::Initialize(
 		InGearComponent,
 		InOwner);
 
-	//GearSpecialAction = NewObject<UGearSpecialAction>(InOwner);
-
 	// ギア発動時間初期化
 	InitializeGearDuration();
 
@@ -68,8 +66,8 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	// ================================================================
 	// ダッシュギアのレベル4状態クラスの初期化
 	// ================================================================
-	StartPlayerTransform = Player->GetTransform();
-	bExecuteFinalDash = false;
+	StartPlayerTransform	= Player->GetTransform();
+	bExecuteFinalDash		= false;
 
 	// ギアスキル発動前のカメラステータスを保存
 	GearSpecialAction->SaveCameraStatus(Player);
@@ -158,7 +156,7 @@ void UDashGearState_Lv4::UpdateAttackSphereCollision(float ElapsedTime)
 	if(	!StanceTime.IsWithinRange(ElapsedTime) &&
 		!DashTime.IsWithinRange(ElapsedTime)) { return; }
 
-	SetSphereCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	SetSphereCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
 	if (!GroundAlignmentComp) { return; }
@@ -181,7 +179,7 @@ void UDashGearState_Lv4::UpdateCameraData(
 		Player,
 		Owner,
 		GetGearLevelIndex(),
-		GetCameraRestoreDuration(), DeltaTime);
+		DeltaTime);
 
 	// 復元補間中は処理を行わない
 	if (GearSpecialAction->GetCameraRestoreElapsedTime() >= 0.0f) { return; }
@@ -334,19 +332,11 @@ const FCameraSequenceData* UDashGearState_Lv4::GetPreviousValidCameraData(int32 
 
 void UDashGearState_Lv4::InitializeGearDuration()
 {
-	if (!Owner) { return; }
+	if (!Owner ||
+		!GearSpecialAction) { return; }
 
-	float TotalDuration = 0.f;
-
-	// 区間時間の合計時間をギア発動時間とする
-	for (auto& Data : CameraData) {
-		TotalDuration += Data.Time;
-	}
-
-	TotalDuration += GetCameraRestoreDuration();
-	//UE_LOG(LogTemp, Display, TEXT("TotalDuration %.2f"), TotalDuration);
 	// ギア発動時間を更新
-	Owner->SetGearDuration(TotalDuration, kLv4Index);
+	Owner->SetGearDuration(GearSpecialAction->GetTotalDuration(), kLv4Index);
 }
 
 void UDashGearState_Lv4::InitializeRestoreStartData()

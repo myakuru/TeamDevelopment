@@ -4,12 +4,14 @@
 #include "CoreMinimal.h"
 
 #include "UObject/Object.h"
-//#include "UObject/Interface.h"
+#include <ProjectNull/Utility/Common/GameTypes/GameTypes.h>
 
 #include "GearSpecialActionState.generated.h"
 
 class APlayerBase;
 class UGearBase;
+class UGearStateBase;
+class ARobotController;
 
 /**
  * 
@@ -23,8 +25,20 @@ public:
 	UGearSpecialAction();
 public:
 
+	void Initialize(
+		class UGearStateBase* InOwner);
+
+	void Update(
+		float DeltaTime,
+		float InElapsedTime);
+
+	void Execute();
+
 	/** Getter */
 	inline float GetCameraRestoreElapsedTime()	const { return CameraRestoreElapsedTime; }
+	inline float GetCameraRestoreDuration()		const { return CameraRestoreDuration; }
+
+	float GetTotalDuration() const;
 
 	/**
 	 * @brief カメラステータスを保存
@@ -36,12 +50,7 @@ public:
 	 * @brief カメラ復帰補間を更新
 	 * @param DeltaTime デルタタイム
 	 */
-	void UpdateCameraRestoreInterpolation(
-		APlayerBase* Player,
-		UGearBase* Owner,
-		int32 LevelIndex,
-		float CameraRestoreDuration,
-		float DeltaTime);
+	void UpdateCameraRestoreInterpolation(float DeltaTime);
 
 	/** ギアスキル開始時カメラ回転 */
 	FRotator StartControlRotation;
@@ -56,6 +65,19 @@ public:
 	float RestoreStartTargetArmLength;
 
 private:
+
+	void UpdateCameraRotation(
+		int32 DataIndex,
+		float InLerpAlpha);
+
+	/**
+	 * @brief プレイヤーとカメラとの距離更新
+	 * @param DataIndex 更新したいデータインデックス
+	 * @param InLerpAlpha 補間値
+	 */
+	void UpdateTargetArmLength(
+		int32 DataIndex,
+		float InLerpAlpha);
 
 	/**
 	 * @brief StartControlRotationへ補間する
@@ -77,6 +99,49 @@ private:
 		float InCurrentTargetArmLength,
 		float InLerpAlpha);
 
+	/**
+	 * @brief 前区間の有効なカメラデータ取得
+	 * @param DataIndex データインデックス
+	 * @return カメラデータ
+	 */
+	const FCameraSequenceData* GetPreviousValidCameraData(int32 DataIndex) const;
+
+	/**
+	 * @brief 経過時間に基づいて、どの区間かどうか調べ、インデックスを返す
+	 * @param InElapsedTime 経過時間
+	 * @return 区間インデックス
+	 */
+	int32 GetCurrentSectionIndex(float InElapsedTime);
+
+	/**
+	 * @brief 区間内での開始時間
+	 * @param InTargetIndex 計算する地点インデックス
+	 * @return 経過時間
+	 */
+	float GetElapsedTimeToIndex(int32 InTargetIndex);
+
+
+	UPROPERTY()
+	TObjectPtr<APlayerBase> Player;
+
+	UPROPERTY()
+	TObjectPtr<UGearBase> Gear;
+
+	UPROPERTY()
+	TObjectPtr<UGearStateBase> Owner;
+
+	/** ロボットコントローラークラス */
+	UPROPERTY()
+	TObjectPtr<ARobotController>			RobotController;
+
 	/** カメラ復帰処理の経過時間 */
 	float CameraRestoreElapsedTime;
+
+	/** カメラを元に戻すまでの時間 */
+	UPROPERTY(EditAnywhere)
+	float CameraRestoreDuration;
+
+	/** カメラデータをまとめる配列 */
+	UPROPERTY(EditAnywhere)
+	TArray<FCameraSequenceData> CameraSequenceData;
 };
