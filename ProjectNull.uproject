@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"StateTreeModule",
 				"Engine",
-				"UMG"
+				"UMG",
+				"CoreUObject"
 			]
 		}
 	],
