@@ -35,11 +35,13 @@ void UGearSpecialAction::Initialize(UGearStateBase* InOwner)
 	RobotController = Cast<ARobotController>(Player->GetController());
 
 }
-void UGearSpecialAction::Execute()
+
+void UGearSpecialAction::Execute(const FTransform& StartTransform)
 {
-
+	StartPlayerTransform = StartTransform;
+	SaveCameraStatus();
+	InitializeRestoreStartData();
 }
-
 
 void UGearSpecialAction::Update(
 	float DeltaTime,
@@ -90,7 +92,7 @@ float UGearSpecialAction::GetTotalDuration() const
 	return TotalDuration;
 }
 
-void UGearSpecialAction::SaveCameraStatus(APlayerBase* Player)
+void UGearSpecialAction::SaveCameraStatus()
 {
 	if (!Player)		{ return; }
 
@@ -103,6 +105,28 @@ void UGearSpecialAction::SaveCameraStatus(APlayerBase* Player)
 	StartTargetArmLength = SpringArmComp->TargetArmLength;
 	StartControlRotation = Controller->GetControlRotation();
 }
+
+
+void UGearSpecialAction::InitializeRestoreStartData()
+{
+	// 最後の要素番号を取り出す
+	const int32 MaxIndex = CameraSequenceData.Num() - 1;
+
+	if (!CameraSequenceData.IsValidIndex(MaxIndex)) { return; }
+
+	const auto& Data = CameraSequenceData[MaxIndex];
+
+	// ギアスキル発動開始時のプレイヤーYaw回転
+	const float BaseYaw = StartPlayerTransform.GetRotation().Rotator().Yaw;
+
+	// 最後の要素データを取得
+	RestoreStartTargetArmLength = Data.TargetArmLength;
+	RestoreStartControlRotation = Data.TargetRotator;
+
+	// オフセット考慮して計算
+	RestoreStartControlRotation.Yaw += BaseYaw;
+}
+
 
 void UGearSpecialAction::UpdateCameraRestoreInterpolation(
 	float DeltaTime)
@@ -123,8 +147,8 @@ void UGearSpecialAction::UpdateCameraRestoreInterpolation(
 	LerpAlpha = FMath::Clamp(LerpAlpha, 0.f, 1.f);
 
 	// 回転とプレイヤーとカメラ距離を補間する
-	InterpToStartControlRotation(Player,RestoreStartControlRotation.Quaternion(), LerpAlpha);
-	InterpToStartTargetArmLength(Player,RestoreStartTargetArmLength, LerpAlpha);
+	InterpToStartControlRotation(RestoreStartControlRotation.Quaternion(), LerpAlpha);
+	InterpToStartTargetArmLength(RestoreStartTargetArmLength, LerpAlpha);
 }
 
 void UGearSpecialAction::UpdateCameraRotation(
@@ -206,7 +230,6 @@ void UGearSpecialAction::UpdateTargetArmLength(
 }
 
 void UGearSpecialAction::InterpToStartControlRotation(
-	APlayerBase* Player,
 	const FQuat& InCurrentQuaternion,
 	float InLerpAlpha)
 {
@@ -225,7 +248,6 @@ void UGearSpecialAction::InterpToStartControlRotation(
 }
 
 void UGearSpecialAction::InterpToStartTargetArmLength(
-	APlayerBase* Player,
 	float InCurrentTargetArmLength,
 	float InLerpAlpha)
 {

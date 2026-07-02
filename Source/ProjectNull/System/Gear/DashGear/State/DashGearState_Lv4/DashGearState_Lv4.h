@@ -3,9 +3,10 @@
 #include "CoreMinimal.h"
 
 #include <ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h>
-#include <ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.h>
 
 #include "DashGearState_Lv4.generated.h"
+
+class UGearSpecialAction;
 
 /** ロボットコントローラークラス */
 class ARobotController;
@@ -44,11 +45,6 @@ private:
 	void InitializeGearDuration();
 
 	/**
-	 * @brief 復元する際の開始データ初期化
-	 */
-	void InitializeRestoreStartData();
-
-	/**
 	 * @brief 戦闘構え状態を更新
 	 * @param ElapsedTime 経過時間
 	 */
@@ -61,32 +57,6 @@ private:
 	void UpdateAttackSphereCollision(float ElapsedTime);
 
 	/**
-	 * @brief カメラデータ更新処理
-	 * @param DeltaTime デルタタイム
-	 * @param ElapsedTime 経過時間
-	 */
-	void UpdateCameraData(float DeltaTime, float InElapsedTime);
-
-	/**
-	 * @brief カメラの回転更新処理
-	 * @param DataIndex 更新したいデータインデックス
-	 * @param InLerpAlpha 補間値
-	 */
-	void UpdateCameraRotation(
-		int32 DataIndex,
-		float InLerpAlpha);
-
-	/**
-	 * @brief プレイヤーとカメラとの距離更新
-	 * @param DataIndex 更新したいデータインデックス
-	 * @param InLerpAlpha 補間値
-	 */
-	void UpdateTargetArmLength(
-		int32 DataIndex,
-		float InLerpAlpha);
-
-	
-	/**
 	 * @brief 最終ダッシュの更新処理
 	 * @param DeltaTime デルタタイム
 	 * @param ElapsedTime 経過時間
@@ -95,27 +65,6 @@ private:
 		float DeltaTime,
 		float ElapsedTime);
 
-	/**
-	 * @brief 前区間の有効なカメラデータ取得
-	 * @param DataIndex データインデックス
-	 * @return カメラデータ
-	 */
-	const FCameraSequenceData* GetPreviousValidCameraData(int32 DataIndex) const;
-
-	/**
-	 * @brief 経過時間に基づいて、どの区間かどうか調べ、インデックスを返す
-	 * @param InElapsedTime 経過時間
-	 * @return 区間インデックス
-	 */
-	int32 GetCurrentSectionIndex(float InElapsedTime);
-
-	/**
-	 * @brief 区間内での開始時間
-	 * @param InTargetIndex 計算する地点インデックス
-	 * @return 経過時間
-	 */
-	float GetElapsedTimeToIndex(int32 InTargetIndex);
-	
 	/**
 	 * @brief 構え状態のアニメーション再生
 	 */
@@ -141,13 +90,6 @@ private:
 	/** ダッシュの時間閾値 */
 	UPROPERTY(EditAnywhere)
 	FThresholdRange DashTime;
-
-	/** カメラデータをまとめる配列 */
-	UPROPERTY(EditAnywhere, Category = "Camera")
-	TArray<FCameraSequenceData> CameraData;
-
-	/** ギアスキル開始時プレイヤーのTransform */
-	FTransform StartPlayerTransform;
 
 	/** 構え状態のアニメーションモンタージュ */
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")

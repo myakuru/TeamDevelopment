@@ -214,6 +214,14 @@ bool APlayerBase::GetCurrentFloorNormal(FVector& OutCurrentFloorNormal)
 	return true;
 }
 
+USceneComponent* APlayerBase::GetGroundAlignmentRootComponent() const
+{
+	if (!GroundAlignmentComponent) { return nullptr; }
+	const auto RootComp = GroundAlignmentComponent->GetRootComponent();
+	
+	return RootComp;
+}
+
 UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 {
 	const auto PlayerMesh = GetMesh();

@@ -32,19 +32,13 @@ public:
 		float DeltaTime,
 		float InElapsedTime);
 
-	void Execute();
+	void Execute(const FTransform& StartTransform);
 
 	/** Getter */
-	inline float GetCameraRestoreElapsedTime()	const { return CameraRestoreElapsedTime; }
-	inline float GetCameraRestoreDuration()		const { return CameraRestoreDuration; }
-
-	float GetTotalDuration() const;
-
-	/**
-	 * @brief カメラステータスを保存
-	 * ※ギアスキル発動前に呼び、保存する
-	 */
-	void SaveCameraStatus(APlayerBase* Player);
+	inline float	GetCameraRestoreElapsedTime()	const { return CameraRestoreElapsedTime; }
+	inline float	GetCameraRestoreDuration()		const { return CameraRestoreDuration; }
+	float			GetTotalDuration()				const;
+private:
 
 	/**
 	 * @brief カメラ復帰補間を更新
@@ -64,8 +58,24 @@ public:
 	/** カメラ復帰開始時カメラ距離 */
 	float RestoreStartTargetArmLength;
 
-private:
 
+
+	/**
+	 * @brief カメラステータスを保存
+	 * ※ギアスキル発動前に呼び、保存する
+	 */
+	void SaveCameraStatus();
+
+	/**
+	 * @brief 復元する際の開始データ初期化
+	 */
+	void InitializeRestoreStartData();
+
+	/**
+	 * @brief カメラの回転更新処理
+	 * @param DataIndex 更新したいデータインデックス
+	 * @param InLerpAlpha 補間値
+	 */
 	void UpdateCameraRotation(
 		int32 DataIndex,
 		float InLerpAlpha);
@@ -85,7 +95,6 @@ private:
 	 * @param InLerpAlpha 補間値
 	 */
 	void InterpToStartControlRotation(
-		APlayerBase* Player,
 		const FQuat& InCurrentQuaternion,
 		float InLerpAlpha);
 
@@ -95,7 +104,6 @@ private:
 	 * @param InLerpAlpha 補間値
 	 */
 	void InterpToStartTargetArmLength(
-		APlayerBase* Player,
 		float InCurrentTargetArmLength,
 		float InLerpAlpha);
 
@@ -144,4 +152,7 @@ private:
 	/** カメラデータをまとめる配列 */
 	UPROPERTY(EditAnywhere)
 	TArray<FCameraSequenceData> CameraSequenceData;
+
+	/** ギアスキル開始時プレイヤーのTransform */
+	FTransform StartPlayerTransform;
 };

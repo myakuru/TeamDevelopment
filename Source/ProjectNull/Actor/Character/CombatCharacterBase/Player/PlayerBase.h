@@ -91,6 +91,8 @@ public:
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
 	bool									GetCurrentFloorNormal(FVector& OutCurrentFloorNormal);
+	USceneComponent*						GetGroundAlignmentRootComponent()	const;
+
 
 	/** Setter */
 	inline void SetTargetCameraLagSpeed(float InTargetCameraLagSpeed) { TargetCameraLagSpeed = InTargetCameraLagSpeed; }

@@ -14,6 +14,8 @@ class UEffectBase;
 
 class ALaserbeam;
 
+class UGearSpecialAction;
+
 /**
  * 
  */
@@ -33,6 +35,8 @@ public:
 	void Update(float DeltaTime)			override;
 	void End()								override;
 
+	inline const int32 GetGearLevelIndex() const	override { return kLv4Index; }
+
 private:
 
 	/** Spell状態のアニメーションモンタージュ */
@@ -48,5 +52,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float SpellAnimBlendOutTime;
 
-
+	UPROPERTY(EditAnywhere, Instanced)
+	TObjectPtr<UGearSpecialAction> GearSpecialAction;
 };
