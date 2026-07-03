@@ -1,5 +1,6 @@
 ﻿#include "StageSelectHUDWidget.h"
 #include "Components/CanvasPanel.h"
+#include "Components/BackgroundBlur.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"

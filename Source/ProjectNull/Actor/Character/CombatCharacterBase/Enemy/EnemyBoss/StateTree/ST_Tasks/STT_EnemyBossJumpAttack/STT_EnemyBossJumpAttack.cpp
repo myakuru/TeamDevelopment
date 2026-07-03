@@ -111,6 +111,7 @@ EStateTreeRunStatus USTT_EnemyBossJumpAttack::Tick(FStateTreeExecutionContext& C
 			{
 				Boss->SetActionPriority(EBossActionType::None);
 				AIC->StopMovement();
+				Boss->SetPrevAction(Boss->GetCurrentAction());
 				return EStateTreeRunStatus::Succeeded;
 			}
 		}

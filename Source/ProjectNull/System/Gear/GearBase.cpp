@@ -17,9 +17,11 @@ UGearBase::UGearBase():
 	bCanExecute(true),
 	ElapsedTime(0.f),
 	Duration(0.f),
+	SimultaneousActivationCoolTime(0.f),
 	bIsActive(false),
 	bBlocksMovement(false),
-	CoolTimerHandle(FTimerHandle())
+	CoolTimerHandle(FTimerHandle()),
+	bAllowOtherGearActivation(true)
 {
 
 }
@@ -47,7 +49,7 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 	bIsActive			= true;
 	bCanExecute			= false;
 	ExecutedGearLevel	= CurrentGearLevel;
-
+	bAllowOtherGearActivation = false;
 	// 発動したいギアの状態クラス配列のインデックス取得
 	const int32	StateIndex = ExecutedGearLevel - 1;
 
@@ -60,6 +62,7 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 
 	// 発動時間の更新
 	Duration = GearStatuses[StateIndex].Duration;
+	SimultaneousActivationCoolTime = GearStatuses[StateIndex].SimultaneousActivationCoolTime;
 
 	// ギアのクールタイムをセットし、クールタイム終了時にリセット処理を呼ぶ
 	GetWorld()->GetTimerManager().SetTimer(
@@ -84,6 +87,8 @@ void UGearBase::Update(float DeltaTime)
 	// 状態クラスの更新
 	CurrentGearState->Update(DeltaTime);
 	
+	bAllowOtherGearActivation = ElapsedTime >= SimultaneousActivationCoolTime;
+
 	// 発動時間が終了したら
 	// 状態クラスの終了処理を呼び出し、更新を行わない
 	if (ElapsedTime >= Duration)
@@ -92,6 +97,14 @@ void UGearBase::Update(float DeltaTime)
 		bIsActive	= false;
 		ElapsedTime = 0.0f;
 	}
+}
+
+void UGearBase::ForceStop()
+{
+	if (!CurrentGearState) { return; }
+	CurrentGearState->End();
+	bIsActive	= false;
+	ElapsedTime = 0.0f;
 }
 
 float UGearBase::GetGearDuration(int32 Index) const
@@ -124,7 +137,7 @@ void UGearBase::Reset()
 	if (!ParameterData)		{ return; }
 
 	ParameterData->ResetSkillCooldown(GearIndex);
-	UE_LOG(LogTemp, Display, TEXT("GearIndex %d"), GearIndex);
+	//UE_LOG(LogTemp, Display, TEXT("GearIndex %d"), GearIndex);
 
 }
 

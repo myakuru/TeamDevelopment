@@ -6,6 +6,7 @@
 
 class UStageDataAsset;
 class UCanvasPanel;
+class UBackgroundBlur;
 class UTextBlock;
 class UImage;
 class UTexture2D;
@@ -83,6 +84,10 @@ protected:
 	/** ステージリストを表示するCanvasPanel */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> StageCanvas;
+
+	//** Background Blur ウィジェットの参照 */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UBackgroundBlur> BackBlur;
 
 	/** ステージ詳細UI */
 	UPROPERTY(meta = (BindWidget))

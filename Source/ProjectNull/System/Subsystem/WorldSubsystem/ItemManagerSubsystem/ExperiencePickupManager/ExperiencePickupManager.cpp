@@ -34,8 +34,21 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 
 
 	// 描画専用Actorをスポーン
-	AActor* Owner = World->SpawnActor<AActor>();
+	//AActor* Owner = World->SpawnActor<AActor>();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Name = FName(TEXT("ExperienceNiagaraActor"));
+	SpawnParams.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
+
+	AActor* Owner = World->SpawnActor<AActor>(AActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	
 	if (!Owner) { return; }
+
+	//名前とラベルを変更
+	Owner->SetIsTemporarilyHiddenInEditor(true);
+#if WITH_EDITOR
+	Owner->SetActorLabel(TEXT("ExperienceNiagaraActor"));
+#endif
 
 	NiagaraOwnerActor = Owner;
 
@@ -129,6 +142,9 @@ void FExperiencePickupManager::SpawnExperience(
 
 void FExperiencePickupManager::Clear()
 {
+	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
+	UE_LOG(LogTemp, Log, TEXT("-  FExperiencePickupManager:Clear  -"));
+
 	ExperienceList.Empty();
 	PendingExpValue = 0.0f;
 
@@ -140,7 +156,14 @@ void FExperiencePickupManager::Clear()
 	{
 		NiagaraOwnerActor->Destroy();
 		NiagaraOwnerActor = nullptr;
+
+		UE_LOG(LogTemp, Log, TEXT("- NiagaraOwnerActor:Destroy -"));
 	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("- NiagaraOwnerActor:None -"));
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
 }
 
 float FExperiencePickupManager::ConsumeCollectedExp()
