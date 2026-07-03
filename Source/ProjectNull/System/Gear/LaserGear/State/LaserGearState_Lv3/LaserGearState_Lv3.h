@@ -27,6 +27,9 @@ public:
 	void Update(float DeltaTime)			override;
 	void End()								override;
 
+	inline const int32 GetGearLevelIndex() const	override { return kLv3Index; }
+
+
 private:
 
 	UPROPERTY(EditAnywhere, Instanced)
