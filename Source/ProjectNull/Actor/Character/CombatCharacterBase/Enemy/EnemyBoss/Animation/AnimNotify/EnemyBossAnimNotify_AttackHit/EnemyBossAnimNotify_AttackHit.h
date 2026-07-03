@@ -80,6 +80,22 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	bool bDrawGroundImpactDebug = false;
 
+	// Socketの向きを利用してエフェクトを出す
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	bool bUseSocketDirectionForEffect = true;
+
+	// Niagaraへ渡す初速度
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	float VelocityPower = 800.0f;
+
+	// 少し上方向に飛ばしたくなった場合に使用
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	float UpVelocityPower = 150.0f;
+
+	// Niagara側のUserParameter名
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	FName VelocityParameterName = TEXT("User.ImpactEffectVelocity");
+
 private:
 
 	/** この攻撃で当たったアクター（二重ヒット防止）*/
@@ -88,7 +104,7 @@ private:
 	bool bGroundImpactEffect = false;
 	float ElapsedTime = 0.0f;
 
-	bool TrySpawnGroundImpactEffect(USkeletalMeshComponent* MeshComp, const FVector& TraceCenter);
+	bool TrySpawnGroundImpactEffect(USkeletalMeshComponent* MeshComp, const FVector& TraceCenter, const FTransform& SourceTransform);
 	UNiagaraSystem* GetGroundImpactEffect(EPhysicalSurface SurfaceType) const;
 
 };

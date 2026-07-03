@@ -12,6 +12,7 @@
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 
 // ------------------------------------------------------------------------------------
@@ -43,7 +44,9 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 	if (!IsValid(Owner) || !IsValid(World)) { return; }
 
 	// ソケットの現在位置を取得 → ここに当たり判定を出す
-	const FVector HitCenter = MeshComp->GetSocketLocation(SocketName) + SphereOffset;
+	const FTransform SocketTransform = MeshComp->GetSocketTransform(SocketName);
+	// SphereOffsetをSocketの基準のローカルオフセットとして利用する
+	const FVector HitCenter = SocketTransform.TransformPosition(SphereOffset);
 
 	// Notifyからの経過時間を取得
 	ElapsedTime += FrameDeltaTime;
@@ -51,7 +54,7 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 	// 一度だけ地面エフェクトを出す
 	if (ElapsedTime >= GroundImpactDelay && !bGroundImpactEffect && bSpawnGroundImpactEffect)
 	{
-		if(TrySpawnGroundImpactEffect(MeshComp, HitCenter))
+		if(TrySpawnGroundImpactEffect(MeshComp, HitCenter, SocketTransform))
 		{
 			bGroundImpactEffect = true;
 		}
@@ -125,7 +128,10 @@ void UEnemyBossAnimNotify_AttackHit::NotifyEnd(USkeletalMeshComponent* MeshComp,
 	HitActors.Empty();
 }
 
-bool UEnemyBossAnimNotify_AttackHit::TrySpawnGroundImpactEffect(USkeletalMeshComponent* MeshComp, const FVector& TraceCenter)
+bool UEnemyBossAnimNotify_AttackHit::TrySpawnGroundImpactEffect(
+	USkeletalMeshComponent* MeshComp, 
+	const FVector&			TraceCenter,
+	const FTransform&		SourceTransform)
 {
 	if (!IsValid(MeshComp)) 
 	{ return false; }
@@ -202,27 +208,50 @@ bool UEnemyBossAnimNotify_AttackHit::TrySpawnGroundImpactEffect(USkeletalMeshCom
 
 	const FVector SpawnLocation = Hit.ImpactPoint + Hit.ImpactNormal * 2.0f;
 
-	// NiagaraのZ方向を地面の法線に合わせる
-	const FRotator SpawnRotation = FRotationMatrix::MakeFromZ(Hit.ImpactNormal).Rotator();
+	// エフェクトの向きとVelocityを作る
+	const FVector SocketForward = SourceTransform.GetUnitAxis(EAxis::X);	// Xが前、Yが右、Zが上
+	const FVector SocketRight	= SourceTransform.GetUnitAxis(EAxis::Y);
+	const FVector SocketUp		= SourceTransform.GetUnitAxis(EAxis::Z);
 
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+	// NiagaraのZ方向を地面の法線に合わせる
+	FVector EffectForward = FVector::VectorPlaneProject(SocketForward, Hit.ImpactNormal).GetSafeNormal();
+	if (EffectForward.IsNearlyZero())
+	{
+		EffectForward = FVector::VectorPlaneProject(MeshComp->GetOwner()->GetActorForwardVector(), Hit.ImpactNormal).GetSafeNormal();
+	}
+
+	// X方向 = 攻撃Socketの前方向　Z方向 = 地面の法線方向
+	const FRotator SpawnRotation = FRotationMatrix::MakeFromXZ(EffectForward, Hit.ImpactNormal).Rotator();
+
+	// 攻撃方向に飛ぶ速度 + 地面から少し跳ねる速度
+	const FVector ImpactVelocity = EffectForward * VelocityPower + Hit.ImpactNormal * UpVelocityPower;
+
+	UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 		World,
 		Effect,
 		SpawnLocation,
 		SpawnRotation,
 		FVector(1.0f),
-		true,
-		true,
+		false,
+		false,
 		ENCPoolMethod::AutoRelease,
 		true
 	);
+
+	// Niagaraを作って、falseでいきなり動かさず、NiagaraVelocityをセットした後にActivateをtrueにする
+	if (NiagaraComp)
+	{
+		NiagaraComp->SetNiagaraVariableVec3(
+			VelocityParameterName.ToString(), ImpactVelocity);
+
+		NiagaraComp->Activate(true);
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Ground Impact Surface: %d / PhysMat: %s / HitActor: %s"),
 		static_cast<int32>(SurfaceType),
 		*GetNameSafe(Hit.PhysMaterial.Get()),
 		*GetNameSafe(Hit.GetActor())
 	);
-
 
 	return true;
 }

@@ -69,7 +69,9 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Conte
 
 		if (CurrentRadius <= KINDA_SMALL_NUMBER)
 		{
-			return EStateTreeRunStatus::Running;
+			// 画面上にデバッグ表示（見やすい）
+			UKismetSystemLibrary::PrintString(this, "CurrentRadisu <= KINDA_SMALL_NUMBER", true, true, FColor::Blue, 2.0f);
+			//return EStateTreeRunStatus::Running;
 		}
 
 		const FVector RadialDir = FromTarget / CurrentRadius;
@@ -83,7 +85,13 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Conte
 		// 半径を保つ補正
 		// 近すぎるなら外へ、遠すぎるならうちへ
 		const float RadiusError = OrbitRadius - CurrentRadius;
-		const float CorrectionScale = FMath::Clamp(RadiusError / OrbitRadius, -1.0f, 1.0f);
+		float CorrectionScale = FMath::Clamp(RadiusError / OrbitRadius, -1.0f, 1.0f);
+
+		// 遠いとき、つまり内側へ寄る補正だけ弱める
+		if (CorrectionScale < 0.0f)
+		{
+			CorrectionScale *= 0.3f;
+		}
 
 		const FVector RadiusCorrection = RadialDir * CorrectionScale * OrbitRadiusCorrection;
 

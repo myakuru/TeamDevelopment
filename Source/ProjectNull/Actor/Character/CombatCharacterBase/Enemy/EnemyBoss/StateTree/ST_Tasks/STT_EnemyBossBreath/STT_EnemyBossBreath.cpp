@@ -100,6 +100,7 @@ EStateTreeRunStatus USTT_EnemyBossBreath::Tick(FStateTreeExecutionContext& Conte
 			{
 				Boss->SetActionPriority(EBossActionType::None);
 				AIC->StopMovement();
+				Boss->SetPrevAction(Boss->GetCurrentAction());
 				return EStateTreeRunStatus::Succeeded;
 			}
 		}
@@ -139,6 +140,4 @@ void USTT_EnemyBossBreath::ExitState(FStateTreeExecutionContext& Context, const 
 	{
 		return;
 	}
-
-	Boss->SetPrevAction(Boss->GetCurrentAction());
 }
