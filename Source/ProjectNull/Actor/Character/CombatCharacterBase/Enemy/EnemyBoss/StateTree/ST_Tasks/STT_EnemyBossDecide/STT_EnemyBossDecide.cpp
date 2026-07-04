@@ -24,7 +24,7 @@ EStateTreeRunStatus USTT_EnemyBossDecide::Tick(FStateTreeExecutionContext& Conte
 // タスク開始時の処理
 EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Decide EnterState In"));
+	//UE_LOG(LogTemp, Warning, TEXT("Decide EnterState In"));
 
 	Super::EnterState(Context, Transition);
 
@@ -42,12 +42,8 @@ EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext&
 	// 優先度の高いものがある場合それを選択する
 	if (Boss->GetActionPriority() != EBossActionType::None)
 	{
-		Boss->SetNextAction(Boss->GetActionPriority());
+		Boss->SetCurrentAction(Boss->GetActionPriority());
 		Boss->SelectNextAttack(Boss->GetActionPriority());
-		/*if (Boss->SelectAttackByDistance(Dist))
-		{
-			BossAction = Boss->GetActionPriority();
-		}*/
 	}
 	else
 	{
@@ -58,15 +54,15 @@ EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext&
 			DistRange ? ActionTable->NearActions
 			: ActionTable->FarActions;
 
-		BossAction = SelectWeightedRandom(ActionEntry);
-		Boss->SetNextAction(BossAction);
-		Boss->SelectNextAttack(BossAction);
-
-		/*if (BossAction == EBossActionType::Strafe || BossAction == EBossActionType::PlayAttack ||
-			BossAction == EBossActionType::JumpAttack || BossAction == EBossActionType::Breath)
+		// 同じモーションに連続で入らないようにする
+		for (int i = 0; i < 10; ++i) 
 		{
-			Boss->SelectAttackByDistance(Dist);
-		}*/
+			BossAction = SelectWeightedRandom(ActionEntry);
+			if (BossAction != Boss->GetPrevAction()) 
+			{ break; }
+		}
+		Boss->SetCurrentAction(BossAction);
+		Boss->SelectNextAttack(BossAction);
 
 		//if (Dist <= Boss->GetNearRange())
 		//{
@@ -109,7 +105,7 @@ EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext&
 		//}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Decide EnterState Out"));
+	//UE_LOG(LogTemp, Warning, TEXT("Decide EnterState Out"));
 
 	return EStateTreeRunStatus::Succeeded;
 }

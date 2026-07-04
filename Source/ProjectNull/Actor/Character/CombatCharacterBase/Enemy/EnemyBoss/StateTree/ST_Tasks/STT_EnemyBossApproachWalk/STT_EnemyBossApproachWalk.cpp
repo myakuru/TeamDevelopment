@@ -18,7 +18,7 @@ USTT_EnemyBossApproachWalk::USTT_EnemyBossApproachWalk(const FObjectInitializer&
 
 EStateTreeRunStatus USTT_EnemyBossApproachWalk::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Tick In"));
+	//UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Tick In"));
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
 
@@ -47,13 +47,13 @@ EStateTreeRunStatus USTT_EnemyBossApproachWalk::Tick(FStateTreeExecutionContext&
 	if (UCharacterMovementComponent* MoveComp = OwnerBoss->GetCharacterMovement())
 	{
 		MoveComp->MaxWalkSpeed = MoveSpeed;
-		UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Move"));
+		//UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Move"));
 	}
 
 	// 移動処理
 	UAIBlueprintHelperLibrary::SimpleMoveToActor(AIC, TargetActor);
 
-	UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Tick Out"));
+	//UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Tick Out"));
 
 	return EStateTreeRunStatus::Running;
 }

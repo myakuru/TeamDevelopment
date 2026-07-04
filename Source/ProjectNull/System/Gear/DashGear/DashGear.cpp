@@ -37,21 +37,21 @@ void UDashGear::Initialize(
 
 	// 攻撃用球アクターに親をアタッチ
 	SphereCollision->AttachToActor(
-		Player,
-		FAttachmentTransformRules::KeepRelativeTransform
+		OwnerPlayer,
+		FAttachmentTransformRules::KeepRelativeTransform,
+		TEXT("DashSphere")
 	);
 
 	auto SphereComponent = SphereCollision->GetSphereComponent();
 	if (!SphereComponent) { return; }
-	
-	
+
 	// オーバーラップ時、オーバーラップ抜け時の関数をセット
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(
 		this,
 		&UDashGear::OnDashGearAttackBeginOverlap
 	);
 
-	SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void UDashGear::Execute(int32 CurrentGearLevel)
@@ -101,6 +101,8 @@ void UDashGear::OnDashGearAttackBeginOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	//UE_LOG(LogTemp, Display, TEXT("DashAttack"));
+
 	if (!OwnerPlayer) { return; }
 	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
 

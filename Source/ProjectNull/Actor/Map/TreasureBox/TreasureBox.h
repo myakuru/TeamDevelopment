@@ -53,11 +53,11 @@ public:
 	)override;
 
 	UFUNCTION()
-	UGetGearHUDWidget* CreateDropItemWidget(const FText& itemName);
+	UGetGearHUDWidget* CreateDropItemWidget(const FName& itemName);
 
 	/** ID */
-	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
-	FName TreasureID = NAME_None;
+	//UPROPERTY(EditInstanceOnly, Category = "Params|ID")
+	//FName TreasureID = NAME_None;
 
 	UPROPERTY(EditInstanceOnly, Category = "Params|ID")
 	bool DestroyedFromSaveData = true;
@@ -85,7 +85,7 @@ public:
 
 	/** ドロップギア */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params|DropItem")
-	FText DropGearName = FText::FromString("");
+	FName DropGearName = FName();
 
 	/** ドロップアイテムのパラメータ */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params|DropItem")

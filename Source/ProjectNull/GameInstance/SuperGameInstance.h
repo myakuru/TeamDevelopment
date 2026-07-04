@@ -21,6 +21,7 @@ namespace InGameDefinition {
 class UMySaveGame;
 class UStageManager;
 class UWeaponManager;
+class UResultManager;
 class UMapActorManager;
 class UPlayerParameterData;
 class UPlayerRuntimeData;
@@ -59,6 +60,9 @@ public:
 	/** ギアマネージャーを取得する */
 	UWeaponManager* GetWeaponManager() const { return WeaponManager; }
 
+	/** リザルトマネージャー取得 */
+	UResultManager* GetResultManager() const { return ResultManager; }
+
 	/** マップアクターマネージャーを取得する */
 	UMapActorManager* GetMapActorManager() const { return MapActorManager; }
 protected:
@@ -79,7 +83,14 @@ protected:
 	TSubclassOf<UWeaponManager> WeaponManagerClass;
 
 	UPROPERTY(BlueprintReadOnly)
-	UWeaponManager* WeaponManager;
+	TObjectPtr<UWeaponManager> WeaponManager;
+
+	/** リザルトマネージャー */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UResultManager> ResultManagerClass;
+
+	UPROPERTY()
+	TObjectPtr<UResultManager> ResultManager;
 
 	/** マップアクターマネージャー */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

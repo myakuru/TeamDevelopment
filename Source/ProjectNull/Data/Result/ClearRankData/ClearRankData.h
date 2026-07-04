@@ -7,6 +7,8 @@
 
 #include "ClearRankData.generated.h"
 
+class URankConditionData;
+
 /**
  * 
  */
@@ -21,15 +23,6 @@ struct FClearRankData : public FTableRowBase {
 	FDataTableRowHandle RewardRow;
 
 	UPROPERTY(EditAnywhere)
-	int32 ClearPhase = 0;
-
-	UPROPERTY(EditAnywhere)
-	bool bReachedMidBossPhase = false;
-
-	UPROPERTY(EditAnywhere)
-	bool bReachedFinalPhase = false;
-
-	UPROPERTY(EditAnywhere)
-	float ClearTime = 0.0f;
+	TObjectPtr<URankConditionData> ConditionData;
 
 };

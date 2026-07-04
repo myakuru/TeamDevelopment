@@ -1,6 +1,6 @@
 ﻿#include "TreasureBox.h"
 
-#include <ProjectNull/Actor/Map/MapActorManager.h>
+//#include <ProjectNull/Actor/Map/MapActorManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Stage/Manager/StageManager.h>
@@ -76,9 +76,10 @@ void ATreasureBox::ExtinctionStart()
 	bDissolving = true;
 
 	//ドロップギアの名前の有無で決める
-	FText dropItemName;
-	if (!DropGearName.IsEmpty()) {
-		dropItemName = DropGearName;
+	FName dropItemID;
+
+	if (!DropGearName.IsNone()) {
+		dropItemID = DropGearName;
 	}
 	else {
 		//データからランダムにギアを選んでドロップ
@@ -93,16 +94,14 @@ void ATreasureBox::ExtinctionStart()
 		FWeaponData* data =
 			dataTable.GetRow<FWeaponData>(TEXT("TreasureBox:ExtinctionStart FDataTableRowHandle!!"));
 		if (!data) return;
-
-		// FName から FText への変換が必要
-		dropItemName = FText::FromName(data->WeaponID);
+		dropItemID = data->WeaponID;
 	}
 
 	//取得ギア追加
 	GetWorld()->GetGameInstance<USuperGameInstance>()
-		->GetStageManagerSubsystem()->AddAcquiredWeapon(dropItemName);
+		->GetStageManagerSubsystem()->AddAcquiredWeapon(dropItemID);
 
-	CreateDropItemWidget(dropItemName);
+	CreateDropItemWidget(dropItemID);
 }
 
 void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -136,7 +135,7 @@ void ATreasureBox::HitReaction(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	);
 }
 
-UGetGearHUDWidget* ATreasureBox::CreateDropItemWidget(const FText& itemName)
+UGetGearHUDWidget* ATreasureBox::CreateDropItemWidget(const FName& itemName)
 {
 	UGetGearHUDWidget* widget =
 		CreateWidget<UGetGearHUDWidget>(

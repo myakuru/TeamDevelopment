@@ -5,6 +5,7 @@
 #include<ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
 #include<ProjectNull/Stage/Manager/StageManager.h>
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
+#include <ProjectNull/System/Result/ResultManager/ResultManager.h>
 #include <ProjectNull/Actor/Map/MapActorManager.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
@@ -15,10 +16,17 @@ void USuperGameInstance::Init()
 	//Super::InitがなぜかUObjectのInitになる
 	UGameInstance::Init();
 
+	// WeaponManager生成・初期化
 	if (WeaponManagerClass) {
 		WeaponManager = NewObject<UWeaponManager>(this, WeaponManagerClass);
 	}
 	if (WeaponManager) WeaponManager->Initialize();
+
+	// ResultManager生成・初期化
+	if (ResultManagerClass) {
+		ResultManager = NewObject<UResultManager>(this, ResultManagerClass);
+	}
+	if (ResultManager)ResultManager->Initialize();
 
 	//StageManager
 	if (StageManagerClass) {

@@ -21,6 +21,8 @@ void UEnemyBossAnimNotify_BreathHit::NotifyBegin(USkeletalMeshComponent* MeshCom
 	// 振り始め：ヒット済みリストをクリア
 	HitCooldownMap.Empty();
 
+	BreathCount = 0.0f;
+
 	AActor* Owner = MeshComp->GetOwner();
 	// Niagaraコンポーネントを名前で取得
 	if (AEnemyBossBase* Boss = Cast<AEnemyBossBase>(Owner))
@@ -46,10 +48,15 @@ void UEnemyBossAnimNotify_BreathHit::NotifyTick(USkeletalMeshComponent* MeshComp
 	{
 		Time -= FrameDeltaTime;
 	}
-	/*for (auto& Pair : HitCoolDownMap)
+	BreathCount += FrameDeltaTime;
+
+	if (BreathCount >= BreathDuration)
 	{
-		Pair.Time -= DeltaTime;
-	}*/
+		if (UNiagaraComponent* NC = BreathNiagara.Get())
+		{
+			NC->Deactivate();
+		}
+	}
 
 	if (!IsValid(MeshComp)) { return; }
 
@@ -61,7 +68,43 @@ void UEnemyBossAnimNotify_BreathHit::NotifyTick(USkeletalMeshComponent* MeshComp
 
 	const FVector Start = MeshComp->GetSocketLocation(SocketName);
 	const FVector Forward = MeshComp->GetSocketRotation(SocketName).Vector();
-	const FVector End = Start + Forward * Range;
+	const FVector Forward2 = Boss->GetActorForwardVector();
+	const FVector End = Start + Forward2 * Range;
+
+	// デバッグ表示
+	/*if(bDrawDebug)
+	{
+		DrawDebugLine(
+			World,
+			Start,
+			End,
+			FColor::Cyan,
+			true,
+			0.5f,
+			0,
+			3.0f
+		);
+
+		DrawDebugSphere(
+			World,
+			Start,
+			12.0f,
+			12,
+			FColor::Green,
+			false,
+			0.05f
+		);
+
+		DrawDebugSphere(
+			World,
+			End,
+			12.0f,
+			12,
+			FColor::Blue,
+			false,
+			0.05f
+		);
+	}*/
 
 	TArray<FHitResult> Hits;
 	FCollisionQueryParams Params;
@@ -98,7 +141,52 @@ void UEnemyBossAnimNotify_BreathHit::NotifyTick(USkeletalMeshComponent* MeshComp
 
 		Damageable->ReceiveDamage(Damage);
 		Cooldown = HitInterval;
+
+		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
+		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
+		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
+		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
+		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
+		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
 	}
+
+	/*if (bDrawDebug)
+	{
+		DrawDebugSphere(
+			World,
+			Hit.ImpactPoint,
+			20.0f,
+			16,
+			FColor::Red,
+			false,
+			0.15f
+		);
+
+		DrawDebugLine(
+			World,
+			Start,
+			Hit.ImpactPoint,
+			FColor::Red,
+			false,
+			0.15f,
+			0,
+			5.0f
+		);
+
+		if (Hit.GetActor())
+		{
+			DrawDebugString(
+				World,
+				Hit.ImpactPoint + FVector(0.0f, 0.0f, 40.0f),
+				Hit.GetActor()->GetName(),
+				nullptr,
+				FColor::Red,
+				0.15f,
+				true
+			);
+		}
+	}*/
+
 }
 
 // ------------------------------------------------------------------------------------
@@ -114,6 +202,5 @@ void UEnemyBossAnimNotify_BreathHit::NotifyEnd(USkeletalMeshComponent* MeshComp,
 	{
 		NC->Deactivate();
 	}
-
 	BreathNiagara.Reset();
 }

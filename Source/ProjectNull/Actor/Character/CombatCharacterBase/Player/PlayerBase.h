@@ -43,13 +43,9 @@ class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
 {
 	GENERATED_BODY()
 public:
-
 	APlayerBase();
-
 	virtual void BeginPlay() override;
-
 public:
-
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -78,6 +74,8 @@ public:
 
 	void StartCutscene();
 
+	void ResetTargetCameraLagSpeed();
+
 	/** Getter */
 	inline UCameraComponent*				GetCameraComponent()			const	{ return CameraComponent; }
 	inline USpringArmComponent*				GetSpringArmComponent()			const	{ return SpringArmComponent; }
@@ -93,6 +91,11 @@ public:
 	FPoseSnapshot&							GetPlayerPoseSnapshot();
 	int32									GetCurrentGearLevel() const;
 	bool									GetCurrentFloorNormal(FVector& OutCurrentFloorNormal);
+	USceneComponent*						GetGroundAlignmentRootComponent()	const;
+
+
+	/** Setter */
+	inline void SetTargetCameraLagSpeed(float InTargetCameraLagSpeed) { TargetCameraLagSpeed = InTargetCameraLagSpeed; }
 
 private:
 
@@ -102,7 +105,10 @@ private:
 	 */
 	bool CanMove();
 
+	void UpdateCameraData(float DeltaTime);
+
 	void UpdateModelAfterimageTrailEffect(float DeltaTime);
+
 
 	/** スプリングアームコンポーネント */
 	UPROPERTY(VisibleAnywhere,Category = "Camera")
@@ -152,4 +158,11 @@ private:
 	/** ゲーム全体で共有されるデータや機能を管理するクラス */
 	UPROPERTY()
 	TObjectPtr<USuperGameInstance> SuperGameInstance;
+
+	float NormalStateCameraLagSpeed;
+
+	float TargetCameraLagSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float CameraLagInterpSpeed;
 };

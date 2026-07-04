@@ -15,7 +15,7 @@ class UNiagaraComponent;
 
 
 /** エフェクト中間基底クラス */
-UCLASS()
+UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UEffectBase : public UObject
 {
 	GENERATED_BODY()

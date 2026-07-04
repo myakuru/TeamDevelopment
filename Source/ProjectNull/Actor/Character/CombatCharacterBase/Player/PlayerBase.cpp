@@ -122,6 +122,11 @@ void APlayerBase::BeginPlay()
 
 	GetWorld()->GetFirstPlayerController()->InputComponent->BindKey(
 		EKeys::K, IE_Pressed, this, &APlayerBase::StartCutscene);
+
+	if (!SpringArmComponent) { return; }
+
+	NormalStateCameraLagSpeed = SpringArmComponent->CameraLagSpeed;
+	ResetTargetCameraLagSpeed();
 }
 
 void APlayerBase::Tick(float DeltaTime)
@@ -135,6 +140,8 @@ void APlayerBase::Tick(float DeltaTime)
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
 
 	UpdateModelAfterimageTrailEffect(DeltaTime);
+
+	UpdateCameraData(DeltaTime);
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -145,26 +152,23 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 float APlayerBase::GetFinalAttackPower() const
 {
-	auto GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
+	if (!SuperGameInstance) { return 1.f; }
 
-	if (!GameInstance || !GameInstance->GetPlayerRuntimeData()) { return 1.f; }
-	auto PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (PlayerRuntimeData)	{ return 1.f; }
 
 	return PlayerRuntimeData->GetCharacterAttackPower();
 }
 
 void APlayerBase::ApplyDamaged(float InDamage)
 {
-	auto GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
+	if (!SuperGameInstance) { return; }
 
-	if (GameInstance&& GameInstance->GetPlayerRuntimeData())
-	{
-		auto PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (PlayerRuntimeData)	{ return; }
 
-		PlayerRuntimeData->SubtractHealth(InDamage);
-
-		//UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
-	}
+	PlayerRuntimeData->SubtractHealth(InDamage);
+	//UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)
@@ -191,6 +195,11 @@ void APlayerBase::StartCutscene()
 	CutsceneComponent->PlayCutScene(NullGameplayTags::Cutscene_Intro);
 }
 
+void APlayerBase::ResetTargetCameraLagSpeed()
+{
+	TargetCameraLagSpeed = NormalStateCameraLagSpeed;
+}
+
 int32 APlayerBase::GetCurrentGearLevel() const
 {
 	if (!GearComponent) { return 0; }
@@ -199,20 +208,29 @@ int32 APlayerBase::GetCurrentGearLevel() const
 
 bool APlayerBase::GetCurrentFloorNormal(FVector& OutCurrentFloorNormal)
 {
-	auto CharacterMovementComp = GetCharacterMovement();
+	const auto CharacterMovementComp = GetCharacterMovement();
 	if (!CharacterMovementComp) { return false; }
 	OutCurrentFloorNormal = CharacterMovementComp->CurrentFloor.HitResult.ImpactNormal;
 	return true;
 }
 
+USceneComponent* APlayerBase::GetGroundAlignmentRootComponent() const
+{
+	if (!GroundAlignmentComponent) { return nullptr; }
+	const auto RootComp = GroundAlignmentComponent->GetRootComponent();
+	
+	return RootComp;
+}
+
 UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 {
-	if (!GetMesh())		{ return nullptr; }
+	const auto PlayerMesh = GetMesh();
+	if (!PlayerMesh)	{ return nullptr; }
 
-	auto AnimInstance = GetMesh()->GetAnimInstance();
+	const auto AnimInstance = PlayerMesh->GetAnimInstance();
 	if (!AnimInstance)	{ return nullptr; }
 
-	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
+	const auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
 	return PlayerAnimInstance;
 }
 
@@ -220,12 +238,13 @@ FPoseSnapshot& APlayerBase::GetPlayerPoseSnapshot()
 {
 	FPoseSnapshot PoseSnapshot;
 
-	if (!GetMesh())				{ return PoseSnapshot; }
+	const auto PlayerMesh = GetMesh();
+	if (!PlayerMesh)			{ return PoseSnapshot; }
 
-	auto AnimInstance = GetMesh()->GetAnimInstance();
+	const auto AnimInstance = PlayerMesh->GetAnimInstance();
 	if (!AnimInstance)			{ return PoseSnapshot; }
 
-	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
+	const auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
 	if (!PlayerAnimInstance)	{ return PoseSnapshot; }
 
 	return PlayerAnimInstance->GetPlayerPoseSnapshot();
@@ -241,19 +260,34 @@ bool APlayerBase::CanMove()
 	return true;
 }
 
+void APlayerBase::UpdateCameraData(float DeltaTime)
+{
+	if (!SpringArmComponent) { return; }
+
+	SpringArmComponent->CameraLagSpeed = FMath::FInterpTo(
+		SpringArmComponent->CameraLagSpeed,
+		TargetCameraLagSpeed,
+		DeltaTime,
+		CameraLagInterpSpeed
+		);
+}
+
 void APlayerBase::UpdateModelAfterimageTrailEffect(float DeltaTime)
 {
-	if (!ModelAfterimageTrailEffect || 
-		!GetMesh()) { return; }
-
+	const auto PlayerMesh = GetMesh();
+	if (!PlayerMesh)					{ return; }
+	
 	const auto PlayerAnimInstance = GetPlayerAnimInstance();
-	if (!PlayerAnimInstance) { return; }
+	if (!PlayerAnimInstance)			{ return; }
+
+	if (!ModelAfterimageTrailEffect)	{ return; }
 
 	ModelAfterimageTrailEffect->Update(
 		DeltaTime,
 		GetActorTransform(),
-		GetMesh()->GetSkeletalMeshAsset(),
-		PlayerAnimInstance->GetPlayerPoseSnapshot());
+		PlayerMesh->GetSkeletalMeshAsset(),
+		PlayerAnimInstance->GetPlayerPoseSnapshot()
+	);
 }
 
 

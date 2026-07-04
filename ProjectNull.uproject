@@ -10,7 +10,9 @@
 			"LoadingPhase": "PostConfigInit",
 			"AdditionalDependencies": [
 				"StateTreeModule",
-				"Engine"
+				"Engine",
+				"UMG",
+				"CoreUObject"
 			]
 		}
 	],
