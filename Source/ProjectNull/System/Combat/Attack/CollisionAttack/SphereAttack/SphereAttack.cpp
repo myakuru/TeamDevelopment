@@ -71,20 +71,4 @@ void USphereAttack::Update(float InDeltaTime)
 	if (!IsActive()) { return; }
 
 	UCollisionAttack::Update(InDeltaTime);
-
-	// デバッグ表示
-	if (auto SphereComponent = SphereCollision->GetSphereComponent())
-	{
-		DrawDebugSphere(
-			GetWorld(),									// ワールドポインタ
-			SphereComponent->GetComponentLocation(),	// 中心のワールド座標
-			SphereComponent->GetScaledSphereRadius(),	// 半径
-			12.f,										// セグメント数（円の滑らかさ）
-			FColor::Red,								// 色
-			false,										// 永続的に表示するかどうか
-			1.f,										// 表示時間（負の値で1フレーム）
-			0,											// 優先度
-			10.0f										// 線の太さ
-		);
-	}
 }

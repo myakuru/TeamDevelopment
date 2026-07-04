@@ -103,7 +103,7 @@ void ACrossLaserbeam::OnHit(const TObjectPtr<AActor>& Actor)
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(Actor))
 	{
-		Interface->ApplyDamaged();
+		Interface->ApplyDamaged(1.f);
 		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }

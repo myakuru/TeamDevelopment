@@ -62,7 +62,7 @@ public:
 	* @brief ダメージを受ける処理
 	* @param Damage ダメージ量
 	*/
-	virtual void ApplyDamaged(float InDamage = 1.f)override;
+	virtual void ApplyDamaged(float InDamage)override;
 	/* End Character Interface.*/
 
 	/**

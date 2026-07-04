@@ -5,7 +5,7 @@
 
 UEnemyAttackComponent::UEnemyAttackComponent():
 	OwnerEnemy(nullptr),
-	EnemyAttacks(TArray<UAttackBase*>())
+	EnemyAttacks(TMap<EEnemyAttackType, TObjectPtr<UAttackBase>>())
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -14,12 +14,13 @@ UEnemyAttackComponent::UEnemyAttackComponent():
 void UEnemyAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	// 初期化
-	for (auto& attack : EnemyAttacks)
+	for (auto& Attack : EnemyAttacks)
 	{
-		if (!attack) { continue; }
-		attack->Initialize(GetOwner());
+		if (!IsValid(Attack.Value)) { continue; }
+		Attack.Value->Initialize(GetOwner());
+		AttackTimerHandles.Add(Attack.Key, FTimerHandle());
 	}
 }
 
@@ -31,16 +32,16 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	APawn* pPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!pPlayerPawn) { return; }
 
-	for (auto& attack : EnemyAttacks)
+	for (auto& Attack : EnemyAttacks)
 	{
-		if (!attack) { continue; }
+		if (!IsValid(Attack.Value)) { continue; }
 
-		if (attack->CanExecute())
+		if (Attack.Value->CanExecute())
 		{
-			attack->Execute();
+			Attack.Value->Execute();
 		}
 
-		attack->Update(DeltaTime);
+		Attack.Value->Update(DeltaTime);
 	}
 }
 
@@ -50,7 +51,8 @@ void UEnemyAttackComponent::AllAtackDeactivate()
 
 	for (auto& Attack : EnemyAttacks)
 	{
-		Attack->Cancel();
+		if (!IsValid(Attack.Value)) { continue; }
+		Attack.Value->Cancel();
 	}
 }
 
@@ -61,8 +63,8 @@ bool UEnemyAttackComponent::IsAllAttackDeactivate()
 
 	for (auto& Attack : EnemyAttacks)
 	{
-		if (!Attack) { continue; }
-		if (Attack->IsActive())
+		if (!IsValid(Attack.Value)) { continue; }
+		if (Attack.Value->IsActive())
 		{
 			bIsAllDeactive = false;
 			break;
@@ -72,10 +74,33 @@ bool UEnemyAttackComponent::IsAllAttackDeactivate()
 	return bIsAllDeactive;
 }
 
+void UEnemyAttackComponent::AttackActive(EEnemyAttackType InAttackType)
+{
+	if (AttackTimerHandles.IsEmpty()||
+		!AttackTimerHandles.Find(InAttackType)) { return; }
+
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindLambda([this,InAttackType]
+		{
+			if(EnemyAttacks.IsEmpty()||
+				!!AttackTimerHandles.Find(InAttackType)) { return; }
+
+			EnemyAttacks[InAttackType]->SetCanExecute(true);
+		}
+	);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		AttackTimerHandles[InAttackType],
+		TimerDelegate,
+		EnemyAttacks[InAttackType]->GetAttackStartDelay(),
+		false
+	);
+}
+
 void UEnemyAttackComponent::TestActive()
 {
 	if (EnemyAttacks.IsEmpty()) { return; }
 
 	// 試しに0番目の要素をアクティブ化
-	EnemyAttacks[0]->SetCanExecute(true);
+	EnemyAttacks[EEnemyAttackType::Attack1]->SetCanExecute(true);
 }

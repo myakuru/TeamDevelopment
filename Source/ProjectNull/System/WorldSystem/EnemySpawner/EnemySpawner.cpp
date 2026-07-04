@@ -117,7 +117,6 @@ void AEnemySpawner::SpawnEnemy()
 		{
 			Accumulated += Unit.CreateProbability;
 
-			// 累積確率を超えたらこの敵を選択
 			// 乱数よりも敵生成確率が低ければ次の敵に移って再生成
 			// 累積確率を超えたらこの敵を選択
 			if (Roll < Accumulated)

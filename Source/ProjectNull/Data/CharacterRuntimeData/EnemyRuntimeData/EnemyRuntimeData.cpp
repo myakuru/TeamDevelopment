@@ -22,11 +22,6 @@ void UEnemyRuntimeData::SetAttackFinishTime(float InLastTime)
 	AttackFinishTime = InLastTime;
 }
 
-bool UEnemyRuntimeData::CanAttack()const 
-{
-	return GetWorld()->GetTimeSeconds() >= AttackInterval + AttackFinishTime;
-}
-
 void UEnemyRuntimeData::SetTargetLocation(const FVector& InTargetLocation)
 {
 	TargetLocation = InTargetLocation;

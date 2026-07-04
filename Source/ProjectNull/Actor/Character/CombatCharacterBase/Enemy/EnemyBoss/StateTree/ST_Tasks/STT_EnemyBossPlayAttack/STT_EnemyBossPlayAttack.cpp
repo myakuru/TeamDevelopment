@@ -69,12 +69,11 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 	if (!Anim->Montage_IsPlaying(Cur))
 	{
 		Boss->AdvanceHitIndex();
-		// 次のアニメーションがあり、flgがtrueなら次のアニメーションを実行
+		// 次のアニメーションがあり、flgがtrueなら
+		// 上述の処理に入り直して次のアニメーションを実行
 		if (Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 		{
 			bMontageStarted = false;
-			//Anim->Montage_Play(Atk.AttackMontages[Boss->GetHitIndex()]);
-			
 			return EStateTreeRunStatus::Running;
 		}
 		return EStateTreeRunStatus::Succeeded;

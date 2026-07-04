@@ -37,6 +37,11 @@ void UCollisionAttack::Cancel()
 	ElpsedTimer = 0.f;		// 経過時間をリセット
 }
 
+bool UCollisionAttack::CanStartAttack()
+{
+	return false;
+}
+
 void UCollisionAttack::OnSphericalBeginOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,

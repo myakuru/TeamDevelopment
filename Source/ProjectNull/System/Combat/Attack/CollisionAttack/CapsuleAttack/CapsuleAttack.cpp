@@ -70,20 +70,4 @@ void UCapsuleAttack::Update(float InDeltaTime)
 	if (!IsActive()) { return; }
 
 	UCollisionAttack::Update(InDeltaTime);
-
-	if (auto CapsuleComponent = CapsuleCollision->GetCapsuleComponent())
-	{
-		DrawDebugCapsule(
-			GetWorld(),										// ワールドポインタ
-			CapsuleComponent->GetComponentLocation(),		// 中心座標
-			CapsuleComponent->GetScaledCapsuleHalfHeight(),	// 高さの半径
-			CapsuleComponent->GetScaledCapsuleRadius(),		// 半径
-			CapsuleComponent->GetComponentQuat(),			// 角度
-			FColor::Red,									// 色
-			false,											// 永続的に表示するか
-			1.f,											// 表示時間(負の値で1フレーム)
-			0,												// 優先度
-			2.f												// 線の太さ
-		);
-	}
 }

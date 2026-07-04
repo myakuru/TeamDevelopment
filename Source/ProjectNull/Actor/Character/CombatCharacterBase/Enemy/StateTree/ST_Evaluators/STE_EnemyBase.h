@@ -124,10 +124,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "OutPut",meta=(AllowPrivateAcces="true"))
 	float DamageRatio = 1.f;
 
-	/** ノックバック時の重さ */
-	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
-	float KnockBackWeight = 0.f;
-
 	/**	移動速度 */
 	UPROPERTY(VisibleAnywhere, Category = "Output", meta = (AllowPrivateAccess = "true"))
 	float MoveSpeed = 600.f;

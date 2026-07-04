@@ -32,9 +32,6 @@ void USTE_EnemyBase::TreeStop(FStateTreeExecutionContext& a_Context)
 void USTE_EnemyBase::RegisterFixedParams()
 {
 	if (!OwnerEnemy) { return; }
-
-	// ノックバックの時の重さ
-	KnockBackWeight = OwnerEnemy->GetKnockBackWeight();
 	
 	// 移動速度
 	MoveSpeed = OwnerEnemy->GetMoveSpeed();

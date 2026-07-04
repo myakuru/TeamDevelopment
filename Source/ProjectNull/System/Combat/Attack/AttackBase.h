@@ -123,6 +123,9 @@ public:
 	/**	最終的なダメージ量を取得 */
 	float GetFinalDamage()const { return FinalDamage; }
 
+	/** 攻撃開始までの待ち時間 */
+	float GetAttackStartDelay()const { return AttackStartDelay; }
+
 	/**
 	 * @brief 攻撃実行可能か
 	 * @return 攻撃実行可能ならtrue
@@ -166,6 +169,12 @@ private:
 	UPROPERTY()
 	float FinalDamage = 0.f;
 
+	/**
+	* @brief 攻撃開始までの待ち時間
+	*/
+	UPROPERTY(EditAnywhere)
+	float AttackStartDelay = 0.f;
+
 	/**	攻撃可能フラグ */
 	UPROPERTY()
 	bool bCanExecute = true;
@@ -173,7 +182,6 @@ private:
 	/**	攻撃有効フラグ */
 	UPROPERTY()
 	bool bIsActive = false;
-
 
 	UPROPERTY(EditAnywhere)
 	bool bAbsoluteScale;

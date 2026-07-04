@@ -6,14 +6,12 @@
 #include "NiagaraSystem.h"
 #include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
 #include "EnemyDataStruct.h"
-#include "../CombatCharacterBase.h"
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 #include "EnemyBase.generated.h"
 
 // 前方宣言
 class UCapsuleComponent;
 class UStateTreeComponent;
-class USkeletalMeshComponent;
 class UPrimitiveComponent;
 class UEnemyDataAsset;
 class AEnemyISMManager;
@@ -49,8 +47,6 @@ class UEnemyRuntimeData;
 
 /// <summary>
 /// 敵の中間基底クラス
-/// メモ：Characterクラスを継承しているがコンポーネントが多く、
-///	重くなる可能性があるためActorを継承する可能性大
 /// </summary>
 UCLASS()
 class PROJECTNULL_API AEnemyBase:	public AActor
@@ -189,7 +185,7 @@ public:
 	 * @brief ダメージを受ける処理
 	 * @param Damage ダメージ量
 	 */
-	virtual void ApplyDamaged(float InDamaged = 1.f)override;
+	virtual void ApplyDamaged(float InDamaged)override;
 
 	/**
 	 * @brief ノックバックを受ける処理

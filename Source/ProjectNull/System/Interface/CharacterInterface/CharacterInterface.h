@@ -31,7 +31,7 @@ public:
 	 * @brief ダメージを受ける処理
 	 * @param Damage ダメージ量
 	 */
-	virtual void ApplyDamaged(float InDamage = 1.f)PURE_VIRTUAL(ICharacterInterface::ApplyDamaged, );
+	virtual void ApplyDamaged(float InDamage)PURE_VIRTUAL(ICharacterInterface::ApplyDamaged, );
 
 	/**
 	 * @brief ノックバックを受ける処理

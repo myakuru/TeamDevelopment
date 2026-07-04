@@ -130,9 +130,6 @@ void AEnemyBase::UpdateParams()
 		// 基礎攻撃力と倍率をセット
 		EnemyRuntimeData->SetBaseAttackPower(EnemyStatus.AttackScaling.Base);
 		EnemyRuntimeData->SetAttackScaling(AttackScale);
-
-		// 攻撃のインターバル(秒)をセット
-		EnemyRuntimeData->SetAttackInterval(EnemyStatus.AttackInterval);
 	}
 }
 
@@ -210,8 +207,7 @@ void AEnemyBase::FinalizeDeath()
 
 void AEnemyBase::CheckCanAttack()
 {
-	if (!EnemyRuntimeData||
-		!EnemyRuntimeData->CanAttack()) { return; }
+	if (!EnemyRuntimeData) { return; }
 
 	// 既に攻撃中なら処理を飛ばす
 	if (EnemyStatus.StateTag == EEnemyState::Attack||
@@ -340,9 +336,7 @@ void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)
 
 	EnemyStatus.MoveSpeed = InData->MoveSpeed;
 	EnemyStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
-	EnemyStatus.FinalHP = InData->FinalHP;
 	EnemyStatus.HPScaling = InData->HPScaling;
-	EnemyStatus.FinalAttack = InData->FinalAttack;
 	EnemyStatus.AttackScaling = InData->AttackScaling;
 	EnemyStatus.KnockBackWeight = InData->KnockBackWeight;
 	EnemyStatus.Exp = InData->Exp;

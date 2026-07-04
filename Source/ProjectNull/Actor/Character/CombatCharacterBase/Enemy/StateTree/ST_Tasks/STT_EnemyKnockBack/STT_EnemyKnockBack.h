@@ -61,10 +61,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	FVector TargetLocation = FVector::ZeroVector;
 
-	/**	敵の重量 */
-	UPROPERTY(VisibleAnywhere, Category = "Input")
-	float	EnemyWeight = 1.0f;
-
 	/**	最大体力に対する受けたダメージの割合 */
 	UPROPERTY()
 	float	DamageRatio = 0.0f;

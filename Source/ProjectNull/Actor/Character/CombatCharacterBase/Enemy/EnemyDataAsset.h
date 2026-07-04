@@ -25,17 +25,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float	RotationInterpSpeed = 5.0f;
 
-	// 最終的なヒットポイント
-	UPROPERTY(EditAnywhere)
-	int32	FinalHP = 100;
-
 	// スケーリング計算用ヒットポイント
 	UPROPERTY(EditAnywhere)
 	FStatScaling HPScaling;
-
-	// 最終的な攻撃力
-	UPROPERTY(EditAnywhere)
-	int32	FinalAttack = 1;
 
 	// スケーリング計算用攻撃力
 	UPROPERTY(EditAnywhere)
@@ -69,25 +61,7 @@ public:
 	// 攻撃可能フラグ
 	bool CanAttack = false;
 
-	/** ステートごとのデータを管理するマップ*/
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Instanced,Category = "StateData")
-	TArray<TObjectPtr<UStateDataBase>> StateDataList;
-
 	/** 生存フラグ*/
 	UPROPERTY(EditAnywhere)
 	bool IsAlive = true;
-
-	/** Stateデータをクラス型で判定する*/
-	template<typename T>
-	const T* GetStateData() const
-	{
-		for (const TObjectPtr<UStateDataBase>& Data : StateDataList)
-		{
-			if (const T* Casted = Cast<T>(Data.Get()))
-			{
-				return Casted;
-			}
-		}
-		return nullptr;
-	}
 };

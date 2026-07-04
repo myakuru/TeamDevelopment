@@ -36,6 +36,11 @@ public:
 	 */
 	virtual void Cancel();
 
+	/**
+	 * @brief 開始までの待ち時間分経過して攻撃開始可能か
+	 * @return 攻撃可能ならtrue
+	 */
+	bool CanStartAttack();
 
 protected:
 
@@ -108,6 +113,6 @@ private:
 	/**
 	 * @brief 経過時間
 	 */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	float ElpsedTimer = 0.f;
 };

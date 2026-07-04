@@ -106,7 +106,7 @@ void UDashGear::OnDashGearAttackBeginOverlap(
 
 	auto Interface = Cast<ICharacterInterface>(OtherActor);
 	if (!Interface) { return; }
-	Interface->ApplyDamaged();
+	Interface->ApplyDamaged(1.f);
 	Interface->ApplyKnockBack(PlayerLocation);
 }
 
