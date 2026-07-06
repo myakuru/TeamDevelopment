@@ -51,6 +51,14 @@ void AEnemyMidBossBase::BeginPlay()
 
 	// デリゲートへの登録
 	RegisterDelegates();
+
+	// 中ボスのデータをセット
+	SetEnemyStatusData(EnemyDataAsset);
+}
+
+bool AEnemyMidBossBase::IsInChaseDistance()
+{
+	return EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.ChaseDistance);
 }
 
 void AEnemyMidBossBase::RegisterDelegates()
@@ -148,6 +156,11 @@ void AEnemyMidBossBase::ActivateAttack(EEnemyAttackType InAttackTyp)
 	AttackComponent->AttackActive(InAttackTyp);
 }
 
+bool AEnemyMidBossBase::IsInAttackDistance()
+{
+	return EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance);
+}
+
 float AEnemyMidBossBase::GetFinalAttackPower() const
 {
 	if (!IsValid(EnemyMidBossRuntimeData)) { return 1.f; }
@@ -179,9 +192,30 @@ void AEnemyMidBossBase::ApplyKnockBack(const FVector& InOwnerLocation)
 	EnemyMidBossRuntimeData->SetTargetLocation(InOwnerLocation);
 }
 
+void AEnemyMidBossBase::SetEnemyStatusData(UEnemyDataAsset* InData)
+{
+	if (!InData) { return; }
+
+	EnemyStatus.MoveSpeed = InData->MoveSpeed;
+	EnemyStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
+	EnemyStatus.HPScaling = InData->HPScaling;
+	EnemyStatus.AttackScaling = InData->AttackScaling;
+	EnemyStatus.KnockBackWeight = InData->KnockBackWeight;
+	EnemyStatus.Exp = InData->Exp;
+	EnemyStatus.GearEnergy = InData->GearEnergy;
+	EnemyStatus.AttackDistance = InData->AttackDistance;
+	EnemyStatus.ChaseDistance = InData->ChaseDistance;
+}
+
 void AEnemyMidBossBase::TransitionIdleToWalk()
 {
-	if (EnemyStatus.StateTag != EEnemyState::Idle) { return; }
+	// 「棒立ち」で無いか、「追跡可能距離内」なら処理を飛ばす
+	if (EnemyStatus.StateTag != EEnemyState::Idle||
+		IsInChaseDistance()) 
+	{
+		return; 
+	}
+
 	NotifyChangedStateEnum(EEnemyState::Walk);
 }
 
@@ -196,7 +230,7 @@ void AEnemyMidBossBase::CheckCanAttack()
 	}
 
 	// プレイヤーとの距離が攻撃可能距離内か
-	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
+	if (IsInAttackDistance())
 	{
 		NotifyChangedStateEnum(EEnemyState::Attack);
 	}

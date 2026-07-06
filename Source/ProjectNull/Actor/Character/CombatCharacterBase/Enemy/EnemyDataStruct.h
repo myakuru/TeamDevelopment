@@ -115,6 +115,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AttackDistance = 20.0f;
 
+	/**	追跡可能距離 */
+	UPROPERTY(EditAnywhere)
+	float ChaseDistance = 20.f;
+
 	/**	攻撃のインターバル(秒) */
 	UPROPERTY(EditAnywhere)
 	float AttackInterval = 1.f;

@@ -50,7 +50,7 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		Interface->ApplyDamaged();
+		Interface->ApplyDamaged(1.f);
 		Interface->ApplyKnockBack(OwnerActor->GetActorLocation());
 	}
 

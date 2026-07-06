@@ -58,6 +58,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AttackDistance = 20.0f;
 
+	/**	追跡可能距離 */
+	UPROPERTY(EditAnywhere)
+	float ChaseDistance = 20.f;
+
 	// 攻撃可能フラグ
 	bool CanAttack = false;
 

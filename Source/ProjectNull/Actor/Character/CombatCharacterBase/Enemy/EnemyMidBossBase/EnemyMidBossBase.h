@@ -42,6 +42,17 @@ public:
 	virtual void FinalizeDeath();								/** 死亡時の最終処理 */
 	virtual void ActivateAttack(EEnemyAttackType InAttackTyp);	/** 攻撃の発動処理 */
 
+	/**
+	 * @brief 今、攻撃可能距離内にいるかを返す
+	 * @return 範囲内ならtrue
+	 */
+	virtual bool IsInAttackDistance();
+	
+	/**
+	 * @brief 今、追跡可能距離内にいるかを返す
+	 * @return 範囲内ならtrue
+	 */
+	virtual bool IsInChaseDistance();
 
 	/** デリゲートへの登録関数*/
 	virtual void RegisterDelegates();
@@ -68,8 +79,8 @@ public:
 
 	/**
 	 * @brief 所持する当たり判定チャンネルのレスポンス設定を変更
-	 * @param Channel 変更対象チャンネル(WorldStatic,Pawn,etc..)
-	 * @param NewResponse レスポンスタイプ(Block・Overlap・Ignore)
+	 * @param InChannel 変更対象チャンネル(WorldStatic,Pawn,etc..)
+	 * @param InNewResponse レスポンスタイプ(Block・Overlap・Ignore)
 	 */
 	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel InChannel, ECollisionResponse InNewResponse);
 
@@ -106,13 +117,13 @@ public:
 
 	/**
 	 * @brief ダメージを受ける処理
-	 * @param Damage ダメージ量
+	 * @param InDamaged ダメージ量
 	 */
 	virtual void ApplyDamaged(float InDamaged)override;
 
 	/**
 	 * @brief ノックバックを受ける処理
-	 * @param OwnerLocation 攻撃者の位置
+	 * @param InOwnerLocation 攻撃者の位置
 	 */
 	virtual void ApplyKnockBack(const FVector& InOwnerLocation)override;
 	/* End Character Interface.*/
@@ -122,19 +133,19 @@ protected:
 	//~ Begin Setter
 	/**
 	 * @brief 移動方向のセット
-	 * @param MoveDir 移動方向
+	 * @param InMoveDir 移動方向
 	 */
 	virtual void SetMoveDir(const FVector& InMoveDir) { EnemyStatus.MoveDir = InMoveDir; }
 
 	/**
 	 * @brief ターゲットとの距離の二乗値セット
-	 * @param DistSqr 距離の二乗値
+	 * @param InDistSqr 距離の二乗値
 	 */
 	virtual void SetTargetDistanceSqr(float InDistSqr) { EnemyStatus.TargetDistanceSqr = InDistSqr; }
 
 	/**
 	 * @brief 状態タイプをセット
-	 * @param a_State 変更先ステート
+	 * @param InTargetState 変更先ステート
 	 */
 	virtual void SetEnemyState(EEnemyState InTargetState) { EnemyStatus.StateTag = InTargetState; }
 
@@ -143,7 +154,14 @@ protected:
 	 * @param InAttackData 発動する攻撃データ
 	 */
 	virtual void SetAttackData(const FEnemyAttackData& InAttackData) { AttackData = InAttackData; }
+	
+	/**
+	 * @brief データアセットからパラメータ取得
+	 * @param InData データアセット
+	 */
+	virtual void SetEnemyStatusData(UEnemyDataAsset* InData);
 	//~ End Setter
+
 
 private:
 

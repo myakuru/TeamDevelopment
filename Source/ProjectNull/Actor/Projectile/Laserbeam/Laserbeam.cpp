@@ -56,7 +56,7 @@ void ALaserbeam::OnLaserbeamBeginOverlap(
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		Interface->ApplyDamaged();
+		Interface->ApplyDamaged(1.f);
 		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }

@@ -21,7 +21,7 @@ EStateTreeRunStatus USTT_EnemyMidBossAttackSelect::EnterState(FStateTreeExecutio
 	for (const auto& Attack : AttackDataAsset->AttackDatas)
 	{
 		const float MaxDistanceSqr = FMath::Square(Attack.MaxDistance);
-		if (TargetDistanceSqr > MaxDistanceSqr)
+		if (TargetDistanceSqr < MaxDistanceSqr)
 		{
 			// 最初の比較なら条件無しに代入
 			if (MinDistanceSqr < 0.f)
@@ -30,7 +30,7 @@ EStateTreeRunStatus USTT_EnemyMidBossAttackSelect::EnterState(FStateTreeExecutio
 				MinAttackData = Attack;
 			}
 			// 最小距離よりも短ければそれを採用
-			else if (MinDistanceSqr < MaxDistanceSqr)
+			else if (MaxDistanceSqr < MinDistanceSqr)
 			{
 				MinDistanceSqr = MaxDistanceSqr;
 				MinAttackData = Attack;

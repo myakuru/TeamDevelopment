@@ -221,7 +221,7 @@ void AEnemyBase::CheckCanAttack()
 
 
 	// プレイヤーとの距離が攻撃可能距離内か
-	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
+	if (IsInAttackDistance())
 	{
 		NotifyChangedStateEnum(EEnemyState::Attack);
 	}
@@ -336,6 +336,16 @@ void AEnemyBase::Deactivate()
 	}
 }
 
+bool AEnemyBase::IsInAttackDistance()
+{
+	return EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance);
+}
+
+bool AEnemyBase::IsInChaseDistance()
+{
+	return EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.ChaseDistance);
+}
+
 void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)
 {
 	if (!InData) { return; }
@@ -348,6 +358,7 @@ void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)
 	EnemyStatus.Exp = InData->Exp;
 	EnemyStatus.GearEnergy = InData->GearEnergy;
 	EnemyStatus.AttackDistance = InData->AttackDistance;
+	EnemyStatus.ChaseDistance = InData->ChaseDistance;
 }
 
 void AEnemyBase::SpawnDeathEffect()

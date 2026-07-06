@@ -67,6 +67,18 @@ public:
 	/** Poolに返却するときに呼ぶ*/
 	virtual void Deactivate();
 
+	/**
+	 * @brief 今、攻撃可能距離内にいるかを返す
+	 * @return 範囲内ならtrue
+	 */
+	virtual bool IsInAttackDistance();
+
+	/**
+	 * @brief 今、追跡可能距離内にいるかを返す
+	 * @return 範囲内ならtrue
+	 */
+	virtual bool IsInChaseDistance();
+
 	//~ Begin Setter
 	/**
 	 * @brief 移動方向のセット
