@@ -18,24 +18,7 @@
     <configurations />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
-      <change afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/Animation/ABP_Pelura.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Projectile/Laserbeam/BP_Laserbeam_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Projectile/Laserbeam/BP_Laserbeam_Lv4.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/NS_Laserbeam_Body.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/NS_Laserbeam_Body.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/NS_Laserbeam_Head.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/NS_Laserbeam_Head.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/State/BP_LaserGearState_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/State/BP_LaserGearState_Lv4.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Controller/RobotController/RobotController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Controller/RobotController/RobotController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Controller/RobotController/RobotController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Controller/RobotController/RobotController.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearState_Lv4/DashGearState_Lv4.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearState_Lv4/DashGearState_Lv4.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.h" afterDir="false" />
-    </list>
+    <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -200,7 +183,7 @@
       <workItem from="1783308128882" duration="890000" />
       <workItem from="1783309113254" duration="1391000" />
       <workItem from="1783312732518" duration="14087000" />
-      <workItem from="1783329010430" duration="4630000" />
+      <workItem from="1783329010430" duration="4882000" />
     </task>
     <servers />
   </component>
