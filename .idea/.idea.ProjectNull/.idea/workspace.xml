@@ -5,6 +5,7 @@
     <projectFile profileName="EpicGames.AspNet">../../Program Files/Epic Games/UE_5.7/Engine/Source/Programs/Shared/EpicGames.AspNet/EpicGames.AspNet.csproj</projectFile>
     <projectFile kind="Docker">../../Program Files/Epic Games/UE_5.7/Engine/Source/Programs/Shared/EpicGames.Perforce.Fixture/EpicGames.Perforce.Fixture.csproj</projectFile>
     <projectFile>../../Program Files/Epic Games/UE_5.7/Engine/Source/Programs/UnrealBuildTool/UnrealBuildTool.csproj</projectFile>
+    <projectFile kind="Docker">../../UE_5.7/Engine/Source/Programs/Shared/EpicGames.Perforce.Fixture/EpicGames.Perforce.Fixture.csproj</projectFile>
     <projectFile>Intermediate/ProjectFiles/ProjectNull.vcxproj</projectFile>
     <projectFile>Intermediate/ProjectFiles/UE5.vcxproj</projectFile>
   </component>
@@ -20,9 +21,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/Material/MI_Ray.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/Material/MI_Ray.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/Material/M_Ray.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/Material/M_Ray.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/NS_Laserbeam2.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/NS_Laserbeam2.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,12 +56,13 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "Hinata/feature",
+    "git-widget-placeholder": "Todo/feature",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.C/C++",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -154,6 +153,17 @@
         <option name="Build" />
       </method>
     </configuration>
+    <configuration name="EpicGames.Perforce.Fixture/Dockerfile (1)" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="containerName" value="epicgames.perforce.fixture" />
+          <option name="contextFolderPath" value="D:\_ProjectNull(Team)\TeamDevelopment" />
+          <option name="sourceFilePath" value="../../UE_5.7/Engine/Source/Programs/Shared/EpicGames.Perforce.Fixture/Dockerfile" />
+        </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
     <configuration name="EpicGames.Perforce.Fixture/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
       <deployment type="dockerfile">
         <settings>
@@ -183,6 +193,7 @@
       <workItem from="1783054823895" duration="163000" />
       <workItem from="1783055095762" duration="1872000" />
       <workItem from="1783078688002" duration="3590000" />
+      <workItem from="1783386602635" duration="1387000" />
     </task>
     <servers />
   </component>
@@ -215,5 +226,9 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
