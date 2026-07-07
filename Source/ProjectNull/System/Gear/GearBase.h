@@ -123,6 +123,7 @@ private:
 	TArray<FGearStatus> GearStatuses;
 
 	/** 現在のギア状態 */
+	UPROPERTY()
 	TObjectPtr<UGearStateBase> CurrentGearState;
 
 	/** 実行時のギアレベルを保持する用途 */
