@@ -84,7 +84,6 @@ void ULaserGearState_Lv4::Execute(int32 CurrentGearLevel)
 
 	PlayerAnimInstance->Montage_Play(SpellAnimMontage);
 
-	
 	const FTransform& PlayerTransform = Player->GetActorTransform();
 	
 	if (!GearSpecialAction) { return; }

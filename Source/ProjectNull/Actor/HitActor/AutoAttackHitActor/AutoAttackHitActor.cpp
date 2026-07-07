@@ -8,7 +8,8 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
-AAutoAttackHitActor::AAutoAttackHitActor()
+AAutoAttackHitActor::AAutoAttackHitActor():
+	bEnabled(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -18,16 +19,16 @@ AAutoAttackHitActor::AAutoAttackHitActor()
 	if (!BoxComp) { return; }
 	BoxComp->SetupAttachment(RootComponent);
 	BoxComp->SetCollisionEnabled(
-		ECollisionEnabled::QueryOnly);
+		ECollisionEnabled::Type::NoCollision);
 
-	BoxComp->SetGenerateOverlapEvents(true);
-	BoxComp->SetCollisionResponseToChannel(
-		ECC_Enemy,
-		ECR_Overlap);
+	// BoxComp->SetGenerateOverlapEvents(true);
+	// BoxComp->SetCollisionResponseToChannel(
+	// 	ECC_Enemy,
+	// 	ECR_Overlap);
 
-	BoxComp->OnComponentBeginOverlap.AddDynamic(
-		this,
-		&AAutoAttackHitActor::OnAutoAttackBeginOverlap);
+	// BoxComp->OnComponentBeginOverlap.AddDynamic(
+	// 	this,
+	// 	&AAutoAttackHitActor::OnAutoAttackBeginOverlap);
 }
 
 void AAutoAttackHitActor::BeginPlay()
@@ -54,15 +55,16 @@ void AAutoAttackHitActor::Tick(float DeltaTime)
 	HitActors.Empty();
 }
 
-void AAutoAttackHitActor::SetHitEnabled(bool bEnabled)
+void AAutoAttackHitActor::SetHitEnabled(bool bInEnabled)
 {
-	const ECollisionEnabled::Type CollisionType =
-		bEnabled
-		? ECollisionEnabled::QueryOnly
-		: ECollisionEnabled::NoCollision;
-
-	if (!BoxComp) { return; }
-	BoxComp->SetCollisionEnabled(CollisionType);
+	bEnabled = bInEnabled;
+	// const ECollisionEnabled::Type CollisionType =
+	// 	bEnabled
+	// 	? ECollisionEnabled::QueryOnly
+	// 	: ECollisionEnabled::NoCollision;
+	//
+	// if (!BoxComp) { return; }
+	// BoxComp->SetCollisionEnabled(CollisionType);
 }
 
 void AAutoAttackHitActor::OnAutoAttackBeginOverlap(
@@ -83,7 +85,9 @@ void AAutoAttackHitActor::OnAutoAttackBeginOverlap(
 
 void AAutoAttackHitActor::PerformHitSweep()
 {
+	if (!bEnabled) { return; }
 	if (!BoxComp) { return; }
+	//UE_LOG(LogTemp, Display, TEXT("hi 生成"));
 
 	const FVector CurrentLocation =
 		BoxComp->GetComponentLocation();
@@ -131,7 +135,6 @@ void AAutoAttackHitActor::PerformHitSweep()
 
 		Interface->ApplyDamaged(SetAttackDamage());
 		Interface->ApplyKnockBack(GetActorLocation());
-		UE_LOG(LogTemp, Display, TEXT("当たった"));
 	}
 }
 
