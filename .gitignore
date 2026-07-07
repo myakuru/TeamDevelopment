@@ -9,6 +9,10 @@
 *.ipch
 .vsconfig
 
+# Rider
+*.idea/
+
+
 # コンパイルの中間ファイル
 *.o
 *.obj
