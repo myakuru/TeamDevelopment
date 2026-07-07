@@ -173,14 +173,10 @@ void ULaserGearState_Lv4::UpdateRotation(
 	
 	const int32 CurrentIndex = GetCurrentSectionIndex(InElapsedTime);
 	
-	FRotator TargetRotator = StartTransform.Rotator();
-	
-	if (!RotationYaws.IsValidIndex(CurrentIndex)) { return; }
-	
-	TargetRotator.Yaw += RotationYaws[CurrentIndex].TargetYawOffset;
-	
 	// 区間内での開始時間
 	const float SectionStartTime = GetElapsedTimeToIndex(CurrentIndex);
+
+	if (!RotationYaws.IsValidIndex(CurrentIndex)) { return; }
 	
 	// 補間値を求める
 	const float LerpAlpha = FMath::Clamp(
@@ -188,8 +184,24 @@ void ULaserGearState_Lv4::UpdateRotation(
 		0.f,
 		1.f);
 	//UE_LOG(LogTemp, Display, TEXT("hi LerpAlpha %.2f"), LerpAlpha);
+	
+	// 区間開始のカメラとプレイヤーの距離
+	FRotator StartRotator = StartTransform.Rotator();
+
+	FRotator TargetRotator = StartTransform.Rotator();
+	
+	if (!RotationYaws.IsValidIndex(CurrentIndex)) { return; }
+	
+	TargetRotator.Yaw += RotationYaws[CurrentIndex].TargetYawOffset;
+	
+	// 前区間のカメラデータ取得
+	if (const FRotationYaw* PrevData = GetPreviousValidRotationYawData(CurrentIndex))
+	{
+		StartRotator.Yaw += PrevData->TargetYawOffset;
+	}
+	
 	const FQuat ResultQuat = FQuat::Slerp(
-		StartTransform.Rotator().Quaternion(),
+		StartRotator.Quaternion(),
 		TargetRotator.Quaternion(),
 		LerpAlpha) ;
 	
@@ -226,3 +238,16 @@ float ULaserGearState_Lv4::GetElapsedTimeToIndex(int32 InTargetIndex)
 
 	return ResultTime;
 }
+
+const FRotationYaw* ULaserGearState_Lv4::GetPreviousValidRotationYawData(int32 DataIndex) const
+{
+	if (!RotationYaws.IsValidIndex(DataIndex - 1))
+	{
+		return nullptr;
+	}
+
+	const FRotationYaw& PrevData = RotationYaws[DataIndex - 1];
+	
+	return &PrevData;
+}
+

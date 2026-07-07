@@ -21,21 +21,12 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/Animation/ABP_Pelura.uasset" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv4.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/BP_LaserGear.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/BP_LaserGear.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/State/BP_LaserGearState_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/State/BP_LaserGearState_Lv4.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponAttackState/FloatingWeaponAttackState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponAttackState/FloatingWeaponAttackState.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponAttackState/FloatingWeaponAttackState.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponAttackState/FloatingWeaponAttackState.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponTransitionState/FloatingWeaponTransitionState.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponTransitionState/FloatingWeaponTransitionState.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/HitActor/AutoAttackHitActor/AutoAttackHitActor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/HitActor/AutoAttackHitActor/AutoAttackHitActor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/HitActor/AutoAttackHitActor/AutoAttackHitActor.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/HitActor/AutoAttackHitActor/AutoAttackHitActor.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -224,6 +215,8 @@
       <workItem from="1783398389902" duration="20000" />
       <workItem from="1783398618745" duration="131000" />
       <workItem from="1783399022640" duration="3409000" />
+      <workItem from="1783403771486" duration="202000" />
+      <workItem from="1783405129048" duration="2894000" />
     </task>
     <servers />
   </component>

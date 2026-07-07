@@ -47,7 +47,7 @@ class PROJECTNULL_API ULaserGearState_Lv4 final : public ULaserGearStateBase
 	GENERATED_BODY()
 public:
 	ULaserGearState_Lv4();
-public:
+	
 	void Initialize(
 		class APlayerBase* InPlayer,
 		class UPlayerGearComponent* InGearComponent,
@@ -69,6 +69,14 @@ private:
 
 	
 	float GetElapsedTimeToIndex(int32 InTargetIndex);
+
+	/**
+	* @brief 前区間の有効なカメラデータ取得
+	* @param DataIndex データインデックス
+	* @return カメラデータ
+	*/
+	const FRotationYaw* GetPreviousValidRotationYawData(int32 DataIndex) const;
+
 	
 	/** ロボットコントローラークラス */
 	UPROPERTY()
