@@ -10,8 +10,8 @@
 .vsconfig
 
 # Rider
-*.idea/
-
+.idea/
+*.DotSettings.user
 
 # コンパイルの中間ファイル
 *.o
@@ -56,5 +56,5 @@ SourceArt/**/*.tga
 *_BuiltData.uasset
 
 # その他
-*.DS_Store
+.DS_Store
 desktop.ini
