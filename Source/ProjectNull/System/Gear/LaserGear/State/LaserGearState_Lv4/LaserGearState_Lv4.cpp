@@ -14,6 +14,9 @@
 
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
+#include "ProjectNull/GameInstance/SuperGameInstance.h"
+
 
 ULaserGearState_Lv4::ULaserGearState_Lv4():
 	SpellAnimMontage(nullptr),
@@ -60,15 +63,25 @@ void ULaserGearState_Lv4::Initialize(
 	GearSpecialAction->Initialize(this);
 	
 	RobotController = Cast<ARobotController>(InPlayer->GetController());
+
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
 }
 
 void ULaserGearState_Lv4::Execute(int32 CurrentGearLevel)
 {
 	ULaserGearStateBase::Execute(CurrentGearLevel);
 	bSpawnEnable = false;
+
+
 	
 	if (!Player || 
-		!RobotController) { return; }
+		!RobotController ||
+		!PlayerRuntimeData) { return; }
+
+	PlayerRuntimeData->SetIsInvincible(true);
 	
 	// 入力を無効化
 	RobotController->SetCanReceiveInput(false);
@@ -145,8 +158,11 @@ void ULaserGearState_Lv4::End()
 {
 	ULaserGearStateBase::End();
 
-	if (!Player) { return; }
+	if (!Player ||
+		!PlayerRuntimeData) { return; }
 
+	PlayerRuntimeData->SetIsInvincible(false);
+	
 	RobotController->SetCanReceiveInput(true);
 	
 	const auto MovementComp = Player->GetCharacterMovement(); 

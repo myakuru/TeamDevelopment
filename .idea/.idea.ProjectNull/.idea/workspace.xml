@@ -21,14 +21,21 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/Animation/Montage/AM_Perula_Spell.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/Animation/Montage/AM_Perula_Spell.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/Animation/Montage/AM_Perula_Dash.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/Animation/Montage/AM_Perula_Dash.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Projectile/Laserbeam/BP_Laserbeam_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Projectile/Laserbeam/BP_Laserbeam_Lv4.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Levels/Map_hinata/TestMap_hinata.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Levels/Map_hinata/TestMap_hinata.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/BP_DashGear.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/BP_DashGear.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv1.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv1.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv2.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv2.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv3.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv3.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv4.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/State/BP_LaserGearState_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/State/BP_LaserGearState_Lv4.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearStateBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearStateBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +52,8 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Plugins/Media/ElectraPlayer/Source/ElectraPlayerRuntime/Private/Runtime/Platforms/Android/PlayerRuntime_Android.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/MovieSceneTools/Public/MovieSceneToolHelpers.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/UnrealEd/Private/Tools/EdModeInteractiveToolsContext.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/UnrealEd/Public/Tools/EdModeInteractiveToolsContext.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Public/DrawDebugHelpers.h" root0="FORCE_HIGHLIGHTING" />
@@ -223,6 +232,8 @@
       <workItem from="1783421841504" duration="1000" />
       <workItem from="1783421934576" duration="811000" />
       <workItem from="1783468736345" duration="6229000" />
+      <workItem from="1783479692953" duration="196000" />
+      <workItem from="1783483975336" duration="5554000" />
     </task>
     <servers />
   </component>

@@ -19,6 +19,8 @@ class UGearSpecialAction;
 
 class ARobotController;
 
+class UPlayerRuntimeData;
+
 USTRUCT()
 struct FRotationYaw
 {
@@ -117,6 +119,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float TargetLocationOffsetZ;
 	
-	
-	
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 };
