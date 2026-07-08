@@ -20,7 +20,7 @@ USTT_EnemyBossApproachRun::USTT_EnemyBossApproachRun(const FObjectInitializer& a
 
 EStateTreeRunStatus USTT_EnemyBossApproachRun::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("ApproachRun Tick In"));
+	UE_LOG(LogTemp, Warning, TEXT("ApproachRun Tick In"));
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
 

@@ -18,6 +18,7 @@ USTT_EnemyBossRangedAttack::USTT_EnemyBossRangedAttack(const FObjectInitializer&
 
 EStateTreeRunStatus USTT_EnemyBossRangedAttack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
+	UE_LOG(LogTemp, Warning, TEXT("RangedAttackState"));
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
 

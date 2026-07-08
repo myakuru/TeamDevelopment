@@ -130,6 +130,7 @@ void AAutoAttackHitActor::PerformHitSweep()
 		if (!Interface) { continue; }
 
 		Interface->ApplyDamaged(SetAttackDamage());
+		Interface->ApplyLocalHitPos(Hit.Location);
 		Interface->ApplyKnockBack(GetActorLocation());
 		UE_LOG(LogTemp, Display, TEXT("当たった"));
 	}
