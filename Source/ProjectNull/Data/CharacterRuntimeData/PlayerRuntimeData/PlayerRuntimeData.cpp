@@ -67,7 +67,7 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 void UPlayerRuntimeData::AddGearEnergy(float Amount)
 {
 	Gear.GearEnergy += Amount;
-	UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
+	//UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
 	OnGearEnergyChanged.Broadcast(Gear.GearEnergy);
 }
 
@@ -98,7 +98,7 @@ float UPlayerRuntimeData::GetPlayerAttackDamage()
 	// プレイヤーの攻撃力を計算するロジックをここに実装
 	Attack.Final = Attack.Base * AttackMultiplier;
 
-	UE_LOG(LogTemp, Error, TEXT("%f:Attack.Final"), Attack.Final);
+	//UE_LOG(LogTemp, Error, TEXT("%f:Attack.Final"), Attack.Final);
 
 	return Attack.Final;
 }
@@ -139,7 +139,9 @@ void UPlayerRuntimeData::CalculateExperience(const FExperienceParameterData& Dat
 	Experience.CalculateExperienceToNextLevel(Data.BaseExperienceToNextLevel, Data.ExperienceToNextLevelIncreasePerLevel, Level);
 }
 
-void UPlayerRuntimeData::CalculateFinalSpeed(const FSpeedParameterData& Data, int32 CurrentGearLevel)
+void UPlayerRuntimeData::CalculateFinalSpeed(
+	const FSpeedParameterData& Data,
+	int32 CurrentGearLevel)
 {
 	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(CurrentGearLevel)) { return; }
 	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
@@ -191,7 +193,9 @@ FName UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 	return "null";
 }
 
-void UPlayerRuntimeData::UpgradeAttackMultiplier(FName Id, float InMultiplier)
+void UPlayerRuntimeData::UpgradeAttackMultiplier(
+	FName Id,
+	float InMultiplier)
 {
 	for (auto& UpgradeState : UpgradeStates)
 	{

@@ -37,8 +37,11 @@ void ALaserbeam::BeginPlay()
 void ALaserbeam::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	DrawDebugBox(GetWorld(),
-		BoxComp->GetComponentLocation(),BoxComp->GetScaledBoxExtent(),GetActorQuat(),FColor::Green);
+	// DrawDebugBox(GetWorld(),
+	// 	BoxComp->GetComponentLocation(),
+	// 			BoxComp->GetScaledBoxExtent(),
+	// 				GetActorQuat(),
+	// 				FColor::Green);
 }
 
 void ALaserbeam::OnLaserbeamBeginOverlap(
