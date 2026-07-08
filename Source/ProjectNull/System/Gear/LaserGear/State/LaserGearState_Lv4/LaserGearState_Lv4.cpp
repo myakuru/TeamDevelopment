@@ -103,7 +103,7 @@ void ULaserGearState_Lv4::Update(float DeltaTime)
 	// 経過時間取得
 	const float ElapsedTime = Owner->GetElapsedTime();
 	
-	float LerpTime =  ElapsedTime < FlyingTime
+	const float LerpTime =  ElapsedTime < FlyingTime
 	? ElapsedTime / FlyingTime
 	: 1.f - (ElapsedTime - Owner->GetGearDuration(GetGearLevelIndex()) + WalkingTime) /  WalkingTime;
 	
@@ -187,7 +187,6 @@ void ULaserGearState_Lv4::UpdateRotation(
 	
 	// 区間開始のカメラとプレイヤーの距離
 	FRotator StartRotator = StartTransform.Rotator();
-
 	FRotator TargetRotator = StartTransform.Rotator();
 	
 	if (!RotationYaws.IsValidIndex(CurrentIndex)) { return; }
