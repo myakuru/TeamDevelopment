@@ -40,7 +40,7 @@ void UGroundAlignmentComponent::TickComponent(
 		TickType,
 		ThisTickFunction);
 
-	auto Player = Cast<APlayerBase>(GetOwner());
+	const auto Player = Cast<APlayerBase>(GetOwner());
 	if (!Player) { return; }
 
 	FVector FloorNormal = FVector::ZeroVector;

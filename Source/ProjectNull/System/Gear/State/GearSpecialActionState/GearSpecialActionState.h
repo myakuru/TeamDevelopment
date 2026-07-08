@@ -23,7 +23,6 @@ class PROJECTNULL_API UGearSpecialAction : public UObject
 	GENERATED_BODY()
 public:	
 	UGearSpecialAction();
-public:
 
 	void Initialize(
 		class UGearStateBase* InOwner);
