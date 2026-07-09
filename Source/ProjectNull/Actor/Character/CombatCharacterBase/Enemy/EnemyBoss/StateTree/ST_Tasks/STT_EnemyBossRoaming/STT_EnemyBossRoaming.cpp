@@ -29,6 +29,7 @@ EStateTreeRunStatus USTT_EnemyBossRoaming::EnterState(FStateTreeExecutionContext
 
 EStateTreeRunStatus USTT_EnemyBossRoaming::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Roaming"));
 	if (!IsValid(OwnerBoss) || !IsValid(AIC))
 	{
 		return EStateTreeRunStatus::Failed;

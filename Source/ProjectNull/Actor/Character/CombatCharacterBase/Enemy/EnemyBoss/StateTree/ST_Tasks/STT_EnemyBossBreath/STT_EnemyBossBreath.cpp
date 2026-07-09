@@ -18,7 +18,7 @@ USTT_EnemyBossBreath::USTT_EnemyBossBreath(const FObjectInitializer& a_ObjInit)
 
 EStateTreeRunStatus USTT_EnemyBossBreath::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Breath Tick In"));
+	UE_LOG(LogTemp, Warning, TEXT("BreathState"));
 
 	AEnemyBossBase* Boss = GetBoss();
 	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }
@@ -51,6 +51,12 @@ EStateTreeRunStatus USTT_EnemyBossBreath::Tick(FStateTreeExecutionContext& Conte
 
 			// 挙動を停止させてからアニメーション再生
 			AIC->StopMovement();
+			if (Move)
+			{
+				Move->StopMovementImmediately();
+				Move->Velocity = FVector::ZeroVector;
+				Move->ClearAccumulatedForces();
+			}
 			Phase = EBossBreathPhase::Start;
 			// アニメ再生
 			//if (UAnimInstance* Anim = Boss->GetMesh() ? Boss->GetMesh()->GetAnimInstance() : nullptr)
@@ -100,6 +106,7 @@ EStateTreeRunStatus USTT_EnemyBossBreath::Tick(FStateTreeExecutionContext& Conte
 			{
 				Boss->SetActionPriority(EBossActionType::None);
 				AIC->StopMovement();
+				Boss->SetPrevAction(Boss->GetCurrentAction());
 				return EStateTreeRunStatus::Succeeded;
 			}
 		}
@@ -127,6 +134,14 @@ EStateTreeRunStatus USTT_EnemyBossBreath::EnterState(FStateTreeExecutionContext&
 
 	BreathCount = 0.0f;
 
+	UCharacterMovementComponent* Move = Boss->GetCharacterMovement();
+	if (Move)
+	{
+		Move->StopMovementImmediately();
+		Move->Velocity = FVector::ZeroVector;
+		Move->ClearAccumulatedForces();
+	}
+
 	return EStateTreeRunStatus::Running;
 }
 
@@ -139,6 +154,4 @@ void USTT_EnemyBossBreath::ExitState(FStateTreeExecutionContext& Context, const 
 	{
 		return;
 	}
-
-	Boss->SetPrevAction(Boss->GetCurrentAction());
 }

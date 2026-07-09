@@ -55,6 +55,12 @@ void UStageManager::LoadFromSaveData(UMySaveGame* inSaveGame)
 		}
 
 	}
+
+	if ((*StageProgressList)[0].MissionClears.IsEmpty()) {
+		for (int i = 0; i < StageCount; i++) {
+			(*StageProgressList)[i].MissionClears.SetNum(3);
+		}
+	}
 }
 
 void UStageManager::SaveToData(UMySaveGame* inSaveGame)

@@ -18,6 +18,7 @@ USTT_EnemyBossStrafe::USTT_EnemyBossStrafe(const FObjectInitializer& a_ObjInit)
 
 EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
+	UE_LOG(LogTemp, Warning, TEXT("StrafeState"));
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
 
@@ -30,6 +31,10 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Conte
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Strafe Tick End"));
 		AIC->StopMovement();
+		if (UAnimInstance* Anim = Boss->GetMesh()->GetAnimInstance())
+		{
+			Anim->Montage_Stop(0.2f);
+		}
 		return EStateTreeRunStatus::Succeeded;
 	}
 
@@ -37,6 +42,10 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Conte
 	if (GetOutDistance * GetOutDistance <= FVector::DistSquared(TargetActor->GetActorLocation(), Boss->GetActorLocation()))
 	{
 		AIC->StopMovement();
+		if (UAnimInstance* Anim = Boss->GetMesh()->GetAnimInstance())
+		{
+			Anim->Montage_Stop(0.2f);
+		}
 		return EStateTreeRunStatus::Succeeded;
 	}
 
@@ -55,6 +64,16 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Conte
 		// 後退はボス自身の後ろの方向
 		Boss->SetActorRotation(FRotator(0.0f, ToPlayer.Rotation().Yaw, 0.0f));
 		MoveDir = -Boss->GetActorForwardVector();
+
+		if (BackOutDistance * BackOutDistance >= FVector::DistSquared(TargetActor->GetActorLocation(), Boss->GetActorLocation()))
+		{
+			AIC->StopMovement();
+			if (UAnimInstance* Anim = Boss->GetMesh()->GetAnimInstance())
+			{
+				Anim->Montage_Stop(0.2f);
+			}
+			return EStateTreeRunStatus::Succeeded;
+		}
 	}
 	else
 	{
@@ -69,7 +88,9 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Conte
 
 		if (CurrentRadius <= KINDA_SMALL_NUMBER)
 		{
-			return EStateTreeRunStatus::Running;
+			// 画面上にデバッグ表示（見やすい）
+			UKismetSystemLibrary::PrintString(this, "CurrentRadisu <= KINDA_SMALL_NUMBER", true, true, FColor::Blue, 2.0f);
+			//return EStateTreeRunStatus::Running;
 		}
 
 		const FVector RadialDir = FromTarget / CurrentRadius;
@@ -83,7 +104,13 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::Tick(FStateTreeExecutionContext& Conte
 		// 半径を保つ補正
 		// 近すぎるなら外へ、遠すぎるならうちへ
 		const float RadiusError = OrbitRadius - CurrentRadius;
-		const float CorrectionScale = FMath::Clamp(RadiusError / OrbitRadius, -1.0f, 1.0f);
+		float CorrectionScale = FMath::Clamp(RadiusError / OrbitRadius, -1.0f, 1.0f);
+
+		// 遠いとき、つまり内側へ寄る補正だけ弱める
+		if (CorrectionScale < 0.0f)
+		{
+			CorrectionScale *= 0.3f;
+		}
 
 		const FVector RadiusCorrection = RadialDir * CorrectionScale * OrbitRadiusCorrection;
 
@@ -109,10 +136,10 @@ EStateTreeRunStatus USTT_EnemyBossStrafe::EnterState(FStateTreeExecutionContext&
 
 	Elapsed = 0.0f;
 
-	int flg = FMath::RandBool();
-	int bBackStepFlg = FMath::RandBool();
-	int SelectAttack = 0;
-	bBackStep = false;
+	int flg				= FMath::RandBool();
+	int bBackStepFlg	= FMath::RandBool();
+	int SelectAttack	= 0;
+	bBackStep			= false;
 	if (flg)
 	{
 		//StrifeDir = 1.0f;

@@ -63,6 +63,7 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 	// 発動時間の更新
 	Duration = GearStatuses[StateIndex].Duration;
 	SimultaneousActivationCoolTime = GearStatuses[StateIndex].SimultaneousActivationCoolTime;
+	bAllowOtherGearActivation = false;
 
 	// ギアのクールタイムをセットし、クールタイム終了時にリセット処理を呼ぶ
 	GetWorld()->GetTimerManager().SetTimer(
@@ -86,8 +87,13 @@ void UGearBase::Update(float DeltaTime)
 
 	// 状態クラスの更新
 	CurrentGearState->Update(DeltaTime);
+
+	if (ElapsedTime >= SimultaneousActivationCoolTime
+		&& !bAllowOtherGearActivation)
+	{
+		bAllowOtherGearActivation = true;
+	}
 	
-	bAllowOtherGearActivation = ElapsedTime >= SimultaneousActivationCoolTime;
 
 	// 発動時間が終了したら
 	// 状態クラスの終了処理を呼び出し、更新を行わない

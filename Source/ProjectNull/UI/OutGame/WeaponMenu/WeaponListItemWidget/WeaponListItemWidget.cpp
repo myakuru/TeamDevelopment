@@ -5,6 +5,7 @@
 #include <Components/Border.h>
 #include <Components/TextBlock.h>
 #include <Components/Button.h>
+#include <Components/Image.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 
@@ -14,10 +15,13 @@ bool UWeaponListItemWidget::Initialize()
 
 	WeaponName->SetText(FText());
 
+	BackGround->SetBrushColor(UnselectedBackGroundColor);
+	Overlay->SetBrushColor(UnHoveredOverlayColor);
+
 	if (Button) {
 		Button->OnClicked.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonClicked);
 		Button->OnHovered.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonHovered);
-
+		Button->OnUnhovered.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonUnHovered);
 	}
 
 	return false;
@@ -39,7 +43,7 @@ void UWeaponListItemWidget::SetWeaponInstance(const FWeaponInstance& InWeaponIns
 	if (!weaponManager)return;
 
 	if (weaponManager->GetWeaponMaster(InWeaponInstance.WeaponId, WeaponData)) {
-		WeaponName->SetText(WeaponData.DisplayName);
+		SetWeaponData(WeaponData);
 	}
 
 }
@@ -48,6 +52,8 @@ void UWeaponListItemWidget::SetWeaponData(const FWeaponData& InWeaponData)
 {
 	WeaponData = InWeaponData;
 	WeaponName->SetText(InWeaponData.DisplayName);
+	Icon->SetBrushFromTexture(InWeaponData.Icon);
+	
 }
 
 void UWeaponListItemWidget::OnButtonClicked()
@@ -58,4 +64,10 @@ void UWeaponListItemWidget::OnButtonClicked()
 void UWeaponListItemWidget::OnButtonHovered()
 {
 	OnWeaponListItemHovered.Broadcast(WeaponInstance, WeaponData);
+	Overlay->SetBrushColor(HoveredOverlayColor);
+}
+
+void UWeaponListItemWidget::OnButtonUnHovered()
+{
+	Overlay->SetBrushColor(UnHoveredOverlayColor);
 }

@@ -5,6 +5,7 @@
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 #include <ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.h>
 
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
@@ -110,5 +111,40 @@ void UDashGear::OnDashGearAttackBeginOverlap(
 	if (!Interface) { return; }
 	Interface->ApplyDamaged();
 	Interface->ApplyKnockBack(PlayerLocation);
+	//Interface->ApplyLocalHitPos(OtherActor->GetActorLocation());
+
+
+
+	// TargetのActorのローカル座標を取得
+	FVector HitWorldLocation = OwnerPlayer->GetActorLocation();
+
+	if (IsValid(OtherComp))
+	{
+		FVector ClosestPoint;
+		// @brief	当たった相手のコリジョンで、OwnerPlayerの位置に一番近い点を探す
+		// ClosesPoint	OtherCompのコリジョン表面上で、プレイヤーに一番近いワールド座標
+		// Distance		Player位置からClosesPointまでの距離
+		const float Distance = OtherComp->GetClosestPointOnCollision(
+			OwnerPlayer->GetActorLocation(),
+			ClosestPoint
+		);
+
+		// Player位置とOtherCompのコリジョンにきょりがあれば
+		if (Distance >= 0.0f)
+		{
+			// Playerに一番近い敵のコリジョンの表面を当たった座標にセット
+			HitWorldLocation = ClosestPoint;
+		}
+		else
+		{
+			HitWorldLocation = OtherActor->GetActorLocation();
+		}
+	}
+	else
+	{
+		HitWorldLocation = OtherActor->GetActorLocation();
+	}
+
+	Interface->ApplyLocalHitPos(HitWorldLocation);
 }
 

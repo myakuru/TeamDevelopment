@@ -3,44 +3,68 @@
 
 #include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
+#include <ProjectNull/Actor/HitActor/AutoAttackHitActor/AutoAttackHitActor.h>
 
 UFloatingWeaponAttackState::UFloatingWeaponAttackState()
 {
 }
 
+void UFloatingWeaponAttackState::Start()
+{
+	Super::Start();
+
+	if (!Owner) { return; }
+	const auto OwnerAttack = Owner->GetOwnerAttack();
+	if (!OwnerAttack) { return; }
+	const auto AutoAttackHitActor = OwnerAttack->GetAutoAttackHitActor();
+	if (!AutoAttackHitActor) { return; }
+
+	AutoAttackHitActor->SetHitEnabled(true);
+	
+}
+
 void UFloatingWeaponAttackState::Update(float DeltaTime)
 {
-	if (!OwnerActor || !Owner || !Owner->GetOwnerAttack()) { return; }
+	if (!Owner) { return; }
+	const auto OwnerAttack = Owner->GetOwnerAttack();
+	if (!OwnerAttack) { return; }
+	
 	//UE_LOG(LogTemp, Warning, TEXT("AttackState"));
-
-	auto* attack = Owner->GetOwnerAttack();
-
-	if (attack->CanDeactivate())
+	
+	if (OwnerAttack->CanDeactivate())
 	{
-		Owner->ChangeState(EFloatingWeaponState::Transition,EFloatingWeaponState::Stand);
+		Owner->ChangeState(
+			EFloatingWeaponState::Transition,
+			EFloatingWeaponState::Stand);
+		
+		const auto AutoAttackHitActor = OwnerAttack->GetAutoAttackHitActor();
+		if (!AutoAttackHitActor) { return; }
+
+		AutoAttackHitActor->SetHitEnabled(false);
+		
 		return;
 	}
 
-	const float currentAngle = attack->GetCurrentAngle();
+	const float CurrentAngle = OwnerAttack->GetCurrentAngle();
 
-	RelativeTransform = CalcAttackStateTransformOffset(attack, currentAngle);
+	RelativeTransform = CalcAttackStateTransformOffset(OwnerAttack, CurrentAngle);
 	
 	UFloatingWeaponStateBase::Update(DeltaTime);
 }
 
 FTransform UFloatingWeaponAttackState::CalcAttackStateTransformOffset(UFloatingWeaponAttack* OwnerAttack, float RotatorOffsetAngle)
 {
-	FTransform resultOffset;
+	FTransform ResultOffset;
 
-	if (!Owner || !OwnerActor || !OwnerAttack) { return resultOffset; }
+	if (!Owner || !OwnerActor || !OwnerAttack) { return ResultOffset; }
 
 	// 攻撃方向からのオフセット位置
-	const FVector location = OwnerAttack->CalcAttackDir(FVector::ForwardVector, RotatorOffsetAngle) * RadiusOffset;
+	const FVector Location = OwnerAttack->CalcAttackDir(FVector::ForwardVector, RotatorOffsetAngle) * RadiusOffset;
 
 	RelativeRotation.Yaw = RotatorOffsetAngle;
 
-	resultOffset.SetLocation(location);
-	resultOffset.SetRotation(RelativeRotation.Quaternion());
+	ResultOffset.SetLocation(Location);
+	ResultOffset.SetRotation(RelativeRotation.Quaternion());
 
-	return resultOffset;
+	return ResultOffset;
 }

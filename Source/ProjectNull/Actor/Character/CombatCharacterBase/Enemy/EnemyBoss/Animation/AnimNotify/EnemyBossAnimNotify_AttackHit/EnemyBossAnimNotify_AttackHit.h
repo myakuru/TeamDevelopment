@@ -5,7 +5,14 @@
 // ------------------------------------------------------------------------------------
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "EnemyBossAnimNotify_AttackHit.generated.h"
+
+// ------------------------------------------------------------------------------------
+// 前方宣言
+// ------------------------------------------------------------------------------------
+class UNiagaraSystem;
+class USkeletalMeshComponent;
 
 UCLASS()
 class PROJECTNULL_API UEnemyBossAnimNotify_AttackHit : public UAnimNotifyState
@@ -43,9 +50,61 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	bool bDrawDebug = true;
 
+	// ------------------------------------------------------------------------------------
+	/** 地面ヒットエフェクト*/
+	// ------------------------------------------------------------------------------------
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	bool bSpawnGroundImpactEffect = true;
+
+	// Notify開始から何秒後にエフェクトを出すか
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	float GroundImpactDelay = 0.0f;
+
+	// 地面Traceの上方向距離
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	float GroundTraceUpDistance = 100.0f;
+
+	// 地面Traceの下方向距離
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	float GroundTraceDownDistance = 500.0f;
+
+	// SurfaceTypeごとのNiagara
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	TMap<TEnumAsByte<EPhysicalSurface>, TObjectPtr<UNiagaraSystem>> GroundImpactEffects;
+
+	// 対応Surfaceがなかった時の対応
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	TObjectPtr<UNiagaraSystem> DefaultGroundImpactEffect;
+
+	// デバッグ表示用
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	bool bDrawGroundImpactDebug = false;
+
+	// Socketの向きを利用してエフェクトを出す
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	bool bUseSocketDirectionForEffect = true;
+
+	// Niagaraへ渡す初速度
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	float VelocityPower = 800.0f;
+
+	// 少し上方向に飛ばしたくなった場合に使用
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	float UpVelocityPower = 150.0f;
+
+	// Niagara側のUserParameter名
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	FName VelocityParameterName = TEXT("User.ImpactEffectVelocity");
+
 private:
 
 	/** この攻撃で当たったアクター（二重ヒット防止）*/
 	TSet<TWeakObjectPtr<AActor>> HitActors;
+
+	bool bGroundImpactEffect = false;
+	float ElapsedTime = 0.0f;
+
+	bool TrySpawnGroundImpactEffect(USkeletalMeshComponent* MeshComp, const FVector& TraceCenter, const FTransform& SourceTransform);
+	UNiagaraSystem* GetGroundImpactEffect(EPhysicalSurface SurfaceType) const;
 
 };
