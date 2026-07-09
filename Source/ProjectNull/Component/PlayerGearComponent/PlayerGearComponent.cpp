@@ -1,12 +1,9 @@
 ﻿#include "PlayerGearComponent.h"
 
-#include "Components/SphereComponent.h"
-
 #include <ProjectNull/Component/HitStopComponent/HitStopComponent.h>
 
 #include <ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
 #include <ProjectNull/Actor/Effect/EffectBase.h>
 
@@ -16,23 +13,20 @@
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 #include <ProjectNull/System/Gear/GearBase.h>
-#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/System/Combat/Attack/CollisionAttack/SphereAttack/SphereAttack.h>
 
-
-UPlayerGearComponent::UPlayerGearComponent():
-		OwnerPlayer(nullptr),
-		PlayerRuntimeData(nullptr),
-		PlayerParameterData(nullptr),
-		PlayerGears(TArray<TObjectPtr<UGearBase>>()),
-		SphereCollision(nullptr),
-		SphereCollisionClass(nullptr),
-		CurrentGearLevel(1),
-		HitStopDuration(0.f),
-		HitStopTimeDilation(0.f),
-		InvincibilityTimerHandle(FTimerHandle())
+UPlayerGearComponent::UPlayerGearComponent() :
+	OwnerPlayer(nullptr),
+	PlayerRuntimeData(nullptr),
+	PlayerParameterData(nullptr),
+	PlayerGears(TArray<TObjectPtr<UGearBase>>()),
+	SphereAttack(nullptr),
+	CurrentGearLevel(1),
+	HitStopDuration(0.f),
+	HitStopTimeDilation(0.f),
+	InvincibilityTimerHandle(FTimerHandle())
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
 
 void UPlayerGearComponent::BeginPlay()
@@ -41,14 +35,14 @@ void UPlayerGearComponent::BeginPlay()
 
 	OwnerPlayer = Cast<APlayerBase>(GetOwner());
 
-	auto SuperGameInstance	= GetWorld()->GetGameInstance<USuperGameInstance>();
-	if (!SuperGameInstance)		{ return; }
+	auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
 
-	PlayerParameterData		= SuperGameInstance->GetPlayerParameterData();
-	if (!PlayerParameterData)	{ return; }
+	PlayerParameterData = SuperGameInstance->GetPlayerParameterData();
+	if (!PlayerParameterData) { return; }
 
-	PlayerRuntimeData		= SuperGameInstance->GetPlayerRuntimeData();
-	if (!PlayerRuntimeData)		{ return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (!PlayerRuntimeData) { return; }
 
 	InitializeSphereCollision();
 
@@ -59,7 +53,6 @@ void UPlayerGearComponent::BeginPlay()
 		PlayerGears[Index]->SetGearIndex(Index);
 		PlayerParameterData->ResetSkillCooldown(Index);
 	}
-
 }
 
 void UPlayerGearComponent::TickComponent(
@@ -67,12 +60,12 @@ void UPlayerGearComponent::TickComponent(
 	ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
-	
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	UpdateGearWidget(DeltaTime);
 
-	for(auto& Gear : PlayerGears) {
+	for (auto& Gear : PlayerGears)
+	{
 		if (!Gear) { continue; }
 		Gear->Update(DeltaTime);
 	}
@@ -81,14 +74,15 @@ void UPlayerGearComponent::TickComponent(
 
 	/*if (!PlayerRuntimeData) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("hi IsInvincible %d"), PlayerRuntimeData->IsInvincible());*/
-
 }
 
 bool UPlayerGearComponent::IsMovementBlockedByGear() const
 {
-	for (auto& Gear : PlayerGears) {
+	for (auto& Gear : PlayerGears)
+	{
 		if (!Gear) { continue; }
-		if (Gear->BlocksMovement()) {
+		if (Gear->BlocksMovement())
+		{
 			return true;
 		}
 	}
@@ -97,7 +91,7 @@ bool UPlayerGearComponent::IsMovementBlockedByGear() const
 
 void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 {
-	if (!PlayerGears.IsValidIndex(GearIndex) || 
+	if (!PlayerGears.IsValidIndex(GearIndex) ||
 		!PlayerGears[GearIndex]) { return; }
 
 	bool bShouldExecute = true;
@@ -105,7 +99,7 @@ void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
 		auto& Gear = PlayerGears[Index];
-		if(!IsValid(Gear) ||
+		if (!IsValid(Gear) ||
 			Index == GearIndex) { continue; }
 
 		if (!Gear->AllowOtherGearActivation())
@@ -123,12 +117,12 @@ void UPlayerGearComponent::ChangeGear()
 {
 	if (!OwnerPlayer ||
 		!PlayerRuntimeData ||
-		!PlayerParameterData)	{ return; }
+		!PlayerParameterData) { return; }
 
-	if (!CanChangeGear())		{ return; }
+	if (!CanChangeGear()) { return; }
 
 	PlayerRuntimeData->ResetDataOnGearChange(CurrentGearLevel);
-	
+
 	// プレイヤーのギアパラメータデータ取得
 	const auto GearParameterData = PlayerParameterData->GetGearData();
 
@@ -137,59 +131,28 @@ void UPlayerGearComponent::ChangeGear()
 	//UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
 
 	OnInvincibilityStart();
-
 }
 
-void UPlayerGearComponent::OnGearBeginOverlap(
-	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
+void UPlayerGearComponent::OnGearBeginOverlap(const TObjectPtr<AActor>& OtherActor) const
 {
-	if (!OwnerPlayer)	{ return; }
-	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
-
-	auto Interface = Cast<ICharacterInterface>(OtherActor);
-	if (!Interface)		{ return; }
-	Interface->ApplyDamaged(1.f);
-	Interface->ApplyKnockBack(PlayerLocation);
-	
 	auto HitStopComp = OwnerPlayer->GetHitStopComponent();
-	if (!HitStopComp)	{ return; }
+	if (!HitStopComp) { return; }
 
 	HitStopComp->StartHitStop(
 		HitStopDuration,
 		HitStopTimeDilation
 	);
-
 }
 
 void UPlayerGearComponent::InitializeSphereCollision()
 {
-	SphereCollision = GetWorld()->SpawnActor<ASphereCollision>
-		(SphereCollisionClass);
+	if (!IsValid(SphereAttack)) { return; }
 
-	if (!SphereCollision) { return; }
-
-	// 攻撃用球アクターに親をアタッチ
-	SphereCollision->AttachToActor(
-		OwnerPlayer,
-		FAttachmentTransformRules::KeepRelativeTransform,
-		TEXT("GearSphere")
-	);
-
-	auto SphereComponent = SphereCollision->GetSphereComponent();
-	if (!SphereComponent) { return; }
-
-	// オーバーラップ時、オーバーラップ抜け時の関数をセット
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(
-		this,
-		&UPlayerGearComponent::OnGearBeginOverlap
-	);
-
-	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// 攻撃がHITした時に呼びたい関数をコリジョンのデリゲートに登録
+	SphereAttack->GetDelegateOnOverlapIn().AddUObject(
+			this
+		,	&ThisClass::OnGearBeginOverlap
+		);
 }
 
 void UPlayerGearComponent::UpdateSkillCooldown(
@@ -199,13 +162,13 @@ void UPlayerGearComponent::UpdateSkillCooldown(
 	if (!PlayerParameterData ||
 		!Gear) { return; }
 
-	const FTimerHandle	CoolTimerHandle		= Gear->GetCoolTimerHandle();
-	FTimerManager&		TimerManager		= GetWorld()->GetTimerManager();
-	const bool			IsCooldownActive	= TimerManager.IsTimerActive(CoolTimerHandle);
-	const float			RemainTime			= IsCooldownActive ? TimerManager.GetTimerRemaining(CoolTimerHandle) : 0.f;
+	const FTimerHandle CoolTimerHandle = Gear->GetCoolTimerHandle();
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	const bool IsCooldownActive = TimerManager.IsTimerActive(CoolTimerHandle);
+	const float RemainTime = IsCooldownActive ? TimerManager.GetTimerRemaining(CoolTimerHandle) : 0.f;
 
 	PlayerParameterData->UpdateSkillCooldown(
-		Index, 
+		Index,
 		RemainTime,
 		Gear->GetGearCoolTime(Index));
 }
@@ -213,23 +176,18 @@ void UPlayerGearComponent::UpdateSkillCooldown(
 void UPlayerGearComponent::SetIsInvincible(bool bInIsInvincible)
 {
 	if (!PlayerRuntimeData ||
-		!SphereCollision) { return; }
+		!SphereAttack) { return; }
 
 	PlayerRuntimeData->SetIsInvincible(bInIsInvincible);
-	
-	ECollisionEnabled::Type CollisionType
-		= bInIsInvincible ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision;
-
 
 	if (bInIsInvincible)
 	{
 		StartInvincibleEffect();
 	}
-	else {
+	else
+	{
 		DeactivateEffect();
 	}
-
-	SphereCollision->SetCollisionEnabled(CollisionType);
 }
 
 bool UPlayerGearComponent::CanChangeGear() const
@@ -243,7 +201,7 @@ void UPlayerGearComponent::OnInvincibilityStart()
 	if (!PlayerRuntimeData) { return; }
 
 	const auto& GearRuntimeData = PlayerRuntimeData->GetGearData();
-	
+
 	SetIsInvincible(true);
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -258,7 +216,8 @@ void UPlayerGearComponent::OnInvincibilityEnd()
 {
 	if (!PlayerRuntimeData) { return; }
 
-	if (CurrentGearLevel == kMaxGearLevel) {
+	if (CurrentGearLevel == kMaxGearLevel)
+	{
 		CurrentGearLevel = 1;
 		PlayerRuntimeData->LevelUp();
 	}
@@ -269,13 +228,13 @@ void UPlayerGearComponent::OnInvincibilityEnd()
 void UPlayerGearComponent::UpdateCollisionByInvincibility()
 {
 	if (!OwnerPlayer ||
-		!PlayerRuntimeData)					{ return; }
+		!PlayerRuntimeData) { return; }
 
 	if (!PlayerRuntimeData->IsInvincible()) { return; }
 	//UE_LOG(LogTemp, Warning, TEXT("hi addmove"));
-	
-	const FRotator	YawRotation	= { 0.f, OwnerPlayer->GetControlRotation().Yaw, 0.f };
-	const FVector	Forward		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+	const FRotator YawRotation = {0.f, OwnerPlayer->GetControlRotation().Yaw, 0.f};
+	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 	OwnerPlayer->AddMovementInput(Forward);
 }
@@ -291,10 +250,10 @@ void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
 void UPlayerGearComponent::StartInvincibleEffect()
 {
 	if (!InvincibleEffect ||
-		!OwnerPlayer)		{ return; }
+		!OwnerPlayer) { return; }
 
 	const auto RootComp = OwnerPlayer->GetRootComponent();
-	if (!RootComp)			{ return; }
+	if (!RootComp) { return; }
 
 	InvincibleEffect->Start(RootComp);
 }
@@ -304,4 +263,3 @@ void UPlayerGearComponent::DeactivateEffect()
 	if (!InvincibleEffect) { return; }
 	InvincibleEffect->DeactivateEffect();
 }
-

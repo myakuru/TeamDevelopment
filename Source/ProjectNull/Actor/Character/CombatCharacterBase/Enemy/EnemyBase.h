@@ -2,11 +2,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
-#include "ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h"
+#include "ProjectNull/System/Interface/CharacterInterface/CharacterInterface.h"
 #include "EnemyDataStruct.h"
-#include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 #include "EnemyBase.generated.h"
 
 // 前方宣言
@@ -57,12 +55,12 @@ class PROJECTNULL_API AEnemyBase:	public AActor
 public:
 
 	AEnemyBase();
-	~AEnemyBase() override;
+	virtual ~AEnemyBase() override;
 
 public:
 
 	/** Poolから取り出されるときに呼ぶ*/
-	virtual void Activate(const FVector& LocalPos, UEnemyDataAsset* InData);
+	virtual void Activate(const FVector& InLocalPos, UEnemyDataAsset* InData);
 
 	/** Poolに返却するときに呼ぶ*/
 	virtual void Deactivate();
@@ -82,26 +80,26 @@ public:
 	//~ Begin Setter
 	/**
 	 * @brief 移動方向のセット
-	 * @param MoveDir 移動方向
+	 * @param InMoveDir 移動方向
 	 */
-	virtual void SetMoveDir(const FVector& a_MoveDir) { EnemyStatus.MoveDir = a_MoveDir; }
+	virtual void SetMoveDir(const FVector& InMoveDir) { EnemyStatus.MoveDir = InMoveDir; }
 
 	/**
 	 * @brief ターゲットとの距離の二乗値セット
-	 * @param DistSqr 距離の二乗値
+	 * @param InDistSqr 距離の二乗値
 	 */
-	virtual void SetTargetDistanceSqr(float a_DistSqr) { EnemyStatus.TargetDistanceSqr = a_DistSqr; }
+	virtual void SetTargetDistanceSqr(const float InDistSqr) { EnemyStatus.TargetDistanceSqr = InDistSqr; }
 
 	/**
 	* @brief 生存状態をセット
 	*/
-	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
+	virtual void SetIsAlive(const bool InIsAlive) { EnemyStatus.IsAlive = InIsAlive; }
 
 	/**
 	 * @brief 状態タイプをセット
-	 * @param a_State 変更先ステート
+	 * @param InTargetState 変更先ステート
 	 */
-	virtual void SetEnemyState(EEnemyState a_TargetState);
+	virtual void SetEnemyState(EEnemyState InTargetState);
 
 	/**
 	 * @brief 攻撃が終了した瞬間の時間を登録
@@ -110,16 +108,16 @@ public:
 
 	/**
 	 * @brief 外部からステートEnum変更を通知
-	 * @param a_TargetState 変更先ステート
+	 * @param InTargetState 変更先ステート
 	 */
-	virtual void NotifyChangedStateEnum(EEnemyState a_TargetState);
+	virtual void NotifyChangedStateEnum(EEnemyState InTargetState);
 
 	/**
 	 * @brief 所持する当たり判定チャンネルのレスポンス設定を変更
-	 * @param Channel 変更対象チャンネル(WorldStatic,Pawn,etc..)
-	 * @param NewResponse レスポンスタイプ(Block・Overlap・Ignore)
+	 * @param InChannel 変更対象チャンネル(WorldStatic,Pawn,etc..)
+	 * @param InNewResponse レスポンスタイプ(Block・Overlap・Ignore)
 	 */
-	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse);
+	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel InChannel, ECollisionResponse InNewResponse);
 
 	//~ End Setter
 
@@ -184,7 +182,7 @@ public:
 		return GameProgress;
 	}
 
-	bool GetAliveFlg() { return EnemyStatus.IsAlive; }
+	bool GetAliveFlg() const { return EnemyStatus.IsAlive; }
 
 	//~ End Getter
 
@@ -195,13 +193,13 @@ public:
 
 	/**
 	 * @brief ダメージを受ける処理
-	 * @param Damage ダメージ量
+	 * @param InDamaged ダメージ量
 	 */
 	virtual void ApplyDamaged(float InDamaged)override;
 
 	/**
 	 * @brief ノックバックを受ける処理
-	 * @param OwnerLocation 攻撃者の位置
+	 * @param InOwnerLocation 攻撃者の位置
 	 */
 	virtual void ApplyKnockBack(const FVector& InOwnerLocation)override;
 	/* End Character Interface.*/
@@ -265,7 +263,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UEnemyDataAsset> EnemyDataAsset;
-
+	
 public:
 	virtual void Tick(float DeltaTime) override {}
 

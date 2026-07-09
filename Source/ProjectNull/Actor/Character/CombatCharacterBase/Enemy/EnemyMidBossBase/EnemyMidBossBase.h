@@ -41,7 +41,7 @@ public:
 	virtual void FinalizeAttackEnd();							/** 攻撃終了時の最終処理 */
 	virtual void FinalizeDeath();								/** 死亡時の最終処理 */
 	virtual void ActivateAttack(EEnemyAttackType InAttackTyp);	/** 攻撃の発動処理 */
-
+	
 	/**
 	 * @brief 今、攻撃可能距離内にいるかを返す
 	 * @return 範囲内ならtrue
@@ -62,7 +62,6 @@ public:
 
 	/** 被弾時にステートを切り替える */
 	virtual void OnHit() { NotifyChangedStateEnum(EEnemyState::Hit); }
-
 
 	//~ Begin Notify Methods
 	/**
@@ -166,7 +165,7 @@ protected:
 private:
 
 	/** ゲームの進行管理クラスのポインタ */
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UGameProgressSubsystem> GameProgress;
 
 	/**	中ボスのランタイムデータクラス */

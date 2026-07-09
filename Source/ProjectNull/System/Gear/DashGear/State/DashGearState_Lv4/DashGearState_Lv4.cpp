@@ -86,8 +86,6 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 
 	// 入力を無効化
 	RobotController->SetCanReceiveInput(false);
-
-	DashGear->SetSphereRadius(SpecialAttackSphereRadius);
 }
 
 void UDashGearState_Lv4::Update(float DeltaTime)
@@ -153,8 +151,6 @@ void UDashGearState_Lv4::UpdateAttackSphereCollision(float ElapsedTime)
 {
 	if(	!StanceTime.IsWithinRange(ElapsedTime) &&
 		!DashTime.IsWithinRange(ElapsedTime)) { return; }
-
-	SetSphereCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	const auto GroundAlignmentRootComp = Player->GetGroundAlignmentRootComponent();
 	if (!GroundAlignmentRootComp) { return; }

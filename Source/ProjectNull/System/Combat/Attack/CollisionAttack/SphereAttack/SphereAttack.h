@@ -45,6 +45,16 @@ public:
 	 */
 	virtual void Update(float InDeltaTime)override;
 
+	/* ~Begin Setters */
+	/**
+	 * @brief 球コリジョンのトランスフォームに適応(攻撃判定にも親子関係で適応される)
+	 */
+	virtual void ApplyCollisionTransform(const FTransform& InTransform)override;
+	
+	
+	
+	/* End Setters~ */
+	
 private:
 
 	/**

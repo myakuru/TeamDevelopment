@@ -10,7 +10,7 @@ class UGearBase;
 class APlayerBase;
 class UPlayerRuntimeData;
 class UPlayerParameterData;
-class ASphereCollision;
+class USphereAttack;
 class UEffectBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -45,15 +45,11 @@ public:
 	inline int32 GetCurrentGearLevel() const				{ return CurrentGearLevel; }
 
 private:
-
-	UFUNCTION()
-	void OnGearBeginOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
+	
+	/**
+	 * @brief 攻撃がHITした時の処理
+	 */
+	void OnGearBeginOverlap(const TObjectPtr<AActor>& OtherActor) const;
 
 	/**
 	 * @brief 無敵時間用スフィア判定初期化
@@ -110,13 +106,9 @@ private:
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<TObjectPtr<UGearBase>> PlayerGears;
 
-	/** ギアチェンジによる無敵用スフィアコリジョン */
-	UPROPERTY()
-	TObjectPtr<ASphereCollision> SphereCollision;
-
-	/** ギアチェンジによる無敵用スフィアスフィアコリジョンクラス */
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<ASphereCollision> SphereCollisionClass;
+	/**	ギアチェンジによる無敵用スフィアコリジョン */
+	UPROPERTY(EditAnywhere,Instanced)
+	TObjectPtr<USphereAttack> SphereAttack;
 
 	/** 無敵状態を表現するエフェクトActor */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Effect")

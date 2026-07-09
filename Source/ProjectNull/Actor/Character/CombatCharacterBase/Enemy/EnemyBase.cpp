@@ -2,19 +2,15 @@
 #include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StateTreeComponent.h"
-#include "Components/SkeletalMeshComponent.h"
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Utility/StateMachine/StateMachine.h>
-#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
-#include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 
@@ -58,11 +54,11 @@ void AEnemyBase::NotifyChangedStateEnum(EEnemyState a_TargetState)
 	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
 }
 
-void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse)
+void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse InNewResponse)
 {
 	if (!CapsuleComponent) { return; }
 
-	CapsuleComponent->SetCollisionResponseToChannel(Channel, NewResponse);
+	CapsuleComponent->SetCollisionResponseToChannel(Channel, InNewResponse);
 }
 
 float AEnemyBase::GetFinalAttackPower() const
@@ -139,9 +135,9 @@ void AEnemyBase::UpdateParams()
 	}
 }
 
-void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
+void AEnemyBase::SetEnemyState(EEnemyState InTargetState)
 {
-	EnemyStatus.StateTag = a_TargetState;
+	EnemyStatus.StateTag = InTargetState;
 }
 
 void AEnemyBase::NotfyAttackFinishTime()
@@ -249,7 +245,7 @@ FRotator AEnemyBase::CalculateRotationToMoveDirection(const FRotator& CurrentRot
 							RotationInterpSpeed);
 }
 
-void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
+void AEnemyBase::Activate(const FVector& InLocalPos, UEnemyDataAsset* InData)
 {
 	// ヌルチェック
 	check(InData != nullptr);
@@ -287,7 +283,7 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	// ゲームの進行に合わせて敵パラメータを設定
 	UpdateParams();
 
-	SetActorLocation(LocalPos);
+	SetActorLocation(InLocalPos);
 
 	/** ISMManagerへの自己登録*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))

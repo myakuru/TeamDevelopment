@@ -14,7 +14,7 @@ class PROJECTNULL_API UEnemyDataAsset : public UDataAsset
 public:
 
 	// 移動方向
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	FVector MoveDir = FVector::ZeroVector;
 
 	// 移動速度

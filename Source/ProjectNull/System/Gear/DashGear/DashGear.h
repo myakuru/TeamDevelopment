@@ -6,7 +6,8 @@
 
 #include "DashGear.generated.h"
 
-class ASphereCollision;
+/** 前方宣言 */
+class UCollisionAttack;
 
 /** ダッシュギアクラス */
 UCLASS(Blueprintable, EditInlineNew)
@@ -23,27 +24,19 @@ public:
 	void Execute(int32 CurrentGearLevel)			override;
 	void Update(float DeltaTime)					override;
 
-	void SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnabled);
-	void SetSphereTransform(const FTransform& Transform);
-	void SetSphereRadius(float Radius);
+	void SetSphereTransform(const FTransform& Transform) const;
 
 private:
 
+	/**
+	 * @brief 球状攻撃クラス配列(ステートレベルが複数あるため)
+	 */
+	UPROPERTY(EditAnywhere,Instanced)
+	TArray<TObjectPtr<UCollisionAttack>> SphereAttacks;
 
-	UFUNCTION()
-	void OnDashGearAttackBeginOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
-
-	/** 攻撃スフィア判定用 */
+	/**
+	 * @brief 現在発動中の攻撃インデックス
+	 */
 	UPROPERTY()
-	TObjectPtr<ASphereCollision>	SphereCollision;
-
-	/** 攻撃スフィア判定用クラス */
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<ASphereCollision>	SphereCollisionClass;
+	int32 CurrentExecuteAttackIndex = 0;
 };

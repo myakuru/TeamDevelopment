@@ -104,6 +104,12 @@ public:
 	 * @param bInIsActive trueで有効
 	 */
 	void SetIsActive(const bool InbIsActive) { bIsActive = InbIsActive; }
+
+	/** 補正値トランスフォームをセット */
+	virtual void SetOffestTransform(const FTransform& InOffsetTransform)
+	{
+		OffsetTransform = InOffsetTransform;
+	}
 	/* End ProtectedMenber Setters */
 
 

@@ -56,7 +56,8 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 	UGearStateBase::Execute(CurrentGearLevel);
 
 	ExecuteDash();
-
+	
+	DashGear->Execute(CurrentGearLevel);
 }
 
 void UDashGearStateBase::Update(float DeltaTime)
@@ -104,12 +105,9 @@ void UDashGearStateBase::ExecuteDash()
 		return;
 	}
 
-	DashGear->SetSphereRadius(DashSphereRadius);
-
 	InitializeStartDashData(RootComp);
 	PlayDashNiagaraEffect(RootComp);
 	PlayDashAnimation();
-	SetSphereCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetEnableSpawnAfterimage(true);
 
 	Player->SetTargetCameraLagSpeed(TargetCameraLagSpeed);
@@ -119,7 +117,6 @@ void UDashGearStateBase::EndDash()
 {
 	BlendOutDashAnimation();
 	DeactivateNiagaraEffect();
-	SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetEnableSpawnAfterimage(false);
 
 	if (!Player) { return; }
@@ -184,12 +181,6 @@ void UDashGearStateBase::BlendOutDashAnimation()
 	if (!PlayerAnimInstance) { return; }
 
 	PlayerAnimInstance->Montage_Stop(MontageBlendOutTime);
-}
-
-void UDashGearStateBase::SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnabled)
-{
-	if (!DashGear) { return; }
-	DashGear->SetSphereCollisionEnabled(InEnabled);
 }
 
 void UDashGearStateBase::SetEnableSpawnAfterimage(bool bInEnableSpawn)

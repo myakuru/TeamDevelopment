@@ -1,8 +1,6 @@
 ﻿#include "SphereAttack.h"
 
-#include "Components\SphereComponent.h"
-
-#include <ProjectNull\Actor\CollisionActor\SphereCollision\SphereCollision.h>
+#include <ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.h>
 
 USphereAttack::USphereAttack()
 {
@@ -18,31 +16,32 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 	{
 		SphereCollision = GetWorld()->SpawnActor<ASphereCollision>(SubSphereCollision);
 		if (!SphereCollision) { return; }
+		SphereCollision->BeginPlay();
 
-		// 攻撃用ボックスアクターに親をアタッチ
+		// 攻撃用スフィアアクターに親をアタッチ
 		SphereCollision->AttachToActor(
 			InOwner,
 			FAttachmentTransformRules::KeepRelativeTransform
 		);
 
+		// 攻撃の最大時間を加算して「攻撃の最大有効時間」として使う
+		AddDuration(SphereCollision->GetBaseAttackDuration());
+
 		// 指定したコリジョンチャンネルとそれに対するレスポンスをセット
-		SphereCollision->SetCollisionResponseToChannnel(
+		SphereCollision->SetAllCollisionResponseToChannel(
 			GetTargetChannel(),
 			GetTargetResponse()
 		);
 
-		if (auto SphereComponent = SphereCollision->GetSphereComponent())
-		{
-			// オーバーラップ時、オーバーラップ抜け時の関数をセット
-			SphereComponent->OnComponentBeginOverlap.AddDynamic(
-				this,
-				&ThisClass::OnSphericalBeginOverlap
-			);
-			SphereComponent->OnComponentEndOverlap.AddDynamic(
-				this,
-				&ThisClass::OnSphericalEndOverlap
-			);
-		}
+		// オーバーラップ時、オーバーラップ抜け時の関数をセット
+		SphereCollision->BindSphereBeginOverlapEvents<ThisClass>(
+			this
+			, &ThisClass::OnSphericalBeginOverlap
+		);
+		SphereCollision->BindSphereEndOverlapEvents<ThisClass>(
+			this
+			, &ThisClass::OnSphericalEndOverlap
+		);
 
 		Cancel();
 	}
@@ -51,10 +50,10 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 void USphereAttack::Execute()
 {
 	UCollisionAttack::Execute();
-
+	
 	if (!SphereCollision) { return; }
-	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);// 当たり判定有効化	
-	SphereCollision->SetRelativeTransform(GetOffsetTransform());		// 初期Transformに設定
+	SphereCollision->SetJustExecuteTime(GetJustExecuteTime());	// 有効化された瞬間の時間をセット
+	SphereCollision->SetActorTransform(GetOffsetTransform());	// 補正用トランスフォーム値をコリジョンの基準としてセット
 }
 
 void USphereAttack::Cancel()
@@ -62,8 +61,7 @@ void USphereAttack::Cancel()
 	UCollisionAttack::Cancel();
 
 	if (!SphereCollision) { return; }
-	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);	// 当たり判定無効化
-
+	SphereCollision->SetAllCollisionEnabled(ECollisionEnabled::NoCollision); // 当たり判定無効化
 }
 
 void USphereAttack::Update(float InDeltaTime)
@@ -71,4 +69,14 @@ void USphereAttack::Update(float InDeltaTime)
 	if (!IsActive()) { return; }
 
 	UCollisionAttack::Update(InDeltaTime);
+
+	if (!IsValid(SphereCollision)) { return; }
+	SphereCollision->Update(InDeltaTime);
+}
+
+void USphereAttack::ApplyCollisionTransform(const FTransform& InTransform)
+{
+	if (!IsValid(SphereCollision)) { return; }
+	
+	SphereCollision->SetActorTransform(InTransform);
 }

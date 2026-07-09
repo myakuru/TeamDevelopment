@@ -19,7 +19,7 @@ EStateTreeRunStatus USTT_EnemyMidBossAttack::EnterState(FStateTreeExecutionConte
 
 	// 攻撃を実行
 	OwnerEnemy->ActivateAttack(AttackData.AttackType);
-
+	
 	// 攻撃に適したアニメーションを再生
 	{
 		// メッシュチェック

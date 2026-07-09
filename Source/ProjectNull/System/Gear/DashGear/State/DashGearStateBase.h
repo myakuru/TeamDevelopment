@@ -47,8 +47,6 @@ protected:
 	void PlayDashAnimation();
 	void BlendOutDashAnimation();
 
-	void SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnabled);
-
 	void SetEnableSpawnAfterimage(bool bInEnableSpawn);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
