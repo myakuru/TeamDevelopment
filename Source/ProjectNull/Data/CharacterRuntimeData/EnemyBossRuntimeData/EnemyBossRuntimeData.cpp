@@ -15,3 +15,9 @@ void UEnemyBossRuntimeData::ChangedIsAlive(const bool a_IsAlive)
 	IsAlive = a_IsAlive;
 	OnIsAliveChanged.Broadcast(IsAlive);
 }
+
+void UEnemyBossRuntimeData::CalclateDamageToMaxHealthRatio(const float InReciveDamage)
+{
+	DamageToMaxHealthRatio = InReciveDamage / Health.Max;
+	OnDamageRatioChanged.Broadcast(DamageToMaxHealthRatio);
+}

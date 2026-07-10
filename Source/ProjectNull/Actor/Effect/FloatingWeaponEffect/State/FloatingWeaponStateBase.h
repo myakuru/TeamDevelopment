@@ -6,28 +6,20 @@
 #include "../../FloatingWeaponEffect/FloatingWeaponEffect.h"
 #include "FloatingWeaponStateBase.generated.h"
 
-// 浮遊武器クラス
+/** 浮遊武器クラス */
 class UFloatingWeaponEffect;
 
-/// <summary>
-// 浮遊武器の状態基底クラス
-/// </summary>
+/** 浮遊武器の状態基底クラス */
 UCLASS()
 class PROJECTNULL_API UFloatingWeaponStateBase : public UObject
 {
 	GENERATED_BODY()
-
 public:
 
 	UFloatingWeaponStateBase();
-
-public:
-
+	
 	virtual void Initialize() { return; }
-
-	/// <summary>
-	/// 開始処理
-	/// </summary>
+	
 	virtual void Start() { return; }
 	virtual void Start(EFloatingWeaponState SetNextState) { return; }
 

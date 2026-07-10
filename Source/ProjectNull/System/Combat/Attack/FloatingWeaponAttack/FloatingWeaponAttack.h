@@ -72,6 +72,7 @@ public:
 
 	/** ゲッター */
 	inline UAutoAttack* GetAutoAttack() const { return AutoAttack; }
+	inline AAutoAttackHitActor* GetAutoAttackHitActor() const { return AutoAttackHitActor; }
 	inline float GetStartAngle() const { return StartAngle; }
 	inline float GetCurrentAngle() const { return CurrentAngle; }
 	

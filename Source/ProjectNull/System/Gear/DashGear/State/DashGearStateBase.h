@@ -22,7 +22,6 @@ class PROJECTNULL_API UDashGearStateBase : public UGearStateBase
 	GENERATED_BODY()
 public:	
 	UDashGearStateBase();
-public:
 
 	virtual void Initialize(
 		class APlayerBase* InPlayer,

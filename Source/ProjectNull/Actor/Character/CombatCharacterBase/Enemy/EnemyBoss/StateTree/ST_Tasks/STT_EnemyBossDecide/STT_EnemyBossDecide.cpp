@@ -24,7 +24,7 @@ EStateTreeRunStatus USTT_EnemyBossDecide::Tick(FStateTreeExecutionContext& Conte
 // タスク開始時の処理
 EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Decide EnterState In"));
+	UE_LOG(LogTemp, Warning, TEXT("Decide EnterState In"));
 
 	Super::EnterState(Context, Transition);
 
@@ -63,46 +63,6 @@ EStateTreeRunStatus USTT_EnemyBossDecide::EnterState(FStateTreeExecutionContext&
 		}
 		Boss->SetCurrentAction(BossAction);
 		Boss->SelectNextAttack(BossAction);
-
-		//if (Dist <= Boss->GetNearRange())
-		//{
-
-		//	// 近距離
-		//	if (FMath::FRand() < Boss->GetStrafeChance())
-		//	{
-		//		UE_LOG(LogTemp, Warning, TEXT("BossAction Strafe"));
-		//		BossAction = EBossActionType::Strafe;		// 様子見
-		//	}
-		//	else if (Boss->SelectAttackByDistance(Dist))
-		//	{
-		//		UE_LOG(LogTemp, Warning, TEXT("BossAction Attack"));
-		//		BossAction = EBossActionType::PlayAttack;	// 攻撃
-		//	}
-		//	else
-		//	{
-		//		UE_LOG(LogTemp, Warning, TEXT("BossAction Strafe"));
-		//		BossAction = EBossActionType::Strafe;		// 条件に合致しなければ様子見
-		//	}
-		//}
-		//else
-		//{
-		//	// 遠距離
-		//	// 歩く、走る、ジャンプ攻撃、遠距離攻撃から選ぶ
-		//	// とりあえずランダムで作る
-		//	const EBossActionType Far[] =
-		//	{
-		//		EBossActionType::ApproachWalk,
-		//		EBossActionType::ApproachRun,
-		//		EBossActionType::JumpAttack,
-		//		EBossActionType::RangedAttack
-		//	};
-		//	BossAction = Far[FMath::RandRange(0, 3)];
-		//	if (BossAction == EBossActionType::JumpAttack || BossAction == EBossActionType::RangedAttack)
-		//	{
-		//		Boss->SelectAttackByDistance(Dist);
-		//	}
-		//	UE_LOG(LogTemp, Warning, TEXT("BossAction Range"));
-		//}
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Decide EnterState Out"));
