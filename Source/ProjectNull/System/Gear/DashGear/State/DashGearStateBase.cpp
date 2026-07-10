@@ -170,7 +170,7 @@ void UDashGearStateBase::PlayDashAnimation()
 {
 	if (!Player) { return; }
 
-	auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
+	const auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
 	if (!PlayerAnimInstance) { return; }
 
 	PlayerAnimInstance->Montage_Play(DashAnimMontage);

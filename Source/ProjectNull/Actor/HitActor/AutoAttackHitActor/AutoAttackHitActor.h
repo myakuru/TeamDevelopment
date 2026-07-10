@@ -25,7 +25,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	void SetHitEnabled(bool bEnabled);
+	void SetHitEnabled(bool bInEnabled);
 
 private:
 
@@ -53,8 +53,12 @@ private:
 	TObjectPtr<UBoxComponent> BoxComp;
 
 	/** ゲームインスタンスへの参照 */
+	UPROPERTY()
 	TObjectPtr<USuperGameInstance> GameInstance;
 
 	/** プレイヤーのランタイムデータへの参照 */
+	UPROPERTY()
 	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+
+	bool bEnabled;
 };

@@ -5,9 +5,6 @@
 #include "../FloatingWeaponStateBase.h"
 #include "FloatingWeaponTransitionState.generated.h"
 
-/// <summary>
-/// ���V����̑J�ڏ�ԃN���X
-/// </summary>
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UFloatingWeaponTransitionState final : public UFloatingWeaponStateBase
 {

@@ -18,7 +18,7 @@ USTT_EnemyBossPlayAttack::USTT_EnemyBossPlayAttack(const FObjectInitializer& a_O
 
 EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick In"));
+	UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick In"));
 
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }

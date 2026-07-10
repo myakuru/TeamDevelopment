@@ -133,11 +133,13 @@ void ARobotController::InitializeUI()
 	}
 }
 
-void ARobotController::GearExecute(const FInputActionValue& ActionValue, int32 ExecuteIndex)
+void ARobotController::GearExecute(
+	const FInputActionValue& ActionValue,
+	int32 ExecuteIndex)
 {
 	if (!bCanReceiveInput)	{ return; }
 	if (!PlayerBase)		{ return; }
-	auto GearComp = PlayerBase->GetGearComponent();
+	const auto GearComp = PlayerBase->GetGearComponent();
 	if (!GearComp)			{ return; }
 
 	GearComp->ExecuteGear(ExecuteIndex);

@@ -18,7 +18,7 @@ USTT_EnemyBossJumpAttack::USTT_EnemyBossJumpAttack(const FObjectInitializer& a_O
 
 EStateTreeRunStatus USTT_EnemyBossJumpAttack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("JumpAttack Tick In"));
+	UE_LOG(LogTemp, Warning, TEXT("JumpAttack Tick In"));
 
 	AEnemyBossBase* Boss = GetBoss();
 	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }

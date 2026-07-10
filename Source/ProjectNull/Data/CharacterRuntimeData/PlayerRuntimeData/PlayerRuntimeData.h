@@ -115,9 +115,7 @@ public:
 		GearChangeEnergyCost(TArray<float>())
 	{
 	}
-
-public:
-
+	
 	inline bool CanChangeGear(int32 CurrentGearLevel)
 	{
 		const int32 Index = --CurrentGearLevel;
@@ -185,18 +183,15 @@ struct FExperienceParameterData;
 /** ギアパラメータ構造体 */
 struct FGearParameterData;
 
-struct FUpgradeState;
 
 /** プレイヤーのRuntimeデータクラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UPlayerRuntimeData final : public UCharacterRuntimeData
 {
 	GENERATED_BODY()
-
 public:
 	UPlayerRuntimeData();
 
-public:
 	void Initialize() override;
 
 	/**
@@ -253,7 +248,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnGearEnergyChanged OnGearEnergyChanged;
 
-
+	UPROPERTY()
 	TObjectPtr<ARobotController> RobotController;
 
 	/** Widget側で呼び出す */
