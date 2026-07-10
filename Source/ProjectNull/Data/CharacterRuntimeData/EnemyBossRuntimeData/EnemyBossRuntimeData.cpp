@@ -21,3 +21,8 @@ void UEnemyBossRuntimeData::CalclateDamageToMaxHealthRatio(const float InReciveD
 	DamageToMaxHealthRatio = InReciveDamage / Health.Max;
 	OnDamageRatioChanged.Broadcast(DamageToMaxHealthRatio);
 }
+
+void UEnemyBossRuntimeData::SetFinalHP(float InFinalHP)
+{
+	Health.Max = Health.Current = InFinalHP;
+}

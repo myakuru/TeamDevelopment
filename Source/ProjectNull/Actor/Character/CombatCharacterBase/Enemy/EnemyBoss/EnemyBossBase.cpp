@@ -7,6 +7,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
 
 // Sets default values
 AEnemyBossBase::AEnemyBossBase()
@@ -86,6 +87,18 @@ void AEnemyBossBase::BeginPlay()
 
 	SetEnemyBossStatusData(EnemyDataAsset);
 
+	// ヒットポイントの更新
+	{
+		// 計算後の最終的なHPをセット
+		EnemyBossRuntimeData->SetFinalHP(EnemyBossStatus.FinalHP);
+	}
+
+	// 攻撃パラメータの更新
+	{
+		// 最終的な攻撃倍率の更新
+		float AttackScale = EnemyBossStatus.FinalAttack;
+	}
+
 }
 
 // Called every frame
@@ -125,6 +138,14 @@ void AEnemyBossBase::ApplyDamaged(float InDamaged)
 	EnemyBossRuntimeData
 		->CalclateDamageToMaxHealthRatio(InDamaged);// 受けたダメージが最大体力に対して何割かを算出
 	OnHit();
+
+	// ダメージUI表示位置
+	const FVector DamageUILocation = GetActorLocation() + FVector(0.0f, 0.0f, 120.0f);
+
+	if (UDamageNumberPoolSubsystem* Pool = GetWorld()->GetSubsystem<UDamageNumberPoolSubsystem>())
+	{
+		Pool->ShowDamageNumber(DamageUILocation, InDamaged, false);
+	}
 
 	// 体力が0以下なら死亡フラグを立てる
 	if (EnemyBossRuntimeData->GetHealth() <= 0)
@@ -265,6 +286,8 @@ void AEnemyBossBase::BossFinalize()
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);
 
+	SpawnDeathEffect();
+
 	// StateTreeを停止
 	if (StateTreeComp)
 	{
@@ -286,12 +309,14 @@ void AEnemyBossBase::SpawnDeathEffect()
 		Loc.Z -= 90.0f;
 		AdjustedTransform.SetLocation(Loc);
 
+		FTransform MeshTransform = GetMesh()->GetComponentTransform();
+
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			DeathEffect,
-			GetActorLocation(),
-			GetActorRotation(),
-			FVector(1.0f),
+			MeshTransform.GetLocation(),
+			MeshTransform.Rotator(),
+			MeshTransform.GetScale3D(),
 			true,   // bAutoDestroy
 			true,   // bAutoActivate
 			ENCPoolMethod::None,
