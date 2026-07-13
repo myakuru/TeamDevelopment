@@ -8,6 +8,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Stage/Manager/StageManager.h>
 
 // Sets default values
 AEnemyBossBase::AEnemyBossBase()
@@ -294,6 +296,12 @@ void AEnemyBossBase::BossFinalize()
 	if (StateTreeComp)
 	{
 		StateTreeComp->StopLogic(TEXT("Deactivate"));
+	}
+
+	if (USuperGameInstance* GameInstance =
+		GetWorld()->GetGameInstance<USuperGameInstance>())
+	{
+		GameInstance->GetStageManagerSubsystem()->InGameFinalize();
 	}
 }
 
