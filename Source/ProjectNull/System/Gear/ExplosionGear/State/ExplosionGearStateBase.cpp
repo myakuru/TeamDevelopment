@@ -44,6 +44,7 @@ void UExplosionGearStateBase::SpawnExplosions()
 		initializeData.IgnitionDelay = data.IgnitionDelay;
 		initializeData.Scale = data.Scale;
 		Explosion->Initialize(initializeData);
+		Explosion->StartExplosionSequence();
 
 		UGameplayStatics::FinishSpawningActor(
 			Explosion,
@@ -71,6 +72,7 @@ void UExplosionGearStateBase::SpawnExplosion(const FExplosionSpawnData& Explosio
 	initializeData.IgnitionDelay = ExplosionData.IgnitionDelay;
 	initializeData.Scale = ExplosionData.Scale;
 	Explosion->Initialize(initializeData);
+	Explosion->StartExplosionSequence();
 
 	UGameplayStatics::FinishSpawningActor(
 		Explosion,
@@ -102,6 +104,7 @@ void UExplosionGearStateBase::SpawnExplosionsInCircle(const FExplosionSpawnData&
 		initializeData.IgnitionDelay = ExplosionData.IgnitionDelay;
 		initializeData.Scale = ExplosionData.Scale;
 		Explosion->Initialize(initializeData);
+		Explosion->StartExplosionSequence();
 
 		UGameplayStatics::FinishSpawningActor(
 			Explosion,

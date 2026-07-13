@@ -53,16 +53,27 @@ AExplosionGearSkill::AExplosionGearSkill()
 void AExplosionGearSkill::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
+//SpawnActorDeferredを使ってBeginPlay前にInitializeを呼ぶ必要あり
+void AExplosionGearSkill::Initialize(const FExplosionData& InData)
+{
+	Data = InData;
+
+	ApplyData();
+}
+
+void AExplosionGearSkill::StartExplosionSequence()
+{
 	FTimerDelegate timerDelegate;
 	timerDelegate.BindLambda([this] {
-			if (PreExplosionFX) {
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-					GetWorld(),
-					PreExplosionFX,
-					GetActorLocation()
-				);
-			}
+		if (PreExplosionFX) {
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				PreExplosionFX,
+				GetActorLocation()
+			);
+		}
 		}
 	);
 
@@ -82,15 +93,6 @@ void AExplosionGearSkill::BeginPlay()
 		Data.IgnitionDelay + Data.Delay,
 		false
 	);
-	
-}
-
-//SpawnActorDeferredを使ってBeginPlay前にInitializeを呼ぶ必要あり
-void AExplosionGearSkill::Initialize(const FExplosionData& InData)
-{
-	Data = InData;
-
-	ApplyData();
 }
 
 void AExplosionGearSkill::ApplyData()

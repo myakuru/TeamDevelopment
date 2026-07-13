@@ -46,6 +46,9 @@ public:
 
 	void Initialize(const FExplosionData& InData);
 
+	UFUNCTION(BlueprintCallable)
+	void StartExplosionSequence();
+
 private:
 
 	void ApplyData();
