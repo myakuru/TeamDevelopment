@@ -83,6 +83,8 @@ class PROJECTNULL_API AEnemySpawner : public AActor
 public:	
 	AEnemySpawner();
 
+	void SetFinalPhase();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -146,4 +148,7 @@ private:
 	/// 現在のフェーズデータ
 	/// </sumamry>
 	int NowPhase = 0;
+
+	/** 最終フェーズチェック*/
+	bool FinalPhase = false;
 };
