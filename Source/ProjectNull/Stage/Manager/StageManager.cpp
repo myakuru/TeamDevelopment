@@ -1,8 +1,10 @@
 ﻿#include "StageManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 //ゲームインスタンス
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
 #include <ProjectNull/SaveGame/MySaveGame.h>
 #include <ProjectNull/SaveGame/StageProgressData.h>
 
@@ -86,6 +88,16 @@ void UStageManager::InGameInitialize(int32 inNowStageIndex)
 
 	FInputModeGameOnly InputMode;
 	PC->SetInputMode(InputMode);
+	
+	//BGM再生
+	if (InGameBGMSound)
+	{
+		InGameBGMSoundComponent = 
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Spawn2D(InGameBGMSound,1.0f,
+				1.0f,0.0f,nullptr,
+				true,true);
+	}
 }
 
 void UStageManager::InGameFinalize()
@@ -133,6 +145,20 @@ void UStageManager::InGameFinalize()
 
 void UStageManager::OutGameInitialize()
 {
+	//BGM再生
+	if (OutGameBGMSound)
+	{
+		OutGameBGMSoundComponent = 
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Spawn2D(OutGameBGMSound,1.0f,
+				1.0f,0.0f,nullptr,
+				true,true);
+	}
+}
+
+void UStageManager::OutGameFinalize()
+{
+	if (OutGameBGMSoundComponent)OutGameBGMSoundComponent->Stop();
 }
 
 void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
