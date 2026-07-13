@@ -52,7 +52,7 @@ public:
 	void PlayAtLocation(USoundBase* inSound, const FVector& inLocation,
 	FRotator inRotation = FRotator::ZeroRotator,float inVolume = 1.0f,
 	float inPitch = 1.0f,float inStart = 0.0f,USoundAttenuation* inAttenuationSettings = nullptr,
-	USoundConcurrency* inConcurrencySettings = nullptr,const AActor* inOwningActor = nullptr,);
+	USoundConcurrency* inConcurrencySettings = nullptr,const AActor* inOwningActor = nullptr);
 	
 private:
 	UPROPERTY()
