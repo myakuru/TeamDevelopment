@@ -286,7 +286,9 @@ void AEnemyBossBase::BossFinalize()
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);
 
-	SpawnDeathEffect();
+	//SpawnDeathEffect();
+
+	DeathEffect->ReleaseRef();
 
 	// StateTreeを停止
 	if (StateTreeComp)
