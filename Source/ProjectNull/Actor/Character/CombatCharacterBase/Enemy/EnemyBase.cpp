@@ -17,6 +17,7 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -163,6 +164,14 @@ void AEnemyBase::ApplyDamaged(float InDamaged)
 	EnemyRuntimeData
 		->CalclateDamageToMaxHealthRatio(InDamaged);// 受けたダメージが最大体力に対して何割かを算出
 	OnHit();
+
+	// ダメージUI表示位置
+	const FVector DamageUILocation = GetActorLocation() + FVector(0.0f, 0.0f, 120.0f);
+
+	if (UDamageNumberPoolSubsystem* Pool = GetWorld()->GetSubsystem<UDamageNumberPoolSubsystem>())
+	{
+		Pool->ShowDamageNumber(DamageUILocation, InDamaged, false);
+	}
 
 	// 体力が0以下なら死亡フラグを立てる
 	if (EnemyRuntimeData->GetHealth() <= 0)

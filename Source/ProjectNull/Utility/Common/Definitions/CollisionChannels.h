@@ -8,3 +8,4 @@
  */
 #define ECC_Enemy	ECollisionChannel::ECC_GameTraceChannel1	// 「敵」のコリジョンチャンネル
 #define ECC_Player	ECollisionChannel::ECC_Pawn	// 「プレイヤー」のコリジョンチャンネル
+#define ECC_PlayerAttack ECollisionChannel::ECC_GameTraceChannel2

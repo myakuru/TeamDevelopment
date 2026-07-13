@@ -26,7 +26,7 @@ AExplosionGearSkill::AExplosionGearSkill()
 
 	// 自身をPlayerAttackOverlapとして設定
 	Collision->SetCollisionObjectType(
-		ECC_Player
+		ECC_PlayerAttack
 	);
 
 	// 当たり判定の種類設定(物理衝突を行わず、判定のみ行う)
@@ -90,6 +90,11 @@ void AExplosionGearSkill::Initialize(const FExplosionData& InData)
 {
 	Data = InData;
 
+	ApplyData();
+}
+
+void AExplosionGearSkill::ApplyData()
+{
 	Collision->SetSphereRadius(CollisionRadius * Data.Scale);
 	Collision->SetGenerateOverlapEvents(true);
 }

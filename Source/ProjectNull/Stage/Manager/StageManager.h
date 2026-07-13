@@ -9,6 +9,8 @@
 
 class UStageDataAsset;
 class UMySaveGame;
+class USoundBase;
+class UAudioComponent;
 
 /**
  * ステージの状況を管理するマネージャー
@@ -34,6 +36,9 @@ public:
 
 	UFUNCTION()
 	void OutGameInitialize();
+	
+	UFUNCTION()
+	void OutGameFinalize();
 
 	UFUNCTION()
 	void AddAcquiredWeapon(const FName& WeaponName) {
@@ -84,4 +89,17 @@ private:
 
 	/** クリア時にResultManagerに渡す情報 */
 	FResultData ResultData;
+	
+	/** BGM */
+	UPROPERTY(EditAnywhere,Category = "Sound")
+	TObjectPtr<USoundBase> OutGameBGMSound;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> OutGameBGMSoundComponent;
+	
+	UPROPERTY(EditAnywhere,Category = "Sound")
+	TObjectPtr<USoundBase> InGameBGMSound;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> InGameBGMSoundComponent;
 };

@@ -7,6 +7,7 @@
 #include "EnemySpawnPattern/EnemySpawnPatternBase.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyGrunt/EnemyGruntBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/System/WorldSystem/EnemySpawner/EnemyPhaseSpawnTable.h>
@@ -17,6 +18,14 @@ AEnemySpawner::AEnemySpawner()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+}
+
+void AEnemySpawner::SetFinalPhase()
+{
+	if (FinalPhase) { return; }
+	FinalPhase = true;
+
+	ApplySpawnModeByPhase(PhaseSpawnTable->FinalWave);
 }
 
 void AEnemySpawner::BeginPlay()
@@ -203,4 +212,24 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 
 	CurrentWaveData = NewWaveData;
 	NowPhase = NewPhase;
+
+	// SpawnTableからFinalWaveかどうかを取得
+	if (PhaseSpawnTable->FinalWave == NewPhase)
+	{
+		FinalPhase = true;
+
+		if (PhaseSpawnTable->StageBoss)
+		{
+
+			AEnemyBossBase* Boss = GetWorld()->SpawnActor<AEnemyBossBase>(
+				PhaseSpawnTable->StageBoss,
+				GetActorLocation(),
+				GetActorRotation());
+
+			if (!IsValid(Boss))
+			{
+				return;
+			}
+		}
+	}
 }

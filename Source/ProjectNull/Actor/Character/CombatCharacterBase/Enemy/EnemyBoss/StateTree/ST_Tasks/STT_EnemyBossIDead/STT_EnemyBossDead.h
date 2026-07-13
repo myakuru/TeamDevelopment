@@ -23,4 +23,22 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UAnimMontage> DeathMontage;
 
+	/** 死亡エフェクトの終了時間*/
+	UPROPERTY(EditAnywhere, Category = "Input")
+	float DeathEffectDuration = 5.0f;
+
+	/** 死亡エフェクトの開始時間*/
+	UPROPERTY(EditAnywhere, Category = "Input")
+	float DeathEffectStart = 3.0f;
+
+	/** 死亡時のマテリアル変色*/
+	UPROPERTY(EditAnywhere, Category = "Input")
+	float DethMaterialDuration = 3.0f;
+
+	float DeathCount = 0.0f;
+
+	bool bDeathAnimationEnd = false;
+
+	bool bDeathEffectFlg = false;
+
 };

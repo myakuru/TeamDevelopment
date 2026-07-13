@@ -1,6 +1,9 @@
 ﻿#include "ButtonBaseWidget.h"
 #include "Components/Button.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
+
 void UButtonBaseWidget::NativeConstruct()
 {
 	if (!Button)return;
@@ -13,6 +16,12 @@ void UButtonBaseWidget::NativeConstruct()
 
 void UButtonBaseWidget::OnHoveredButton()
 {
+	if (HoverSound)
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(HoverSound);
+	}
+	
 	DoHoveredButton();
 }
 
@@ -24,6 +33,13 @@ void UButtonBaseWidget::DoHoveredButton()
 
 void UButtonBaseWidget::OnClickedButton()
 {
+	if (ClickSound)
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+		GetSoundManager()->Spawn2D(ClickSound,1.0f,1.0f,0.0f,
+			nullptr,true,true);
+	}
+	
 	DoClickedButton();
 }
 
