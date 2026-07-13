@@ -32,13 +32,14 @@ EStateTreeRunStatus USTT_EnemyBossDead::EnterState(FStateTreeExecutionContext& C
 	UAnimInstance* Anim = Mesh ? Mesh->GetAnimInstance() : nullptr;
 	if (!IsValid(Anim)) { return EStateTreeRunStatus::Failed; }
 
-	Anim->Montage_Play(DeathMontage);
+	Anim->Montage_Play(DeathMontage,1.0f);
 
 	return EStateTreeRunStatus::Running;
 }
 
 EStateTreeRunStatus USTT_EnemyBossDead::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
+
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
 
@@ -50,10 +51,43 @@ EStateTreeRunStatus USTT_EnemyBossDead::Tick(FStateTreeExecutionContext& Context
 	UAnimInstance* Anim = Mesh ? Mesh->GetAnimInstance() : nullptr;
 	if (!IsValid(Anim)) { return EStateTreeRunStatus::Failed; }
 
-	// モンタージュが終わったら終了
-	if (!Anim->Montage_IsPlaying(DeathMontage))
+	// まだ死亡アニメーションが終わっていない場合
+	if (!bDeathAnimationEnd)
 	{
-		return EStateTreeRunStatus::Succeeded;
+		const float CurrentPosition = Anim->Montage_GetPosition(DeathMontage);
+		const float MontageLength = DeathMontage->GetPlayLength();
+
+		// 少し手前で止める
+		// 完全な末尾だとブレンドや終了処理に入ることがあるため
+		const float StopPosition = FMath::Max(0.0f, MontageLength - 0.33f);
+
+		if (CurrentPosition >= StopPosition)
+		{
+			bDeathAnimationEnd = true;
+
+			// 最終ポーズ付近に固定
+			Anim->Montage_SetPosition(DeathMontage, StopPosition);
+			Anim->Montage_Pause(DeathMontage);
+		}
+	}
+
+	if (bDeathAnimationEnd)
+	{
+		DeathCount += DeltaTime;
+
+		if (!bDeathEffectFlg)
+		{
+			if (DeathCount >= DeathEffectStart)
+			{
+				bDeathEffectFlg = true;
+				Boss->SpawnDeathEffect();
+			}
+		}
+
+		if (DeathCount >= DeathEffectDuration)
+		{
+			return EStateTreeRunStatus::Succeeded;
+		}
 	}
 
 

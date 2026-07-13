@@ -53,27 +53,18 @@ AExplosionGearSkill::AExplosionGearSkill()
 void AExplosionGearSkill::BeginPlay()
 {
 	Super::BeginPlay();
-}
 
-//SpawnActorDeferredを使ってBeginPlay前にInitializeを呼ぶ必要あり
-void AExplosionGearSkill::Initialize(const FExplosionData& InData)
-{
-	Data = InData;
-
-	ApplyData();
-}
-
-void AExplosionGearSkill::StartExplosionSequence()
-{
 	FTimerDelegate timerDelegate;
 	timerDelegate.BindLambda([this] {
-		if (PreExplosionFX) {
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-				GetWorld(),
-				PreExplosionFX,
-				GetActorLocation()
-			);
-		}
+			if (PreExplosionFX) {
+				auto* Effect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+					GetWorld(),
+					PreExplosionFX,
+					GetActorLocation()
+				);
+			Effect->SetWorldRotation(RootComponent->GetComponentQuat());
+				
+			}
 		}
 	);
 
@@ -93,6 +84,15 @@ void AExplosionGearSkill::StartExplosionSequence()
 		Data.IgnitionDelay + Data.Delay,
 		false
 	);
+	
+}
+
+//SpawnActorDeferredを使ってBeginPlay前にInitializeを呼ぶ必要あり
+void AExplosionGearSkill::Initialize(const FExplosionData& InData)
+{
+	Data = InData;
+
+	ApplyData();
 }
 
 void AExplosionGearSkill::ApplyData()
@@ -113,7 +113,7 @@ void AExplosionGearSkill::Explode()
 		);
 
 		NiagaraComp->SetWorldScale3D(FVector(Data.Scale));
-
+		NiagaraComp->SetWorldRotation(RootComponent->GetComponentQuat());
 	}
 
 	// カメラシェイクを爆発のスケールに応じて再生

@@ -9,6 +9,12 @@
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 AAutoAttackHitActor::AAutoAttackHitActor():
+	HitActors(TSet<TObjectPtr<AActor>>()),
+	PreviousLocation(FVector::ZeroVector),
+	BoxComp(nullptr),
+	GameInstance(nullptr),
+	PlayerRuntimeData(nullptr),
+	AttackPowerScale(1.f),
 	bEnabled(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -21,14 +27,6 @@ AAutoAttackHitActor::AAutoAttackHitActor():
 	BoxComp->SetCollisionEnabled(
 		ECollisionEnabled::Type::NoCollision);
 
-	// BoxComp->SetGenerateOverlapEvents(true);
-	// BoxComp->SetCollisionResponseToChannel(
-	// 	ECC_Enemy,
-	// 	ECR_Overlap);
-
-	// BoxComp->OnComponentBeginOverlap.AddDynamic(
-	// 	this,
-	// 	&AAutoAttackHitActor::OnAutoAttackBeginOverlap);
 }
 
 void AAutoAttackHitActor::BeginPlay()
@@ -38,6 +36,9 @@ void AAutoAttackHitActor::BeginPlay()
 	// ゲームインスタンス取得
 	GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
 
+	if (!GameInstance) { return; }
+	PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+
 	if (!BoxComp) { return; }
 	PreviousLocation = BoxComp->GetComponentLocation();
 }
@@ -45,42 +46,28 @@ void AAutoAttackHitActor::BeginPlay()
 void AAutoAttackHitActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (!BoxComp) { return; }
-
+	
 	PerformHitSweep();
 
+	if (!BoxComp) { return; }
 	PreviousLocation = BoxComp->GetComponentLocation();
-
-	HitActors.Empty();
 }
 
 void AAutoAttackHitActor::SetHitEnabled(bool bInEnabled)
 {
+	const bool bWasEnabled = bEnabled;
 	bEnabled = bInEnabled;
-	// const ECollisionEnabled::Type CollisionType =
-	// 	bEnabled
-	// 	? ECollisionEnabled::QueryOnly
-	// 	: ECollisionEnabled::NoCollision;
-	//
-	// if (!BoxComp) { return; }
-	// BoxComp->SetCollisionEnabled(CollisionType);
-}
 
-void AAutoAttackHitActor::OnAutoAttackBeginOverlap(
-	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
-{
-	//// キャラクターインターフェースを実装しているか
-	//if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
-	//{
-	//	Interface->ApplyDamaged();
-	//	Interface->ApplyKnockBack(GetActorLocation());
-	//}
+	// OFF -> ON の瞬間だけ、ヒット済みリストと基準位置をリセット
+	if (bEnabled && !bWasEnabled)
+	{
+		HitActors.Empty();
+
+		if (BoxComp)
+		{
+			PreviousLocation = BoxComp->GetComponentLocation();
+		}
+	}
 }
 
 void AAutoAttackHitActor::PerformHitSweep()
@@ -133,26 +120,15 @@ void AAutoAttackHitActor::PerformHitSweep()
 		auto* Interface = Cast<ICharacterInterface>(HitActor);
 		if (!Interface) { continue; }
 
-		Interface->ApplyDamaged(SetAttackDamage());
+		Interface->ApplyDamaged(GetAttackDamage());
 		Interface->ApplyLocalHitPos(Hit.Location);
 		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }
 
-float AAutoAttackHitActor::SetAttackDamage()
+float AAutoAttackHitActor::GetAttackDamage() const
 {
-	if (GameInstance)
-	{
-		PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
-
-		if (PlayerRuntimeData)
-		{
-			float AttackDamage = PlayerRuntimeData->GetCharacterAttackPower();
-
-			return AttackDamage;
-		}
-	}
-
-	return 1.0f;
+	if (!PlayerRuntimeData) { return 1.f; }
+	return PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale);
 }
 

@@ -18,13 +18,13 @@ void UCrossLaserAttack::Initialize(const TObjectPtr<AActor>& Owner)
 	CrossLaserbeam = GetWorld()->SpawnActor<ACrossLaserbeam>(CrossLaserbeamClass);
 	if (!CrossLaserbeam) { return; }
 
-	auto Player = Cast<APlayerBase>(Owner);
+	const auto Player = Cast<APlayerBase>(Owner);
 	if (!Player) { return; }
 
-	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
+	const auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
 	if (!GroundAlignmentComp) { return; }
 
-	auto RootComp = GroundAlignmentComp->GetRootComponent();
+	const auto RootComp = GroundAlignmentComp->GetRootComponent();
 	if (!RootComp) { return; }
 
 	CrossLaserbeam->AttachToComponent(

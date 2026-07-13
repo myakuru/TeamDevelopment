@@ -8,6 +8,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Stage/Manager/StageManager.h>
 
 // Sets default values
 AEnemyBossBase::AEnemyBossBase()
@@ -286,12 +288,20 @@ void AEnemyBossBase::BossFinalize()
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);
 
-	SpawnDeathEffect();
+	//SpawnDeathEffect();
+
+	DeathEffect->ReleaseRef();
 
 	// StateTreeを停止
 	if (StateTreeComp)
 	{
 		StateTreeComp->StopLogic(TEXT("Deactivate"));
+	}
+
+	if (USuperGameInstance* GameInstance =
+		GetWorld()->GetGameInstance<USuperGameInstance>())
+	{
+		GameInstance->GetStageManagerSubsystem()->InGameFinalize();
 	}
 }
 

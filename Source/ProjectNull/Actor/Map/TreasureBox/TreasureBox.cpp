@@ -1,13 +1,9 @@
 ﻿#include "TreasureBox.h"
 
 //#include <ProjectNull/Actor/Map/MapActorManager.h>
-#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Stage/Manager/StageManager.h>
 #include <ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
-#include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
-#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
-#include <ProjectNull/SaveGame/MySaveGame.h>
 #include <ProjectNull/UI/InGame/GetGearHUDWidget/GetGearHUDWidget.h>
 #include <ProjectNull/Weapon/Data/WeaponData.h>
 

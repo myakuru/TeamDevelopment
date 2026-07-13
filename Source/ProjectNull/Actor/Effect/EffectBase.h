@@ -21,11 +21,11 @@ class PROJECTNULL_API UEffectBase : public UObject
 	GENERATED_BODY()
 public:
 	UEffectBase();
-public:
 
 	void Start(USceneComponent* RootComponent);
 
 	void DeactivateEffect();
+	void DeactivateImmediateEffect();
 
 	void SetAbsolute(
 		bool bNewAbsoluteLocation,
