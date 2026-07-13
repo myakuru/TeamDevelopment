@@ -57,11 +57,13 @@ void AExplosionGearSkill::BeginPlay()
 	FTimerDelegate timerDelegate;
 	timerDelegate.BindLambda([this] {
 			if (PreExplosionFX) {
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				auto* Effect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 					GetWorld(),
 					PreExplosionFX,
 					GetActorLocation()
 				);
+			Effect->SetWorldRotation(RootComponent->GetComponentQuat());
+				
 			}
 		}
 	);
@@ -111,7 +113,7 @@ void AExplosionGearSkill::Explode()
 		);
 
 		NiagaraComp->SetWorldScale3D(FVector(Data.Scale));
-
+		NiagaraComp->SetWorldRotation(RootComponent->GetComponentQuat());
 	}
 
 	// カメラシェイクを爆発のスケールに応じて再生
