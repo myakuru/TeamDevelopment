@@ -9,8 +9,7 @@
 
 class UBoxComponent;
 class UEffectBase;
-
-
+class UPlayerRuntimeData;
 UCLASS()
 class PROJECTNULL_API ALaserbeam : public AActor
 {
@@ -41,4 +40,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<TObjectPtr<UEffectBase>>	NiagaraEffectArray;
+	
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
+	UPROPERTY(EditAnywhere)
+	float AttackPowerScale;
 };

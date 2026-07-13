@@ -7,6 +7,7 @@
 #include "DashGear.generated.h"
 
 class ASphereCollision;
+class UPlayerRuntimeData;
 
 /** ダッシュギアクラス */
 UCLASS(Blueprintable, EditInlineNew)
@@ -46,4 +47,11 @@ private:
 	/** 攻撃スフィア判定用クラス */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASphereCollision>	SphereCollisionClass;
+
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
+	UPROPERTY(EditAnywhere)
+	float AttackPowerScale;
 };

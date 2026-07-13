@@ -136,4 +136,7 @@ private:
 
 	/** ギアチェンジによる無敵時間ハンドル */
 	FTimerHandle InvincibilityTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float InvincibilityAttackPowerScale;
 };

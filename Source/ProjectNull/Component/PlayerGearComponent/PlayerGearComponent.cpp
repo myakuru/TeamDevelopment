@@ -29,7 +29,8 @@ UPlayerGearComponent::UPlayerGearComponent():
 		CurrentGearLevel(1),
 		HitStopDuration(0.f),
 		HitStopTimeDilation(0.f),
-		InvincibilityTimerHandle(FTimerHandle())
+		InvincibilityTimerHandle(FTimerHandle()),
+		InvincibilityAttackPowerScale(1.f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -151,12 +152,12 @@ void UPlayerGearComponent::OnGearBeginOverlap(
 	if (!OwnerPlayer)	{ return; }
 	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
 
-	auto Interface = Cast<ICharacterInterface>(OtherActor);
+	const auto Interface = Cast<ICharacterInterface>(OtherActor);
 	if (!Interface)		{ return; }
-	Interface->ApplyDamaged();
+	Interface->ApplyDamaged(InvincibilityAttackPowerScale * OwnerPlayer->GetFinalAttackPower());
 	Interface->ApplyKnockBack(PlayerLocation);
 	
-	auto HitStopComp = OwnerPlayer->GetHitStopComponent();
+	const auto HitStopComp = OwnerPlayer->GetHitStopComponent();
 	if (!HitStopComp)	{ return; }
 
 	HitStopComp->StartHitStop(
@@ -180,7 +181,7 @@ void UPlayerGearComponent::InitializeSphereCollision()
 		TEXT("GearSphere")
 	);
 
-	auto SphereComponent = SphereCollision->GetSphereComponent();
+	const auto SphereComponent = SphereCollision->GetSphereComponent();
 	if (!SphereComponent) { return; }
 
 	// オーバーラップ時、オーバーラップ抜け時の関数をセット

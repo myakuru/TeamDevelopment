@@ -21,8 +21,19 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Explosion/ExplosionGearSkill.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Explosion/ExplosionGearSkill.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/ExplosionGear/State/ExplosionGearStateBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/ExplosionGear/State/ExplosionGearStateBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/CrossLaserbeam/CrossLaserbeam.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/CrossLaserbeam/CrossLaserbeam.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/CrossLaserbeam/CrossLaserbeam.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/CrossLaserbeam/CrossLaserbeam.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ProjectileBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ProjectileBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ProjectileBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ProjectileBase.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ReflectiveLaser/ReflectiveLaser.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ReflectiveLaser/ReflectiveLaser.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ReflectiveLaser/ReflectiveLaser.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ReflectiveLaser/ReflectiveLaser.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +59,11 @@
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectHandle.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/GameFramework/Character.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Private/Character.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Private/WorldPartition/HLOD/DestructibleHLODComponent.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Public/DrawDebugHelpers.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Public/WorldPartition/HLOD/DestructibleHLODComponent.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Net/Iris/Private/Iris/Serialization/LastResortPropertyNetSerializer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/ProjectNull/Sound/SoundManager.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/ProjectNull/Sound/SoundManager.h" root0="FORCE_HIGHLIGHTING" />
@@ -242,6 +257,7 @@
       <workItem from="1783908428599" duration="3170000" />
       <workItem from="1783915360497" duration="12000" />
       <workItem from="1783915495058" duration="6831000" />
+      <workItem from="1783922600108" duration="5514000" />
     </task>
     <servers />
   </component>

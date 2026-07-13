@@ -9,6 +9,7 @@
 
 /** 敵の中間基底クラス */
 class AEnemyBase;
+class UPlayerRuntimeData;
 
 /** 反射機能を持つレーザー(弾タイプ)クラス */
 UCLASS(Blueprintable)
@@ -18,7 +19,6 @@ class PROJECTNULL_API AReflectiveLaser final : public AProjectileBase
 public:
 	AReflectiveLaser();
 	AReflectiveLaser(int32 InReflectionCount);
-public:
 
 private:
 
@@ -49,4 +49,5 @@ private:
 
 	/** 反射インターバル管理タイマー */
 	FTimerHandle ReflectionIntervalTimerHandle;
+
 };
