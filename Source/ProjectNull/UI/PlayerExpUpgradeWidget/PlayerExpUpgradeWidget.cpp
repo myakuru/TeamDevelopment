@@ -44,15 +44,15 @@ void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDe
 
 	if (UpgradeWidget_0)
 	{
-		UpgradeWidget_0->ImageRotation();
+		UpgradeWidget_0->UpdateScale();
 	}
 	if (UpgradeWidget_1)
 	{
-		UpgradeWidget_1->ImageRotation();
+		UpgradeWidget_1->UpdateScale();
 	}
 	if (UpgradeWidget_2)
 	{
-		UpgradeWidget_2->ImageRotation();
+		UpgradeWidget_2->UpdateScale();
 	}
 
 	// 背景の黒い画像のフェードイン処理

@@ -33,55 +33,32 @@ UDataTable* UExpUpgradeWidgetBase::GetExpUpgradeTable()
 	return CachedExpUpgradeTable;
 }
 
-void UExpUpgradeWidgetBase::ImageRotation()
+void UExpUpgradeWidgetBase::UpdateScale()
 {
-	if (UpgradeImage)
-	{
-		if (UiScale.X <= UiScaleMax.X)
-		{
-			UiScale.X += GetWorld()->GetDeltaSeconds() * UiScaleSpeed.X;
+	if (!UpgradeImage) return;
 
-			UpgradeImage->SetRenderScale(UiScale);
-		}
+	// ホバー中は拡大サイズ、そうでなければ通常サイズを目標にする
+	const FVector2D TargetScale = bIsMouseOver ? UiScaleHover : UiScaleMax;
 
-		if (UiScale.Y >= UiScaleMax.Y)
-		{
-			UiScale.Y -= GetWorld()->GetDeltaSeconds() * UiScaleSpeed.Y;
+	// 毎フレーム目標スケールへ補間する。
+	UiScale = FMath::Vector2DInterpTo(UiScale, TargetScale, GetWorld()->GetDeltaSeconds(), ScaleInterpSpeed);
 
-			UpgradeImage->SetRenderScale(UiScale);
-		}
-	}
+	UpgradeImage->SetRenderScale(UiScale);
 }
 
 void UExpUpgradeWidgetBase::InitExpUpgradeWidget()
 {
-	if(UiScale.X >= UiScaleMax.X)
-	{
-		UiScale = UiScaleMin;
-	}
+	// 出現アニメーションを最初から再生できるように初期スケールへ戻す
+	UiScale = UiScaleMin;
+	bIsMouseOver = false;
 }
 
 void UExpUpgradeWidgetBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
+	// 状態を記録するだけ。実際のスケール変化は UpdateScale() が毎フレーム行う
 	bIsMouseOver = true;
-
-	if (UpgradeImage)
-	{
-		if (UiScale.X <= UiScaleMax.X) return;
-
-		if (UiScale.X <= UiScaleMax.X + 0.5f)
-		{
-			UiScale.X += GetWorld()->GetDeltaSeconds() * 10.0f;
-		}
-		if (UiScale.Y <= UiScaleMax.Y + 1.0f)
-		{
-			UiScale.Y += GetWorld()->GetDeltaSeconds() * 10.0f;
-		}
-
-		UpgradeImage->SetRenderScale(UiScale);
-	}
 }
 
 void UExpUpgradeWidgetBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
@@ -89,21 +66,6 @@ void UExpUpgradeWidgetBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent
 	Super::NativeOnMouseLeave(InMouseEvent);
 
 	bIsMouseOver = false;
-
-	if (UpgradeImage)
-	{
-		if (UiScale.X <= UiScaleMax.X) return;
-
-		if (UiScale.X >= UiScaleMax.X)
-		{
-			UiScale.X -= GetWorld()->GetDeltaSeconds() * 10.0f;
-		}
-		if (UiScale.Y >= UiScaleMax.Y)
-		{
-			UiScale.Y -= GetWorld()->GetDeltaSeconds() * 10.0f;
-		}
-		UpgradeImage->SetRenderScale(UiScale);
-	}
 }
 
 void UExpUpgradeWidgetBase::SetDescriptionText(const FText& Description)

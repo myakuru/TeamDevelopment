@@ -21,21 +21,13 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/Animation/Montage/AM_Perula_Dash.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/Animation/Montage/AM_Perula_Dash.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/BP_DashGear.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/BP_DashGear.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv1.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv1.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv2.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv2.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv3.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv3.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/State/BP_DashGearState_Lv4.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/State/BP_LaserGearState_Lv4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/State/BP_LaserGearState_Lv4.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearStateBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearStateBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/State/DashGearStateBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/ABP_Perula.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/ABP_Perula.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget0/MyExpUpgradeWidgetBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget0/MyExpUpgradeWidgetBase.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget1/MyExpUpgradeWidgetBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget1/MyExpUpgradeWidgetBase.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget2/MyExpUpgradeWidgetBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget2/MyExpUpgradeWidgetBase.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Core/NullGameplayTags.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Core/NullGameplayTags.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Core/NullGameplayTags.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Core/NullGameplayTags.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +56,65 @@
     <urls />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0000005543814063" />
+      <entry key="MS500" value="1.0895378190248064" />
+      <entry key="S2" value="2.1360955351437365" />
+      <entry key="S5" value="3.4683592433747563" />
+      <entry key="S10" value="5.2289453651287365" />
+      <entry key="S30" value="9.342265293370728" />
+      <entry key="S60" value="11.616187541475208" />
+      <entry key="M2" value="13.135093234320705" />
+      <entry key="M5" value="14.207047680713856" />
+      <entry key="M10" value="14.595181424095475" />
+      <entry key="M15" value="14.72822707279168" />
+      <entry key="M30" value="14.863156377209396" />
+      <entry key="H1" value="14.931336961415939" />
+      <entry key="H2" value="14.965607929882756" />
+      <entry key="H4" value="14.982788796614896" />
+      <entry key="D1" value="14.997129356786091" />
+      <entry key="W1" value="14.999589856421576" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.9460581649309331" />
+      <entry key="MS500" value="1.0774565660459858" />
+      <entry key="S2" value="2.1300784004994613" />
+      <entry key="S5" value="3.464425450798404" />
+      <entry key="S10" value="5.225135046258089" />
+      <entry key="S30" value="9.33719704712006" />
+      <entry key="S60" value="11.612058678508188" />
+      <entry key="M2" value="13.13241983263613" />
+      <entry key="M5" value="14.205794169357121" />
+      <entry key="M10" value="14.59452020320943" />
+      <entry key="M15" value="14.727778295592596" />
+      <entry key="M30" value="14.862927928328752" />
+      <entry key="H1" value="14.931221706913117" />
+      <entry key="H2" value="14.96555004321982" />
+      <entry key="H4" value="14.982759788192178" />
+      <entry key="D1" value="14.997124512988227" />
+      <entry key="W1" value="14.99958916422829" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 2
@@ -79,19 +130,20 @@
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Hinata/feature&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Todo/feature&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.C/C++&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -129,10 +181,8 @@
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="PTY_MODE" value="Auto" />
       <option name="MIXED_MODE_DEBUG" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
@@ -152,10 +202,8 @@
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="PTY_MODE" value="Auto" />
       <option name="MIXED_MODE_DEBUG" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
@@ -174,7 +222,6 @@
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Programs/Shared/EpicGames.AspNet/EpicGames.AspNet.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
       <option name="LAUNCH_PROFILE_NAME" value="EpicGames.AspNet" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
       <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
@@ -182,16 +229,10 @@
       <option name="SEND_DEBUG_REQUEST" value="1" />
       <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
       <option name="AUTO_ATTACH_CHILDREN" value="0" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
       <method v="2">
         <option name="Build" />
       </method>
-    </configuration>
-    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile">
-        <settings />
-      </deployment>
-      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
-      <method v="2" />
     </configuration>
     <configuration name="EpicGames.Perforce.Fixture/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
       <deployment type="dockerfile">
@@ -200,6 +241,13 @@
           <option name="contextFolderPath" value="C:\_Team\TeamDevelopment" />
           <option name="sourceFilePath" value="../../Program Files/Epic Games/UE_5.7/Engine/Source/Programs/Shared/EpicGames.Perforce.Fixture/Dockerfile" />
         </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
       </deployment>
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
@@ -234,6 +282,11 @@
       <workItem from="1783468736345" duration="6229000" />
       <workItem from="1783479692953" duration="196000" />
       <workItem from="1783483975336" duration="5554000" />
+      <workItem from="1783643482364" duration="4000" />
+      <workItem from="1783644076076" duration="32000" />
+      <workItem from="1783657201949" duration="88000" />
+      <workItem from="1783657375033" duration="1244000" />
+      <workItem from="1783658834756" duration="1479000" />
     </task>
     <servers />
   </component>
