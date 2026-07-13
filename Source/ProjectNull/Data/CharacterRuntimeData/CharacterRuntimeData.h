@@ -111,7 +111,8 @@ public:
 	float GetAttackScaling()const { return Attack.Scaling; }
 
 	/** 基礎攻撃力とスケール値から最終的な攻撃力を算出 */
-	float GetCharacterAttackPower(){ return Attack.GetFinalPower(); }
+	float GetFinalAttackPower(float Scaling)  { return Attack.GetFinalPower() * Scaling; }
+	float GetCharacterAttackPower() { return Attack.GetFinalPower(); }
 	/* End Getters~*/
 
 protected:

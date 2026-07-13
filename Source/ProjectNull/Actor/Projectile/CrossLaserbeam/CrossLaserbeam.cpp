@@ -75,7 +75,7 @@ void ACrossLaserbeam::SetLaserEnabled(bool bEnabled)
 		}
 		else 
 		{
-			Effect->DeactivateEffect();
+			Effect->DeactivateImmediateEffect();
 		}
 	}
 }
