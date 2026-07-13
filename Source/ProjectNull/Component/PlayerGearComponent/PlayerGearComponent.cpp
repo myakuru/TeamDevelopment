@@ -302,6 +302,6 @@ void UPlayerGearComponent::StartInvincibleEffect()
 void UPlayerGearComponent::DeactivateEffect()
 {
 	if (!InvincibleEffect) { return; }
-	InvincibleEffect->DeactivateEffect();
+	InvincibleEffect->DeactivateImmediateEffect();
 }
 
