@@ -27,6 +27,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
 	void ChangedIsAlive(const bool a_IsAlive);
 
+	/**
+	 * @brief 最終的なHP
+	 * @param InFinalHP 計算後の最終HP
+	 */
+	void SetFinalHP(float InFinalHP);
+
 	/** 敵の生存フラグが変更されたときに呼び出される*/
 	FOnIsAliveChanged		OnIsAliveChanged;
 

@@ -6,6 +6,8 @@
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/UI/InGame/HitDamageWidget/DamageNumberActor/DamageNumberActor.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
 
 ASurvivalGameMode::ASurvivalGameMode()
 {
@@ -15,6 +17,11 @@ ASurvivalGameMode::ASurvivalGameMode()
 void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (UDamageNumberPoolSubsystem* Pool = GetWorld()->GetSubsystem<UDamageNumberPoolSubsystem>())
+	{
+		Pool->InitializePool(DamageNumberActorClass, DamageNumberPoolSize);
+	}
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)
