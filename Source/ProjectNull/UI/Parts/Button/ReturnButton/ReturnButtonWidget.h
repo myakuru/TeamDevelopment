@@ -19,6 +19,6 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,category = "Parameter")
 	FName OpenLevelName = "";
 };

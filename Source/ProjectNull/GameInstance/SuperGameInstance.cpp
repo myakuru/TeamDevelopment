@@ -2,12 +2,13 @@
 #include "Kismet/GameplayStatics.h"
 
 #include <ProjectNull/SaveGame/MySaveGame.h>
-#include<ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
+#include <ProjectNull/Sound/SoundManager.h>
+//#include<ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
 #include<ProjectNull/Stage/Manager/StageManager.h>
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 #include <ProjectNull/System/Result/ResultManager/ResultManager.h>
 #include <ProjectNull/Actor/Map/MapActorManager.h>
-#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
+//#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 void USuperGameInstance::Init()
@@ -15,6 +16,13 @@ void USuperGameInstance::Init()
 	//class UStageDataAssetを消したら
 	//Super::InitがなぜかUObjectのInitになる
 	UGameInstance::Init();
+	
+	//SoundManager生成
+	if (SoundManagerClass)
+	{
+		SoundManager = NewObject<USoundManager>(this, SoundManagerClass);
+	}
+	if (SoundManager)SoundManager->Initialize(this);
 
 	// WeaponManager生成・初期化
 	if (WeaponManagerClass) {
