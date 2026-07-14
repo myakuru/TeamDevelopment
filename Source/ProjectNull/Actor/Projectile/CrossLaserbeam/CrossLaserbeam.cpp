@@ -7,7 +7,11 @@
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Effect/EffectBase.h>
 
-ACrossLaserbeam::ACrossLaserbeam()
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
+#include "ProjectNull/GameInstance/SuperGameInstance.h"
+
+ACrossLaserbeam::ACrossLaserbeam():
+	AttackPowerScale(1.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -43,6 +47,9 @@ void ACrossLaserbeam::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
 }
 
 void ACrossLaserbeam::Tick(float DeltaTime)
@@ -94,10 +101,12 @@ void ACrossLaserbeam::OnLaserBeginOverlap(
 		return;
 	}
 
+	if (!PlayerRuntimeData) { return; }
+	
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		Interface->ApplyDamaged();
+		Interface->ApplyDamaged(PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale));
 		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }

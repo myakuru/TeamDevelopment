@@ -5,19 +5,17 @@
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 #include <ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.h>
 
-#include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
-#include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
-
-#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 
 
 UDashGear::UDashGear():
 	SphereCollision(nullptr),
-	SphereCollisionClass(nullptr)
+	SphereCollisionClass(nullptr),
+	AttackPowerScale(1.f)
 {
 	
 }
@@ -53,6 +51,11 @@ void UDashGear::Initialize(
 	);
 
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	
 }
 
 void UDashGear::Execute(int32 CurrentGearLevel)
@@ -107,9 +110,9 @@ void UDashGear::OnDashGearAttackBeginOverlap(
 	if (!OwnerPlayer) { return; }
 	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
 
-	auto Interface = Cast<ICharacterInterface>(OtherActor);
+	const auto Interface = Cast<ICharacterInterface>(OtherActor);
 	if (!Interface) { return; }
-	Interface->ApplyDamaged();
+	Interface->ApplyDamaged(PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale));
 	Interface->ApplyKnockBack(PlayerLocation);
 	//Interface->ApplyLocalHitPos(OtherActor->GetActorLocation());
 

@@ -54,6 +54,7 @@ public:
 
 	/** 最大ギアレベル */
 	static constexpr int32 kMaxGearLevel = 4;
+	static constexpr int32 kLv4Index = 3;
 
 	/**
 	 * @brief ギアの初期化処理

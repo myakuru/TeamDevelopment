@@ -44,8 +44,9 @@ void UGearBase::Initialize(
 
 void UGearBase::Execute(int32 CurrentGearLevel)
 {
-	if (!bCanExecute) { return; }
-
+	if (!bCanExecute)			{ return; }
+	if (!OwnerGearComponent)	{ return; }
+	
 	bIsActive			= true;
 	bCanExecute			= false;
 	ExecutedGearLevel	= CurrentGearLevel;
@@ -75,12 +76,18 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 
 	// 状態クラス実行処理
 	CurrentGearState->Execute(CurrentGearLevel);
+
+	if (CurrentGearState->GetGearLevelIndex() == kLv4Index)
+	{
+		OwnerGearComponent->SetIsInvincible(false);
+	}
 }
 
 void UGearBase::Update(float DeltaTime)
 {
 	if (!bIsActive)			{ return; }
-	if (!CurrentGearState)	{ return; }
+	if (!CurrentGearState ||
+		!OwnerGearComponent){ return; }
 
 	// 経過時間更新
 	ElapsedTime += DeltaTime;
@@ -94,7 +101,6 @@ void UGearBase::Update(float DeltaTime)
 		bAllowOtherGearActivation = true;
 	}
 	
-
 	// 発動時間が終了したら
 	// 状態クラスの終了処理を呼び出し、更新を行わない
 	if (ElapsedTime >= Duration)
@@ -102,6 +108,17 @@ void UGearBase::Update(float DeltaTime)
 		CurrentGearState->End();
 		bIsActive	= false;
 		ElapsedTime = 0.0f;
+		
+		if (CurrentGearState->GetGearLevelIndex() == kLv4Index)
+		{
+			const FTimerHandle& TimerHandle = OwnerGearComponent->GetInvincibilityTimerHandle();
+			const bool IsTimerActive = GetWorld()->GetTimerManager().IsTimerActive(TimerHandle);
+			if (IsTimerActive)
+			{
+				OwnerGearComponent->SetIsInvincible(true);
+			}
+		}
+		
 	}
 }
 
@@ -135,7 +152,7 @@ void UGearBase::Reset()
 {
 	bCanExecute = true;
 
-	auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
 	if (!SuperGameInstance) { return; }
 
 	const TObjectPtr<UPlayerParameterData> ParameterData

@@ -20,6 +20,7 @@ class UStaticMeshComponent;
 class UProjectileMovementComponent;
 
 class UEffectBase;
+class UPlayerRuntimeData;
 
 /** 発射物の中間基底クラス */
 UCLASS(Blueprintable)
@@ -33,8 +34,7 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
-
-
+	
 	virtual void HandleCollision(AActor* OtherActor);
 
 	/** 持ち主のアクタークラス */
@@ -91,4 +91,11 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float AliveTime;
+protected:
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
+	UPROPERTY(EditAnywhere)
+	float AttackPowerScale;
 };

@@ -7,6 +7,9 @@
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Actor/Effect/EffectBase.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
 
 
 AProjectileBase::AProjectileBase():
@@ -15,7 +18,8 @@ AProjectileBase::AProjectileBase():
 	StaticMesh(nullptr),
 	ProjectileMovement(nullptr),
 	AliveTimerHandle(FTimerHandle()),
-	AliveTime(2.f)
+	AliveTime(2.f),
+	AttackPowerScale(1.f)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
@@ -60,6 +64,10 @@ void AProjectileBase::BeginPlay()
 
 	Super::BeginPlay();
 
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	
 	if (!SphereCollision) { return; }
 
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(
@@ -87,12 +95,13 @@ void AProjectileBase::HandleCollision(AActor* OtherActor)
 {
 	if (!OtherActor || 
 		OtherActor == this ||
-		!OwnerActor) { return; }
+		!OwnerActor ||
+		!PlayerRuntimeData) { return; }
 
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		Interface->ApplyDamaged();
+		Interface->ApplyDamaged(PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale));
 		Interface->ApplyKnockBack(OwnerActor->GetActorLocation());
 	}
 

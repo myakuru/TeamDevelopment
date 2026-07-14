@@ -38,12 +38,13 @@ public:
 
 	void ChangeGear();
 
+	void SetIsInvincible(bool bInIsInvincible);
 	/** セッター */
 
 	/** ゲッター */
-	inline const TArray<UGearBase*>& GetPlayerGears() const { return PlayerGears; }
-	inline int32 GetCurrentGearLevel() const				{ return CurrentGearLevel; }
-
+	inline const TArray<UGearBase*>&	GetPlayerGears()			const	{ return PlayerGears; }
+	inline int32						GetCurrentGearLevel()		const	{ return CurrentGearLevel; }
+	inline const FTimerHandle&			GetInvincibilityTimerHandle()		{ return InvincibilityTimerHandle; }
 private:
 
 	UFUNCTION()
@@ -65,7 +66,6 @@ private:
 		int32 Index,
 		UGearBase* Gear);
 
-	void SetIsInvincible(bool bInIsInvincible);
 
 	bool CanChangeGear() const;
 
@@ -136,4 +136,7 @@ private:
 
 	/** ギアチェンジによる無敵時間ハンドル */
 	FTimerHandle InvincibilityTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float InvincibilityAttackPowerScale;
 };

@@ -33,6 +33,18 @@ void UAutoAttack::Initialize(const TObjectPtr<AActor>& Owner)
 		ConeSlashParams->Initialize(Owner);
 	}
 
+	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front)
+			&& AutoAttackParamsMap[EAutoAttackType::Front])
+	{
+		AutoAttackParamsMap[EAutoAttackType::Front]->Execute();
+	}
+
+	if (AutoAttackParamsMap.Contains(EAutoAttackType::Ring)
+			&& AutoAttackParamsMap[EAutoAttackType::Ring])
+	{
+		AutoAttackParamsMap[EAutoAttackType::Ring]->Execute();
+	}
+	
 	// 自動攻撃のタイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		AutoFrontConeAttackTimerHandle,

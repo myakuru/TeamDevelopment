@@ -21,8 +21,18 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Explosion/ExplosionGearSkill.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Explosion/ExplosionGearSkill.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/ExplosionGear/State/ExplosionGearStateBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/ExplosionGear/State/ExplosionGearStateBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/DataAsset/PlayerData/PlayerParameterData.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/DataAsset/PlayerData/PlayerParameterData.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/GameInstance/BP_SuperGameInstance.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/GameInstance/BP_SuperGameInstance.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/HitActor/AutoAttackHitActor/AutoAttackHitActor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/HitActor/AutoAttackHitActor/AutoAttackHitActor.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/ExplosionGear/State/ExplosionGearState_Lv4/ExplosionGearState_Lv4.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/ExplosionGear/State/ExplosionGearState_Lv4/ExplosionGearState_Lv4.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,8 +57,13 @@
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Math/TransformVectorized.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectHandle.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/Engine/TimerHandle.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/GameFramework/Character.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Private/Character.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Private/WorldPartition/HLOD/DestructibleHLODComponent.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Public/DrawDebugHelpers.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Public/WorldPartition/HLOD/DestructibleHLODComponent.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Net/Iris/Private/Iris/Serialization/LastResortPropertyNetSerializer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/ProjectNull/Sound/SoundManager.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/ProjectNull/Sound/SoundManager.h" root0="FORCE_HIGHLIGHTING" />
@@ -242,6 +257,8 @@
       <workItem from="1783908428599" duration="3170000" />
       <workItem from="1783915360497" duration="12000" />
       <workItem from="1783915495058" duration="6831000" />
+      <workItem from="1783922600108" duration="5514000" />
+      <workItem from="1783987303341" duration="5562000" />
     </task>
     <servers />
   </component>
