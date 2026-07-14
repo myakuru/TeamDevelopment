@@ -24,7 +24,6 @@ protected:
 public:	
 	/** 最大ギアレベル */
 	static constexpr int32 kMaxGearLevel = 4;
-
 	static constexpr int32 kMaxGearNum = 3;
 
 	virtual void TickComponent(
@@ -38,9 +37,11 @@ public:
 
 	void ChangeGear();
 
-	void SetIsInvincible(bool bInIsInvincible);
 	/** セッター */
+	void SetIsInvincible(bool bInIsInvincible);
+	void SetPlayerGears(UGearBase* InGear,int32 Index); 
 
+	
 	/** ゲッター */
 	inline const TArray<UGearBase*>&	GetPlayerGears()			const	{ return PlayerGears; }
 	inline int32						GetCurrentGearLevel()		const	{ return CurrentGearLevel; }
@@ -97,31 +98,31 @@ private:
 
 	/** 持ち主のプレイヤークラス */
 	UPROPERTY()
-	TObjectPtr<APlayerBase> OwnerPlayer;
+	TObjectPtr<APlayerBase>				OwnerPlayer;
 
 	/** プレイヤーのRuntimeDataクラス */
 	UPROPERTY()
-	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	TObjectPtr<UPlayerRuntimeData>		PlayerRuntimeData;
 
 	/** プレイヤーのParameterDataクラス */
 	UPROPERTY()
-	TObjectPtr<UPlayerParameterData> PlayerParameterData;
+	TObjectPtr<UPlayerParameterData>	PlayerParameterData;
 
 	/** ギアを管理する配列 */
 	UPROPERTY(EditAnywhere, Instanced)
-	TArray<TObjectPtr<UGearBase>> PlayerGears;
+	TArray<TObjectPtr<UGearBase>>		PlayerGears;
 
 	/** ギアチェンジによる無敵用スフィアコリジョン */
 	UPROPERTY()
-	TObjectPtr<ASphereCollision> SphereCollision;
+	TObjectPtr<ASphereCollision>		SphereCollision;
 
 	/** ギアチェンジによる無敵用スフィアスフィアコリジョンクラス */
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<ASphereCollision> SphereCollisionClass;
+	TSubclassOf<ASphereCollision>		SphereCollisionClass;
 
 	/** 無敵状態を表現するエフェクトActor */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Effect")
-	TObjectPtr<UEffectBase> InvincibleEffect;
+	TObjectPtr<UEffectBase>				InvincibleEffect;
 
 	/** 現在のギアレベル */
 	UPROPERTY(EditAnywhere)

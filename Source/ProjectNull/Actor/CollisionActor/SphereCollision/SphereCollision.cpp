@@ -3,7 +3,8 @@
 #include "Components\SphereComponent.h"
 
 // Sets default values
-ASphereCollision::ASphereCollision()
+ASphereCollision::ASphereCollision():
+	SphereComponent(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));

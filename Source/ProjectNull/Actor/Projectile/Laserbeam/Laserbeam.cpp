@@ -10,6 +10,9 @@
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 ALaserbeam::ALaserbeam():
+	BoxComp(nullptr),
+	NiagaraEffectArray(TArray<TObjectPtr<UEffectBase>>()),
+	PlayerRuntimeData(nullptr),
 	AttackPowerScale(1.f)
 {
 	PrimaryActorTick.bCanEverTick = true;

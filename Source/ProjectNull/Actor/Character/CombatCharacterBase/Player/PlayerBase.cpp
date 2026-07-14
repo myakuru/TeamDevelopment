@@ -31,7 +31,10 @@ APlayerBase::APlayerBase():
 		AutoAttack(nullptr),
 		MaterialCollectionUpdater(nullptr),
 		CutsceneComponent(nullptr),
-		SuperGameInstance(nullptr)
+		SuperGameInstance(nullptr),
+		NormalStateCameraLagSpeed(0.f),
+		TargetCameraLagSpeed(0.f),
+		CameraLagInterpSpeed(0.f)
 {
 	// ================================================================
 	// プレイヤーの初期化

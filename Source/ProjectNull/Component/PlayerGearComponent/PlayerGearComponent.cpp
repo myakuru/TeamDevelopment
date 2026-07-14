@@ -27,6 +27,7 @@ UPlayerGearComponent::UPlayerGearComponent():
 		PlayerGears(TArray<TObjectPtr<UGearBase>>()),
 		SphereCollision(nullptr),
 		SphereCollisionClass(nullptr),
+		InvincibleEffect(nullptr),
 		CurrentGearLevel(1),
 		HitStopDuration(0.f),
 		HitStopTimeDilation(0.f),
@@ -234,6 +235,14 @@ void UPlayerGearComponent::SetIsInvincible(bool bInIsInvincible)
 	}
 
 	SphereCollision->SetCollisionEnabled(CollisionType);
+}
+
+void UPlayerGearComponent::SetPlayerGears(
+	UGearBase* InGear,
+	int32 Index)
+{
+	if (!PlayerGears.IsValidIndex(Index)) { return; }
+	PlayerGears[Index] = InGear;
 }
 
 bool UPlayerGearComponent::CanChangeGear() const
