@@ -45,6 +45,7 @@ public:
 	inline const TArray<UGearBase*>&	GetPlayerGears()			const	{ return PlayerGears; }
 	inline int32						GetCurrentGearLevel()		const	{ return CurrentGearLevel; }
 	inline const FTimerHandle&			GetInvincibilityTimerHandle()		{ return InvincibilityTimerHandle; }
+	inline float 						GetCoolTimeScale()			const	{ return CoolTimeScale; }
 private:
 
 	UFUNCTION()
@@ -139,4 +140,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float InvincibilityAttackPowerScale;
+
+	UPROPERTY(EditAnywhere)
+	float CoolTimeScale;
+
+	UPROPERTY(EditAnywhere)
+	float SpeedScale;
 };

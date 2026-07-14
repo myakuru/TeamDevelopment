@@ -42,6 +42,7 @@ class APlayerBase;
 /** ギアの状態基底クラス */
 class UGearStateBase;
 
+class UPlayerRuntimeData;
 
 /** ギアの基底クラス */
 UCLASS()
@@ -108,6 +109,10 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UPlayerGearComponent> OwnerGearComponent;
 
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
 private:
 
 	/**

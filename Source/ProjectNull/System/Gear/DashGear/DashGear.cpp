@@ -41,7 +41,7 @@ void UDashGear::Initialize(
 		TEXT("DashSphere")
 	);
 
-	auto SphereComponent = SphereCollision->GetSphereComponent();
+	const auto SphereComponent = SphereCollision->GetSphereComponent();
 	if (!SphereComponent) { return; }
 
 	// オーバーラップ時、オーバーラップ抜け時の関数をセット
@@ -51,11 +51,6 @@ void UDashGear::Initialize(
 	);
 
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
-	if (!SuperGameInstance) { return; }
-	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
-	
 }
 
 void UDashGear::Execute(int32 CurrentGearLevel)
