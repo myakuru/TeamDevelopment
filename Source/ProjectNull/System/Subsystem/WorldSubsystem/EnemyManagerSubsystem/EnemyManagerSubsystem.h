@@ -67,6 +67,9 @@ public:
 	*/
 	AEnemyISMManager* GetISMManager(TSubclassOf<AEnemyISMManager> ManagerClass) const;
 
+	/** すべての敵を破壊する*/
+	void DestroyAllEnemy();
+
 private:
 
 	/**

@@ -68,6 +68,12 @@ void AEnemySpawner::BeginPlay()
 	{
 		CachedSubsystem->OnPhaseChanged.AddUObject(this, &AEnemySpawner::HandlePhaseChanged);
 		HandlePhaseChanged(CachedSubsystem->GetPhase());
+		
+		CachedSubsystem = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
+		if (CachedSubsystem)
+		{
+			CachedSubsystem->SetPhaseThresholds(PhaseSpawnTable->PhaseWaves[0].PhaseUpDeathEnemyCount);
+		}
 	}
 }
 
@@ -202,16 +208,22 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 	// 新しいウェーブデータを取得
 	UEnemyWaveDataAsset* NewWaveData = 
 		const_cast<UEnemyWaveDataAsset*>(PhaseSpawnTable->FindWaveDataByPhase(NewPhase));
-	
+
 	if (!NewWaveData)
 	{
 		UE_LOG(LogTemp, Error, TEXT("No WaveData found Phase : %d"), NewPhase);
-		CurrentWaveData = nullptr;
+		//CurrentWaveData = nullptr;
 		return;
 	}
 
 	CurrentWaveData = NewWaveData;
 	NowPhase = NewPhase;
+
+	CachedSubsystem = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
+	if (CachedSubsystem)
+	{
+		CachedSubsystem->SetPhaseThresholds(PhaseSpawnTable->PhaseWaves[NewPhase].PhaseUpDeathEnemyCount);
+	}
 
 	// SpawnTableからFinalWaveかどうかを取得
 	if (PhaseSpawnTable->FinalWave == NewPhase)

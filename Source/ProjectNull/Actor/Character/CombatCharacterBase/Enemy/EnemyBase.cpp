@@ -399,8 +399,8 @@ void AEnemyBase::SpawnDeathExperience()
 	if (UItemManagerSubsystem* ItemSubsystem =
 		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
 	{
-		const FLinearColor Color = EnemyStatus.ExpColor;
-		const float Size = EnemyStatus.ExpSize;
+		const FLinearColor Color	= EnemyStatus.ExpColor;
+		const float Size			= EnemyStatus.ExpSize;
 
 		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
 			GetActorLocation(),
