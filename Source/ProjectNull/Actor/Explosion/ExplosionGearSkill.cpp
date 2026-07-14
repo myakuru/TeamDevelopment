@@ -95,6 +95,10 @@ void AExplosionGearSkill::Initialize(const FExplosionData& InData)
 	ApplyData();
 }
 
+void AExplosionGearSkill::StartExplosionSequence()
+{
+}
+
 void AExplosionGearSkill::ApplyData()
 {
 	Collision->SetSphereRadius(CollisionRadius * Data.Scale);
