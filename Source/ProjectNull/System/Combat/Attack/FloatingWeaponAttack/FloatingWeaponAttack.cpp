@@ -66,7 +66,7 @@ void UFloatingWeaponAttack::Update(float DeltaTime)
 
 void UFloatingWeaponAttack::Execute()
 {
-	auto Owner = GetOwnerActor();
+	const auto Owner = GetOwnerActor();
 	if (!Owner)					{ return; }
 
 	SetIsActive(true);
@@ -83,7 +83,7 @@ void UFloatingWeaponAttack::Execute()
 	for (auto& SlashEffect : SlashEffectArray)
 	{
 		if (!SlashEffect) { continue; }
-		SlashEffect->Start(RootComp);
+		SlashEffect->StartOnce(RootComp);
 	}
 }
 

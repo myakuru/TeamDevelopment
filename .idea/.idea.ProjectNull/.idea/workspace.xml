@@ -22,8 +22,11 @@
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/BP_DashGear.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/BP_DashGear.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +43,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RD/thirdparty/spdlog/include/spdlog/fmt/bundled/core.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Plugins/Media/ElectraPlayer/Source/ElectraPlayerRuntime/Private/Runtime/Platforms/Android/PlayerRuntime_Android.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/KismetCompiler/Public/KismetCastingUtils.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/MovieSceneTools/Public/MovieSceneToolHelpers.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/UnrealEd/Private/Tools/EdModeInteractiveToolsContext.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/UnrealEd/Public/Tools/EdModeInteractiveToolsContext.h" root0="FORCE_HIGHLIGHTING" />
@@ -96,7 +101,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.C/C++&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.Mappings&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -134,10 +139,8 @@
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="PTY_MODE" value="Auto" />
       <option name="MIXED_MODE_DEBUG" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
@@ -157,10 +160,8 @@
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="PASS_PARENT_ENVS" value="1" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
-      <option name="PTY_MODE" value="Auto" />
       <option name="MIXED_MODE_DEBUG" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
@@ -179,7 +180,6 @@
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Programs/Shared/EpicGames.AspNet/EpicGames.AspNet.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
       <option name="LAUNCH_PROFILE_NAME" value="EpicGames.AspNet" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
       <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
@@ -187,16 +187,10 @@
       <option name="SEND_DEBUG_REQUEST" value="1" />
       <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
       <option name="AUTO_ATTACH_CHILDREN" value="0" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
       <method v="2">
         <option name="Build" />
       </method>
-    </configuration>
-    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile">
-        <settings />
-      </deployment>
-      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
-      <method v="2" />
     </configuration>
     <configuration name="EpicGames.Perforce.Fixture/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
       <deployment type="dockerfile">
@@ -205,6 +199,13 @@
           <option name="contextFolderPath" value="C:\_Team\TeamDevelopment" />
           <option name="sourceFilePath" value="../../Program Files/Epic Games/UE_5.7/Engine/Source/Programs/Shared/EpicGames.Perforce.Fixture/Dockerfile" />
         </settings>
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
       </deployment>
       <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
@@ -260,6 +261,8 @@
       <workItem from="1784008454858" duration="292000" />
       <workItem from="1784008975248" duration="1107000" />
       <workItem from="1784010188017" duration="904000" />
+      <workItem from="1784024810774" duration="3638000" />
+      <workItem from="1784034728785" duration="2207000" />
     </task>
     <servers />
   </component>

@@ -23,6 +23,7 @@ public:
 	UEffectBase();
 
 	void Start(USceneComponent* RootComponent);
+	void StartOnce(USceneComponent* RootComponent);
 
 	void DeactivateEffect();
 	void DeactivateImmediateEffect();

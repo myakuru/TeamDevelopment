@@ -22,6 +22,7 @@
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 #include <ProjectNull/Weapon/Data/WeaponData.h>
 #include <ProjectNull/Weapon/Instance/WeaponInstance.h>
+#include "NiagaraComponent.h"
 
 
 UPlayerGearComponent::UPlayerGearComponent():
@@ -38,7 +39,10 @@ UPlayerGearComponent::UPlayerGearComponent():
 		InvincibilityTimerHandle(FTimerHandle()),
 		InvincibilityAttackPowerScale(1.f),
 		CoolTimeScale(0.8f),
-		SpeedScale(1.4f)
+		SpeedScale(1.4f),
+		TargetEffectScale(1.f),
+		EffectScaleInterpSpeed(1.f),
+		EffectDeactivateScaleThreshold(0.1f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -64,19 +68,16 @@ void UPlayerGearComponent::BeginPlay()
 	
 	//↓のコードで装備してるギアのTSubclassOf<UGearBase>が三つ手に入る。
 	//データテーブルにクラスが設定されてないか装備しているセーブデータがないと取得できない。
-
 	const auto WeaponManager = SuperGameInstance->GetWeaponManager();
 	if (!WeaponManager) { return; }
 	
 	FWeaponInstance WeaponInstance;
+	FWeaponData		WeaponData;
 	
-	FWeaponData WeaponData;
 	for (int i = 0; i < 3; i++)
 	{
-		if (!WeaponManager->GetEquippedWeapon(WeaponInstance, i))continue;
-		if (!WeaponManager->GetWeaponMaster(WeaponInstance.WeaponId, WeaponData))continue;
-
-		// ↓これが設定されてるTSubclassOf <UGearBase>
+		if (!WeaponManager->GetEquippedWeapon(WeaponInstance, i)) { continue; }
+		if (!WeaponManager->GetWeaponMaster(WeaponInstance.WeaponId, WeaponData)) { continue;}
 
 		PlayerGears[i] = NewObject<UGearBase>(this,WeaponData.Gear);
 	}
@@ -107,10 +108,8 @@ void UPlayerGearComponent::TickComponent(
 	}
 
 	UpdateCollisionByInvincibility();
-
-	/*if (!PlayerRuntimeData) { return; }
-	UE_LOG(LogTemp, Warning, TEXT("hi IsInvincible %d"), PlayerRuntimeData->IsInvincible());*/
-
+	
+	UpdateEffectScale(DeltaTime);
 }
 
 bool UPlayerGearComponent::IsMovementBlockedByGear() const
@@ -246,18 +245,14 @@ void UPlayerGearComponent::SetIsInvincible(bool bInIsInvincible)
 
 	PlayerRuntimeData->SetIsInvincible(bInIsInvincible);
 	
-	ECollisionEnabled::Type CollisionType
+	const ECollisionEnabled::Type CollisionType
 		= bInIsInvincible ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision;
-
-
+	
 	if (bInIsInvincible)
 	{
 		StartInvincibleEffect();
 	}
-	else {
-		DeactivateEffect();
-	}
-
+	
 	SphereCollision->SetCollisionEnabled(CollisionType);
 }
 
@@ -282,8 +277,6 @@ void UPlayerGearComponent::OnInvincibilityStart()
 		!OwnerPlayer) { return; }
 
 	const auto& GearRuntimeData = PlayerRuntimeData->GetGearData();
-	const auto& SpeedRuntimeData = PlayerRuntimeData->GetSpeed();
-	const auto& SpeedParameterData = PlayerParameterData->GetSpeedData();
 	
 	SetIsInvincible(true);
 
@@ -337,6 +330,34 @@ void UPlayerGearComponent::UpdateCollisionByInvincibility()
 	const FVector	Forward		= FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 	OwnerPlayer->AddMovementInput(Forward);
+}
+
+void UPlayerGearComponent::UpdateEffectScale(float InDeltaTime)
+{
+	if (!PlayerRuntimeData ||
+		!InvincibleEffect)					{ return; }
+	
+	const auto EffectComp = InvincibleEffect->GetEffectComponent();
+	if (!EffectComp) { return; }
+	
+	const bool IsInvincible = PlayerRuntimeData->IsInvincible();
+	
+	const FVector TargetScale = IsInvincible
+	? FVector(TargetEffectScale, TargetEffectScale, TargetEffectScale)
+	: FVector::ZeroVector;
+	
+	const FVector ResultScale = FMath::VInterpTo(
+		EffectComp->GetRelativeScale3D(),
+		TargetScale,
+		InDeltaTime,
+		EffectScaleInterpSpeed);
+	
+	if (!IsInvincible && ResultScale.X < EffectDeactivateScaleThreshold)
+	{
+		DeactivateEffect();
+	}
+	
+	EffectComp->SetRelativeScale3D(ResultScale);
 }
 
 void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)

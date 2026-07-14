@@ -45,7 +45,7 @@ public:
 	/** ゲッター */
 	inline const TArray<UGearBase*>&	GetPlayerGears()			const	{ return PlayerGears; }
 	inline int32						GetCurrentGearLevel()		const	{ return CurrentGearLevel; }
-	inline const FTimerHandle&			GetInvincibilityTimerHandle()		{ return InvincibilityTimerHandle; }
+	inline const FTimerHandle&			GetInvincibilityTimerHandle() const	{ return InvincibilityTimerHandle; }
 	inline float 						GetCoolTimeScale()			const	{ return CoolTimeScale; }
 private:
 
@@ -86,6 +86,8 @@ private:
 	 */
 	void UpdateCollisionByInvincibility();
 
+	void UpdateEffectScale(float InDeltaTime);
+	
 	/**
 	 * @brief ギアのWidget更新
 	 * @param DeltaTime デルタタイム
@@ -147,4 +149,13 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float SpeedScale;
+	
+	UPROPERTY(EditAnywhere)
+	float TargetEffectScale;
+	
+	UPROPERTY(EditAnywhere)
+	float EffectScaleInterpSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float EffectDeactivateScaleThreshold;
 };

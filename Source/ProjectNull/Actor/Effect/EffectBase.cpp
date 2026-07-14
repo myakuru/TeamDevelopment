@@ -30,6 +30,24 @@ void UEffectBase::Start(USceneComponent* RootComponent)
 	EffectComponent->SetRelativeTransform(RelativeTransform);
 }
 
+void UEffectBase::StartOnce(USceneComponent* RootComponent)
+{
+	if (!EffectSystem) { return; }
+
+	const auto Comp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+		EffectSystem,
+		RootComponent,
+		NAME_None,
+		FVector::ZeroVector,
+		FRotator::ZeroRotator,
+		EAttachLocation::KeepRelativeOffset,
+		true);
+
+	if (!Comp) { return; }
+	Comp->SetRelativeTransform(RelativeTransform);
+	
+}
+
 void UEffectBase::DeactivateEffect()
 {
 	if (!EffectComponent) { return; }
