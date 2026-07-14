@@ -21,7 +21,10 @@ void USoundManager::Play2D(USoundBase* inSound, float inVolume, float inPitch, f
 UAudioComponent* USoundManager::Spawn2D(USoundBase* inSound, float inVolume, float inPitch, float inStart,
 	USoundConcurrency* inConcurrencySettings, bool inPersistAcrossLevelTransition, bool inAutoDestroy)
 {
-	if (!inSound)return nullptr;
+	if (!inSound || !GameInstance)return nullptr;
+	
+	UE_LOG(LogTemp, Warning, TEXT("SoundManager Spawn2D!!"));
+	
 	return UGameplayStatics::SpawnSound2D(
 		GameInstance,inSound,inVolume,
 		inPitch,inStart,inConcurrencySettings,

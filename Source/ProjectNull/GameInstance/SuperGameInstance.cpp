@@ -21,30 +21,40 @@ void USuperGameInstance::Init()
 	if (SoundManagerClass)
 	{
 		SoundManager = NewObject<USoundManager>(this, SoundManagerClass);
+		
+		UE_LOG(LogTemp, Log, TEXT("!!SuperGameInstance : SoundManager Generate!!"));
 	}
 	if (SoundManager)SoundManager->Initialize(this);
 
 	// WeaponManager生成・初期化
 	if (WeaponManagerClass) {
 		WeaponManager = NewObject<UWeaponManager>(this, WeaponManagerClass);
+		
+		UE_LOG(LogTemp, Log, TEXT("!!SuperGameInstance : WeaponManager Generate!!"));
 	}
 	if (WeaponManager) WeaponManager->Initialize();
 
 	// ResultManager生成・初期化
 	if (ResultManagerClass) {
 		ResultManager = NewObject<UResultManager>(this, ResultManagerClass);
+		
+		UE_LOG(LogTemp, Log, TEXT("!!SuperGameInstance : ResultManager Generate!!"));
 	}
 	if (ResultManager)ResultManager->Initialize();
 
 	//StageManager
 	if (StageManagerClass) {
 		StageManager = NewObject<UStageManager>(this, StageManagerClass);
+		
+		UE_LOG(LogTemp, Log, TEXT("!!SuperGameInstance : StageManager Generate!!"));
 	}
 	if (StageManager) StageManager->Initialize();
 
 	//MapActorManager
 	if (MapActorManagerClass) {
 		MapActorManager = NewObject<UMapActorManager>(this, MapActorManagerClass);
+		
+		UE_LOG(LogTemp, Log, TEXT("!!SuperGameInstance : MapActorManager Generate!!"));
 	}
 
 	if (PlayerRuntimeData) {
