@@ -16,7 +16,8 @@
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 #include <ProjectNull/System/Gear/GearBase.h>
-#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+
+#include <GameFramework/CharacterMovementComponent.h>
 
 
 UPlayerGearComponent::UPlayerGearComponent():
@@ -30,7 +31,9 @@ UPlayerGearComponent::UPlayerGearComponent():
 		HitStopDuration(0.f),
 		HitStopTimeDilation(0.f),
 		InvincibilityTimerHandle(FTimerHandle()),
-		InvincibilityAttackPowerScale(1.f)
+		InvincibilityAttackPowerScale(1.f),
+		CoolTimeScale(0.8f),
+		SpeedScale(1.4f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -241,9 +244,13 @@ bool UPlayerGearComponent::CanChangeGear() const
 
 void UPlayerGearComponent::OnInvincibilityStart()
 {
-	if (!PlayerRuntimeData) { return; }
+	if (!PlayerRuntimeData ||
+		!PlayerParameterData ||
+		!OwnerPlayer) { return; }
 
 	const auto& GearRuntimeData = PlayerRuntimeData->GetGearData();
+	const auto& SpeedRuntimeData = PlayerRuntimeData->GetSpeed();
+	const auto& SpeedParameterData = PlayerParameterData->GetSpeedData();
 	
 	SetIsInvincible(true);
 
@@ -253,17 +260,36 @@ void UPlayerGearComponent::OnInvincibilityStart()
 		&UPlayerGearComponent::OnInvincibilityEnd,
 		GearRuntimeData.GearChangeInvincibilityTime,
 		false);
+
+	const auto& CharacterMovement = OwnerPlayer->GetCharacterMovement();
+	if (!CharacterMovement) { return; }
+
+	PlayerRuntimeData->CalculateFinalSpeed(SpeedParameterData,CurrentGearLevel);
+	CharacterMovement->MaxWalkSpeed = SpeedRuntimeData.Final * SpeedScale;
+	UE_LOG(LogTemp, Warning, TEXT("hi MaxWalkSpeed %.0f"),SpeedRuntimeData.Final);
+
 }
 
 void UPlayerGearComponent::OnInvincibilityEnd()
 {
-	if (!PlayerRuntimeData) { return; }
+	if (!PlayerRuntimeData ||
+		!PlayerParameterData ||
+		!OwnerPlayer) { return; }
+
+	const auto& SpeedRuntimeData = PlayerRuntimeData->GetSpeed();
+	const auto& SpeedParameterData = PlayerParameterData->GetSpeedData();
 
 	if (CurrentGearLevel == kMaxGearLevel) {
 		CurrentGearLevel = 1;
 		PlayerRuntimeData->LevelUp();
 	}
 
+	const auto& CharacterMovement = OwnerPlayer->GetCharacterMovement();
+	if (!CharacterMovement) { return; }
+	
+	PlayerRuntimeData->CalculateFinalSpeed(SpeedParameterData,CurrentGearLevel);
+	CharacterMovement->MaxWalkSpeed = SpeedRuntimeData.Final;
+	
 	SetIsInvincible(false);
 }
 

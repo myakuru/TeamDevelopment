@@ -217,6 +217,11 @@ public:
 	void ResetDataOnGearChange(int32 CurrentGearLevel);
 
 	void CalculateInvincibilityTime(const FGearParameterData& Data);
+	
+	/**
+	 * @brief 最終的な速度計算処理
+	 */
+	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
 
 	/**
 	 * @brief プレイヤーの攻撃力を計算する
@@ -235,6 +240,7 @@ public:
 
 	inline bool IsInvincible() const { return bIsInvincible; }
 	inline FGearRuntimeData& GetGearData() { return Gear; }
+	inline FSpeedRuntimeData& GetSpeed() { return Speed; }
 
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
@@ -271,11 +277,7 @@ private:
 	 */
 	void CalculateExperience(const FExperienceParameterData& Data);
 
-	/**
-	 * @brief 最終的な速度計算処理
-	 */
-	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
-
+	
 	/**
 	 * @brief 計算済みの速度をCharacterMovementに適用する
 	 */

@@ -7,8 +7,6 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
-#include <ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h>
-#include <ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData() :
 	Owner(nullptr),
