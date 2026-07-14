@@ -264,10 +264,9 @@ void UPlayerGearComponent::OnInvincibilityStart()
 	const auto& CharacterMovement = OwnerPlayer->GetCharacterMovement();
 	if (!CharacterMovement) { return; }
 
-	PlayerRuntimeData->CalculateFinalSpeed(SpeedParameterData,CurrentGearLevel);
-	CharacterMovement->MaxWalkSpeed = SpeedRuntimeData.Final * SpeedScale;
-	UE_LOG(LogTemp, Warning, TEXT("hi MaxWalkSpeed %.0f"),SpeedRuntimeData.Final);
-
+	CharacterMovement->MaxWalkSpeed *= SpeedScale;
+	
+	//UE_LOG(LogTemp, Warning, TEXT("hi MaxWalkSpeed %.0f"),SpeedRuntimeData.Final);
 }
 
 void UPlayerGearComponent::OnInvincibilityEnd()

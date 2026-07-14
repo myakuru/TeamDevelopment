@@ -143,7 +143,9 @@ void UPlayerRuntimeData::CalculateFinalSpeed(
 	const FSpeedParameterData& Data,
 	int32 CurrentGearLevel)
 {
-	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(CurrentGearLevel)) { return; }
+	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(--CurrentGearLevel)) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("hi 止まって"));
+	
 	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
 }

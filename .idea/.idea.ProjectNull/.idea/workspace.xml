@@ -21,18 +21,9 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Projectile/CrossLaserbeam/BP_CrossLaserbeam.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Projectile/CrossLaserbeam/BP_CrossLaserbeam.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Combat/Attack/CrossLaserAttack/BP_CrossLaserAttack.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Combat/Attack/CrossLaserAttack/BP_CrossLaserAttack.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/System/Gear/LaserGear/BP_LaserGear.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/LaserGear/BP_LaserGear.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/DashGear/DashGear.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/GearBase.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Gear/LaserGear/State/LaserGearState_Lv4/LaserGearState_Lv4.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -262,6 +253,7 @@
       <workItem from="1783987303341" duration="5562000" />
       <workItem from="1783993622252" duration="4705000" />
       <workItem from="1784000851093" duration="559000" />
+      <workItem from="1784001815025" duration="2355000" />
     </task>
     <servers />
   </component>
