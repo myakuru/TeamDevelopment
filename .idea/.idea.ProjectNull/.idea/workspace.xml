@@ -21,32 +21,9 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/CollisionActor/BoxCollision/BoxCollision.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/CollisionActor/BoxCollision/BoxCollision.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/CollisionActor/CapsuleCollision/CapsuleCollision.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/CollisionActor/CapsuleCollision/CapsuleCollision.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/AfterImageAttackEffect/AfterImageAttackEffect.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/AfterImageAttackEffect/AfterImageAttackEffect.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStandState/FloatingWeaponStandState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStandState/FloatingWeaponStandState.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStandState/FloatingWeaponStandState.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStandState/FloatingWeaponStandState.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/NiagaraEffectBase.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/NiagaraEffectBase.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/CrossLaserbeam/CrossLaserbeam.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/CrossLaserbeam/CrossLaserbeam.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/Laserbeam/Laserbeam.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ProjectileBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ProjectileBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ProjectileBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Projectile/ProjectileBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/HitStopComponent/HitStopComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/HitStopComponent/HitStopComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/DataTable/Gear/DT_Gear.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/DataTable/Gear/DT_Gear.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Levels/OutGame/WeaponHubLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Levels/OutGame/WeaponHubLevel.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerMovementComponent/PlayerMovementComponent.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerMovementComponent/PlayerMovementComponent.h" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +48,7 @@
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Core/Public/Math/TransformVectorized.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectHandle.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/Engine/TimerHandle.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/GameFramework/Character.h" root0="FORCE_HIGHLIGHTING" />
@@ -280,6 +258,7 @@
       <workItem from="1784005046220" duration="1192000" />
       <workItem from="1784006468234" duration="1858000" />
       <workItem from="1784008454858" duration="292000" />
+      <workItem from="1784008975248" duration="1107000" />
     </task>
     <servers />
   </component>

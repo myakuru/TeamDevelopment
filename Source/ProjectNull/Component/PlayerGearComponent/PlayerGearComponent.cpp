@@ -19,6 +19,10 @@
 
 #include <GameFramework/CharacterMovementComponent.h>
 
+#include <ProjectNull/Weapon/Manager/WeaponManager.h>
+#include <ProjectNull/Weapon/Data/WeaponData.h>
+#include <ProjectNull/Weapon/Instance/WeaponInstance.h>
+
 
 UPlayerGearComponent::UPlayerGearComponent():
 		OwnerPlayer(nullptr),
@@ -56,6 +60,24 @@ void UPlayerGearComponent::BeginPlay()
 	if (!PlayerRuntimeData)		{ return; }
 
 	InitializeSphereCollision();
+
+	
+	//↓のコードで装備してるギアのTSubclassOf<UGearBase>が三つ手に入る。
+	//データテーブルにクラスが設定されてないか装備しているセーブデータがないと取得できない。
+
+	UWeaponManager* weaponManager = SuperGameInstance->GetWeaponManager();
+	FWeaponInstance weaponInstance;
+	
+	FWeaponData weaponData;
+	for (int i = 0; i < 3; i++)
+	{
+		if (!weaponManager->GetEquippedWeapon(weaponInstance, i))continue;
+		if (!weaponManager->GetWeaponMaster(weaponInstance.WeaponId, weaponData))continue;
+
+		// ↓これが設定されてるTSubclassOf <UGearBase>
+
+		PlayerGears[i] = NewObject<UGearBase>(this,weaponData.Gear);
+	}
 
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
