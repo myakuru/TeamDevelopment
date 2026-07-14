@@ -19,7 +19,15 @@
     <configurations />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="" />
+    <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/BGM/KAMIKAZE_ATTACK.uasset" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Content/Sounds/BGM/harunopayapaya.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/System/Stage/BP_StageManager.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Stage/BP_StageManager.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/GameInstance/SuperGameInstance.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/GameInstance/SuperGameInstance.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Sound/SoundManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Sound/SoundManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Stage/Manager/StageManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Stage/Manager/StageManager.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,6 +49,7 @@
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/UnrealEd/Public/Tools/EdModeInteractiveToolsContext.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectHandle.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Classes/Engine/InGameAdManager.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Public/DrawDebugHelpers.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Net/Iris/Private/Iris/Serialization/LastResortPropertyNetSerializer.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/ProjectNull/Sound/SoundManager.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -229,6 +238,9 @@
       <workItem from="1783665465462" duration="293000" />
       <workItem from="1783901949794" duration="5695000" />
       <workItem from="1783908428599" duration="3170000" />
+      <workItem from="1783912208444" duration="2143000" />
+      <workItem from="1783916522902" duration="837000" />
+      <workItem from="1783917654234" duration="6834000" />
     </task>
     <servers />
   </component>
