@@ -42,7 +42,7 @@ void UPlayerGearComponent::BeginPlay()
 
 	OwnerPlayer = Cast<APlayerBase>(GetOwner());
 
-	auto SuperGameInstance	= GetWorld()->GetGameInstance<USuperGameInstance>();
+	const auto SuperGameInstance	= GetWorld()->GetGameInstance<USuperGameInstance>();
 	if (!SuperGameInstance)		{ return; }
 
 	PlayerParameterData		= SuperGameInstance->GetPlayerParameterData();
@@ -201,7 +201,7 @@ void UPlayerGearComponent::UpdateSkillCooldown(
 		!Gear) { return; }
 
 	const FTimerHandle	CoolTimerHandle		= Gear->GetCoolTimerHandle();
-	FTimerManager&		TimerManager		= GetWorld()->GetTimerManager();
+	const FTimerManager&TimerManager		= GetWorld()->GetTimerManager();
 	const bool			IsCooldownActive	= TimerManager.IsTimerActive(CoolTimerHandle);
 	const float			RemainTime			= IsCooldownActive ? TimerManager.GetTimerRemaining(CoolTimerHandle) : 0.f;
 

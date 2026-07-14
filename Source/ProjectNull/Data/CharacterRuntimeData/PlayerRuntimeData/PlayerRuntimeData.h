@@ -133,11 +133,11 @@ public:
 		const int32 Index = --CurrentGearLevel;
 		if (!GearChangeEnergyCost.IsValidIndex(Index)) { return; }
 		const float EnergyCost = GearChangeEnergyCost[Index];
-		UE_LOG(LogTemp, Warning, TEXT("hi EnergyCost %.0f"), EnergyCost);
+		//UE_LOG(LogTemp, Warning, TEXT("hi EnergyCost %.0f"), EnergyCost);
 		ExcessRatio = (GearEnergy / EnergyCost) - 1.0f;
-		UE_LOG(LogTemp, Warning, TEXT("hi ExcessRatio %.2f"), ExcessRatio);
+		//UE_LOG(LogTemp, Warning, TEXT("hi ExcessRatio %.2f"), ExcessRatio);
 
-		GearEnergy -= EnergyCost;
+		GearEnergy = 0.f;
 
 	}
 	

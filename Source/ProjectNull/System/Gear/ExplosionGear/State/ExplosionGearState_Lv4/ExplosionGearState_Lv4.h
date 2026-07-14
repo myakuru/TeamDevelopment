@@ -16,5 +16,7 @@ class PROJECTNULL_API UExplosionGearState_Lv4 : public UExplosionGearStateBase
 
 public:
 	UExplosionGearState_Lv4();
+
+	inline const int32 GetGearLevelIndex() const override { return kLv4Index; }
 	
 };

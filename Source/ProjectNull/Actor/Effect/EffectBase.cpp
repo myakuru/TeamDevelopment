@@ -15,7 +15,7 @@ UEffectBase::UEffectBase():
 
 void UEffectBase::Start(USceneComponent* RootComponent)
 {
-	if (!EffectSystem) { return; }
+	if (!EffectSystem || EffectComponent) { return; }
 
 	EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		EffectSystem,
