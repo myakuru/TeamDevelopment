@@ -21,8 +21,8 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/DataTable/Gear/DT_Gear.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/DataTable/Gear/DT_Gear.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Levels/OutGame/WeaponHubLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Levels/OutGame/WeaponHubLevel.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/System/Gear/DashGear/BP_DashGear.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/System/Gear/DashGear/BP_DashGear.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -259,6 +259,7 @@
       <workItem from="1784006468234" duration="1858000" />
       <workItem from="1784008454858" duration="292000" />
       <workItem from="1784008975248" duration="1107000" />
+      <workItem from="1784010188017" duration="904000" />
     </task>
     <servers />
   </component>

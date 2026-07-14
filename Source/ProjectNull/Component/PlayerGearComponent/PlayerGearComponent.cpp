@@ -65,18 +65,20 @@ void UPlayerGearComponent::BeginPlay()
 	//↓のコードで装備してるギアのTSubclassOf<UGearBase>が三つ手に入る。
 	//データテーブルにクラスが設定されてないか装備しているセーブデータがないと取得できない。
 
-	UWeaponManager* weaponManager = SuperGameInstance->GetWeaponManager();
-	FWeaponInstance weaponInstance;
+	const auto WeaponManager = SuperGameInstance->GetWeaponManager();
+	if (!WeaponManager) { return; }
 	
-	FWeaponData weaponData;
+	FWeaponInstance WeaponInstance;
+	
+	FWeaponData WeaponData;
 	for (int i = 0; i < 3; i++)
 	{
-		if (!weaponManager->GetEquippedWeapon(weaponInstance, i))continue;
-		if (!weaponManager->GetWeaponMaster(weaponInstance.WeaponId, weaponData))continue;
+		if (!WeaponManager->GetEquippedWeapon(WeaponInstance, i))continue;
+		if (!WeaponManager->GetWeaponMaster(WeaponInstance.WeaponId, WeaponData))continue;
 
 		// ↓これが設定されてるTSubclassOf <UGearBase>
 
-		PlayerGears[i] = NewObject<UGearBase>(this,weaponData.Gear);
+		PlayerGears[i] = NewObject<UGearBase>(this,WeaponData.Gear);
 	}
 
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
