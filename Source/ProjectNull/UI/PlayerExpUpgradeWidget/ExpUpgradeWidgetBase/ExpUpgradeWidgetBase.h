@@ -12,6 +12,28 @@ class UExpUpgradeWidget0;
 class UPlayerRuntimeData;
 struct FExpUpgradeRow;
 
+
+USTRUCT(BlueprintType)
+struct FUIParameter
+{
+	GENERATED_BODY()
+	
+	/** 通常時（非ホバー）の目標スケール */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FVector2D UiScaleMax = { 0.0f,0.0f };
+
+	/** 出現アニメーションの開始スケール */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FVector2D UiScaleMin = { 0.0f,0.0f };
+
+	/** ホバー時の目標スケール */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FVector2D UiScaleHover = { 0.0f,0.0f };
+
+	/** 現在のUIのスケール */
+	FVector2D UiScale = { 0.0f,0.0f };
+};
+
 /**
  * データーテーブルから取得したテキストをUIにするクラスのベースクラス
  */
@@ -61,20 +83,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	float ScaleInterpSpeed = 10.0f;
 
-	/** 通常時（非ホバー）の目標スケール */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	FVector2D UiScaleMax = { 0.0f,0.0f };
-
-	/** 出現アニメーションの開始スケール */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	FVector2D UiScaleMin = { 0.0f,0.0f };
-
-	/** ホバー時の目標スケール */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	FVector2D UiScaleHover = { 0.0f,0.0f };
-
-	/** 現在のUIのスケール */
-	FVector2D UiScale = { 0.0f,0.0f };
+	// UIの画像のスケール値の変更
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "UIの画像のスケール値")
+	FUIParameter UIImageParameter;
+	
+	// UIのテキストのスケール値の変更
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "UIのテキストのスケール値")
+	FUIParameter UITextParameter;
 
 private:
 

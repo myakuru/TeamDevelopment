@@ -15,10 +15,12 @@ void UExpUpgradeWidgetBase::NativeConstruct()
 
 	if (UpgradeText)
 	{
+		// 自動的に改行してもらう
 		UpgradeText->SetWrappingPolicy(ETextWrappingPolicy::AllowPerCharacterWrapping);
 	}
 
-	UiScale = UiScaleMin;
+	UIImageParameter.UiScale = UIImageParameter.UiScaleMin;
+	UITextParameter.UiScale = UITextParameter.UiScaleMin;
 }
 
 UDataTable* UExpUpgradeWidgetBase::GetExpUpgradeTable()
@@ -36,20 +38,30 @@ UDataTable* UExpUpgradeWidgetBase::GetExpUpgradeTable()
 void UExpUpgradeWidgetBase::UpdateScale()
 {
 	if (!UpgradeImage) return;
+	if (!UpgradeText)  return;
 
 	// ホバー中は拡大サイズ、そうでなければ通常サイズを目標にする
-	const FVector2D TargetScale = bIsMouseOver ? UiScaleHover : UiScaleMax;
+	const FVector2D TargetImageScale = bIsMouseOver ? UIImageParameter.UiScaleHover : UIImageParameter.UiScaleMax;
+	
+	const FVector2D TargetTextScale = bIsMouseOver ? UITextParameter.UiScaleHover : UITextParameter.UiScaleMax;
 
 	// 毎フレーム目標スケールへ補間する。
-	UiScale = FMath::Vector2DInterpTo(UiScale, TargetScale, GetWorld()->GetDeltaSeconds(), ScaleInterpSpeed);
+	UIImageParameter.UiScale = FMath::Vector2DInterpTo(UIImageParameter.UiScale, TargetImageScale, GetWorld()->GetDeltaSeconds(), ScaleInterpSpeed);
 
-	UpgradeImage->SetRenderScale(UiScale);
+	UITextParameter.UiScale = FMath::Vector2DInterpTo(UITextParameter.UiScale, TargetTextScale, GetWorld()->GetDeltaSeconds(), ScaleInterpSpeed);
+	
+	// カードの大きさを変更
+	UpgradeImage->SetRenderScale(UIImageParameter.UiScale);
+	
+	// テキストの大きさも変更
+	UpgradeText->SetRenderScale(UITextParameter.UiScale);
 }
 
 void UExpUpgradeWidgetBase::InitExpUpgradeWidget()
 {
 	// 出現アニメーションを最初から再生できるように初期スケールへ戻す
-	UiScale = UiScaleMin;
+	UIImageParameter.UiScale = UIImageParameter.UiScaleMin;
+	UITextParameter.UiScale = UITextParameter.UiScaleMin;
 	bIsMouseOver = false;
 }
 

@@ -52,16 +52,18 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 {
 	Experience.Add(Amount);
 	
+	// 変更があれば、経験値のバーのUIが更新される
+	OnExperienceChanged.Broadcast(Experience.Current, Experience.ExperienceToNextLevel);
+	
 	// 経験値によるレベルアップ
 	while (Experience.Current >= Experience.ExperienceToNextLevel)
 	{
 		Experience.Current -= Experience.ExperienceToNextLevel;
-
+		
+		OnExperienceChanged.Broadcast(1.0f, 1.0f);
+		
 		LevelUp();
 	}
-
-	// 変更があれば、経験値のバーのUIが更新される
-	OnExperienceChanged.Broadcast(Experience.Current, Experience.ExperienceToNextLevel);
 }
 
 void UPlayerRuntimeData::AddGearEnergy(float Amount)

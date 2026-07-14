@@ -21,13 +21,31 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/ABP_Perula.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/ABP_Perula.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget0/MyExpUpgradeWidgetBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget0/MyExpUpgradeWidgetBase.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget1/MyExpUpgradeWidgetBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget1/MyExpUpgradeWidgetBase.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget2/MyExpUpgradeWidgetBase.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/ExpUpgradeWidget2/MyExpUpgradeWidgetBase.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Core/NullGameplayTags.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Core/NullGameplayTags.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Core/NullGameplayTags.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Core/NullGameplayTags.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Assets/UITexture/BlackBar.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Assets/UITexture/BlackBar.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Assets/UITexture/ExperiencePoints.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Assets/UITexture/ExperiencePoints.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Assets/UITexture/ExperiencePointsBlackBar.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Assets/UITexture/ExperiencePointsBlackBar.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Assets/UITexture/HpBar.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Assets/UITexture/HpBar.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/WBP_PlayerExpUpgradeWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerExpHUD/WBP_PlayerExpUpgradeWidget.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerHUD/ExpWidget/MyPlayerExpBarWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerHUD/ExpWidget/MyPlayerExpBarWidget.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerHUD/HpBarWidget/MyPlayerHpBarWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerHUD/HpBarWidget/MyPlayerHpBarWidget.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerHUD/WBP_PlayerHUD.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/UI/InGame/PlayerUI/PlayerHUD/WBP_PlayerHUD.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Controller/RobotController/RobotController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Controller/RobotController/RobotController.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/PlayerExpBarWidget/PlayerExpBarWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/PlayerExpBarWidget/PlayerExpBarWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/PlayerExpBarWidget/PlayerExpBarWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/PlayerExpBarWidget/PlayerExpBarWidget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/SkillWidgetBase/SkillWidgetBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/SkillWidgetBase/SkillWidgetBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/SkillWidgetBase/SkillWidgetBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/UI/PlayerHUDWidget/SkillWidgetBase/SkillWidgetBase.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,12 +62,8 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Plugins/Media/ElectraPlayer/Source/ElectraPlayerRuntime/Private/Runtime/Platforms/Android/PlayerRuntime_Android.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/MovieSceneTools/Public/MovieSceneToolHelpers.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/UnrealEd/Private/Tools/EdModeInteractiveToolsContext.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Editor/UnrealEd/Public/Tools/EdModeInteractiveToolsContext.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Engine/Public/DrawDebugHelpers.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.7/Engine/Source/Runtime/Net/Iris/Private/Iris/Serialization/LastResortPropertyNetSerializer.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../UE_5.7/Engine/Source/Runtime/UMG/Public/Components/Widget.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../UE_5.7/Engine/Source/Runtime/UMG/Public/Slate/WidgetTransform.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -58,61 +72,61 @@
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000005543814063" />
-      <entry key="MS500" value="1.0895378190248064" />
-      <entry key="S2" value="2.1360955351437365" />
-      <entry key="S5" value="3.4683592433747563" />
-      <entry key="S10" value="5.2289453651287365" />
-      <entry key="S30" value="9.342265293370728" />
-      <entry key="S60" value="11.616187541475208" />
-      <entry key="M2" value="13.135093234320705" />
-      <entry key="M5" value="14.207047680713856" />
-      <entry key="M10" value="14.595181424095475" />
-      <entry key="M15" value="14.72822707279168" />
-      <entry key="M30" value="14.863156377209396" />
-      <entry key="H1" value="14.931336961415939" />
-      <entry key="H2" value="14.965607929882756" />
-      <entry key="H4" value="14.982788796614896" />
-      <entry key="D1" value="14.997129356786091" />
-      <entry key="W1" value="14.999589856421576" />
+      <entry key="MS100" value="1.2765416794374222" />
+      <entry key="MS500" value="2.6552477812386313" />
+      <entry key="S2" value="4.572913740618043" />
+      <entry key="S5" value="5.349350375597652" />
+      <entry key="S10" value="5.6594920141714455" />
+      <entry key="S30" value="5.883296745502392" />
+      <entry key="S60" value="6.006419725364752" />
+      <entry key="M2" value="6.876402648159445" />
+      <entry key="M5" value="11.767207297354814" />
+      <entry key="M10" value="21.362891628319858" />
+      <entry key="M15" value="30.6122048692074" />
+      <entry key="M30" value="56.62037727429831" />
+      <entry key="H1" value="106.73320877559397" />
+      <entry key="H2" value="174.10848424896693" />
+      <entry key="H4" value="233.97132027826518" />
+      <entry key="D1" value="306.9973836596251" />
+      <entry key="W1" value="322.34793314594566" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="0.0" />
-      <entry key="S30" value="0.0" />
-      <entry key="S60" value="0.0" />
-      <entry key="M2" value="0.0" />
-      <entry key="M5" value="0.0" />
-      <entry key="M10" value="0.0" />
-      <entry key="M15" value="0.0" />
-      <entry key="M30" value="0.0" />
-      <entry key="H1" value="0.0" />
-      <entry key="H2" value="0.0" />
-      <entry key="H4" value="0.0" />
-      <entry key="D1" value="0.0" />
-      <entry key="W1" value="0.0" />
+      <entry key="S2" value="1.136391519654574E-84" />
+      <entry key="S5" value="2.6436940503480117E-34" />
+      <entry key="S10" value="1.6259440489598784E-17" />
+      <entry key="S30" value="2.5334485972669574E-6" />
+      <entry key="S60" value="0.001603369572511326" />
+      <entry key="M2" value="0.046274961139805205" />
+      <entry key="M5" value="0.8084398349662655" />
+      <entry key="M10" value="3.963672943910989" />
+      <entry key="M15" value="7.547918823809646" />
+      <entry key="M30" value="15.534065291153125" />
+      <entry key="H1" value="23.824249643225578" />
+      <entry key="H2" value="30.80229933436418" />
+      <entry key="H4" value="35.674119829082485" />
+      <entry key="D1" value="40.820164988016145" />
+      <entry key="W1" value="41.827987422335305" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9460581649309331" />
-      <entry key="MS500" value="1.0774565660459858" />
-      <entry key="S2" value="2.1300784004994613" />
-      <entry key="S5" value="3.464425450798404" />
-      <entry key="S10" value="5.225135046258089" />
-      <entry key="S30" value="9.33719704712006" />
-      <entry key="S60" value="11.612058678508188" />
-      <entry key="M2" value="13.13241983263613" />
-      <entry key="M5" value="14.205794169357121" />
-      <entry key="M10" value="14.59452020320943" />
-      <entry key="M15" value="14.727778295592596" />
-      <entry key="M30" value="14.862927928328752" />
-      <entry key="H1" value="14.931221706913117" />
-      <entry key="H2" value="14.96555004321982" />
-      <entry key="H4" value="14.982759788192178" />
-      <entry key="D1" value="14.997124512988227" />
-      <entry key="W1" value="14.99958916422829" />
+      <entry key="MS100" value="1.2589669716734553" />
+      <entry key="MS500" value="2.647287215059582" />
+      <entry key="S2" value="4.5688017559911085" />
+      <entry key="S5" value="5.347323933223469" />
+      <entry key="S10" value="5.658400608472155" />
+      <entry key="S30" value="5.882907432119797" />
+      <entry key="S60" value="6.0069387833471515" />
+      <entry key="M2" value="6.915778816972969" />
+      <entry key="M5" value="12.552910320074657" />
+      <entry key="M10" value="25.28801918594588" />
+      <entry key="M15" value="38.11620304916001" />
+      <entry key="M30" value="72.11205852243711" />
+      <entry key="H1" value="130.52361987664833" />
+      <entry key="H2" value="204.88727786890445" />
+      <entry key="H4" value="269.6310565157787" />
+      <entry key="D1" value="347.8146458384286" />
+      <entry key="W1" value="364.17549108981956" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -143,7 +157,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -287,6 +301,8 @@
       <workItem from="1783657201949" duration="88000" />
       <workItem from="1783657375033" duration="1244000" />
       <workItem from="1783658834756" duration="1479000" />
+      <workItem from="1783916498482" duration="5450000" />
+      <workItem from="1783988406875" duration="9647000" />
     </task>
     <servers />
   </component>

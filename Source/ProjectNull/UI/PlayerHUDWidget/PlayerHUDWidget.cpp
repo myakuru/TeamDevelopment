@@ -69,6 +69,14 @@ void UPlayerHUDWidget::SetPlayerExp(float CurrentExp, float NextLevelExp)
 	}
 }
 
+void UPlayerHUDWidget::SetExpRainbowVisible(bool bVisible)
+{
+	if (PlayerExpBar)
+	{
+		PlayerExpBar->SetRainbowVisible(bVisible);
+	}
+}
+
 void UPlayerHUDWidget::SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime, float MaxCooldown)
 {
 	if (SkillWidgets.IsValidIndex(SkillIndex) && SkillWidgets[SkillIndex])
