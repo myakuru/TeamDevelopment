@@ -161,6 +161,21 @@ AEnemyISMManager* UEnemyManagerSubsystem::GetISMManager(TSubclassOf<AEnemyISMMan
 	}
 }
 
+void UEnemyManagerSubsystem::DestroyAllEnemy()
+{
+	// すべて敵の更新メソッドを呼ぶ
+	for (AEnemyBase* Enemy : EnemyGruntList)
+	{
+		if (Enemy)
+		{
+			if (Enemy->GetAliveFlg())
+			{
+				Enemy->FinalizeDeath();
+			}
+		}
+	}
+}
+
 float UEnemyManagerSubsystem::CalcDistance(const FVector& EnemyPos, const FVector& PlayerPos)
 {
 	return  FVector::DistSquared(EnemyPos, PlayerPos);

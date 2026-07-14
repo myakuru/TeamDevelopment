@@ -79,6 +79,9 @@ public:
 	// 活動終了
 	void BossFinalize();
 
+	// ボスの死亡後のマテリアル変更
+	void BossDeathMaterialChange();
+
 
 	// ------------------------------------------------------------------------------------
 	// ゲッター
@@ -106,6 +109,7 @@ public:
 	void SetTargetActor(AActor* InTarget)				{ TargetActor = InTarget; }							/** 追尾対象を設定（nullptrでロスト扱い） */
 	void SetActionPriority(EBossActionType InAction)	{ EnemyBossRuntimeData->ActionPriority = InAction; }	/** Decideがアクションを決める際に優先度付で使用する*/
 	void SetNextAttack(EBossActionType InAttack)		{ EnemyBossRuntimeData->CurrentAttack = AttackSet->Patterns[static_cast<int>(InAttack)]; }
+	void SetDeathMaterialChange()						{ DeathMaterialChangeFlg = true; }
 	void SelectNextAttack(EBossActionType InAction)
 	{
 		for (const FBossAttackPattern& P : GetAttackPatterns())
@@ -212,6 +216,22 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "VFX")
 	TObjectPtr<UNiagaraSystem> DeathEffect;
 
+	UPROPERTY(EditAnywhere, Category = "VFX")
+	TObjectPtr<UNiagaraSystem> DestroyEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float MaterialCount = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Material")
+	FName MaterialNodeName = "";
+
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float RadiusOffset = 5.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Material")
+	float HitEmissivePowerOffset = 5.0f;
+
+	bool DeathMaterialChangeFlg = false;
 
 	/** ヒットした個所を光らせる*/
 	UPROPERTY()

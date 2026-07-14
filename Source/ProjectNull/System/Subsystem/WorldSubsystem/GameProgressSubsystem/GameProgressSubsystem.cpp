@@ -6,7 +6,6 @@ void UGameProgressSubsystem::AddKillCount(int32 Value)
 {
 	// ���Z����
 	KillCount += Value;
-	UE_LOG(LogTemp, Warning, TEXT("hi KillCount"), KillCount);
 
 	// �t�F�[�Y�X�V���\�b�h��Ă�
 	UpdatePhase();
@@ -19,18 +18,17 @@ void UGameProgressSubsystem::SetPhase(int NewPhase)
 	OnPhaseChanged.Broadcast(Phase);
 }
 
+void UGameProgressSubsystem::SetPhaseThresholds(int32 Num)
+{
+	PhaseThresholds = Num;
+}
+
 void UGameProgressSubsystem::UpdatePhase() 
 {
-	int32 killCount = KillCount;
+	if (KillCount >= PhaseThresholds)
+	{
+		SetPhase(Phase + 1);
+		KillCount = 0;
 
-	// �|�����G���Ɋ�Â��Ăǂ̃t�F�[�Y�Ȃ̂�����肷��
-	for (int32 phaseNum = 0; phaseNum < PhaseThresholds.Num(); ++phaseNum) {
-
-		killCount -= PhaseThresholds[phaseNum];
-		// �t�F�[�Y臒l�������ꍇ�̓t�F�[�Y��X�V����
-		if (killCount < 0) {
-			Phase = phaseNum;
-			break;
-		}
 	}
 }

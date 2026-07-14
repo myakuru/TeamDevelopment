@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Stage/Manager/StageManager.h>
 
@@ -120,6 +121,11 @@ void AEnemyBossBase::Tick(float DeltaTime)
 			UE_LOG(LogTemp, Warning, TEXT("CurrentMontage = None"));
 		}
 	}
+
+	if (DeathMaterialChangeFlg)
+	{
+		BossDeathMaterialChange();
+	}
 }
 
 // ------------------------------------------------------------------------------------
@@ -223,20 +229,22 @@ void AEnemyBossBase::SetEnemyBossStatusData(UEnemyBossDataAsset* InData)
 {
 	if (!InData) { return; }
 
-	EnemyBossStatus.MoveSpeed			= InData->MoveSpeed;
+	EnemyBossStatus.MoveSpeed = InData->MoveSpeed;
 	EnemyBossStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
-	EnemyBossStatus.FinalHP				= InData->FinalHP;
-	EnemyBossStatus.FinalAttack			= InData->FinalAttack;
-	EnemyBossStatus.KnockBackWeight		= InData->KnockBackWeight;
-	EnemyBossStatus.Exp					= InData->Exp;
-	EnemyBossStatus.GearEnergy			= InData->GearEnergy;
+	EnemyBossStatus.FinalHP = InData->FinalHP;
+	EnemyBossStatus.FinalAttack = InData->FinalAttack;
+	EnemyBossStatus.KnockBackWeight = InData->KnockBackWeight;
+	EnemyBossStatus.Exp = InData->Exp;
+	EnemyBossStatus.GearEnergy = InData->GearEnergy;
 }
 
 void AEnemyBossBase::ApplyLocalHitPos(const FVector& HitWorldLocation)
 {
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	if (!IsValid(MeshComp))
-	{ return; }
+	{
+		return;
+	}
 
 	// ワールド座標のヒット位置を、ボスメッシュのローカル座標へ変換
 	const FVector HitLocalPos = MeshComp->GetComponentTransform().InverseTransformPosition(HitWorldLocation);
@@ -255,7 +263,7 @@ void AEnemyBossBase::ApplyLocalHitPos(const FVector& HitWorldLocation)
 
 		MID->SetScalarParameterValue(TEXT("HitRadius"), HitRadius);
 		MID->SetScalarParameterValue(TEXT("HitPower"), HitPower);
-		MID->SetVectorParameterValue(TEXT("HitColor"), FLinearColor(HitColor.X,HitColor.Y,HitColor.Z, 1.0f));
+		MID->SetVectorParameterValue(TEXT("HitColor"), FLinearColor(HitColor.X, HitColor.Y, HitColor.Z, 1.0f));
 		MID->SetScalarParameterValue(TEXT("NoiseScale"), NoiseScale);
 		MID->SetScalarParameterValue(TEXT("NoisePower"), NoisePower);
 		MID->SetScalarParameterValue(TEXT("HitEmissivePower"), HitEmissivePower);
@@ -302,6 +310,81 @@ void AEnemyBossBase::BossFinalize()
 		GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
 		GameInstance->GetStageManagerSubsystem()->InGameFinalize();
+	}
+
+	if (DeathEffect)
+	{
+		FTransform AdjustedTransform = GetActorTransform();
+		FRotator Rot = AdjustedTransform.GetRotation().Rotator();
+		Rot.Yaw -= 90.0f;
+		AdjustedTransform.SetRotation(Rot.Quaternion());
+
+		FVector Loc = AdjustedTransform.GetLocation();
+		Loc.Z -= 90.0f;
+		AdjustedTransform.SetLocation(Loc);
+
+		FTransform MeshTransform = GetMesh()->GetComponentTransform();
+
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			DestroyEffect,
+			MeshTransform.GetLocation(),
+			MeshTransform.Rotator(),
+			MeshTransform.GetScale3D(),
+			true,   // bAutoDestroy
+			true,   // bAutoActivate
+			ENCPoolMethod::None,
+			true    // bPreCullCheck
+		);
+	}
+
+	if (UEnemyManagerSubsystem* EnemyManager =
+		GetWorld()->GetSubsystem<UEnemyManagerSubsystem>())
+	{
+		EnemyManager->DestroyAllEnemy();
+	}
+}
+
+void AEnemyBossBase::BossDeathMaterialChange()
+{
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (!IsValid(MeshComp))
+	{
+		return;
+	}
+
+	// 変化させるマテリアルの中心を決める（ソケットから）
+	//const FVector StartLocalPos = MeshComp->GetSocketTransform(MaterialNodeName).GetTranslation();
+
+	FVector StartLocalPos =
+		MeshComp->GetSocketTransform(
+			MaterialNodeName,
+			RTS_Component
+		).GetLocation();
+
+	StartLocalPos = GetActorLocation();
+
+	for (UMaterialInstanceDynamic* MID : DynamicMaterials)
+	{
+		if (!IsValid(MID))
+		{
+			continue;
+		}
+
+		MID->SetVectorParameterValue(
+			TEXT("HitLocalPos"),
+			FLinearColor(StartLocalPos.X, StartLocalPos.Y, StartLocalPos.Z, 1.0f)
+		);
+
+		//HitRadius += RadiusOffset;
+		//HitEmissivePower += HitEmissivePowerOffset;
+
+		MID->SetScalarParameterValue(TEXT("HitRadius"), HitRadius);
+		MID->SetScalarParameterValue(TEXT("HitPower"), HitPower);
+		MID->SetVectorParameterValue(TEXT("HitColor"), FLinearColor(HitColor.X, HitColor.Y, HitColor.Z, 1.0f));
+		MID->SetScalarParameterValue(TEXT("NoiseScale"), NoiseScale);
+		MID->SetScalarParameterValue(TEXT("NoisePower"), NoisePower);
+		MID->SetScalarParameterValue(TEXT("HitEmissivePower"), HitEmissivePower);
 	}
 }
 

@@ -81,6 +81,7 @@ EStateTreeRunStatus USTT_EnemyBossDead::Tick(FStateTreeExecutionContext& Context
 			{
 				bDeathEffectFlg = true;
 				Boss->SpawnDeathEffect();
+				Boss->SetDeathMaterialChange();
 			}
 		}
 

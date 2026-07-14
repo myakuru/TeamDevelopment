@@ -8,10 +8,10 @@
 */
 namespace ExperienceNiagaraParams
 {
-	static const FName Positions = TEXT("User.Positions");
-	static const FName Colors = TEXT("User.Colors");
-	static const FName Sizes = TEXT("User.Sizes");
-	static const FName SpawnCount = TEXT("User.SpawnCount");
+	static const FName Positions	= TEXT("User.Positions");
+	static const FName Colors		= TEXT("User.Colors");
+	static const FName Sizes		= TEXT("User.Sizes");
+	static const FName SpawnCount	= TEXT("User.SpawnCount");
 }
 
 // 
@@ -23,7 +23,7 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 
 	UNiagaraSystem* LoadedNiagaraSystem = LoadObject<UNiagaraSystem>(
 		nullptr,
-		TEXT("/Game/FreeNiagaraPack/Effects/Matsuura_Test_Niagara/ExperiencePickup.ExperiencePickup")
+		TEXT("/Game/Actor/Item/PickupItem/ExperiencePickup.ExperiencePickup")
 		// アセットを右クリック → Copy Reference で正確なパスを取得
 	);
 
@@ -134,8 +134,8 @@ void FExperiencePickupManager::SpawnExperience(
 	FExperiencePickupData NewExp;
 	NewExp.Location = Location;
 	NewExp.ExpValue = ExpValue;
-	NewExp.Color = Color;
-	NewExp.Size = Size;
+	NewExp.Color	= Color;
+	NewExp.Size		= Size;
 
 	ExperienceList.Add(NewExp);
 }
