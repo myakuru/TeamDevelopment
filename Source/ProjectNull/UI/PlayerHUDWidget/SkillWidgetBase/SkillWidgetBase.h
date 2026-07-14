@@ -36,7 +36,7 @@ protected:
 	/** アイコンの拡大率 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	float UIScale = 1.0f;
-
+	
 	FVector2D MaxUiScale = FVector2D(1.0f, 1.0f);
 
 	/** アイコンの拡大率の減少速度 */
