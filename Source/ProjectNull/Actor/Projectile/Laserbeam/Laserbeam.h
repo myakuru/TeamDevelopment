@@ -23,7 +23,6 @@ public:
 
 	void SetLaserEnabled(bool bEnabled);
 
-
 private:
 
 	UFUNCTION()

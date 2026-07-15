@@ -40,7 +40,14 @@ protected:
 	/** 持ち主のアクタークラス */
 	UPROPERTY()
 	TObjectPtr<AActor> OwnerActor;
-
+	
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
+	UPROPERTY(EditAnywhere)
+	float AttackPowerScale;
+	
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -91,11 +98,5 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float AliveTime;
-protected:
-	/** プレイヤーのRuntimeDataクラス */
-	UPROPERTY()
-	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 	
-	UPROPERTY(EditAnywhere)
-	float AttackPowerScale;
 };

@@ -161,6 +161,11 @@ AEnemyISMManager* UEnemyManagerSubsystem::GetISMManager(TSubclassOf<AEnemyISMMan
 	}
 }
 
+USoundBase* UEnemyManagerSubsystem::GetDamagedSound() const
+{
+	return ManagerConfig->DamagedSESound;
+}
+
 void UEnemyManagerSubsystem::DestroyAllEnemy()
 {
 	// すべて敵の更新メソッドを呼ぶ

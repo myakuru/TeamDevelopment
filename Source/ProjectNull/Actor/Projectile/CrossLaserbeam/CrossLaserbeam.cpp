@@ -11,6 +11,9 @@
 #include "ProjectNull/GameInstance/SuperGameInstance.h"
 
 ACrossLaserbeam::ACrossLaserbeam():
+	BoxCompArray(TArray<TObjectPtr<UBoxComponent>>()),
+	NiagaraEffectArray(TArray<TObjectPtr<UEffectBase>>()),
+	PlayerRuntimeData(nullptr),
 	AttackPowerScale(1.f)
 {
 	PrimaryActorTick.bCanEverTick = true;

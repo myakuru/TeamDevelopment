@@ -6,6 +6,8 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
+
 
 UGearBase::UGearBase():
 	OwnerPlayer(nullptr),
@@ -40,12 +42,18 @@ void UGearBase::Initialize(
 		State->Initialize(Player, GearComponent, this);
 	}
 
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance)		{ return; }
+
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	
 }
 
 void UGearBase::Execute(int32 CurrentGearLevel)
 {
 	if (!bCanExecute)			{ return; }
-	if (!OwnerGearComponent)	{ return; }
+	if (!OwnerGearComponent ||
+		!PlayerRuntimeData)	{ return; }
 	
 	bIsActive			= true;
 	bCanExecute			= false;
@@ -65,13 +73,16 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 	Duration = GearStatuses[StateIndex].Duration;
 	SimultaneousActivationCoolTime = GearStatuses[StateIndex].SimultaneousActivationCoolTime;
 	bAllowOtherGearActivation = false;
-
+	
+	const float CoolTime =  PlayerRuntimeData->IsInvincible() ?
+	GearStatuses[StateIndex].CoolTime * OwnerGearComponent->GetCoolTimeScale() :
+	GearStatuses[StateIndex].CoolTime;
 	// ギアのクールタイムをセットし、クールタイム終了時にリセット処理を呼ぶ
 	GetWorld()->GetTimerManager().SetTimer(
 		CoolTimerHandle,
 		this,
 		&UGearBase::Reset,
-		GearStatuses[StateIndex].CoolTime,
+		CoolTime,
 		false);
 
 	// 状態クラス実行処理

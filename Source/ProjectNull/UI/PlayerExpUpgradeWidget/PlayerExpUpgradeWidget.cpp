@@ -11,6 +11,8 @@
 #include "Input/Events.h"
 #include "Input/Reply.h"
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
 
 void UPlayerExpUpgradeWidget::NativeConstruct()
 {
@@ -44,15 +46,15 @@ void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDe
 
 	if (UpgradeWidget_0)
 	{
-		UpgradeWidget_0->ImageRotation();
+		UpgradeWidget_0->UpdateScale();
 	}
 	if (UpgradeWidget_1)
 	{
-		UpgradeWidget_1->ImageRotation();
+		UpgradeWidget_1->UpdateScale();
 	}
 	if (UpgradeWidget_2)
 	{
-		UpgradeWidget_2->ImageRotation();
+		UpgradeWidget_2->UpdateScale();
 	}
 
 	// 背景の黒い画像のフェードイン処理
@@ -189,10 +191,23 @@ FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	return FReply::Unhandled();
 }
 
+bool UPlayerExpUpgradeWidget::NowOpenWidget()
+{
+	if (bIsOpen) return true;
+	
+	return false;	
+}
+
 void UPlayerExpUpgradeWidget::OpenWidget()
 {
 	SetVisibility(ESlateVisibility::Visible);
 	SetIsEnabled(true);
+	
+	// 現在ウィジットがオープンしている
+	bIsOpen = true;
+
+	// 強化画面が開いている間、経験値バーを虹色に光らせる
+	SetExpBarRainbow(true);
 
 	// 強化画面の初期化
 	InitUpgradeWidget();
@@ -214,6 +229,11 @@ void UPlayerExpUpgradeWidget::CloseWidget()
 {
 	SetVisibility(ESlateVisibility::Hidden);
 	SetIsEnabled(false);
+
+	bIsOpen = false;
+
+	// 強化画面を閉じたら虹色演出を消す
+	SetExpBarRainbow(false);
 
 	// マウスカーソルを非表示にする
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -270,4 +290,15 @@ void UPlayerExpUpgradeWidget::InitUpgradeWidget()
 void UPlayerExpUpgradeWidget::SetAttackMultiplier(float Multiplier)
 {
 
+}
+
+void UPlayerExpUpgradeWidget::SetExpBarRainbow(bool bVisible)
+{
+	ARobotController* RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!RobotController) return;
+
+	if (UPlayerHUDWidget* PlayerHUD = RobotController->GetPlayerHUD())
+	{
+		PlayerHUD->SetExpRainbowVisible(bVisible);
+	}
 }

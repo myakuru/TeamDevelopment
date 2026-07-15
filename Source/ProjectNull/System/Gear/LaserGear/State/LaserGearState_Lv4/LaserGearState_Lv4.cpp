@@ -81,7 +81,7 @@ void ULaserGearState_Lv4::Execute(int32 CurrentGearLevel)
 		!RobotController ||
 		!PlayerRuntimeData) { return; }
 
-	PlayerRuntimeData->SetIsInvincible(true);
+	//PlayerRuntimeData->SetIsInvincible(true);
 	
 	// 入力を無効化
 	RobotController->SetCanReceiveInput(false);
@@ -161,7 +161,7 @@ void ULaserGearState_Lv4::End()
 	if (!Player ||
 		!PlayerRuntimeData) { return; }
 
-	PlayerRuntimeData->SetIsInvincible(false);
+	//PlayerRuntimeData->SetIsInvincible(false);
 	
 	RobotController->SetCanReceiveInput(true);
 	

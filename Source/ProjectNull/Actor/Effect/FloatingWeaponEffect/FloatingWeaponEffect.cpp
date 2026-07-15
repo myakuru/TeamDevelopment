@@ -14,9 +14,12 @@
 
 UFloatingWeaponEffect::UFloatingWeaponEffect():
 	OwnerAttack(nullptr),
+	OwnerActor(nullptr),
 	EffectSystem(nullptr),
 	EffectComponent(nullptr),
-	RelativeTransform(FTransform())
+	RelativeTransform(FTransform()),
+	States(TMap<EFloatingWeaponState, TObjectPtr<UFloatingWeaponStateBase>>()),
+	CurrentState(nullptr)
 {
 	
 }

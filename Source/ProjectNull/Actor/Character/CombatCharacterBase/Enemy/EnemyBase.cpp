@@ -19,6 +19,8 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
 
+#include "ProjectNull/Sound/SoundManager.h"
+
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
 	,	GameProgress(nullptr)
@@ -157,6 +159,13 @@ void AEnemyBase::NotfyAttackFinishTime()
 void AEnemyBase::ApplyDamaged(float InDamaged)
 {
 	if (!EnemyRuntimeData) { return; }
+	
+	//ダメージ効果音
+	GetWorld()->GetGameInstance<USuperGameInstance>()->
+	GetSoundManager()->PlayAtLocation(
+		EnemyManager->GetDamagedSound(),
+		GetActorLocation()
+	);
 
 	EnemyRuntimeData->AddHealth(-InDamaged);		// 渡された値分、FinalHPを減算
 	UE_LOG(LogTemp, Error, TEXT("Damage : %f"),InDamaged);

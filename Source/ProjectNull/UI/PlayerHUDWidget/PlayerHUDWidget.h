@@ -14,12 +14,50 @@ class USkillWidgetBase;
 class UGameTimerWidget;
 class UPlayerHpBarWidget;
 class UPlayerRuntimeData;
-class UWaveWidget;
 
 UCLASS()
 class PROJECTNULL_API UPlayerHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
+	
+public:
+
+	/**
+	 * @brief プレイヤーのHPを更新する関数
+	 * @param CurrentHp 現在のHP
+	 * @param MaxHp 最大HP
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerHp(float CurrentHp, float MaxHp);
+
+	/**
+	 * @brief プレイヤーの経験値を更新する関数
+	 * @param CurrentExp 現在の経験値
+	 * @param NextLevelExp 次のレベルに必要な経験値
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerExp(float CurrentExp, float NextLevelExp);
+
+	/**
+	 * @brief 経験値バーの虹色演出の表示・非表示を切り替える関数
+	 * @param bVisible true で表示、false で非表示
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SetExpRainbowVisible(bool bVisible);
+
+	/**
+	 * @brief プレイヤーのスキルのクールダウンを更新する関数
+	 * @param CooldownTime クールダウン時間（0~1の範囲）
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime,float MaxCooldown);
+
+	/**
+	 * @brief ギアチェンジエネルギーを設定します。
+	 * @param Charge 設定するエネルギーの値
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SetGearChangeEnergy(float Charge);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -35,9 +73,6 @@ protected:
 	/** ゲームのタイマー */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UGameTimerWidget> GameTimer;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UWaveWidget> WaveWidget;
 
 	/** スキルWidget（インデックス順） */
 	UPROPERTY(meta = (BindWidget))
@@ -65,43 +100,6 @@ protected:
 	/** プレイヤーのランタイムデータへの参照 */
 	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 
-public:
-
-	/**
-	 * @brief プレイヤーのHPを更新する関数
-	 * @param CurrentHp 現在のHP
-	 * @param MaxHp 最大HP
-	 */
-	UFUNCTION(BlueprintCallable)
-	void SetPlayerHp(float CurrentHp, float MaxHp);
-
-	/**
-	 * @brief プレイヤーの経験値を更新する関数
-	 * @param CurrentExp 現在の経験値
-	 * @param NextLevelExp 次のレベルに必要な経験値
-	 */
-	UFUNCTION(BlueprintCallable)
-	void SetPlayerExp(float CurrentExp, float NextLevelExp);
-
-	/**
-	 * @brief プレイヤーのスキルのクールダウンを更新する関数
-	 * @param CooldownTime クールダウン時間（0~1の範囲）
-	 */
-	UFUNCTION(BlueprintCallable)
-	void SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime,float MaxCooldown);
-
-	/**
-	 * @brief ギアチェンジエネルギーを設定します。
-	 * @param Charge 設定するエネルギーの値
-	 */
-	UFUNCTION(BlueprintCallable)
-	void SetGearChangeEnergy(float Charge);
-
-	/**
-	 * @brief	倒した敵と倒す敵の設定
-	 */
-	UFUNCTION(BlueprintCallable)
-	void SetDeathEnemyCount(int32 Count);
 private:
 	/**
 	 * @brief デリゲートを登録します

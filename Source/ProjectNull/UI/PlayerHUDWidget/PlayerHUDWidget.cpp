@@ -10,8 +10,6 @@
 // ゲームのタイマー
 #include <ProjectNull/UI/PlayerHUDWidget/GameTimerWidget/GameTimerWidget.h>
 
-#include <ProjectNull/UI/InGame/WaveWidget/WaveWidget.h>
-
 // プレイヤーのスキルのUI
 #include <ProjectNull/UI/PlayerHUDWidget/SkillWidgetBase/SkillWidgetBase.h>
 
@@ -30,12 +28,16 @@
 
 void UPlayerHUDWidget::NativeConstruct()
 {
-	//タイマー設定
-	GameTimer->StartTimer(
-		GetWorld()->GetGameInstance<USuperGameInstance>()
-		->GetStageManagerSubsystem()->GetStageDataAsset()->GetStageTimerLimit());
-
 	Super::NativeConstruct();
+
+	//タイマー開始（カウントダウンはStageManagerが所有）
+	if (USuperGameInstance* GI = GetWorld()->GetGameInstance<USuperGameInstance>())
+	{
+		if (UStageManager* StageManager = GI->GetStageManagerSubsystem())
+		{
+			StageManager->StartStageTimer();
+		}
+	}
 
 	// スキルは3つある想定で、配列にまとめる(今後増やすとき、ここに追加)
 	SkillWidgets = { SkillWidget_0,SkillWidget_1,SkillWidget_2 };
@@ -71,6 +73,14 @@ void UPlayerHUDWidget::SetPlayerExp(float CurrentExp, float NextLevelExp)
 	}
 }
 
+void UPlayerHUDWidget::SetExpRainbowVisible(bool bVisible)
+{
+	if (PlayerExpBar)
+	{
+		PlayerExpBar->SetRainbowVisible(bVisible);
+	}
+}
+
 void UPlayerHUDWidget::SetPlayerSkillCooldown(int32 SkillIndex, float CooldownTime, float MaxCooldown)
 {
 	if (SkillWidgets.IsValidIndex(SkillIndex) && SkillWidgets[SkillIndex])
@@ -88,14 +98,6 @@ void UPlayerHUDWidget::SetGearChangeEnergy(float Charge)
 	if (GearChange)
 	{
 		GearChange->SetGearChangeEnergy(Charge);
-	}
-}
-
-void UPlayerHUDWidget::SetDeathEnemyCount(int32 Count)
-{
-	if (WaveWidget)
-	{
-		WaveWidget->SetKillCount(Count);
 	}
 }
 
@@ -121,7 +123,5 @@ void UPlayerHUDWidget::RegisterDelegates()
 
 		// スキルのクールダウンのデリゲートを登録
 		CharacterParameterData->OnSkillCooldownChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerSkillCooldown);
-
-
 	}
 }

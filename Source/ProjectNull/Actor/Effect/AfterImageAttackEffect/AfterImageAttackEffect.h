@@ -141,7 +141,6 @@ class PROJECTNULL_API UAfterImageAttackEffect final : public UObject
 	GENERATED_BODY()
 public:
 	UAfterImageAttackEffect();
-public:
 	
 	/** 初期化 */
 	void Initialize();

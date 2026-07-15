@@ -13,13 +13,16 @@
 
 
 AProjectileBase::AProjectileBase():
+	OwnerActor(nullptr),
+	PlayerRuntimeData(nullptr),
+	AttackPowerScale(1.f),
 	Root(nullptr),
 	SphereCollision(nullptr),
 	StaticMesh(nullptr),
 	ProjectileMovement(nullptr),
+	ProjectileEffect(nullptr),
 	AliveTimerHandle(FTimerHandle()),
-	AliveTime(2.f),
-	AttackPowerScale(1.f)
+	AliveTime(2.f)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	

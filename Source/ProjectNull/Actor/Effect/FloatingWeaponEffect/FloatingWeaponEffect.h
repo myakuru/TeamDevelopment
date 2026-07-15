@@ -36,7 +36,6 @@ class PROJECTNULL_API UFloatingWeaponEffect : public UObject
 
 public:
 	UFloatingWeaponEffect();
-public:
 	
 	/**
 	 * @brief 初期化

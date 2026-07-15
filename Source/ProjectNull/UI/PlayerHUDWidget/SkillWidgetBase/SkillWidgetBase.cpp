@@ -9,7 +9,7 @@ void USkillWidgetBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	MaxUiScale = SkillImage->RenderTransform.Scale;
+	MaxUiScale = SkillImage->GetRenderTransform().Scale;
 
 	if (SkillImage)
 	{

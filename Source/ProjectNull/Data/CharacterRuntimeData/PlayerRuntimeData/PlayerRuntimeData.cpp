@@ -7,8 +7,6 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
-#include <ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h>
-#include <ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData() :
 	Owner(nullptr),
@@ -52,16 +50,18 @@ void UPlayerRuntimeData::AddExperience(float Amount)
 {
 	Experience.Add(Amount);
 	
+	// 変更があれば、経験値のバーのUIが更新される
+	OnExperienceChanged.Broadcast(Experience.Current, Experience.ExperienceToNextLevel);
+	
 	// 経験値によるレベルアップ
 	while (Experience.Current >= Experience.ExperienceToNextLevel)
 	{
 		Experience.Current -= Experience.ExperienceToNextLevel;
-
+		
+		OnExperienceChanged.Broadcast(1.0f, 1.0f);
+		
 		LevelUp();
 	}
-
-	// 変更があれば、経験値のバーのUIが更新される
-	OnExperienceChanged.Broadcast(Experience.Current, Experience.ExperienceToNextLevel);
 }
 
 void UPlayerRuntimeData::AddGearEnergy(float Amount)
@@ -143,7 +143,9 @@ void UPlayerRuntimeData::CalculateFinalSpeed(
 	const FSpeedParameterData& Data,
 	int32 CurrentGearLevel)
 {
-	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(CurrentGearLevel)) { return; }
+	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(--CurrentGearLevel)) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("hi 止まって"));
+	
 	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
 }

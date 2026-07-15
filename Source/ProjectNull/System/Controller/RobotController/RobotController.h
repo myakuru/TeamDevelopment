@@ -34,6 +34,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	inline UPlayerHUDWidget* GetPlayerHUD() const { return PlayerHud; }
+	
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	inline UPlayerExpUpgradeWidget* GetExpUpgradeWidget() const { return PlayerExpUpgradeWidget; }
 
 	/** Setter */
 	inline void SetCanReceiveInput(bool bInCanReceiveInput) { bCanReceiveInput = bInCanReceiveInput;}
