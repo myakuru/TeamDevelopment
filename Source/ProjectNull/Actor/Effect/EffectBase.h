@@ -27,12 +27,14 @@ public:
 
 	void DeactivateEffect();
 	void DeactivateImmediateEffect();
-
+	
+	void SetVisibility(bool bVisibility);
+	
 	void SetAbsolute(
 		bool bNewAbsoluteLocation,
 		bool bNewAbsoluteRotation,
 		bool bNewAbsoluteScale);
-
+	
 	inline UNiagaraComponent* GetEffectComponent() const { return EffectComponent; }
 
 protected:
