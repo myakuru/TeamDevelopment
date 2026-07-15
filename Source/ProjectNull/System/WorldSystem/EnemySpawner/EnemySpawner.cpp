@@ -225,10 +225,30 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 		CachedSubsystem->SetPhaseThresholds(PhaseSpawnTable->PhaseWaves[NewPhase].PhaseUpDeathEnemyCount);
 	}
 
-	// SpawnTableからFinalWaveかどうかを取得
+	// 中ボス出現
 	if (PhaseSpawnTable->FinalWave == NewPhase)
 	{
 		FinalPhase = true;
+
+		if (PhaseSpawnTable->StageBoss)
+		{
+
+			AEnemyBossBase* Boss = GetWorld()->SpawnActor<AEnemyBossBase>(
+				PhaseSpawnTable->StageBoss,
+				GetActorLocation(),
+				GetActorRotation());
+
+			if (!IsValid(Boss))
+			{
+				return;
+			}
+		}
+	}
+
+	// ボス出現
+	if (PhaseSpawnTable->BossWave == NewPhase)
+	{
+		BossPhase = true;
 
 		if (PhaseSpawnTable->StageBoss)
 		{

@@ -14,6 +14,7 @@ class USkillWidgetBase;
 class UGameTimerWidget;
 class UPlayerHpBarWidget;
 class UPlayerRuntimeData;
+class UWaveWidget;
 
 UCLASS()
 class PROJECTNULL_API UPlayerHUDWidget : public UUserWidget
@@ -34,6 +35,9 @@ protected:
 	/** ゲームのタイマー */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UGameTimerWidget> GameTimer;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UWaveWidget> WaveWidget;
 
 	/** スキルWidget（インデックス順） */
 	UPROPERTY(meta = (BindWidget))
@@ -93,6 +97,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetGearChangeEnergy(float Charge);
 
+	/**
+	 * @brief	倒した敵と倒す敵の設定
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SetDeathEnemyCount(int32 Count);
 private:
 	/**
 	 * @brief デリゲートを登録します

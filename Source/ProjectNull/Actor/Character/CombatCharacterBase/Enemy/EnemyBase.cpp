@@ -210,7 +210,7 @@ void AEnemyBase::FinalizeDeath()
 	if (USuperGameInstance* GameInstance =
 		GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
-		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
+		//GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
 		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
 

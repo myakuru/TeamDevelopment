@@ -151,4 +151,7 @@ private:
 
 	/** 最終フェーズチェック*/
 	bool FinalPhase = false;
+
+	/** ボス専用フェーズチェック*/
+	bool BossPhase = false;
 };

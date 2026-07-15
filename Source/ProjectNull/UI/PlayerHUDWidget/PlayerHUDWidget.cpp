@@ -10,6 +10,8 @@
 // ゲームのタイマー
 #include <ProjectNull/UI/PlayerHUDWidget/GameTimerWidget/GameTimerWidget.h>
 
+#include <ProjectNull/UI/InGame/WaveWidget/WaveWidget.h>
+
 // プレイヤーのスキルのUI
 #include <ProjectNull/UI/PlayerHUDWidget/SkillWidgetBase/SkillWidgetBase.h>
 
@@ -89,6 +91,14 @@ void UPlayerHUDWidget::SetGearChangeEnergy(float Charge)
 	}
 }
 
+void UPlayerHUDWidget::SetDeathEnemyCount(int32 Count)
+{
+	if (WaveWidget)
+	{
+		WaveWidget->SetKillCount(Count);
+	}
+}
+
 void UPlayerHUDWidget::RegisterDelegates()
 {
 	// ワールドからインスタンス所得
@@ -111,5 +121,7 @@ void UPlayerHUDWidget::RegisterDelegates()
 
 		// スキルのクールダウンのデリゲートを登録
 		CharacterParameterData->OnSkillCooldownChanged.AddDynamic(this, &UPlayerHUDWidget::SetPlayerSkillCooldown);
+
+
 	}
 }

@@ -1,6 +1,8 @@
 ﻿#include "ExperiencePickupManager.h"
 #include "NiagaraComponent.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include "GameFramework/Pawn.h"
 
 /**
@@ -20,6 +22,8 @@ namespace ExperienceNiagaraParams
 void FExperiencePickupManager::Initialize(UWorld* World)
 {
 	if (!World) { return; }
+
+	spWorld = World;
 
 	UNiagaraSystem* LoadedNiagaraSystem = LoadObject<UNiagaraSystem>(
 		nullptr,
@@ -93,6 +97,13 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 		{
 			PendingExpValue += Exp.ExpValue;
 			ExperienceList.RemoveAt(i);
+
+			//spWorld.Get()
+			if (USuperGameInstance* GameInstance =
+				spWorld.Get()->GetGameInstance<USuperGameInstance>())
+			{
+				GameInstance->GetPlayerRuntimeData()->AddExperience(PendingExpValue);
+			}
 			continue;
 		}
 

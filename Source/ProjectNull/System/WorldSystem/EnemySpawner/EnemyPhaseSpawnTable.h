@@ -44,6 +44,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	int FinalWave = 0;
 
+	// ボス専用ウェーブの設定
+	UPROPERTY(EditAnywhere)
+	int BossWave = 0;
+
+	// 中ボス
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemyBossBase> StageTyuuBoss;
+
 	// 出現するボス
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AEnemyBossBase> StageBoss;
