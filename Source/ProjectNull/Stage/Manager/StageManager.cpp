@@ -17,7 +17,10 @@
 
 void UStageManager::Initialize() {
 	NowStageIndex = StageDefinition::OutGameStageIndex;
-	
+
+	//制限時間切れでステージクリア処理を呼ぶ（一度だけバインド）
+	StageTimer.OnFinished.AddUObject(this, &UStageManager::InGameFinalize);
+
 	//ステージを調査
 	ChangeStageInvestigation(GetWorld());
 	
@@ -97,6 +100,14 @@ void UStageManager::InGameInitialize(int32 inNowStageIndex)
 	}
 }
 
+void UStageManager::StartStageTimer()
+{
+	if (!StageDataAsset)return;
+
+	//制限時間は StageDataAsset から取得して開始
+	StageTimer.StartTimer(GetWorld(), StageDataAsset->GetStageTimerLimit());
+}
+
 void UStageManager::InGameFinalize()
 {
 	if (NowStageIndex < StageDefinition::OutGameStageIndex)return;
@@ -160,6 +171,7 @@ void UStageManager::OutGameInitialize()
 		
 		UE_LOG(LogTemp, Warning, TEXT("After Spawn = %p"),
 			OutGameBGMSoundComponent.Get());
+		c
 	}
 }
 
