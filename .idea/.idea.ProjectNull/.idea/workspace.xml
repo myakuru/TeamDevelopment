@@ -21,12 +21,8 @@
   <component name="ChangeListManager">
     <list default="true" id="9d89e482-8b92-48c1-80d6-5e688d4ff851" name="変更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectNull/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/ABP_Perula.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/ABP_Perula.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Actor/Character/Player/Robot/BP_Robot.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Actor/Effect/EffectBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -263,6 +259,7 @@
       <workItem from="1784010188017" duration="904000" />
       <workItem from="1784024810774" duration="3638000" />
       <workItem from="1784034728785" duration="2207000" />
+      <workItem from="1784088779760" duration="3169000" />
     </task>
     <servers />
   </component>
