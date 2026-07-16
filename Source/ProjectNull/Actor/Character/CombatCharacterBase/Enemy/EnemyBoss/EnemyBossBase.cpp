@@ -2,6 +2,7 @@
 #include "EnemyBossBase.h"
 #include "AIC_EnemyBoss.h"
 #include "Components/StateTreeComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
 #include "Perception/PawnSensingComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -9,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Stage/Manager/StageManager.h>
 
@@ -39,11 +41,11 @@ void AEnemyBossBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 視界トリガー：プレイヤーが視界に入ったら追尾対象に設定
-	if (IsValid(PawnSensingComp))
-	{
-		PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBossBase::OnSeePlayer);
-	}
+	//// 視界トリガー：プレイヤーが視界に入ったら追尾対象に設定
+	//if (IsValid(PawnSensingComp))
+	//{
+	//	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBossBase::OnSeePlayer);
+	//}
 
 	// 攻撃トリガー：ダメージを受けたら攻撃者を追尾対象に設定
 	OnTakeAnyDamage.AddDynamic(this, &AEnemyBossBase::HandleTakeAnyDamage);
@@ -126,6 +128,11 @@ void AEnemyBossBase::Tick(float DeltaTime)
 	{
 		BossDeathMaterialChange();
 	}
+
+	APawn* PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (!PPlayerPawn) { return; }
+
+	SetTargetActor(PPlayerPawn);
 }
 
 // ------------------------------------------------------------------------------------
@@ -298,20 +305,6 @@ void AEnemyBossBase::BossFinalize()
 
 	//SpawnDeathEffect();
 
-	DeathEffect->ReleaseRef();
-
-	// StateTreeを停止
-	if (StateTreeComp)
-	{
-		StateTreeComp->StopLogic(TEXT("Deactivate"));
-	}
-
-	if (USuperGameInstance* GameInstance =
-		GetWorld()->GetGameInstance<USuperGameInstance>())
-	{
-		GameInstance->GetStageManagerSubsystem()->InGameFinalize();
-	}
-
 	if (DeathEffect)
 	{
 		FTransform AdjustedTransform = GetActorTransform();
@@ -338,10 +331,29 @@ void AEnemyBossBase::BossFinalize()
 		);
 	}
 
+	DeathEffect->ReleaseRef();
+
+	// StateTreeを停止
+	if (StateTreeComp)
+	{
+		StateTreeComp->StopLogic(TEXT("Deactivate"));
+	}
+
+	/*if (USuperGameInstance* GameInstance =
+		GetWorld()->GetGameInstance<USuperGameInstance>())
+	{
+		GameInstance->GetStageManagerSubsystem()->InGameFinalize();
+	}*/
+
 	if (UEnemyManagerSubsystem* EnemyManager =
 		GetWorld()->GetSubsystem<UEnemyManagerSubsystem>())
 	{
 		EnemyManager->DestroyAllEnemy();
+	}
+
+	if (auto* GameProgress = GetWorld()->GetSubsystem<UGameProgressSubsystem>())
+	{
+		GameProgress->AddKillBossCount();
 	}
 }
 

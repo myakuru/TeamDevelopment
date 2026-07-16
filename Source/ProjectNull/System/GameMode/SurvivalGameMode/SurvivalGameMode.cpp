@@ -40,7 +40,19 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 		{
 			EnemySpawner->SetFinalPhase();
 		}
+	}
 
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::U))
+	{
+		AActor* FoundActor = UGameplayStatics::GetActorOfClass(
+			GetWorld(), AEnemySpawner::StaticClass());
+
+		AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(FoundActor);
+
+		if (IsValid(EnemySpawner))
+		{
+			EnemySpawner->SetBossPhase();
+		}
 	}
 
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();

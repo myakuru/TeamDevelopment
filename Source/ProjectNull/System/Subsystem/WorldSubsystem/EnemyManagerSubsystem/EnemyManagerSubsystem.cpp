@@ -168,16 +168,22 @@ USoundBase* UEnemyManagerSubsystem::GetDamagedSound() const
 
 void UEnemyManagerSubsystem::DestroyAllEnemy()
 {
-	// すべて敵の更新メソッドを呼ぶ
-	for (AEnemyBase* Enemy : EnemyGruntList)
+	// FinalizeDeath中にEnemyGruntListが変更されても問題ないようにコピー
+	const TArray<TObjectPtr<AEnemyBase>> EnemyListCopy = EnemyGruntList;
+
+	for (AEnemyBase* Enemy : EnemyListCopy)
 	{
-		if (Enemy)
+		if (!IsValid(Enemy))
 		{
-			if (Enemy->GetAliveFlg())
-			{
-				Enemy->FinalizeDeath();
-			}
+			continue;
 		}
+
+		if (!Enemy->GetAliveFlg())
+		{
+			continue;
+		}
+
+		Enemy->FinalizeDeath();
 	}
 }
 

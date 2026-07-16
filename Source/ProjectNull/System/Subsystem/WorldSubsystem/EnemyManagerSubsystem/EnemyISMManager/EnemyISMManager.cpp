@@ -242,7 +242,7 @@ void AEnemyISMManager::RegisterEnemy(AEnemyBase* Enemy)
 	// 前回のインデックスが残っている場合の対処
 	if (Enemy->ISMInstanceIndex != INDEX_NONE)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[ISMManager] RegisterEnemy: 既存インデックスを解除して再登録: %d"), Enemy->ISMInstanceIndex);
+		//UE_LOG(LogTemp, Warning, TEXT("[ISMManager] RegisterEnemy: 既存インデックスを解除して再登録: %d"), Enemy->ISMInstanceIndex);
 		ReleaseIndex(Enemy->ISMInstanceIndex);
 		Enemy->ISMInstanceIndex = INDEX_NONE;
 	}
