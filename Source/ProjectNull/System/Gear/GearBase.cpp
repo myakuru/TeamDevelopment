@@ -76,7 +76,7 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 	SimultaneousActivationCoolTime = GearStatuses[StateIndex].SimultaneousActivationCoolTime;
 	bAllowOtherGearActivation = false;
 	
-	const float CoolTime =  PlayerRuntimeData->IsInvincible() ?
+	const float CoolTime = PlayerRuntimeData->IsInvincible() ?
 	GearStatuses[StateIndex].CoolTime * OwnerGearComponent->GetCoolTimeScale() :
 	GearStatuses[StateIndex].CoolTime;
 	// ギアのクールタイムをセットし、クールタイム終了時にリセット処理を呼ぶ
