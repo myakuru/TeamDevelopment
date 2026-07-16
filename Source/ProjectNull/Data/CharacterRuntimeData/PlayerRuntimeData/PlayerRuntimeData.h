@@ -229,13 +229,12 @@ public:
 	 */
 	float GetPlayerAttackDamage();
 
-	void SetPlayerAttackDamage(float OutAttackMultiplier) { AttackMultiplier = OutAttackMultiplier; }
-
 	/**
 	 * @brief レベルアップ処理
 	 */
 	void LevelUp();
 
+	inline void SetOwner(APlayerBase* InOwner) { Owner = InOwner; }
 	inline void SetIsInvincible(bool bInIsInvincible) { bIsInvincible = bInIsInvincible; }
 
 	inline bool IsInvincible() const { return bIsInvincible; }
@@ -257,14 +256,44 @@ public:
 	UPROPERTY()
 	TObjectPtr<ARobotController> RobotController;
 
-	/** Widget側で呼び出す */
-	void UpdateUpgradeStates(FName Id);
+	/**
+	 * @brief UIに提示する強化候補を Count 件つくる。
+	 *        DataTableの抽選・レベル判定はここに集約し、UIは表示するだけにする。
+	 * @param Count 抽選する件数
+	 * @return 提示可能だった候補の配列（無効な行は除外されるため Count 未満になり得る）
+	 */
+	TArray<FValidUpgradeInfo> BuildUpgradeChoices(int32 Count);
+
+	/**
+	 * @brief UIで選択された強化を適用する（強化レベルの加算＋効果の反映）。
+	 *        効果の反映は EffectType で振り分けるため、Id ごとの分岐は不要。
+	 * @param Id 選択された強化の行名
+	 */
+	void ApplySelectedUpgrade(FName Id);
 
 	FName GetUpgradeLevel(FName Id) const;
 
 	void UpgradeAttackMultiplier(FName Id,float InMultiplier);
 
+	/**
+	 * @brief レベルアップ時のプレイヤーステータスを更新（計算、適用）
+	 */
+	void UpdateStatus();
+	
 private:
+	/** 強化レベルを1段進める */
+	void UpdateUpgradeStates(FName Id);
+
+	/**
+	 * @brief 効果種別に応じて倍率を反映する（Idごとの分岐を持たない共通処理）
+	 * @param Type 効果種別
+	 * @param Value 反映する倍率
+	 */
+	void ApplyUpgradeEffect(EUpgradeEffectType Type, float Value);
+	
+	/** 指定Idの「現在レベル」の効果データを DataTable から取得（無ければ nullptr） */
+	FExpUpgradeLevelData* FindCurrentLevelData(FName Id);
+
 	/**
 	 * @brief HPの更新処理
 	 * @param NewHealth 初期値はPlayerParameterDataから受け取る。
@@ -283,14 +312,9 @@ private:
 	 */
 	void ApplyMovementSpeed();
 
-	/**
-	 * @brief レベルアップ時のプレイヤーステータスを更新（計算、適用）
-	 */
-	void UpdateStatus();
-	
 	/** 持ち主のクラス */
 	UPROPERTY()
-	APlayerBase* Owner;
+	TObjectPtr<APlayerBase> Owner;
 
 	/** 経験値関連Runtimeデータ構造体 */
 	UPROPERTY(EditAnywhere, Category = "Experience")
@@ -318,8 +342,5 @@ private:
 	/** 行名 -> 現在の強化レベル（配列インデックス） */
 	UPROPERTY()
 	TMap<FName, int32> UpgradeLevels;
-
-	/** 攻撃力の倍率 */
-	float AttackMultiplier = 1.0f;
 
 };

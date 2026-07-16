@@ -28,6 +28,14 @@ void AEnemySpawner::SetFinalPhase()
 	ApplySpawnModeByPhase(PhaseSpawnTable->FinalWave);
 }
 
+void AEnemySpawner::SetBossPhase()
+{
+	if (BossPhase) { return; }
+	BossPhase = true;
+
+	ApplySpawnModeByPhase(PhaseSpawnTable->BossWave);
+}
+
 void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
@@ -97,7 +105,7 @@ void AEnemySpawner::SpawnEnemy()
 
 	if (!CurrentWaveData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("WaveData is null"));
+		//UE_LOG(LogTemp, Error, TEXT("WaveData is null"));
 		return;
 	}
 
@@ -199,7 +207,7 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 {
 	if (!PhaseSpawnTable)
 	{
-		UE_LOG(LogTemp, Error, TEXT("PhaseSpawnTable is null"));
+		//UE_LOG(LogTemp, Error, TEXT("PhaseSpawnTable is null"));
 		CurrentWaveData = nullptr;
 		return;
 	}
@@ -210,7 +218,7 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 
 	if (!NewWaveData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("No WaveData found Phase : %d"), NewPhase);
+		//UE_LOG(LogTemp, Error, TEXT("No WaveData found Phase : %d"), NewPhase);
 		//CurrentWaveData = nullptr;
 		return;
 	}
@@ -222,6 +230,14 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 	if (CachedSubsystem)
 	{
 		CachedSubsystem->SetPhaseThresholds(PhaseSpawnTable->PhaseWaves[NewPhase].PhaseUpDeathEnemyCount);
+		if (NewPhase == PhaseSpawnTable->FinalWave)
+		{
+			CachedSubsystem->SetFinalWave(true);
+		}
+		if (NewPhase == PhaseSpawnTable->BossWave)
+		{
+			CachedSubsystem->SetBossWave(true);
+		}
 	}
 
 	// 中ボス出現

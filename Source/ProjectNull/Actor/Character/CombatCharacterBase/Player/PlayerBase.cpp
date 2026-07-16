@@ -102,7 +102,13 @@ void APlayerBase::BeginPlay()
 	// ゲーム全体で共有されるデータや機能を管理するクラスの初期化
 	// ================================================================
 	SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
 
+	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (!PlayerRuntimeData) { return; }
+	PlayerRuntimeData->SetOwner(this);
+	PlayerRuntimeData->UpdateStatus();
+	
 	// ================================================================
 	// 自動攻撃の初期化
 	// ================================================================

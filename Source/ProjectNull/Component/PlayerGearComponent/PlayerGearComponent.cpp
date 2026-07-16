@@ -253,8 +253,11 @@ void UPlayerGearComponent::OnInvincibilityStart()
 	const auto& CharacterMovement = OwnerPlayer->GetCharacterMovement();
 	if (!CharacterMovement) { return; }
 
+	if (PlayerRuntimeData->IsInvincible()) { return; }
+	
 	CharacterMovement->MaxWalkSpeed *= SpeedScale;
 	
+	SetIsInvincible(true);
 	//UE_LOG(LogTemp, Warning, TEXT("hi MaxWalkSpeed %.0f"),SpeedRuntimeData.Final);
 }
 

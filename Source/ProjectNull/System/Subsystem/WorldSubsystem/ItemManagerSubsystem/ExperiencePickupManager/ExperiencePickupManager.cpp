@@ -85,7 +85,7 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 		Exp.LifeTime -= DeltaTime;
 		if (Exp.LifeTime <= 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ExperiencePickupManager: TimeRemove"));
+			//UE_LOG(LogTemp, Warning, TEXT("ExperiencePickupManager: TimeRemove"));
 			ExperienceList.RemoveAt(i);
 			continue;
 		}
@@ -103,6 +103,7 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 				spWorld.Get()->GetGameInstance<USuperGameInstance>())
 			{
 				GameInstance->GetPlayerRuntimeData()->AddExperience(PendingExpValue);
+				//UE_LOG(LogTemp, Warning, TEXT("Experience : %f"), PendingExpValue);
 			}
 			continue;
 		}
