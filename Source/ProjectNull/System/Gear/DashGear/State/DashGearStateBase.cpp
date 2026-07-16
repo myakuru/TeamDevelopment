@@ -1,6 +1,8 @@
 ﻿
 #include "DashGearStateBase.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
 
 #include <ProjectNull/Actor/Effect/EffectBase.h>
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
@@ -76,7 +78,14 @@ void UDashGearStateBase::ExecuteDash()
 {
 	if (!Player || 
 		!DashGear) { return; }
-
+	
+	//ダッシュ効果音
+	if (GearSESound.IsValidIndex(SEIndex::DashSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::DashSESoundIndex]);
+	}
+		
 	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
 	if (!GroundAlignmentComp) { return; }
 

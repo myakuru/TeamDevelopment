@@ -1,8 +1,8 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "ExplosionGearState_Lv3.h"
+﻿#include "ExplosionGearState_Lv3.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
 
 UExplosionGearState_Lv3::UExplosionGearState_Lv3()
 {
@@ -38,6 +38,17 @@ void UExplosionGearState_Lv3::Execute(int32 CurrentGearLevel)
 		false
 	);
 
+	//効果音
+	if (GearSESound.IsValidIndex(SEIndex::FirecrackersSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::FirecrackersSESoundIndex]);
+	}
+	if (GearSESound.IsValidIndex(SEIndex::StrongFlameSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::StrongFlameSESoundIndex]);
+	}
 }
 
 void UExplosionGearState_Lv3::Update(float DeltaTime)

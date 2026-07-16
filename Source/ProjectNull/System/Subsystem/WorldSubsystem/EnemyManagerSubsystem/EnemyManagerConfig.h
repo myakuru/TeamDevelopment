@@ -17,7 +17,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<float> UpdateLimitDistance;
 	
-	/** BGM */
+	/** SE */
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> DamagedSESound;
 };
