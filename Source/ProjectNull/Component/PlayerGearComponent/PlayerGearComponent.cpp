@@ -123,7 +123,6 @@ void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 	if (!PlayerGears.IsValidIndex(GearIndex) ||
 		!PlayerGears[GearIndex]) { return; }
 
-	bool bShouldExecute = true;
 
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
@@ -131,15 +130,13 @@ void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 		if (!IsValid(Gear) ||
 			Index == GearIndex) { continue; }
 
-		if (!Gear->AllowOtherGearActivation())
+		if (Gear->AllowOtherGearActivation())
 		{
-			bShouldExecute = false;
-			break;
+			PlayerGears[GearIndex]->Execute(CurrentGearLevel);
+			return;
 		}
 	}
 
-	if (!bShouldExecute) { return; }
-	PlayerGears[GearIndex]->Execute(CurrentGearLevel);
 }
 
 void UPlayerGearComponent::ChangeGear()
