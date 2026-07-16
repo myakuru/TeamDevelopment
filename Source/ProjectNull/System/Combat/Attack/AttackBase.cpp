@@ -6,7 +6,7 @@
 
 UAttackBase::UAttackBase():
 		OwnerActor(nullptr),
-		bCanExecute(true),
+		bCanExecute(false),
 		bIsActive(false),
 		bAbsoluteScale(false),
 		bAbsoluteRotation(false),

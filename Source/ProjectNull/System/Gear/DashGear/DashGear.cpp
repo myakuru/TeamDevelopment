@@ -5,7 +5,8 @@
 
 
 UDashGear::UDashGear()
-	:	CurrentExecuteAttackIndex(0)
+	:	SphereAttacks(TArray<TObjectPtr<UCollisionAttack>>())
+	,	CurrentExecuteAttackIndex(0)
 {
 }
 
@@ -19,7 +20,7 @@ void UDashGear::Initialize(
 
 	if (!IsValid(OwnerPlayer)) { return; }
 
-	if (!SphereAttacks.IsEmpty()) { return; }
+	if (SphereAttacks.IsEmpty()) { return; }
 	for (const auto& Attack : SphereAttacks)
 	{
 		if (!IsValid(Attack)) { continue; }
@@ -56,5 +57,6 @@ void UDashGear::SetSphereTransform(const FTransform& Transform) const
 {
 	// コリジョンのトランスフォームを指定の値を基に変化させる
 	if (!SphereAttacks.IsValidIndex(CurrentExecuteAttackIndex)) { return; }
+	UE_LOG(LogTemp,Warning,TEXT("SetActorLocation!!"));
 	SphereAttacks[CurrentExecuteAttackIndex]->ApplyCollisionTransform(Transform);
 }

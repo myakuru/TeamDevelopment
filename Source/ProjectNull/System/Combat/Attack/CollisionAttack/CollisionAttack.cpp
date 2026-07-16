@@ -22,7 +22,7 @@ void UCollisionAttack::Update(const float InDeltaTime)
 	}
 }
 
-void UCollisionAttack::Execute()
+void UCollisionAttack::Execute(const FVector& InTargetLocation)
 {
 	SetIsActive(true);								// 攻撃有効化
 	SetCanExecute(false);							// 攻撃実行不可にする
@@ -34,7 +34,7 @@ void UCollisionAttack::Cancel()
 	SetIsActive(false);		// 攻撃無効化
 }
 
-void UCollisionAttack::OnSphericalBeginOverlap(
+void UCollisionAttack::OnCollisionBeginOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
@@ -63,7 +63,7 @@ void UCollisionAttack::OnSphericalBeginOverlap(
 	}
 }
 
-void UCollisionAttack::OnSphericalEndOverlap(
+void UCollisionAttack::OnCollisionEndOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
@@ -74,7 +74,7 @@ void UCollisionAttack::OnSphericalEndOverlap(
 		|| OtherActor == GetOwnerActor()) {
 		return;
 	}
-
+	
 	if (GetHitActors().Contains(OtherActor))
 	{
 		RemoveActor(OtherActor);

@@ -34,7 +34,7 @@ public:
 
 	void Initialize(const TObjectPtr<AActor>& Owner)	override;
 	void Update(float DeltaTime)						override;
-	void Execute()										override { return; }
+	void Execute(const FVector& InTargetLocation = FVector::ZeroVector)		override { return; }
 
 	/** Getter */
 	inline float GetAutoAttackInterval() const	{ return AutoAttackInterval; }
@@ -67,6 +67,6 @@ private:
 	/** 前方扇状自動攻撃タイマー*/
 	FTimerHandle AutoFrontConeAttackTimerHandle;
 
-	/** 前方扇状自動攻撃からの周囲攻撃遅延タイマー */
+	/** 前方扇状自動攻撃からftの周囲攻撃遅延タイマー */
 	FTimerHandle FrontToRingDelayTimerHandle;
 };

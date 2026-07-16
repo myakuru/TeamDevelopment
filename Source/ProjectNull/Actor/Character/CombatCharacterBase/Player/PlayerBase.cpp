@@ -132,7 +132,7 @@ void APlayerBase::BeginPlay()
 void APlayerBase::Tick(float DeltaTime)
 {
 	ACombatCharacterBase::Tick(DeltaTime);
-
+	
 	// 自動攻撃の更新
 	if (AutoAttack) { AutoAttack->Update(DeltaTime); }
 

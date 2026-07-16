@@ -1,5 +1,6 @@
 ﻿#include "STT_EnemyMidBossAttack.h"
 #include "StateTreeExecutionContext.h"
+#include "Kismet/GameplayStatics.h"
 
 #include <ProjectNull\Component\EnemyAttackComponent\EnemyAttackComponent.h>
 #include <ProjectNull\Actor\Character\CombatCharacterBase\Enemy\EnemyMidBossBase\EnemyMidBossBase.h>
@@ -16,9 +17,16 @@ EStateTreeRunStatus USTT_EnemyMidBossAttack::EnterState(FStateTreeExecutionConte
 {
 	OwnerEnemy = Cast<AEnemyMidBossBase>(InContext.GetOwner());
 	if (!IsValid(OwnerEnemy)) { return EStateTreeRunStatus::Failed; }
-
+	
+	// プレイヤーの座標を取得
+	FVector TargetLocation=FVector::ZeroVector;
+	if (TObjectPtr<APawn> PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0))
+	{
+		TargetLocation = PPlayerPawn->GetActorLocation();
+	}
+		
 	// 攻撃を実行
-	OwnerEnemy->ActivateAttack(AttackData.AttackType);
+	OwnerEnemy->ActivateAttack(AttackData.AttackType,TargetLocation);
 	
 	// 攻撃に適したアニメーションを再生
 	{

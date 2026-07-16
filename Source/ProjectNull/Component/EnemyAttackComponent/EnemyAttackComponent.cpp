@@ -3,7 +3,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <ProjectNull/System/Combat/Attack/AttackBase.h>
 
-UEnemyAttackComponent::UEnemyAttackComponent():
+UEnemyAttackComponent::UEnemyAttackComponent() :
 	OwnerEnemy(nullptr),
 	EnemyAttacks(TMap<EEnemyAttackType, TObjectPtr<UAttackBase>>())
 {
@@ -25,7 +25,8 @@ void UEnemyAttackComponent::BeginPlay()
 }
 
 
-void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                          FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -38,7 +39,7 @@ void UEnemyAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		if (Attack.Value->CanExecute())
 		{
-			Attack.Value->Execute();
+			Attack.Value->Execute(TargetLocation);
 		}
 
 		Attack.Value->Update(DeltaTime);
@@ -76,25 +77,45 @@ bool UEnemyAttackComponent::IsAllAttackDeactivate()
 
 void UEnemyAttackComponent::AttackActive(EEnemyAttackType InAttackType)
 {
-	if (AttackTimerHandles.IsEmpty()||
+	if (AttackTimerHandles.IsEmpty() ||
 		!AttackTimerHandles.Find(InAttackType)) { return; }
-
+	
 	FTimerDelegate TimerDelegate;
 	TimerDelegate.BindLambda([this,InAttackType]
 		{
-			if(EnemyAttacks.IsEmpty()||
-				!!AttackTimerHandles.Find(InAttackType)) { return; }
+			if (EnemyAttacks.IsEmpty() ||
+				!AttackTimerHandles.Find(InAttackType)) { return; }
 
-			EnemyAttacks[InAttackType]->SetCanExecute(true);
+			// 攻撃が現在発動中なら有効化しない
+			if (!EnemyAttacks[InAttackType]->IsActive())
+			{
+				EnemyAttacks[InAttackType]->SetCanExecute(true);
+			}
 		}
 	);
 
-	GetWorld()->GetTimerManager().SetTimer(
-		AttackTimerHandles[InAttackType],
-		TimerDelegate,
-		EnemyAttacks[InAttackType]->GetAttackStartDelay(),
-		false
-	);
+	// タイマーは0秒だと無効と判断するので条件分岐
+	const float Deray = EnemyAttacks[InAttackType]->GetAttackStartDelay();
+	if (Deray <= 0.f)
+	{
+		if (EnemyAttacks.IsEmpty() ||
+				!AttackTimerHandles.Find(InAttackType)) { return; }
+		
+		// 攻撃が現在発動中なら有効化しない
+		if (!EnemyAttacks[InAttackType]->IsActive())
+		{
+			EnemyAttacks[InAttackType]->SetCanExecute(true);
+		}
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			AttackTimerHandles[InAttackType],
+			TimerDelegate,
+			Deray,
+			false
+		);
+	}
 }
 
 void UEnemyAttackComponent::TestActive()

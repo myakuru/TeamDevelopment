@@ -37,7 +37,7 @@ public:
 	/**
 	 * @brief 有効化処理
 	 */
-	virtual void Execute();
+	virtual void Execute(const FVector& InTargetLocation = FVector::ZeroVector)override;
 
 	/**
 	 * @brief 中止処理
@@ -76,7 +76,7 @@ protected:
 	 * リストへ追加などを行う
 	 */
 	UFUNCTION()
-	virtual void OnSphericalBeginOverlap(
+	virtual void OnCollisionBeginOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
@@ -89,7 +89,7 @@ protected:
 	 * リストへ追加などを行う
 	 */
 	UFUNCTION()
-	virtual void OnSphericalEndOverlap(
+	virtual void OnCollisionEndOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
@@ -153,6 +153,4 @@ private:
 	 */
 	UPROPERTY()
 	float JustExecuteTime = 0.f;
-	
-	
 };

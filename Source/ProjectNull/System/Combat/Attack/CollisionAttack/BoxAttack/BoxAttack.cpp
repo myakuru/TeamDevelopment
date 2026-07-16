@@ -36,11 +36,11 @@ void UBoxAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 			// オーバーラップ時、オーバーラップ抜け時の関数をセット
 			BoxComponent->OnComponentBeginOverlap.AddDynamic(
 				this,
-				&ThisClass::OnSphericalBeginOverlap
+				&ThisClass::OnCollisionBeginOverlap
 			);
 			BoxComponent->OnComponentEndOverlap.AddDynamic(
 				this,
-				&ThisClass::OnSphericalEndOverlap
+				&ThisClass::OnCollisionEndOverlap
 			);
 		}
 
@@ -48,9 +48,9 @@ void UBoxAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 	}
 }
 
-void UBoxAttack::Execute()
+void UBoxAttack::Execute(const FVector& InTargetLocation)
 {
-	UCollisionAttack::Execute();
+	UCollisionAttack::Execute(InTargetLocation);
 
 	if (!BoxCollision) { return; }
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);// 当たり判定有効化	

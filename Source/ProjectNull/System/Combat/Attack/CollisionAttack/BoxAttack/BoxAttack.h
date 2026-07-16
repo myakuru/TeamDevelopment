@@ -30,7 +30,7 @@ public:
 	/**
 	 * @brief 有効化処理
 	 */
-	virtual void Execute()override;
+	virtual void Execute(const FVector& InTargetLocation = FVector::ZeroVector)override;
 
 	/**
 	 * @brief 中止処理

@@ -1,5 +1,8 @@
 ﻿#include "SphereAttack.h"
 
+#include "Components/SphereComponent.h"
+
+#include <ProjectNull/Actor/WarningShapeActor/WarningShapeActor.h>
 #include <ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.h>
 
 USphereAttack::USphereAttack()
@@ -16,11 +19,10 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 	{
 		SphereCollision = GetWorld()->SpawnActor<ASphereCollision>(SubSphereCollision);
 		if (!SphereCollision) { return; }
-		SphereCollision->BeginPlay();
 
-		// 攻撃用スフィアアクターに親をアタッチ
-		SphereCollision->AttachToActor(
-			InOwner,
+		// 攻撃用スフィアアクターを親にアタッチ
+		SphereCollision->AttachToComponent(
+			GetRootComponent(),
 			FAttachmentTransformRules::KeepRelativeTransform
 		);
 
@@ -34,26 +36,67 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 		);
 
 		// オーバーラップ時、オーバーラップ抜け時の関数をセット
-		SphereCollision->BindSphereBeginOverlapEvents<ThisClass>(
-			this
-			, &ThisClass::OnSphericalBeginOverlap
-		);
-		SphereCollision->BindSphereEndOverlapEvents<ThisClass>(
-			this
-			, &ThisClass::OnSphericalEndOverlap
-		);
+		for (const auto& Sphere : SphereCollision->GetSphereComponents())
+		{
+			if (!IsValid(Sphere)) { continue; }
+			Sphere->OnComponentBeginOverlap.AddDynamic(
+					this
+				,	&ThisClass::OnCollisionBeginOverlap
+			);
+			
+			Sphere->OnComponentEndOverlap.AddDynamic(
+					this
+				,	&ThisClass::OnCollisionEndOverlap
+			);
+		}
 
 		Cancel();
 	}
+	
+	// 警告を出力するなら専用アクターを生成
+	if (IsShowWarning)
+	{
+		for (int32 i = 0; i < SphereCollision->GetSphereComponents().Num(); ++i)
+		{
+			// 初期値パラメータをセットしておく
+			if (SphereCollision->GetSphereEntries().IsValidIndex(i))
+			{
+				const FSphereElemental& Sphere = SphereCollision->GetSphereEntries()[i];
+				TObjectPtr<AWarningShapeActor> WarningShape = GetWorld()->SpawnActor<AWarningShapeActor>(WarningShapeActor);
+				WarningShape->AttachToComponent(SphereCollision->GetSphereComponents()[i],FAttachmentTransformRules::KeepRelativeTransform);
+				
+				// 実行までの時間をセット
+				WarningShape->SetActivationDelay(Sphere.ActivationDelay);
+				if (const auto& SphereComponent=SphereCollision->GetSphereComponents()[i])
+				{
+					// 目標半径
+					WarningShape->SetTargetRadius(
+						SphereComponent->GetScaledSphereRadius());
+				}
+				
+				WarningShape->Initialize();
+				// 要素を追加
+				WarningShapes.Add(WarningShape);
+			}
+		}
+	}
 }
-
-void USphereAttack::Execute()
+void USphereAttack::Execute(const FVector& InTargetLocation)
 {
-	UCollisionAttack::Execute();
+	UCollisionAttack::Execute(InTargetLocation);
 	
 	if (!SphereCollision) { return; }
-	SphereCollision->SetJustExecuteTime(GetJustExecuteTime());	// 有効化された瞬間の時間をセット
-	SphereCollision->SetActorTransform(GetOffsetTransform());	// 補正用トランスフォーム値をコリジョンの基準としてセット
+	SphereCollision->SetJustExecuteTime(GetJustExecuteTime());			// 有効化された瞬間の時間をセット
+	SphereCollision->SetActorRelativeTransform(GetOffsetTransform());	// 補正用トランスフォーム値をコリジョンの基準としてセット
+	
+	// 警告を出力するなら実行
+	if (IsShowWarning)
+	{
+		for (const auto& Warning:WarningShapes)
+		{
+			Warning->Execute();
+		}
+	}
 }
 
 void USphereAttack::Cancel()
@@ -66,12 +109,21 @@ void USphereAttack::Cancel()
 
 void USphereAttack::Update(float InDeltaTime)
 {
-	if (!IsActive()) { return; }
-
 	UCollisionAttack::Update(InDeltaTime);
+	
+	if (!IsActive()) { return; }
 
 	if (!IsValid(SphereCollision)) { return; }
 	SphereCollision->Update(InDeltaTime);
+	
+	// 警告を出力するなら更新
+	if (IsShowWarning)
+	{
+		for (const auto& Warning:WarningShapes)
+		{
+			Warning->Update(InDeltaTime);
+		}
+	}
 }
 
 void USphereAttack::ApplyCollisionTransform(const FTransform& InTransform)

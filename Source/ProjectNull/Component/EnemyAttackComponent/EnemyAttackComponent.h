@@ -65,6 +65,9 @@ public:
 
 	void TestActive();
 
+	/**	ターゲットの座標をセット */
+	void SetTargetLocation(const FVector& InTargetLocation) { TargetLocation = InTargetLocation; }
+	
 private:
 
 	/**
@@ -84,4 +87,10 @@ private:
 	 * @brief それぞれの攻撃に対応したタイマーハンドル
 	 */
 	TMap<EEnemyAttackType,FTimerHandle> AttackTimerHandles;
+
+	/**
+	 * @brief ターゲットの座標
+	 */
+	UPROPERTY()
+	FVector TargetLocation;
 };

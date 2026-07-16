@@ -36,11 +36,11 @@ void UCapsuleAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 			// オーバーラップ時、オーバーラップ抜け時の関数をセット
 			CapsuleComponent->OnComponentBeginOverlap.AddDynamic(
 				this,
-				&ThisClass::OnSphericalBeginOverlap
+				&ThisClass::OnCollisionBeginOverlap
 			);
 			CapsuleComponent->OnComponentEndOverlap.AddDynamic(
 				this,
-				&ThisClass::OnSphericalEndOverlap
+				&ThisClass::OnCollisionEndOverlap
 			);
 		}
 
@@ -48,9 +48,9 @@ void UCapsuleAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 	}
 }
 
-void UCapsuleAttack::Execute()
+void UCapsuleAttack::Execute(const FVector& InTargetLocation)
 {
-	UCollisionAttack::Execute();
+	UCollisionAttack::Execute(InTargetLocation);
 
 	if (!CapsuleCollision) { return; }
 	CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);// 当たり判定有効化	

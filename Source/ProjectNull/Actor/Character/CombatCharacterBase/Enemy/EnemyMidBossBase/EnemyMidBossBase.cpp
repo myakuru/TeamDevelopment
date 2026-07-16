@@ -3,7 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components\CapsuleComponent.h"
 #include "Components\StateTreeComponent.h"
-#include "GameFramework\CharacterMovementComponent.h"
+
 #include <ProjectNull\GameInstance\SuperGameInstance.h>
 #include <ProjectNull\Component\EnemyAttackComponent\EnemyAttackComponent.h>
 #include <ProjectNull\Data\CharacterRuntimeData\PlayerRuntimeData\PlayerRuntimeData.h>
@@ -120,6 +120,8 @@ void AEnemyMidBossBase::Tick(float InDeltaTime)
 		const FVector playerLocation = PPlayerPawn->GetActorLocation();
 		EnemyMidBossRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
 	}
+	
+	UE_LOG(LogTemp,Warning,TEXT("StateEnum : %d"),EnemyStatus.StateTag);
 
 	// 攻撃可能化の判断処理
 	CheckCanAttack();
@@ -148,11 +150,12 @@ void AEnemyMidBossBase::FinalizeDeath()
 	Destroy();
 }
 
-void AEnemyMidBossBase::ActivateAttack(EEnemyAttackType InAttackTyp)
+void AEnemyMidBossBase::ActivateAttack(EEnemyAttackType InAttackTyp,const FVector& InTargetLocation)
 {
 	if (!IsValid(AttackComponent)) { return; }
 
 	// 攻撃種類をキーとして攻撃を発動
+	AttackComponent->SetTargetLocation(InTargetLocation);
 	AttackComponent->AttackActive(InAttackTyp);
 }
 

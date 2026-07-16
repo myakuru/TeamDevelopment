@@ -9,6 +9,9 @@
 /** 球状の当たり判定を持つアクタークラス */
 class ASphereCollision;
 
+/** 攻撃の警告を出力するアクタークラス */
+class AWarningShapeActor;
+
 /**
  * 球状の攻撃処理を行うクラス
  */
@@ -32,7 +35,7 @@ public:
 	/**
 	 * @brief 有効化処理
 	 */
-	virtual void Execute()override;
+	virtual void Execute(const FVector& InTargetLocation = FVector::ZeroVector)override;
 
 	/**
 	 * @brief 中止処理
@@ -69,4 +72,19 @@ private:
 	UPROPERTY()
 	TObjectPtr<ASphereCollision> SphereCollision;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWarningShapeActor> WarningShapeActor;
+	
+	/**
+	 * @brief 攻撃の警告を知らせるアクタークラス配列
+	 */
+	UPROPERTY()
+	TArray<TObjectPtr<AWarningShapeActor>> WarningShapes;
+	
+	/**
+	 * @brief 警告を出すか
+	 */
+	UPROPERTY(EditAnywhere)
+	bool IsShowWarning=false;
+	
 };
