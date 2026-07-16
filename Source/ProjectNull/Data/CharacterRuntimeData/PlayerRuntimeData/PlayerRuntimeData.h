@@ -235,6 +235,7 @@ public:
 	 */
 	void LevelUp();
 
+	inline void SetOwner(APlayerBase* InOwner) { Owner = InOwner; }
 	inline void SetIsInvincible(bool bInIsInvincible) { bIsInvincible = bInIsInvincible; }
 
 	inline bool IsInvincible() const { return bIsInvincible; }
@@ -273,6 +274,13 @@ public:
 
 	FName GetUpgradeLevel(FName Id) const;
 
+	void UpgradeAttackMultiplier(FName Id,float InMultiplier);
+
+	/**
+	 * @brief レベルアップ時のプレイヤーステータスを更新（計算、適用）
+	 */
+	void UpdateStatus();
+	
 private:
 	/** 強化レベルを1段進める */
 	void UpdateUpgradeStates(FName Id);
@@ -308,14 +316,9 @@ private:
 	 */
 	void ApplyMovementSpeed();
 
-	/**
-	 * @brief レベルアップ時のプレイヤーステータスを更新（計算、適用）
-	 */
-	void UpdateStatus();
-	
 	/** 持ち主のクラス */
 	UPROPERTY()
-	APlayerBase* Owner;
+	TObjectPtr<APlayerBase> Owner;
 
 	/** 経験値関連Runtimeデータ構造体 */
 	UPROPERTY(EditAnywhere, Category = "Experience")
