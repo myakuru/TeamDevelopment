@@ -6,6 +6,10 @@
 
 #include "DashGearStateBase.generated.h"
 
+namespace SEIndex {
+	inline constexpr int32 DashSESoundIndex	= 0;
+}
+
 /** ナイアガラシステムクラス */
 class UNiagaraSystem;
 

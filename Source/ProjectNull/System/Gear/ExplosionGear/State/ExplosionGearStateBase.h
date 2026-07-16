@@ -1,10 +1,14 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "../../State/GearStateBase.h"
 #include "ExplosionGearStateBase.generated.h"
+
+namespace SEIndex {
+	inline constexpr int32 FirecrackersSESoundIndex	= 0;
+	inline constexpr int32 LowFlameSESoundIndex		= 1;
+	inline constexpr int32 StrongFlameSESoundIndex	= 2;
+}
 
 class AExplosionGearSkill;
 

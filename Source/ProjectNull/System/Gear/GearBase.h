@@ -44,6 +44,9 @@ class UGearStateBase;
 
 class UPlayerRuntimeData;
 
+/** 効果音 */
+class USoundBase;
+
 /** ギアの基底クラス */
 UCLASS()
 class PROJECTNULL_API UGearBase : public UObject
@@ -129,6 +132,10 @@ private:
 	/** ギアのステータス配列 */
 	UPROPERTY(EditAnywhere)
 	TArray<FGearStatus> GearStatuses;
+	
+	/** 効果音 */
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<USoundBase>> GearSESound;
 
 	/** 現在のギア状態 */
 	UPROPERTY()

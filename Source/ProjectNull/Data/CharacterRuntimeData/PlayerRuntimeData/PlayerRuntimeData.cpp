@@ -28,16 +28,7 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 void UPlayerRuntimeData::Initialize()
 {
 
-	// プレイヤーの情報を取得する（0番:1P）
-	auto* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (!PlayerPawn) { return; }
-
-	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn))
-	{
-		Owner = PlayerBase;
-	}
-
-	UpdateStatus();
+	//UpdateStatus();
 
 	// プレイヤーのパラメータデータ取得
 	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
@@ -48,6 +39,7 @@ void UPlayerRuntimeData::Initialize()
 
 void UPlayerRuntimeData::AddExperience(float Amount)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("hi Amount %.0f"), Amount);
 	Experience.Add(Amount);
 	
 	// 変更があれば、経験値のバーのUIが更新される
@@ -96,7 +88,7 @@ void UPlayerRuntimeData::ApplyMovementSpeed()
 float UPlayerRuntimeData::GetPlayerAttackDamage()
 {
 	// プレイヤーの攻撃力を計算するロジックをここに実装
-	Attack.Final = Attack.Base * AttackMultiplier;
+	Attack.Final = Attack.Base * GetEffectMultiplier(EUpgradeEffectType::AttackDamage);
 
 	//UE_LOG(LogTemp, Error, TEXT("%f:Attack.Final"), Attack.Final);
 
@@ -119,11 +111,11 @@ void UPlayerRuntimeData::LevelUp()
 		RobotController->OpenPlayerExpUpgradeWidget();
 	}
 
-	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
+	UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
 	UE_LOG(LogTemp, Warning, TEXT("hi ExperienceToNextLevel %.0f"), Experience.ExperienceToNextLevel);
-	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);*/
-	//UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
+	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);
+	UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
 	
 }
 
@@ -144,10 +136,11 @@ void UPlayerRuntimeData::CalculateFinalSpeed(
 	int32 CurrentGearLevel)
 {
 	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(--CurrentGearLevel)) { return; }
-	UE_LOG(LogTemp, Warning, TEXT("hi 止まって"));
 	
 	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
+	
+	//Speed.Final *= GetEffectMultiplier(EUpgradeEffectType::PlayerSpeed);
 }
 
 void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Data)
@@ -158,6 +151,7 @@ void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Da
 void UPlayerRuntimeData::UpdateStatus()
 {
 	if (!Owner || !Owner->GetSuperGameInstance() || !Owner->GetSuperGameInstance()->GetPlayerParameterData()) {
+		//UE_LOG(LogTemp, Warning, TEXT("hi 止まって"));
 		return;
 	}
 
@@ -167,6 +161,75 @@ void UPlayerRuntimeData::UpdateStatus()
 	CalculateExperience(ParameterData->GetExperienceData());
 	CalculateFinalSpeed(ParameterData->GetSpeedData(), Owner->GetCurrentGearLevel());
 	ApplyMovementSpeed();
+}
+
+TArray<FValidUpgradeInfo> UPlayerRuntimeData::BuildUpgradeChoices(int32 Count)
+{
+	TArray<FValidUpgradeInfo> Result;
+	if (!CachedExpUpgradeTable) { return Result; }
+
+	// 行名を取得して重複なくランダム抽選する
+	TArray<FName> RowNames = CachedExpUpgradeTable->GetRowNames();
+	if (RowNames.Num() < Count) { return Result; }
+
+	for (int32 i = 0; i < Count; ++i)
+	{
+		const int32 Index = FMath::RandRange(0, RowNames.Num() - 1);
+		const FName RowName = RowNames[Index];
+		RowNames.RemoveAt(Index);
+
+		// 現在レベルに対応する説明文がなければ候補から除外する
+		const FExpUpgradeLevelData* LevelData = FindCurrentLevelData(RowName);
+		if (!LevelData) { continue; }
+
+		FValidUpgradeInfo Info;
+		Info.RowName = RowName;
+		Info.Description = LevelData->Description;
+		Info.CurrentLevel = GetUpgradeLevel(RowName);
+		Result.Add(Info);
+	}
+
+	return Result;
+}
+
+void UPlayerRuntimeData::ApplySelectedUpgrade(FName Id)
+{
+	// レベルを進める前に、いま提示している（現在レベルの）効果データを取得する
+	if (const FExpUpgradeLevelData* LevelData = FindCurrentLevelData(Id))
+	{
+		ApplyUpgradeEffect(LevelData->EffectType, LevelData->AttackMultiplier);
+	}
+
+	// 強化レベルを1段進める
+	UpdateUpgradeStates(Id);
+	
+	// ステータスの更新
+	//UpdateStatus();
+}
+
+void UPlayerRuntimeData::ApplyUpgradeEffect(EUpgradeEffectType Type, float Value)
+{
+	// 効果種別ごとに現在倍率を保持する。効果が増えても分岐は増えない
+	EffectMultipliers.FindOrAdd(Type) = Value;
+}
+
+float UPlayerRuntimeData::GetEffectMultiplier(EUpgradeEffectType Type) const
+{
+	const float* Found = EffectMultipliers.Find(Type);
+	return Found ? *Found : 1.0f;
+}
+
+const FExpUpgradeLevelData* UPlayerRuntimeData::FindCurrentLevelData(FName Id) const
+{
+	if (!CachedExpUpgradeTable) { return nullptr; }
+
+	const FExpUpgradeRow* Row = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(Id, TEXT(""));
+	if (!Row) { return nullptr; }
+
+	const int32 LevelIndex = FCString::Atoi(*GetUpgradeLevel(Id).ToString());
+	if (!Row->UpgradeLevels.IsValidIndex(LevelIndex)) { return nullptr; }
+
+	return &Row->UpgradeLevels[LevelIndex];
 }
 
 void UPlayerRuntimeData::UpdateUpgradeStates(FName Id)
@@ -193,26 +256,4 @@ FName UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 		}
 	}
 	return "null";
-}
-
-void UPlayerRuntimeData::UpgradeAttackMultiplier(
-	FName Id,
-	float InMultiplier)
-{
-	for (auto& UpgradeState : UpgradeStates)
-	{
-		if (UpgradeState.UpgradeId == Id)
-		{
-			if (Id == "0")
-			{
-				float Multiplier = InMultiplier;
-
-				UE_LOG(LogTemp, Error, TEXT("%f:Multiplier"), Multiplier);
-
-				// 強化画面での攻撃倍率の更新処理
-				SetPlayerAttackDamage(Multiplier);
-				break;
-			}
-		}
-	}
 }

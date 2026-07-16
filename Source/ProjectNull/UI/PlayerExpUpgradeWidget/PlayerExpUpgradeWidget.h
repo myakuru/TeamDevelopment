@@ -13,18 +13,6 @@ class UPlayerRuntimeData;
 
 class UImage;
 
-/** 1レベル分の強化情報 */
-USTRUCT(BlueprintType)
-struct FValidUpgradeInfo
-{
-	GENERATED_BODY()
-
-	FName RowName;
-	FText Description;
-	float Multiplier;
-	FName CurrentLevel;
-};
-
 /**
  * 経験値がレベルアップしたら呼ばれるクラス
  */
@@ -64,8 +52,6 @@ protected:
 
 	void InitUpgradeWidget();
 
-	void SetAttackMultiplier(float Multiplier);
-
 	/** 背景の黒い画像 */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> BackgroundImage;
@@ -103,29 +89,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Upgrade")
 	float BackgroundFadeInAlphaMax = 0.0f;
 
-	/** プレイヤー側で保持する各行ごとの現在レベル（デフォルトは 0） */
-	TMap<FName, int32> PlayerUpgradeLevels;
-
-	/** すでに表示した行を記録するセット（同じ行を複数回表示しないようにするため） */
-	TSet<FName> ShownUpgradeRows;
-
-	/** DataTable をキャッシュしておく（毎回ロードしない） */
-	UPROPERTY()
-	UDataTable* CachedExpUpgradeTable = nullptr;
-
 	bool bIsUpgradeWidgetFilledArray = true;
 
 	bool bIsUpgradeWidgetOpen = false;
-	
+
 	bool bIsOpen = false;
-
-	/** 現在表示中の行名（ChoicesExpUpgrade でセット） */
-	FName SelectedRowName = NAME_None;
-
-	/** DataTable のロード（内部でキャッシュ） */
-	UDataTable* GetExpUpgradeTable();
-
-private:
-	// 説明文の数
-	TArray<FValidUpgradeInfo> ValidUpgrades;
 };

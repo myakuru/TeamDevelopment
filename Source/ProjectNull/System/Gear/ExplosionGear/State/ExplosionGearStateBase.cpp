@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "ExplosionGearStateBase.h"
+﻿#include "ExplosionGearStateBase.h"
 #include <ProjectNull/System/Gear/GearBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull\Actor\Explosion\ExplosionGearSkill.h>

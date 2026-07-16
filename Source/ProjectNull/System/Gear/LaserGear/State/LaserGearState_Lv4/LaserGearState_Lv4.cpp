@@ -1,6 +1,9 @@
 ﻿
 #include "LaserGearState_Lv4.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
+
 #include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
 
 #include <GameFramework/CharacterMovementComponent.h>
@@ -74,13 +77,18 @@ void ULaserGearState_Lv4::Execute(int32 CurrentGearLevel)
 {
 	ULaserGearStateBase::Execute(CurrentGearLevel);
 	bSpawnEnable = false;
-
-
 	
 	if (!Player || 
 		!RobotController ||
 		!PlayerRuntimeData) { return; }
 
+	//効果音
+	if (GearSESound.IsValidIndex(SEIndex::BigLaserSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::LaserChargeSESoundIndex]);
+	}
+	
 	//PlayerRuntimeData->SetIsInvincible(true);
 	
 	// 入力を無効化
@@ -139,6 +147,14 @@ void ULaserGearState_Lv4::Update(float DeltaTime)
 		if (!bSpawnEnable)
 		{
 			Laserbeam->SetLaserEnabled(true);
+			
+			//効果音
+			if (GearSESound.IsValidIndex(SEIndex::BigLaserSESoundIndex))
+			{
+				GetWorld()->GetGameInstance<USuperGameInstance>()->
+					GetSoundManager()->Play2D(GearSESound[SEIndex::BigLaserSESoundIndex]);
+			}
+			
 			bSpawnEnable = true;
 		}
 	}

@@ -41,6 +41,7 @@ void UGearBase::Initialize(
 		if (!State) { continue; }
 
 		State->Initialize(Player, GearComponent, this);
+		State->SetGearSESound(GearSESound);
 	}
 
 	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();

@@ -107,8 +107,8 @@ protected:
 	/**
 	 * @brief	倒した敵と倒す敵の設定
 	 */
-	UFUNCTION(BlueprintCallable)
-	void SetDeathEnemyCount(int32 Count);
+	/*UFUNCTION(BlueprintCallable)
+	void SetDeathEnemyCount(int32 Count);*/
 
 private:
 	/**
