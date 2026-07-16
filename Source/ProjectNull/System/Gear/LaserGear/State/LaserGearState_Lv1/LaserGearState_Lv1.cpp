@@ -1,6 +1,9 @@
 ﻿
 #include "LaserGearState_Lv1.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
+
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/System/Combat/Shooter/LaserBulletShooter/LaserBulletShooter.h>
@@ -34,7 +37,13 @@ void ULaserGearState_Lv1::Execute(int32 CurrentGearLevel)
 	if (!LaserBulletShooter) { return; }
 
 	LaserBulletShooter->ShotTargetedLaserBullets(Player->GetActorLocation());
-
+	
+	/** 効果音 */
+	if (GearSESound.IsValidIndex(SEIndex::LaserGunSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::LaserGunSESoundIndex]);
+	}
 }
 
 void ULaserGearState_Lv1::Update(float DeltaTime)
