@@ -28,6 +28,8 @@ void UStageManager::Initialize() {
 		this,
 		&UStageManager::ChangeStageInvestigation
 	);
+	
+	StartStageTimer();
 }
 
 void UStageManager::LoadFromSaveData(UMySaveGame* inSaveGame)

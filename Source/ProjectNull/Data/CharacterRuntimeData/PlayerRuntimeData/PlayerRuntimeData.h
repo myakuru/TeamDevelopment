@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "../CharacterRuntimeData.h"
+#include "ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h"
 #include "PlayerRuntimeData.generated.h"
 
 /** 経験値が変更されたときに呼び出されるデリゲート */
@@ -229,8 +230,6 @@ public:
 	 */
 	float GetPlayerAttackDamage();
 
-	void SetPlayerAttackDamage(float OutAttackMultiplier) { AttackMultiplier = OutAttackMultiplier; }
-
 	/**
 	 * @brief レベルアップ処理
 	 */
@@ -257,14 +256,40 @@ public:
 	UPROPERTY()
 	TObjectPtr<ARobotController> RobotController;
 
-	/** Widget側で呼び出す */
-	void UpdateUpgradeStates(FName Id);
+	/**
+	 * @brief UIに提示する強化候補を Count 件つくる。
+	 *        DataTableの抽選・レベル判定はここに集約し、UIは表示するだけにする。
+	 * @param Count 抽選する件数
+	 * @return 提示可能だった候補の配列（無効な行は除外されるため Count 未満になり得る）
+	 */
+	TArray<FValidUpgradeInfo> BuildUpgradeChoices(int32 Count);
+
+	/**
+	 * @brief UIで選択された強化を適用する（強化レベルの加算＋効果の反映）。
+	 *        効果の反映は EffectType で振り分けるため、Id ごとの分岐は不要。
+	 * @param Id 選択された強化の行名
+	 */
+	void ApplySelectedUpgrade(FName Id);
 
 	FName GetUpgradeLevel(FName Id) const;
 
-	void UpgradeAttackMultiplier(FName Id,float InMultiplier);
-
 private:
+	/** 強化レベルを1段進める */
+	void UpdateUpgradeStates(FName Id);
+
+	/**
+	 * @brief 効果種別に応じて倍率を反映する（Idごとの分岐を持たない共通処理）
+	 * @param Type 効果種別
+	 * @param Value 反映する倍率
+	 */
+	void ApplyUpgradeEffect(EUpgradeEffectType Type, float Value);
+
+	/** 効果種別ごとの現在倍率を取得（未設定なら 1.0） */
+	float GetEffectMultiplier(EUpgradeEffectType Type) const;
+
+	/** 指定Idの「現在レベル」の効果データを DataTable から取得（無ければ nullptr） */
+	const FExpUpgradeLevelData* FindCurrentLevelData(FName Id) const;
+
 	/**
 	 * @brief HPの更新処理
 	 * @param NewHealth 初期値はPlayerParameterDataから受け取る。
@@ -319,7 +344,7 @@ private:
 	UPROPERTY()
 	TMap<FName, int32> UpgradeLevels;
 
-	/** 攻撃力の倍率 */
-	float AttackMultiplier = 1.0f;
+	/** 効果種別 -> 現在の倍率。効果を増やしてもここに項目が増えるだけで済む */
+	TMap<EUpgradeEffectType, float> EffectMultipliers;
 
 };
