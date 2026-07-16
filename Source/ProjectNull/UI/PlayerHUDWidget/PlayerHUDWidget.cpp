@@ -10,6 +10,8 @@
 // ゲームのタイマー
 #include <ProjectNull/UI/PlayerHUDWidget/GameTimerWidget/GameTimerWidget.h>
 
+#include <ProjectNull/UI/InGame/WaveWidget/WaveWidget.h>
+
 // プレイヤーのスキルのUI
 #include <ProjectNull/UI/PlayerHUDWidget/SkillWidgetBase/SkillWidgetBase.h>
 
@@ -98,6 +100,14 @@ void UPlayerHUDWidget::SetGearChangeEnergy(float Charge)
 	if (GearChange)
 	{
 		GearChange->SetGearChangeEnergy(Charge);
+	}
+}
+
+void UPlayerHUDWidget::SetDeathEnemyCount(int32 Count)
+{
+	if (WaveWidget)
+	{
+		WaveWidget->SetKillCount(Count);
 	}
 }
 

@@ -171,7 +171,6 @@ void UStageManager::OutGameInitialize()
 		
 		UE_LOG(LogTemp, Warning, TEXT("After Spawn = %p"),
 			OutGameBGMSoundComponent.Get());
-		c
 	}
 }
 
