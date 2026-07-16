@@ -54,17 +54,34 @@ void AExplosionGearSkill::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+	
+}
+
+//SpawnActorDeferredを使ってBeginPlay前にInitializeを呼ぶ必要あり
+void AExplosionGearSkill::Initialize(const FExplosionData& InData)
+{
+	Data = InData;
+
+	
+}
+
+void AExplosionGearSkill::StartExplosionSequence()
+{
+	
+
+
 	FTimerDelegate timerDelegate;
 	timerDelegate.BindLambda([this] {
-			if (PreExplosionFX) {
-				auto* Effect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-					GetWorld(),
-					PreExplosionFX,
-					GetActorLocation()
-				);
+		if (PreExplosionFX) {
+			auto* Effect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				PreExplosionFX,
+				GetActorLocation()
+			);
 			Effect->SetWorldRotation(RootComponent->GetComponentQuat());
-				
-			}
+
+		}
 		}
 	);
 
@@ -84,19 +101,6 @@ void AExplosionGearSkill::BeginPlay()
 		Data.IgnitionDelay + Data.Delay,
 		false
 	);
-	
-}
-
-//SpawnActorDeferredを使ってBeginPlay前にInitializeを呼ぶ必要あり
-void AExplosionGearSkill::Initialize(const FExplosionData& InData)
-{
-	Data = InData;
-
-	ApplyData();
-}
-
-void AExplosionGearSkill::StartExplosionSequence()
-{
 }
 
 void AExplosionGearSkill::ApplyData()
@@ -107,6 +111,8 @@ void AExplosionGearSkill::ApplyData()
 
 void AExplosionGearSkill::Explode()
 {
+	ApplyData();
+	
 	
 	// 爆発エフェクト再生
 	if (ExplosionFX) {
@@ -122,7 +128,7 @@ void AExplosionGearSkill::Explode()
 
 	// カメラシェイクを爆発のスケールに応じて再生
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
-	if (playerController) {
+	if (playerController && ExplosionCameraShakeClass) {
 		playerController->ClientStartCameraShake(
 			ExplosionCameraShakeClass,
 			Data.Scale
