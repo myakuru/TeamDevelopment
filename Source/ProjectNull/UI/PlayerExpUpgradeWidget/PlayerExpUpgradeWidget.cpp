@@ -1,8 +1,8 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿#include "PlayerExpUpgradeWidget.h"
+#include "Components/AudioComponent.h"
 
-
-#include "PlayerExpUpgradeWidget.h"
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
 #include "Kismet/GameplayStatics.h"
 #include <ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.h>
 #include "Components/Image.h"
@@ -32,6 +32,10 @@ void UPlayerExpUpgradeWidget::NativeConstruct()
 	SetIsEnabled(false);
 
 	bIsUpgradeWidgetOpen = false;
+	
+	UpgradeWidget_0->SetHoverSESound(HoverSESound);
+	UpgradeWidget_1->SetHoverSESound(HoverSESound);
+	UpgradeWidget_2->SetHoverSESound(HoverSESound);
 }
 
 void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -91,6 +95,16 @@ void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
 	OpenWidget();
 
 	ChoicesExpUpgrade();
+	
+	//BGM再生
+	OpenWidgetSEAudioComponent = 
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+		GetSoundManager()->Spawn2D(OpenWidgetSESound);
+	
+	if (OpenWidgetSEAudioComponent)
+	{
+		OpenWidgetSEAudioComponent->bIsUISound = true;
+	}
 }
 
 FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -98,6 +112,12 @@ FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	// 左マウスボタンが押されたかチェック
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
+		//クリック効果音
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(
+				ClickSESound,1.0f,1.0f,0.0f,
+				nullptr,nullptr,true);
+		
 		UExpUpgradeWidgetBase* Widgets[] = { UpgradeWidget_0, UpgradeWidget_1, UpgradeWidget_2 };
 
 		for (UExpUpgradeWidgetBase* Widget : Widgets)
@@ -113,6 +133,12 @@ FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 			}
 		}
 
+		//BGM停止
+		if (OpenWidgetSEAudioComponent)
+		{
+			OpenWidgetSEAudioComponent->Stop();
+		}
+		
 		CloseWidget();
 
 		// イベントをこのウィジェットで処理したことを返す

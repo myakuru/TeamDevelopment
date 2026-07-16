@@ -11,7 +11,7 @@ class UImage;
 class UExpUpgradeWidget0;
 class UPlayerRuntimeData;
 struct FExpUpgradeRow;
-
+class USoundBase;
 
 USTRUCT(BlueprintType)
 struct FUIParameter
@@ -66,6 +66,8 @@ public:
 
 	FName GetUpgradeRowName() const { return UpgradeRowName; }
 
+	/** 効果音 */
+	void SetHoverSESound(USoundBase* inSound){HoverSESound = inSound;}
 protected:
 	/** テキストを表示するためのウィジェット */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -111,4 +113,7 @@ private:
 	UDataTable* GetExpUpgradeTable();
 
 	FName UpgradeRowName = NAME_None;
+	
+	UPROPERTY()
+	TObjectPtr<USoundBase>HoverSESound;
 };
