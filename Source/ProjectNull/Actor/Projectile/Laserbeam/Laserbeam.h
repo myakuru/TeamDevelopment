@@ -9,8 +9,7 @@
 
 class UBoxComponent;
 class UEffectBase;
-
-
+class UPlayerRuntimeData;
 UCLASS()
 class PROJECTNULL_API ALaserbeam : public AActor
 {
@@ -23,7 +22,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void SetLaserEnabled(bool bEnabled);
-
 
 private:
 
@@ -41,4 +39,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<TObjectPtr<UEffectBase>>	NiagaraEffectArray;
+	
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
+	UPROPERTY(EditAnywhere)
+	float AttackPowerScale;
 };

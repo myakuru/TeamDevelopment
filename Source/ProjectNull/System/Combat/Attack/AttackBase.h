@@ -24,8 +24,9 @@ public:
 
 	/**
 	 * @brief 有効化処理
+	 * @param InTargetLocation	ターゲットの座標 
 	 */
-	virtual void Execute() PURE_VIRTUAL(UAttackBase::Execute, );
+	virtual void Execute(const FVector& InTargetLocation = FVector::ZeroVector) PURE_VIRTUAL(UAttackBase::Execute, );
 	
 	/**
 	 * @brief 中止処理
@@ -50,9 +51,10 @@ public:
 	 */
 	virtual bool IsTargetInRange(AActor* Target) { return false; }
 
+
 	/**
 	 * @brief 攻撃方向を計算する
-	 * @param forwardVector 基準となる前方ベクトル(オーナーの前方ベクトル)
+	 * @param ForwardVector 基準となる前方ベクトル(オーナーの前方ベクトル)
 	 * @return 計算された攻撃方向ベクトル
 	 */
 	virtual FVector CalcAttackDir(const FVector& ForwardVector)const;
@@ -78,7 +80,7 @@ public:
 	}
 
 
-	/* Begin ProtectedMenber Setters */
+	/* Begin ProtectedMember Setters */
 	/**
 	 * @brief オーナークラスのセット
 	 * @param InOwnerActor 変更先のオーナーアドレス
@@ -101,15 +103,21 @@ public:
 
 	/**
 	 * @brief 攻撃処理の有効無効の切り替え
-	 * @param bInIsActive trueで有効
+	 * @param InIsActive trueで有効
 	 */
-	void SetIsActive(const bool InbIsActive) { bIsActive = InbIsActive; }
-	/* End ProtectedMenber Setters */
+	void SetIsActive(const bool InIsActive) { bIsActive = InIsActive; }
+
+	/** 補正値トランスフォームをセット */
+	virtual void SetOffestTransform(const FTransform& InOffsetTransform)
+	{
+		OffsetTransform = InOffsetTransform;
+	}
+	/* End ProtectedMember Setters */
 
 
-	/* Begin ProtectedMenber Getters */
+	/* Begin ProtectedMember Getters */
 	/** クラスのオーナーを取得 */
-	TObjectPtr<AActor> GetOwnerActor()const { return OwnerActor; }
+	TWeakObjectPtr<AActor> GetOwnerActor()const { return OwnerActor; }
 
 	/** ルートを取得 */
 	inline USceneComponent* GetRootComponent()const { return RootComponent; }
@@ -123,6 +131,9 @@ public:
 	/**	最終的なダメージ量を取得 */
 	float GetFinalDamage()const { return FinalDamage; }
 
+	/** 攻撃開始までの待ち時間 */
+	float GetAttackStartDelay()const { return AttackStartDelay; }
+
 	/**
 	 * @brief 攻撃実行可能か
 	 * @return 攻撃実行可能ならtrue
@@ -134,7 +145,7 @@ public:
 	 * @return 有効であればtrue
 	 */
 	bool IsActive()		const { return bIsActive; }
-	/* End ProtectedMenber Getters */
+	/* End ProtectedMember Getters */
 
 	inline bool AbsoluteRotation() const { return bAbsoluteRotation;}
 
@@ -143,7 +154,7 @@ private:
 
 	/**	オーナー */
 	UPROPERTY()
-	TObjectPtr<AActor> OwnerActor;
+	TWeakObjectPtr<AActor> OwnerActor;
 	
 	/** アタッチ用のルート（位置・回転管理） */
 	UPROPERTY()
@@ -166,15 +177,20 @@ private:
 	UPROPERTY()
 	float FinalDamage = 0.f;
 
+	/**
+	* @brief 攻撃開始までの待ち時間
+	*/
+	UPROPERTY(EditAnywhere)
+	float AttackStartDelay = 0.f;
+
 	/**	攻撃可能フラグ */
 	UPROPERTY()
-	bool bCanExecute = true;
+	bool bCanExecute = false;
 
 	/**	攻撃有効フラグ */
 	UPROPERTY()
 	bool bIsActive = false;
-
-
+	
 	UPROPERTY(EditAnywhere)
 	bool bAbsoluteScale;
 

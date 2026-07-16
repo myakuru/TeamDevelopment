@@ -6,7 +6,7 @@
 
 class UTextBlock;
 class UImage;
-class UButton;
+class UButtonBaseWidget;
 
 /**
  * 
@@ -43,7 +43,7 @@ private:
 	TObjectPtr<UImage> GearImage;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> CloseUIButton;
+	TObjectPtr<UButtonBaseWidget> CloseUIButton;
 
 	/** アニメーション */
 	UPROPERTY(Transient, meta = (BindWidgetAnim))

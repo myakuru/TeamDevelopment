@@ -63,6 +63,12 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	// ダッシュギアのレベル4状態クラスの初期化
 	// ================================================================
 	bExecuteFinalDash = false;
+	
+	//効果音
+	if (AfterImageAttackEffect && GearSESound.IsValidIndex(SEIndex::DashSESoundIndex))
+	{
+		AfterImageAttackEffect->SetSESound(GearSESound[SEIndex::DashSESoundIndex]);
+	}
 
 	// ギアスキル発動前のカメラステータスを保存
 	GearSpecialAction->Execute(Player->GetTransform());
@@ -81,8 +87,6 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 
 	// 入力を無効化
 	RobotController->SetCanReceiveInput(false);
-
-	DashGear->SetSphereRadius(SpecialAttackSphereRadius);
 }
 
 void UDashGearState_Lv4::Update(float DeltaTime)
@@ -148,8 +152,6 @@ void UDashGearState_Lv4::UpdateAttackSphereCollision(float ElapsedTime)
 {
 	if(	!StanceTime.IsWithinRange(ElapsedTime) &&
 		!DashTime.IsWithinRange(ElapsedTime)) { return; }
-
-	SetSphereCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	const auto GroundAlignmentRootComp = Player->GetGroundAlignmentRootComponent();
 	if (!GroundAlignmentRootComp) { return; }

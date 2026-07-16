@@ -17,6 +17,9 @@ class UPlayerGearComponent;
 /** ギアの中間基底クラス */
 class UGearBase;
 
+/** 効果音 */
+class USoundBase;
+
 
 /** ギアクラスの状態中間基底クラス
 	1Lv,2Lv...(状態) */
@@ -62,6 +65,22 @@ public:
 	inline virtual const int32 GetGearLevelIndex()	const	{ return kLv1Index; }
 	inline APlayerBase* GetPlayer()					const	{ return Player; }
 	inline UGearBase*	GetGear()					const	{ return Owner; }
+	
+	/** 効果音 */
+	void SetGearSESound(TArray<USoundBase*> inSound)
+	{
+		if (inSound.Num() <= 0)return;
+		
+		GearSESound.SetNum(inSound.Num());
+		
+		for (int32 i = 0; i < inSound.Num(); ++i)
+		{
+			if (inSound[i] == nullptr)continue;
+			/** 音が割り当てられていたら無視 */
+			if (GearSESound[i] != nullptr)continue;
+			GearSESound[i] = inSound[i];
+		}
+	}
 
 	/** ギアレベルの配列インデックス */
 	static const int32 kLv1Index = 0;
@@ -82,6 +101,12 @@ protected:
 	/** 持ち主のギアクラス */
 	UPROPERTY()
 	TObjectPtr<UGearBase> Owner;
+	
+	/** 効果音 
+	* 各レベルにセットする
+	*/
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<USoundBase>> GearSESound;
 
 private:
 

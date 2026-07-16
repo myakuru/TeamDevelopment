@@ -1,14 +1,14 @@
-# Default ignored files
+# デフォルトの無視対象ファイル
 /shelf/
 /workspace.xml
-# Rider ignored files
+# Rider の無視対象ファイル
 /.idea.ProjectNull.iml
 /contentModel.xml
 /modules.xml
 /projectSettingsUpdater.xml
-# Editor-based HTTP Client requests
+# エディターベースの HTTP クライアントリクエスト
 /httpRequests/
-# Ignored default folder with query files
+# 無視対象のデフォルトフォルダー (クエリファイルを含む)
 /queries/
 # Datasource local storage ignored files
 /dataSources/

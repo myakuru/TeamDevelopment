@@ -34,7 +34,7 @@ void UCrossLaserAttack::Initialize(const TObjectPtr<AActor>& Owner)
 
 }
 
-void UCrossLaserAttack::Execute()
+void UCrossLaserAttack::Execute(const FVector& InTargetLocation)
 {
 	CurrentAngle = 0.f;
 	SetIsActive(true);

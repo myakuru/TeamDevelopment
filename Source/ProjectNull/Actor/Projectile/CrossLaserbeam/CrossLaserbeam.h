@@ -9,6 +9,7 @@
 
 class UBoxComponent;
 class UEffectBase;
+class UPlayerRuntimeData;
 
 UCLASS(Blueprintable)
 class PROJECTNULL_API ACrossLaserbeam : public AActor
@@ -36,12 +37,17 @@ private:
 		const FHitResult& SweepResult);
 
 	static const int32 LaserbeamNum = 4;
-
+	
 	UPROPERTY(EditAnywhere,Instanced)
 	TArray<TObjectPtr<UBoxComponent>> BoxCompArray;
 
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<TObjectPtr<UEffectBase>>	NiagaraEffectArray;
-	
 
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
+	UPROPERTY(EditAnywhere)
+	float AttackPowerScale;
 };

@@ -161,6 +161,32 @@ AEnemyISMManager* UEnemyManagerSubsystem::GetISMManager(TSubclassOf<AEnemyISMMan
 	}
 }
 
+USoundBase* UEnemyManagerSubsystem::GetDamagedSound() const
+{
+	return ManagerConfig->DamagedSESound;
+}
+
+void UEnemyManagerSubsystem::DestroyAllEnemy()
+{
+	// FinalizeDeath中にEnemyGruntListが変更されても問題ないようにコピー
+	const TArray<TObjectPtr<AEnemyBase>> EnemyListCopy = EnemyGruntList;
+
+	for (AEnemyBase* Enemy : EnemyListCopy)
+	{
+		if (!IsValid(Enemy))
+		{
+			continue;
+		}
+
+		if (!Enemy->GetAliveFlg())
+		{
+			continue;
+		}
+
+		Enemy->FinalizeDeath();
+	}
+}
+
 float UEnemyManagerSubsystem::CalcDistance(const FVector& EnemyPos, const FVector& PlayerPos)
 {
 	return  FVector::DistSquared(EnemyPos, PlayerPos);

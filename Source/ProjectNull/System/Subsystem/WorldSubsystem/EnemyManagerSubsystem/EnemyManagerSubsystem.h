@@ -14,6 +14,8 @@ class AEnemyISMManager;
 class UEnemyISMManagerConfig;
 class UEnemyManagerConfig;
 
+class USoundManager;
+
 /// <summary>
 /// 敵管理クラス
 /// </summary>
@@ -66,6 +68,14 @@ public:
 	*	EnemyBaseのBeginPlayでManagerを探すための関数
 	*/
 	AEnemyISMManager* GetISMManager(TSubclassOf<AEnemyISMManager> ManagerClass) const;
+
+	/**
+	 * ダメージ効果音を返す
+	 */
+	USoundBase* GetDamagedSound() const;
+	
+	/** すべての敵を破壊する*/
+	void DestroyAllEnemy();
 
 private:
 

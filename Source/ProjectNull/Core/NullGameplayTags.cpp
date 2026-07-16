@@ -4,6 +4,5 @@ namespace NullGameplayTags
 {
 	// Cutscene
 	UE_DEFINE_GAMEPLAY_TAG(Cutscene_Intro,        "Cutscene.Intro");
-	UE_DEFINE_GAMEPLAY_TAG(Cutscene_BossEntrance, "Cutscene.BossEntrance");
-	UE_DEFINE_GAMEPLAY_TAG(Cutscene_Ending,       "Cutscene.Ending");
+	UE_DEFINE_GAMEPLAY_TAG(Cutscene_ExplsionGearLev4, "Cutscene.ExplosionGearLev4");
 }

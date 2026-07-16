@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "ProjectNull/System/Combat/CombatTypes/CombatTypes.h"
 #include "EnemyDataStruct.generated.h"
 
 // アニメーション用Enum
@@ -114,6 +115,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AttackDistance = 20.0f;
 
+	/**	追跡可能距離 */
+	UPROPERTY(EditAnywhere)
+	float ChaseDistance = 20.f;
+
 	/**	攻撃のインターバル(秒) */
 	UPROPERTY(EditAnywhere)
 	float AttackInterval = 1.f;
@@ -142,6 +147,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "AnimBlend")
 	float BlendSpeed = 1.2f;
 	
+	/**	発動したい攻撃の種類(攻撃リストのキーとしても使用) */
+	UPROPERTY(VisibleAnywhere, Category = "AttackType")
+	EEnemyAttackType AttackType = EEnemyAttackType::Attack1;
+
 	/** 生存フラグ*/
 	UPROPERTY()
 	bool IsAlive = true;

@@ -19,7 +19,6 @@ class PROJECTNULL_API UModelAfterimageTrailEffect : public UObject
 	GENERATED_BODY()
 public:
 	UModelAfterimageTrailEffect();
-public:
 
 	/**
 	 * @brief 更新処理

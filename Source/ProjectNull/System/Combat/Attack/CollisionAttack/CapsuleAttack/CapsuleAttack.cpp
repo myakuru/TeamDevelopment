@@ -36,11 +36,11 @@ void UCapsuleAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 			// オーバーラップ時、オーバーラップ抜け時の関数をセット
 			CapsuleComponent->OnComponentBeginOverlap.AddDynamic(
 				this,
-				&ThisClass::OnSphericalBeginOverlap
+				&ThisClass::OnCollisionBeginOverlap
 			);
 			CapsuleComponent->OnComponentEndOverlap.AddDynamic(
 				this,
-				&ThisClass::OnSphericalEndOverlap
+				&ThisClass::OnCollisionEndOverlap
 			);
 		}
 
@@ -48,9 +48,9 @@ void UCapsuleAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 	}
 }
 
-void UCapsuleAttack::Execute()
+void UCapsuleAttack::Execute(const FVector& InTargetLocation)
 {
-	UCollisionAttack::Execute();
+	UCollisionAttack::Execute(InTargetLocation);
 
 	if (!CapsuleCollision) { return; }
 	CapsuleCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);// 当たり判定有効化	
@@ -70,20 +70,4 @@ void UCapsuleAttack::Update(float InDeltaTime)
 	if (!IsActive()) { return; }
 
 	UCollisionAttack::Update(InDeltaTime);
-
-	if (auto CapsuleComponent = CapsuleCollision->GetCapsuleComponent())
-	{
-		DrawDebugCapsule(
-			GetWorld(),										// ワールドポインタ
-			CapsuleComponent->GetComponentLocation(),		// 中心座標
-			CapsuleComponent->GetScaledCapsuleHalfHeight(),	// 高さの半径
-			CapsuleComponent->GetScaledCapsuleRadius(),		// 半径
-			CapsuleComponent->GetComponentQuat(),			// 角度
-			FColor::Red,									// 色
-			false,											// 永続的に表示するか
-			1.f,											// 表示時間(負の値で1フレーム)
-			0,												// 優先度
-			2.f												// 線の太さ
-		);
-	}
 }

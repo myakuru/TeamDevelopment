@@ -3,7 +3,7 @@
 
 UCollisionAttack::UCollisionAttack()
 	:	Duration(1.f)
-	,	ElpsedTimer(0.f)
+	,	JustExecuteTime(0.f)
 {
 }
 
@@ -14,30 +14,27 @@ void UCollisionAttack::Update(const float InDeltaTime)
 
 	UAttackBase::Update(InDeltaTime);
 
-	// 継続時間を超えたら攻撃を終了
-	if (Duration < ElpsedTimer)
+	// 発動した瞬間から有効時間分経過していたら終了
+	if (GetWorld()->GetTimeSeconds() > Duration + JustExecuteTime)
 	{
 		Cancel();
 		return;
 	}
-
-	ElpsedTimer += InDeltaTime;
 }
 
-void UCollisionAttack::Execute()
+void UCollisionAttack::Execute(const FVector& InTargetLocation)
 {
-	SetIsActive(true);		// 攻撃有効化
-	SetCanExecute(false);	// 攻撃実行不可にする
-	ElpsedTimer = 0.f;		// 経過時間をリセット
+	SetIsActive(true);								// 攻撃有効化
+	SetCanExecute(false);							// 攻撃実行不可にする
+	JustExecuteTime = GetWorld()->GetTimeSeconds();	// 「発動した時間」として現在の時間を保存
 }
 
 void UCollisionAttack::Cancel()
 {
 	SetIsActive(false);		// 攻撃無効化
-	ElpsedTimer = 0.f;		// 経過時間をリセット
 }
 
-void UCollisionAttack::OnSphericalBeginOverlap(
+void UCollisionAttack::OnCollisionBeginOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
@@ -46,7 +43,7 @@ void UCollisionAttack::OnSphericalBeginOverlap(
 	const FHitResult& SweepResult
 )
 {
-	if (!OtherActor || !GetOwnerActor()
+	if (!OtherActor || !GetOwnerActor().IsValid()
 		|| OtherActor == GetOwnerActor()) {
 		return;
 	}
@@ -59,24 +56,30 @@ void UCollisionAttack::OnSphericalBeginOverlap(
 			interface->ApplyDamaged(GetFinalDamage());
 			interface->ApplyKnockBack(GetOwnerActor()->GetActorLocation());
 			AddHitActors(OtherActor);
+			
+			// 攻撃がHITした瞬間のデリゲートの発火
+			OnOverlapInDelegate.Broadcast(OtherActor);
 		}
 	}
 }
 
-void UCollisionAttack::OnSphericalEndOverlap(
+void UCollisionAttack::OnCollisionEndOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex
 )
 {
-	if (!OtherActor || !GetOwnerActor()
+	if (!OtherActor || !GetOwnerActor().IsValid()
 		|| OtherActor == GetOwnerActor()) {
 		return;
 	}
-
+	
 	if (GetHitActors().Contains(OtherActor))
 	{
 		RemoveActor(OtherActor);
+		
+		// HIT判定から抜け出した瞬間のデリゲートの発火
+		OnOverlapOutDelegate.Broadcast(OtherActor);
 	}
 }

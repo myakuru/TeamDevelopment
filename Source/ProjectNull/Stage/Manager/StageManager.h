@@ -5,6 +5,7 @@
 #include <ProjectNull/SaveGame/StageProgressData.h>
 
 #include <ProjectNull/Data/Result/ResultData/ResultData.h>
+#include <ProjectNull/System/Timer/FGameTimer.h>
 #include "StageManager.generated.h"
 
 class UStageDataAsset;
@@ -28,11 +29,22 @@ public:
 
 	void SaveToData(UMySaveGame* inSaveGame);
 
+	void SetBossWave();
+
 	UFUNCTION()
 	void InGameInitialize(int32 inNowStageIndex);
 
 	UFUNCTION()
 	void InGameFinalize();
+
+	/** ステージ制限時間のカウントダウンを開始する（制限時間は StageDataAsset から取得） */
+	void StartStageTimer();
+
+	/** ステージタイマーの毎秒通知を購読するためのデリゲート参照（表示Widget用） */
+	FOnTimerTick& GetOnStageTimerTick() { return StageTimer.OnTick; }
+
+	/** ステージタイマーの終了通知を購読するためのデリゲート参照（表示Widget用） */
+	FOnTimerFinished& GetOnStageTimerFinished() { return StageTimer.OnFinished; }
 
 	UFUNCTION()
 	void OutGameInitialize();
@@ -89,6 +101,9 @@ private:
 
 	/** クリア時にResultManagerに渡す情報 */
 	FResultData ResultData;
+
+	/** ステージ制限時間のタイマー */
+	FGameTimer StageTimer;
 	
 	/** BGM */
 	UPROPERTY(EditAnywhere,Category = "Sound")

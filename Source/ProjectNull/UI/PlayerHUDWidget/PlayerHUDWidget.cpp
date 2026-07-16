@@ -28,12 +28,16 @@
 
 void UPlayerHUDWidget::NativeConstruct()
 {
-	//タイマー設定
-	GameTimer->StartTimer(
-		GetWorld()->GetGameInstance<USuperGameInstance>()
-		->GetStageManagerSubsystem()->GetStageDataAsset()->GetStageTimerLimit());
-
 	Super::NativeConstruct();
+
+	//タイマー開始（カウントダウンはStageManagerが所有）
+	/*if (USuperGameInstance* GI = GetWorld()->GetGameInstance<USuperGameInstance>())
+	{
+		if (UStageManager* StageManager = GI->GetStageManagerSubsystem())
+		{
+			StageManager->StartStageTimer();
+		}
+	}*/
 
 	// スキルは3つある想定で、配列にまとめる(今後増やすとき、ここに追加)
 	SkillWidgets = { SkillWidget_0,SkillWidget_1,SkillWidget_2 };
@@ -66,6 +70,14 @@ void UPlayerHUDWidget::SetPlayerExp(float CurrentExp, float NextLevelExp)
 	if (PlayerExpBar)
 	{
 		PlayerExpBar->SetExp(CurrentExp, NextLevelExp);
+	}
+}
+
+void UPlayerHUDWidget::SetExpRainbowVisible(bool bVisible)
+{
+	if (PlayerExpBar)
+	{
+		PlayerExpBar->SetRainbowVisible(bVisible);
 	}
 }
 

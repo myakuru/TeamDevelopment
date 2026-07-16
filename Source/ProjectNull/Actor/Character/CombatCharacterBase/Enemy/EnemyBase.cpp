@@ -2,22 +2,20 @@
 #include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StateTreeComponent.h"
-#include "Components/SkeletalMeshComponent.h"
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Utility/StateMachine/StateMachine.h>
-#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
-#include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
+
+#include "ProjectNull/Sound/SoundManager.h"
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -59,11 +57,11 @@ void AEnemyBase::NotifyChangedStateEnum(EEnemyState a_TargetState)
 	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
 }
 
-void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse)
+void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse InNewResponse)
 {
 	if (!CapsuleComponent) { return; }
 
-	CapsuleComponent->SetCollisionResponseToChannel(Channel, NewResponse);
+	CapsuleComponent->SetCollisionResponseToChannel(Channel, InNewResponse);
 }
 
 float AEnemyBase::GetFinalAttackPower() const
@@ -137,15 +135,12 @@ void AEnemyBase::UpdateParams()
 		// 基礎攻撃力と倍率をセット
 		EnemyRuntimeData->SetBaseAttackPower(EnemyStatus.AttackScaling.Base);
 		EnemyRuntimeData->SetAttackScaling(AttackScale);
-
-		// 攻撃のインターバル(秒)をセット
-		EnemyRuntimeData->SetAttackInterval(EnemyStatus.AttackInterval);
 	}
 }
 
-void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
+void AEnemyBase::SetEnemyState(EEnemyState InTargetState)
 {
-	EnemyStatus.StateTag = a_TargetState;
+	EnemyStatus.StateTag = InTargetState;
 }
 
 void AEnemyBase::NotfyAttackFinishTime()
@@ -157,6 +152,13 @@ void AEnemyBase::NotfyAttackFinishTime()
 void AEnemyBase::ApplyDamaged(float InDamaged)
 {
 	if (!EnemyRuntimeData) { return; }
+	
+	//ダメージ効果音
+	GetWorld()->GetGameInstance<USuperGameInstance>()->
+	GetSoundManager()->PlayAtLocation(
+		EnemyManager->GetDamagedSound(),
+		GetActorLocation()
+	);
 
 	EnemyRuntimeData->AddHealth(-InDamaged);		// 渡された値分、FinalHPを減算
 	UE_LOG(LogTemp, Error, TEXT("Damage : %f"),InDamaged);
@@ -210,7 +212,7 @@ void AEnemyBase::FinalizeDeath()
 	if (USuperGameInstance* GameInstance =
 		GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
-		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
+		//GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
 		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
 
@@ -225,8 +227,7 @@ void AEnemyBase::FinalizeDeath()
 
 void AEnemyBase::CheckCanAttack()
 {
-	if (!EnemyRuntimeData||
-		!EnemyRuntimeData->CanAttack()) { return; }
+	if (!EnemyRuntimeData) { return; }
 
 	// 既に攻撃中なら処理を飛ばす
 	if (EnemyStatus.StateTag == EEnemyState::Attack||
@@ -234,7 +235,7 @@ void AEnemyBase::CheckCanAttack()
 
 
 	// プレイヤーとの距離が攻撃可能距離内か
-	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
+	if (IsInAttackDistance())
 	{
 		NotifyChangedStateEnum(EEnemyState::Attack);
 	}
@@ -262,7 +263,7 @@ FRotator AEnemyBase::CalculateRotationToMoveDirection(const FRotator& CurrentRot
 							RotationInterpSpeed);
 }
 
-void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
+void AEnemyBase::Activate(const FVector& InLocalPos, UEnemyDataAsset* InData)
 {
 	// ヌルチェック
 	check(InData != nullptr);
@@ -300,7 +301,7 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	// ゲームの進行に合わせて敵パラメータを設定
 	UpdateParams();
 
-	SetActorLocation(LocalPos);
+	SetActorLocation(InLocalPos);
 
 	/** ISMManagerへの自己登録*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
@@ -349,20 +350,29 @@ void AEnemyBase::Deactivate()
 	}
 }
 
+bool AEnemyBase::IsInAttackDistance()
+{
+	return EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance);
+}
+
+bool AEnemyBase::IsInChaseDistance()
+{
+	return EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.ChaseDistance);
+}
+
 void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)
 {
 	if (!InData) { return; }
 
 	EnemyStatus.MoveSpeed = InData->MoveSpeed;
 	EnemyStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
-	EnemyStatus.FinalHP = InData->FinalHP;
 	EnemyStatus.HPScaling = InData->HPScaling;
-	EnemyStatus.FinalAttack = InData->FinalAttack;
 	EnemyStatus.AttackScaling = InData->AttackScaling;
 	EnemyStatus.KnockBackWeight = InData->KnockBackWeight;
 	EnemyStatus.Exp = InData->Exp;
 	EnemyStatus.GearEnergy = InData->GearEnergy;
 	EnemyStatus.AttackDistance = InData->AttackDistance;
+	EnemyStatus.ChaseDistance = InData->ChaseDistance;
 }
 
 void AEnemyBase::SpawnDeathEffect()
@@ -399,8 +409,8 @@ void AEnemyBase::SpawnDeathExperience()
 	if (UItemManagerSubsystem* ItemSubsystem =
 		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
 	{
-		const FLinearColor Color = EnemyStatus.ExpColor;
-		const float Size = EnemyStatus.ExpSize;
+		const FLinearColor Color	= EnemyStatus.ExpColor;
+		const float Size			= EnemyStatus.ExpSize;
 
 		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
 			GetActorLocation(),
@@ -422,40 +432,40 @@ void AEnemyBase::PlayAnimation(int32 InNextAnimIndex, bool InbLoop,float InBlend
 {
 	if (!EnemyManager)
 	{
-		UE_LOG(LogTemp, Error, TEXT("EnemyManager is null"));
+		//UE_LOG(LogTemp, Error, TEXT("EnemyManager is null"));
 		return;
 	}
 
 	if (!ISMManagerClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ISMManagerClass is null"));
+		//UE_LOG(LogTemp, Error, TEXT("ISMManagerClass is null"));
 		return;
 	}
 
 	AEnemyISMManager* ISMManager = EnemyManager->GetISMManager(ISMManagerClass);
 	if (!ISMManager)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ISMManager not found"));
+		//UE_LOG(LogTemp, Error, TEXT("ISMManager not found"));
 		return;
 	}
 
 	UEnemyAnimDataAsset* AnimData = ISMManager->GetAnimDataAsset();
 	if (!AnimData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("AnimDataAsset is null"));
+		//UE_LOG(LogTemp, Error, TEXT("AnimDataAsset is null"));
 		return;
 	}
 
 	if (!AnimData->Animations.IsValidIndex(InNextAnimIndex))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid AnimIndex: %d / Num: %d"),
-			InNextAnimIndex, AnimData->Animations.Num());
+		/*UE_LOG(LogTemp, Error, TEXT("Invalid AnimIndex: %d / Num: %d"),
+			InNextAnimIndex, AnimData->Animations.Num());*/
 		return;
 	}
 
 	if (!EnemyRuntimeData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("EnemyRuntimeData is null"));
+		//UE_LOG(LogTemp, Error, TEXT("EnemyRuntimeData is null"));
 		return;
 	}
 

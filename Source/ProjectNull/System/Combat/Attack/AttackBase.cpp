@@ -6,7 +6,7 @@
 
 UAttackBase::UAttackBase():
 		OwnerActor(nullptr),
-		bCanExecute(true),
+		bCanExecute(false),
 		bIsActive(false),
 		bAbsoluteScale(false),
 		bAbsoluteRotation(false),
@@ -17,7 +17,7 @@ UAttackBase::UAttackBase():
 void UAttackBase::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	OwnerActor		= Owner;
-	if (!OwnerActor) { return; }
+	if (OwnerActor.IsValid()) { return; }
 	
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OwnerActor))
@@ -26,7 +26,7 @@ void UAttackBase::Initialize(const TObjectPtr<AActor>& Owner)
 		FinalDamage = AttackPower + Interface->GetFinalAttackPower();
 	}
 
-	RootComponent	= NewObject<USceneComponent>(OwnerActor);
+	RootComponent	= NewObject<USceneComponent>(OwnerActor.Get());
 	if (!RootComponent) { return; }
 	RootComponent->RegisterComponent();
 

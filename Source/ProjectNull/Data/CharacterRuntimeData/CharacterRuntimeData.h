@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h"
 #include "CharacterRuntimeData.generated.h"
 
 
@@ -22,11 +23,7 @@ public:
 	}
 
 	/** 基礎攻撃力とスケール値から最終的な攻撃力を算出 */
-	float GetFinalPower()
-	{
-		Final = Base * Scaling;
-		return Final;
-	}
+	float GetFinalPower();
 
 	/**	基礎攻撃力 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
@@ -112,8 +109,11 @@ public:
 
 	/** 基礎攻撃力とスケール値から最終的な攻撃力を算出 */
 	float GetFinalAttackPower(float Scaling)  { return Attack.GetFinalPower() * Scaling; }
-	float GetCharacterAttackPower() { return Attack.GetFinalPower(); }
+	float GetCharacterAttackPower();
 	/* End Getters~*/
+	
+	/** 効果種別ごとの現在倍率を取得（未設定なら 1.0） */
+	float GetEffectMultiplier(EUpgradeEffectType Type) const;
 
 protected:
 
@@ -124,4 +124,7 @@ protected:
 	/** 攻撃力関連Runtimeデータ構造体 */
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	FAttackRuntimeData Attack;
+	
+	/** 効果種別 -> 現在の倍率。効果を増やしてもここに項目が増えるだけで済む */
+	TMap<EUpgradeEffectType, float> EffectMultipliers;
 };

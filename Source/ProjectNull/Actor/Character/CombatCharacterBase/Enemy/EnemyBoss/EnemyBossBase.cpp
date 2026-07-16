@@ -2,12 +2,15 @@
 #include "EnemyBossBase.h"
 #include "AIC_EnemyBoss.h"
 #include "Components/StateTreeComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
 #include "Perception/PawnSensingComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Stage/Manager/StageManager.h>
 
@@ -38,11 +41,11 @@ void AEnemyBossBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 視界トリガー：プレイヤーが視界に入ったら追尾対象に設定
-	if (IsValid(PawnSensingComp))
-	{
-		PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBossBase::OnSeePlayer);
-	}
+	//// 視界トリガー：プレイヤーが視界に入ったら追尾対象に設定
+	//if (IsValid(PawnSensingComp))
+	//{
+	//	PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyBossBase::OnSeePlayer);
+	//}
 
 	// 攻撃トリガー：ダメージを受けたら攻撃者を追尾対象に設定
 	OnTakeAnyDamage.AddDynamic(this, &AEnemyBossBase::HandleTakeAnyDamage);
@@ -120,6 +123,16 @@ void AEnemyBossBase::Tick(float DeltaTime)
 			UE_LOG(LogTemp, Warning, TEXT("CurrentMontage = None"));
 		}
 	}
+
+	if (DeathMaterialChangeFlg)
+	{
+		BossDeathMaterialChange();
+	}
+
+	APawn* PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (!PPlayerPawn) { return; }
+
+	SetTargetActor(PPlayerPawn);
 }
 
 // ------------------------------------------------------------------------------------
@@ -223,20 +236,22 @@ void AEnemyBossBase::SetEnemyBossStatusData(UEnemyBossDataAsset* InData)
 {
 	if (!InData) { return; }
 
-	EnemyBossStatus.MoveSpeed			= InData->MoveSpeed;
+	EnemyBossStatus.MoveSpeed = InData->MoveSpeed;
 	EnemyBossStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
-	EnemyBossStatus.FinalHP				= InData->FinalHP;
-	EnemyBossStatus.FinalAttack			= InData->FinalAttack;
-	EnemyBossStatus.KnockBackWeight		= InData->KnockBackWeight;
-	EnemyBossStatus.Exp					= InData->Exp;
-	EnemyBossStatus.GearEnergy			= InData->GearEnergy;
+	EnemyBossStatus.FinalHP = InData->FinalHP;
+	EnemyBossStatus.FinalAttack = InData->FinalAttack;
+	EnemyBossStatus.KnockBackWeight = InData->KnockBackWeight;
+	EnemyBossStatus.Exp = InData->Exp;
+	EnemyBossStatus.GearEnergy = InData->GearEnergy;
 }
 
 void AEnemyBossBase::ApplyLocalHitPos(const FVector& HitWorldLocation)
 {
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	if (!IsValid(MeshComp))
-	{ return; }
+	{
+		return;
+	}
 
 	// ワールド座標のヒット位置を、ボスメッシュのローカル座標へ変換
 	const FVector HitLocalPos = MeshComp->GetComponentTransform().InverseTransformPosition(HitWorldLocation);
@@ -255,7 +270,7 @@ void AEnemyBossBase::ApplyLocalHitPos(const FVector& HitWorldLocation)
 
 		MID->SetScalarParameterValue(TEXT("HitRadius"), HitRadius);
 		MID->SetScalarParameterValue(TEXT("HitPower"), HitPower);
-		MID->SetVectorParameterValue(TEXT("HitColor"), FLinearColor(HitColor.X,HitColor.Y,HitColor.Z, 1.0f));
+		MID->SetVectorParameterValue(TEXT("HitColor"), FLinearColor(HitColor.X, HitColor.Y, HitColor.Z, 1.0f));
 		MID->SetScalarParameterValue(TEXT("NoiseScale"), NoiseScale);
 		MID->SetScalarParameterValue(TEXT("NoisePower"), NoisePower);
 		MID->SetScalarParameterValue(TEXT("HitEmissivePower"), HitEmissivePower);
@@ -290,6 +305,32 @@ void AEnemyBossBase::BossFinalize()
 
 	//SpawnDeathEffect();
 
+	if (DeathEffect)
+	{
+		FTransform AdjustedTransform = GetActorTransform();
+		FRotator Rot = AdjustedTransform.GetRotation().Rotator();
+		Rot.Yaw -= 90.0f;
+		AdjustedTransform.SetRotation(Rot.Quaternion());
+
+		FVector Loc = AdjustedTransform.GetLocation();
+		Loc.Z -= 90.0f;
+		AdjustedTransform.SetLocation(Loc);
+
+		FTransform MeshTransform = GetMesh()->GetComponentTransform();
+
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			DestroyEffect,
+			MeshTransform.GetLocation(),
+			MeshTransform.Rotator(),
+			MeshTransform.GetScale3D(),
+			true,   // bAutoDestroy
+			true,   // bAutoActivate
+			ENCPoolMethod::None,
+			true    // bPreCullCheck
+		);
+	}
+
 	DeathEffect->ReleaseRef();
 
 	// StateTreeを停止
@@ -298,10 +339,64 @@ void AEnemyBossBase::BossFinalize()
 		StateTreeComp->StopLogic(TEXT("Deactivate"));
 	}
 
-	if (USuperGameInstance* GameInstance =
+	/*if (USuperGameInstance* GameInstance =
 		GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
 		GameInstance->GetStageManagerSubsystem()->InGameFinalize();
+	}*/
+
+	if (UEnemyManagerSubsystem* EnemyManager =
+		GetWorld()->GetSubsystem<UEnemyManagerSubsystem>())
+	{
+		EnemyManager->DestroyAllEnemy();
+	}
+
+	if (auto* GameProgress = GetWorld()->GetSubsystem<UGameProgressSubsystem>())
+	{
+		GameProgress->AddKillBossCount();
+	}
+}
+
+void AEnemyBossBase::BossDeathMaterialChange()
+{
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (!IsValid(MeshComp))
+	{
+		return;
+	}
+
+	// 変化させるマテリアルの中心を決める（ソケットから）
+	//const FVector StartLocalPos = MeshComp->GetSocketTransform(MaterialNodeName).GetTranslation();
+
+	FVector StartLocalPos =
+		MeshComp->GetSocketTransform(
+			MaterialNodeName,
+			RTS_Component
+		).GetLocation();
+
+	StartLocalPos = GetActorLocation();
+
+	for (UMaterialInstanceDynamic* MID : DynamicMaterials)
+	{
+		if (!IsValid(MID))
+		{
+			continue;
+		}
+
+		MID->SetVectorParameterValue(
+			TEXT("HitLocalPos"),
+			FLinearColor(StartLocalPos.X, StartLocalPos.Y, StartLocalPos.Z, 1.0f)
+		);
+
+		//HitRadius += RadiusOffset;
+		//HitEmissivePower += HitEmissivePowerOffset;
+
+		MID->SetScalarParameterValue(TEXT("HitRadius"), HitRadius);
+		MID->SetScalarParameterValue(TEXT("HitPower"), HitPower);
+		MID->SetVectorParameterValue(TEXT("HitColor"), FLinearColor(HitColor.X, HitColor.Y, HitColor.Z, 1.0f));
+		MID->SetScalarParameterValue(TEXT("NoiseScale"), NoiseScale);
+		MID->SetScalarParameterValue(TEXT("NoisePower"), NoisePower);
+		MID->SetScalarParameterValue(TEXT("HitEmissivePower"), HitEmissivePower);
 	}
 }
 

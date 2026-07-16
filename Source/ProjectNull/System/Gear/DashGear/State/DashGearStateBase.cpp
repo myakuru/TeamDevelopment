@@ -1,6 +1,8 @@
 ﻿
 #include "DashGearStateBase.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
 
 #include <ProjectNull/Actor/Effect/EffectBase.h>
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
@@ -56,7 +58,8 @@ void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 	UGearStateBase::Execute(CurrentGearLevel);
 
 	ExecuteDash();
-
+	
+	DashGear->Execute(CurrentGearLevel);
 }
 
 void UDashGearStateBase::Update(float DeltaTime)
@@ -76,7 +79,14 @@ void UDashGearStateBase::ExecuteDash()
 {
 	if (!Player || 
 		!DashGear) { return; }
-
+	
+	//ダッシュ効果音
+	if (GearSESound.IsValidIndex(SEIndex::DashSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::DashSESoundIndex]);
+	}
+		
 	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
 	if (!GroundAlignmentComp) { return; }
 
@@ -104,12 +114,9 @@ void UDashGearStateBase::ExecuteDash()
 		return;
 	}
 
-	DashGear->SetSphereRadius(DashSphereRadius);
-
 	InitializeStartDashData(RootComp);
 	PlayDashNiagaraEffect(RootComp);
 	PlayDashAnimation();
-	SetSphereCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetEnableSpawnAfterimage(true);
 
 	Player->SetTargetCameraLagSpeed(TargetCameraLagSpeed);
@@ -119,7 +126,6 @@ void UDashGearStateBase::EndDash()
 {
 	BlendOutDashAnimation();
 	DeactivateNiagaraEffect();
-	SetSphereCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetEnableSpawnAfterimage(false);
 
 	if (!Player) { return; }
@@ -184,12 +190,6 @@ void UDashGearStateBase::BlendOutDashAnimation()
 	if (!PlayerAnimInstance) { return; }
 
 	PlayerAnimInstance->Montage_Stop(MontageBlendOutTime);
-}
-
-void UDashGearStateBase::SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnabled)
-{
-	if (!DashGear) { return; }
-	DashGear->SetSphereCollisionEnabled(InEnabled);
 }
 
 void UDashGearStateBase::SetEnableSpawnAfterimage(bool bInEnableSpawn)

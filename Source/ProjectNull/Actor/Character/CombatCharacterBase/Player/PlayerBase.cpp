@@ -31,7 +31,10 @@ APlayerBase::APlayerBase():
 		AutoAttack(nullptr),
 		MaterialCollectionUpdater(nullptr),
 		CutsceneComponent(nullptr),
-		SuperGameInstance(nullptr)
+		SuperGameInstance(nullptr),
+		NormalStateCameraLagSpeed(0.f),
+		TargetCameraLagSpeed(0.f),
+		CameraLagInterpSpeed(0.f)
 {
 	// ================================================================
 	// プレイヤーの初期化
@@ -99,7 +102,13 @@ void APlayerBase::BeginPlay()
 	// ゲーム全体で共有されるデータや機能を管理するクラスの初期化
 	// ================================================================
 	SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
 
+	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (!PlayerRuntimeData) { return; }
+	PlayerRuntimeData->SetOwner(this);
+	PlayerRuntimeData->UpdateStatus();
+	
 	// ================================================================
 	// 自動攻撃の初期化
 	// ================================================================
@@ -122,7 +131,7 @@ void APlayerBase::BeginPlay()
 void APlayerBase::Tick(float DeltaTime)
 {
 	ACombatCharacterBase::Tick(DeltaTime);
-
+	
 	// 自動攻撃の更新
 	if (AutoAttack) { AutoAttack->Update(DeltaTime); }
 

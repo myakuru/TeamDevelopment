@@ -6,7 +6,14 @@
 #include <ProjectNull/Actor/Effect/EffectBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 
-ALaserbeam::ALaserbeam()
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+
+ALaserbeam::ALaserbeam():
+	BoxComp(nullptr),
+	NiagaraEffectArray(TArray<TObjectPtr<UEffectBase>>()),
+	PlayerRuntimeData(nullptr),
+	AttackPowerScale(1.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -31,7 +38,9 @@ ALaserbeam::ALaserbeam()
 void ALaserbeam::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
 }
 
 void ALaserbeam::Tick(float DeltaTime)
@@ -57,10 +66,12 @@ void ALaserbeam::OnLaserbeamBeginOverlap(
 		return;
 	}
 
+	if (!PlayerRuntimeData) { return;}
+	
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		Interface->ApplyDamaged();
+		Interface->ApplyDamaged(PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale));
 		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }

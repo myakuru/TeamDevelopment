@@ -1,6 +1,9 @@
 ﻿
 #include "LaserGearState_Lv3.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
+
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/System/Combat/Attack/CrossLaserAttack/CrossLaserAttack.h>
 
@@ -28,6 +31,13 @@ void ULaserGearState_Lv3::Execute(int32 CurrentGearLevel)
 	ULaserGearStateBase::Execute(CurrentGearLevel);
 	if (!CrossLaserAttack) { return; }
 	CrossLaserAttack->Execute();
+	
+	//効果音
+	if (GearSESound.IsValidIndex(SEIndex::CrossLaserSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::CrossLaserSESoundIndex]);
+	}
 }
 
 void ULaserGearState_Lv3::Update(float DeltaTime)

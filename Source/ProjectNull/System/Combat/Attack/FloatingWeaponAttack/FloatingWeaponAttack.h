@@ -25,20 +25,19 @@ class PROJECTNULL_API UFloatingWeaponAttack final : public UAttackBase
 {
 	GENERATED_BODY()
 public:
-
 	UFloatingWeaponAttack();
-
-public:
-
+	
 	void Initialize(const TObjectPtr<AActor>& Owner)			override;
 	void Update(float DeltaTime)								override;
 
 	/**
 	 * @brief 有効化処理
 	 */
-	virtual void Execute()override;
+	virtual void Execute(const FVector& InTargetLocation = FVector::ZeroVector)override;
 
 
+	void SetVisibility(bool bVisibility);
+	
 	bool IsAttackStateStep();
 
 	float TotalTransitionStateTime();
@@ -134,4 +133,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float RotationInterpSpeed;
+	
+	bool bEffectVisibility;
 };

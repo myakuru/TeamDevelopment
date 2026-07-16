@@ -45,7 +45,12 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 
 void AEnemyGruntBase::TransitionIdleToWalk()
 {
-	if (EnemyStatus.StateTag != EEnemyState::Idle) { return; }
+	// 「棒立ち」で無いか、「追跡可能距離内」なら処理を飛ばす
+	if (EnemyStatus.StateTag != EEnemyState::Idle ||
+		IsInChaseDistance())
+	{
+		return;
+	}
 
 	NotifyChangedStateEnum(EEnemyState::Walk);
 }

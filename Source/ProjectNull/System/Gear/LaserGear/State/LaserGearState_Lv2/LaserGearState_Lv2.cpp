@@ -3,6 +3,9 @@
 
 #include "GameFramework/ProjectileMovementComponent.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
+
 #include <ProjectNull/Actor/Projectile/ProjectileBase.h>
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
@@ -39,6 +42,13 @@ void ULaserGearState_Lv2::Execute(int32 CurrentGearLevel)
 	if (!ReflectiveLaserBulletShooter) { return; }
 
 	ReflectiveLaserBulletShooter->ShotTargetedLaserBullets(Player->GetActorLocation());
+	
+	/** 効果音 */
+	if (GearSESound.IsValidIndex(SEIndex::LaserGunSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::LaserGunSESoundIndex]);
+	}
 }
 
 void ULaserGearState_Lv2::Update(float DeltaTime)

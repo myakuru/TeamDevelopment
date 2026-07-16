@@ -1,15 +1,62 @@
 ﻿
 #include "GameProgressSubsystem.h"
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Stage/Manager/StageManager.h>
 
+void UGameProgressSubsystem::Initialize(
+	FSubsystemCollectionBase& Collection
+)
+{
+	Super::Initialize(Collection);
+
+	KillCount	= 0;
+	Phase		= 0;
+}
+
+void UGameProgressSubsystem::Deinitialize()
+{
+	OnPhaseChanged.Clear();
+
+	Super::Deinitialize();
+}
+
+void UGameProgressSubsystem::Tick(float DeltaTime)
+{
+	if (!GameClearFlg)return;
+
+	ClearCountTime += DeltaTime;
+	if (ClearCountTime >= ClearCountDuration)
+	{
+		if (USuperGameInstance* GameInstance = GetWorld()->GetGameInstance<USuperGameInstance>())
+		{
+			GameInstance->GetStageManagerSubsystem()->InGameFinalize();
+		}
+	}
+}
 
 void UGameProgressSubsystem::AddKillCount(int32 Value)
 {
+	if (FinalWave || BossWave) { return; }
 	// ���Z����
 	KillCount += Value;
-	UE_LOG(LogTemp, Warning, TEXT("hi KillCount"), KillCount);
 
 	// �t�F�[�Y�X�V���\�b�h��Ă�
 	UpdatePhase();
+	OnKillCountChanged.Broadcast(KillCount, PhaseThresholds);
+}
+
+void UGameProgressSubsystem::AddTyuuBossCount(int32 Value)
+{
+	KillCount += Value;
+	UpdatePhase();
+	OnKillCountChanged.Broadcast(KillCount, PhaseThresholds);
+}
+
+void UGameProgressSubsystem::AddKillBossCount(int32 Value)
+{
+	KillCount += Value;
+	UpdatePhase();
+	OnKillCountChanged.Broadcast(KillCount, PhaseThresholds);
 }
 
 void UGameProgressSubsystem::SetPhase(int NewPhase)
@@ -19,18 +66,29 @@ void UGameProgressSubsystem::SetPhase(int NewPhase)
 	OnPhaseChanged.Broadcast(Phase);
 }
 
+void UGameProgressSubsystem::SetPhaseThresholds(int32 Num)
+{
+	PhaseThresholds = Num;
+}
+
 void UGameProgressSubsystem::UpdatePhase() 
 {
-	int32 killCount = KillCount;
+	if (FinalWave)
+	{
+		SetPhase(Phase + 1);
+		KillCount = 0;
+	}
 
-	// �|�����G���Ɋ�Â��Ăǂ̃t�F�[�Y�Ȃ̂�����肷��
-	for (int32 phaseNum = 0; phaseNum < PhaseThresholds.Num(); ++phaseNum) {
+	if (BossWave)
+	{
+		GameClearFlg = true;
+	}
 
-		killCount -= PhaseThresholds[phaseNum];
-		// �t�F�[�Y臒l�������ꍇ�̓t�F�[�Y��X�V����
-		if (killCount < 0) {
-			Phase = phaseNum;
-			break;
-		}
+
+	if (KillCount >= PhaseThresholds)
+	{
+		SetPhase(Phase + 1);
+		KillCount = 0;
 	}
 }
+

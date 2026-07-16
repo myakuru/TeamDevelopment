@@ -110,10 +110,7 @@ void AAutoAttackHitActor::PerformHitSweep()
 		if (!HitActor) { continue; }
 		
 		// 既に当たった敵は除外
-		if (HitActors.Contains(HitActor))
-		{
-			continue;
-		}
+		if (HitActors.Contains(HitActor)) { continue; }
 
 		HitActors.Add(HitActor);
 

@@ -6,6 +6,10 @@
 
 #include "DashGearStateBase.generated.h"
 
+namespace SEIndex {
+	inline constexpr int32 DashSESoundIndex	= 0;
+}
+
 /** ナイアガラシステムクラス */
 class UNiagaraSystem;
 
@@ -45,8 +49,6 @@ protected:
 
 	void PlayDashAnimation();
 	void BlendOutDashAnimation();
-
-	void SetSphereCollisionEnabled(const ECollisionEnabled::Type InEnabled);
 
 	void SetEnableSpawnAfterimage(bool bInEnableSpawn);
 

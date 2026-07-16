@@ -84,6 +84,7 @@ public:
 	AEnemySpawner();
 
 	void SetFinalPhase();
+	void SetBossPhase();
 
 protected:
 	virtual void BeginPlay() override;
@@ -151,4 +152,7 @@ private:
 
 	/** 最終フェーズチェック*/
 	bool FinalPhase = false;
+
+	/** ボス専用フェーズチェック*/
+	bool BossPhase = false;
 };

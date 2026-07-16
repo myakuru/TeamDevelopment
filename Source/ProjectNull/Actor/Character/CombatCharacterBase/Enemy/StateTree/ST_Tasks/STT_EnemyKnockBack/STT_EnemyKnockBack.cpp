@@ -13,7 +13,6 @@ USTT_EnemyKnockBack::USTT_EnemyKnockBack(const FObjectInitializer& a_ObjInit)
 	,	KnockBackVelocity(FVector::ZeroVector)
 	,	MoveDir(FVector::ZeroVector)
 	,	TargetLocation(FVector::ZeroVector)
-	,	EnemyWeight(0.0f)
 	,	DamageRatio(0.0f)
 {
 	// Tick処理有効化

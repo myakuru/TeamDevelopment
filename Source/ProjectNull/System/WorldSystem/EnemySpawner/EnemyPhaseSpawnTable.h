@@ -20,6 +20,10 @@ struct FPhaseSpawnWave
     UPROPERTY(EditAnywhere)
     int32 PhaseCreateEnemyNum = 1;
 
+	// フェーズの上昇に必要な倒した敵の数
+	UPROPERTY(EditAnywhere)
+	int32 PhaseUpDeathEnemyCount = 0;
+
     // そのフェーズで使うフェーズデータ
     UPROPERTY(EditAnywhere)
     TObjectPtr<UEnemyWaveDataAsset> WaveData = nullptr;
@@ -39,6 +43,14 @@ public:
 	// 最終ウェーブの設定
 	UPROPERTY(EditAnywhere)
 	int FinalWave = 0;
+
+	// ボス専用ウェーブの設定
+	UPROPERTY(EditAnywhere)
+	int BossWave = 0;
+
+	// 中ボス
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemyBossBase> StageTyuuBoss;
 
 	// 出現するボス
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

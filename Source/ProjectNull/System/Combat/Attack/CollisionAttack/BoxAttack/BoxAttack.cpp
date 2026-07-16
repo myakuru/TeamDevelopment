@@ -36,11 +36,11 @@ void UBoxAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 			// オーバーラップ時、オーバーラップ抜け時の関数をセット
 			BoxComponent->OnComponentBeginOverlap.AddDynamic(
 				this,
-				&ThisClass::OnSphericalBeginOverlap
+				&ThisClass::OnCollisionBeginOverlap
 			);
 			BoxComponent->OnComponentEndOverlap.AddDynamic(
 				this,
-				&ThisClass::OnSphericalEndOverlap
+				&ThisClass::OnCollisionEndOverlap
 			);
 		}
 
@@ -48,9 +48,9 @@ void UBoxAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 	}
 }
 
-void UBoxAttack::Execute()
+void UBoxAttack::Execute(const FVector& InTargetLocation)
 {
-	UCollisionAttack::Execute();
+	UCollisionAttack::Execute(InTargetLocation);
 
 	if (!BoxCollision) { return; }
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);// 当たり判定有効化	
@@ -70,19 +70,4 @@ void UBoxAttack::Update(const float InDeltaTime)
 	if (!IsActive()) { return; }
 
 	UCollisionAttack::Update(InDeltaTime);
-
-	// デバッグ表示
-	if (auto BoxComponent = BoxCollision->GetBoxComponent())
-	{
-		DrawDebugBox(
-			GetWorld(),								// ワールドポインタ
-			BoxComponent->GetComponentLocation(),	// 中心のワールド座標
-			BoxComponent->GetScaledBoxExtent(),		// 範囲
-			FColor::Red,							// 色
-			false,									// 永続的に表示するか
-			1.f,									// 表示時間（負の値で1フレーム）
-			0,										// 優先度
-			2.f										// 線の太さ
-		);
-	}
 }

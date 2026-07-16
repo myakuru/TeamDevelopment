@@ -13,21 +13,24 @@
 #include <ProjectNull/System/Result/ResultManager/ResultManager.h>
 #include <ProjectNull/Data/Result/ClearRankData/ClearRankData.h>
 #include <ProjectNull/Data/Result/RankConditionData/RankConditionData.h>
+#include <ProjectNull/System/WorldSystem/EnemySpawner/EnemySpawner.h>
 
 
 void UStageManager::Initialize() {
-
 	NowStageIndex = StageDefinition::OutGameStageIndex;
 
-	if (!StageDataAsset)return;
+	// 制限時間切れでボスウェーブに飛ぶ
+	StageTimer.OnFinished.AddUObject(this, &UStageManager::SetBossWave);
 
 	//ステージを調査
 	ChangeStageInvestigation(GetWorld());
-
+	
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(
 		this,
 		&UStageManager::ChangeStageInvestigation
 	);
+	
+	StartStageTimer();
 }
 
 void UStageManager::LoadFromSaveData(UMySaveGame* inSaveGame)
@@ -70,6 +73,19 @@ void UStageManager::SaveToData(UMySaveGame* inSaveGame)
 	inSaveGame->StageProgressList = *StageProgressList;
 }
 
+void UStageManager::SetBossWave()
+{
+	AActor* FoundActor = UGameplayStatics::GetActorOfClass(
+		GetWorld(), AEnemySpawner::StaticClass());
+
+	AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(FoundActor);
+
+	if (IsValid(EnemySpawner))
+	{
+		EnemySpawner->SetBossPhase();
+	}
+}
+
 void UStageManager::InGameInitialize(int32 inNowStageIndex)
 {
 	NowStageIndex = inNowStageIndex;
@@ -90,7 +106,7 @@ void UStageManager::InGameInitialize(int32 inNowStageIndex)
 	PC->SetInputMode(InputMode);
 	
 	//BGM再生
-	if (InGameBGMSound)
+	if (InGameBGMSound && !InGameBGMSoundComponent)
 	{
 		InGameBGMSoundComponent = 
 		GetWorld()->GetGameInstance<USuperGameInstance>()->
@@ -98,6 +114,14 @@ void UStageManager::InGameInitialize(int32 inNowStageIndex)
 				1.0f,0.0f,nullptr,
 				true,true);
 	}
+}
+
+void UStageManager::StartStageTimer()
+{
+	if (!StageDataAsset)return;
+
+	//制限時間は StageDataAsset から取得して開始
+	StageTimer.StartTimer(GetWorld(), StageDataAsset->GetStageTimerLimit());
 }
 
 void UStageManager::InGameFinalize()
@@ -141,24 +165,36 @@ void UStageManager::InGameFinalize()
 	}
 	AcquiredWeapons.Reset();
 	UGameplayStatics::OpenLevel(this, "ResultLevel");
+	
+	//BGM停止
+	if (InGameBGMSoundComponent && InGameBGMSoundComponent->IsPlaying())
+		InGameBGMSoundComponent->Stop();
 }
 
 void UStageManager::OutGameInitialize()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Has BegunPlay = %d"),
+	GetWorld()->HasBegunPlay());
+	
 	//BGM再生
-	if (OutGameBGMSound)
+	if (OutGameBGMSound && !OutGameBGMSoundComponent)
 	{
 		OutGameBGMSoundComponent = 
 		GetWorld()->GetGameInstance<USuperGameInstance>()->
 			GetSoundManager()->Spawn2D(OutGameBGMSound,1.0f,
 				1.0f,0.0f,nullptr,
 				true,true);
+		
+		UE_LOG(LogTemp, Warning, TEXT("After Spawn = %p"),
+			OutGameBGMSoundComponent.Get());
+		
 	}
 }
 
 void UStageManager::OutGameFinalize()
 {
-	if (OutGameBGMSoundComponent)OutGameBGMSoundComponent->Stop();
+	//BGM停止
+	if (OutGameBGMSoundComponent && OutGameBGMSoundComponent->IsPlaying())OutGameBGMSoundComponent->Stop();
 }
 
 void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
@@ -173,6 +209,12 @@ void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 			LoadedWorld,
 			true
 		));
+	
+	//ログ
+	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
+	UE_LOG(LogTemp, Log, TEXT("-  StageManager  -"));
+	UE_LOG(LogTemp, Log, TEXT("NowLevelName : %s"), *LevelName.ToString());
+	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
 
 	bool isInGame = false;
 
@@ -183,6 +225,9 @@ void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 		//一致
 		if (StageData.LevelName == LevelName)
 		{
+			//アウトゲームを終わらせる
+			OutGameFinalize();
+			
 			//ステージ開始(マウスが持ってかれるぞ！！)
 			InGameInitialize(i + StageDefinition::FirstStageIndex);
 
@@ -190,12 +235,21 @@ void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 		}
 	}
 
-	if (!isInGame) OutGameInitialize();
+	if (!isInGame)
+	{
+		//OutGameInitialize();
+		//ゲーム起動時では再生出来ないため、次のtickに任せる
+		LoadedWorld->GetTimerManager().SetTimerForNextTick(
+			FTimerDelegate::CreateUObject(
+				this,
+				&UStageManager::OutGameInitialize
+			)
+		);
+	}
 
 	//ログ
 	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
 	UE_LOG(LogTemp, Log, TEXT("-  StageManager  -"));
-	UE_LOG(LogTemp, Log, TEXT("NowLevelName : %s"), *LevelName.ToString());
 	UE_LOG(LogTemp, Log, TEXT("NowStageIndex : %d"),NowStageIndex);
 	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
 }

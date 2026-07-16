@@ -1,8 +1,8 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿#include "PlayerExpUpgradeWidget.h"
+#include "Components/AudioComponent.h"
 
-
-#include "PlayerExpUpgradeWidget.h"
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
 #include "Kismet/GameplayStatics.h"
 #include <ProjectNull/UI/PlayerExpUpgradeWidget/ExpUpgradeWidgetBase/ExpUpgradeWidgetBase.h>
 #include "Components/Image.h"
@@ -11,6 +11,14 @@
 #include "Input/Events.h"
 #include "Input/Reply.h"
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
+
+namespace
+{
+	/** 強化画面に提示する選択肢の数 */
+	constexpr int32 UpgradeChoiceCount = 3;
+}
 
 void UPlayerExpUpgradeWidget::NativeConstruct()
 {
@@ -24,18 +32,10 @@ void UPlayerExpUpgradeWidget::NativeConstruct()
 	SetIsEnabled(false);
 
 	bIsUpgradeWidgetOpen = false;
-}
-
-UDataTable* UPlayerExpUpgradeWidget::GetExpUpgradeTable()
-{
-	if (CachedExpUpgradeTable) return CachedExpUpgradeTable;
-
-	CachedExpUpgradeTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ExpUpgrade"));
-	if (!CachedExpUpgradeTable)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DT_ExpUpgrade がロードできません"));
-	}
-	return CachedExpUpgradeTable;
+	
+	UpgradeWidget_0->SetHoverSESound(HoverSESound);
+	UpgradeWidget_1->SetHoverSESound(HoverSESound);
+	UpgradeWidget_2->SetHoverSESound(HoverSESound);
 }
 
 void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -44,15 +44,15 @@ void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDe
 
 	if (UpgradeWidget_0)
 	{
-		UpgradeWidget_0->ImageRotation();
+		UpgradeWidget_0->UpdateScale();
 	}
 	if (UpgradeWidget_1)
 	{
-		UpgradeWidget_1->ImageRotation();
+		UpgradeWidget_1->UpdateScale();
 	}
 	if (UpgradeWidget_2)
 	{
-		UpgradeWidget_2->ImageRotation();
+		UpgradeWidget_2->UpdateScale();
 	}
 
 	// 背景の黒い画像のフェードイン処理
@@ -61,81 +61,28 @@ void UPlayerExpUpgradeWidget::NativeTick(const FGeometry& MyGeometry, float InDe
 
 void UPlayerExpUpgradeWidget::ChoicesExpUpgrade()
 {
-	UDataTable* Table = GetExpUpgradeTable();
-	if (!Table) return;
+	if (!PlayerRuntimeData) return;
 
-	// キャッシュされたテーブルをロード（既にあるならそのまま）
-	if (!CachedExpUpgradeTable)
-	{
-		CachedExpUpgradeTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ExpUpgrade"));
-		if (!CachedExpUpgradeTable)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("DT_ExpUpgrade がロードできません"));
-			return;
-		}
-	}
-
-	// 行名を取得してランダムに3つ選択
-	TArray<FName> AllRowNames = CachedExpUpgradeTable->GetRowNames();
-	if (AllRowNames.Num() < 3) return;
-
-	TArray<FName> SelectedRowNames;
-
-	for (int32 i = 0; i < 3; ++i)
-	{
-		int32 index = FMath::RandRange(0, AllRowNames.Num() - 1);
-		SelectedRowNames.Add(AllRowNames[index]);
-		AllRowNames.RemoveAt(index);
-	}
-
-	ValidUpgrades.Empty(); // 既存の情報をクリア
-
-	for (const FName& RowName : SelectedRowNames)
-	{
-		const FExpUpgradeRow* RowData = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(RowName, TEXT(""));
-		if (!RowData) continue;
-
-		// 現在のレベルに対応する説明文があるかチェック
-		FName CurrentLevel = PlayerRuntimeData->GetUpgradeLevel(RowName);
-		const int32 LevelIndex = FCString::Atoi(*CurrentLevel.ToString());
-
-		if (RowData->UpgradeLevels.IsValidIndex(LevelIndex))
-		{
-			FValidUpgradeInfo Info;
-
-			Info.RowName = RowName;
-			Info.Multiplier = RowData->UpgradeLevels[LevelIndex].AttackMultiplier;
-			Info.Description = RowData->UpgradeLevels[LevelIndex].Description;
-			Info.CurrentLevel = CurrentLevel;
-
-			ValidUpgrades.Add(Info);
-		}
-	};
+	// 抽選・レベル判定はランタイムデータ側が担当。UIは受け取って表示するだけ
+	const TArray<FValidUpgradeInfo> Choices = PlayerRuntimeData->BuildUpgradeChoices(UpgradeChoiceCount);
 
 	TArray<UExpUpgradeWidgetBase*> Widgets = { UpgradeWidget_0, UpgradeWidget_1, UpgradeWidget_2 };
 
 	// すべてのWidgetを初期状態では非表示にしておく
-	UpgradeWidget_0->SetVisibility(ESlateVisibility::Hidden);
-	UpgradeWidget_1->SetVisibility(ESlateVisibility::Hidden);
-	UpgradeWidget_2->SetVisibility(ESlateVisibility::Hidden);
-
-	for (int32 i = 0; i < ValidUpgrades.Num() && i < Widgets.Num(); ++i)
+	for (UExpUpgradeWidgetBase* Widget : Widgets)
 	{
-		Widgets[i]->SetDescriptionText(ValidUpgrades[i].Description);
-		Widgets[i]->SetUpgradeRowName(ValidUpgrades[i].RowName);
-		Widgets[i]->SetValidUpgradesMultiplier(ValidUpgrades[i].Multiplier);
+		if (Widget) Widget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	for (int32 i = 0; i < Choices.Num() && i < Widgets.Num(); ++i)
+	{
+		if (!Widgets[i]) continue;
+		Widgets[i]->SetDescriptionText(Choices[i].Description);
+		Widgets[i]->SetUpgradeRowName(Choices[i].RowName);
 		Widgets[i]->SetVisibility(ESlateVisibility::Visible);
 	}
 
-	if (ValidUpgrades.Num() <= 1)
-	{
-		bIsUpgradeWidgetFilledArray = false;
-	}
-	else
-	{
-		bIsUpgradeWidgetFilledArray = true;
-	}
-
+	bIsUpgradeWidgetFilledArray = (Choices.Num() > 1);
 }
 
 void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
@@ -148,6 +95,16 @@ void UPlayerExpUpgradeWidget::OpenUpgradeWidget()
 	OpenWidget();
 
 	ChoicesExpUpgrade();
+	
+	//BGM再生
+	OpenWidgetSEAudioComponent = 
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+		GetSoundManager()->Spawn2D(OpenWidgetSESound);
+	
+	if (OpenWidgetSEAudioComponent)
+	{
+		OpenWidgetSEAudioComponent->bIsUISound = true;
+	}
 }
 
 FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -155,30 +112,33 @@ FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	// 左マウスボタンが押されたかチェック
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Mouse Button Down!"));
+		//クリック効果音
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(
+				ClickSESound,1.0f,1.0f,0.0f,
+				nullptr,nullptr,true);
+		
+		UExpUpgradeWidgetBase* Widgets[] = { UpgradeWidget_0, UpgradeWidget_1, UpgradeWidget_2 };
 
-		if (UpgradeWidget_0->IsMouseOver())
+		for (UExpUpgradeWidgetBase* Widget : Widgets)
 		{
-			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_0->GetUpgradeRowName());
-
-			// ここで攻撃力の乗数をプレイヤーのランタイムデータに渡す
-			PlayerRuntimeData->UpgradeAttackMultiplier(UpgradeWidget_0->GetUpgradeRowName(), UpgradeWidget_0->GetValidUpgradesMultiplier());
-		}
-		else if (UpgradeWidget_1->IsMouseOver())
-		{
-			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_1->GetUpgradeRowName());
-
-			// ここで攻撃力の乗数をプレイヤーのランタイムデータに渡す
-			PlayerRuntimeData->UpgradeAttackMultiplier(UpgradeWidget_1->GetUpgradeRowName(), UpgradeWidget_1->GetValidUpgradesMultiplier());
-		}
-		else if (UpgradeWidget_2->IsMouseOver())
-		{
-			PlayerRuntimeData->UpdateUpgradeStates(UpgradeWidget_2->GetUpgradeRowName());
-
-			// ここで攻撃力の乗数をプレイヤーのランタイムデータに渡す
-			PlayerRuntimeData->UpgradeAttackMultiplier(UpgradeWidget_2->GetUpgradeRowName(), UpgradeWidget_2->GetValidUpgradesMultiplier());
+			if (Widget && Widget->IsMouseOver())
+			{
+				// 選択された強化を適用する。効果の反映はランタイムデータ側の責務
+				if (PlayerRuntimeData)
+				{
+					PlayerRuntimeData->ApplySelectedUpgrade(Widget->GetUpgradeRowName());
+				}
+				break;
+			}
 		}
 
+		//BGM停止
+		if (OpenWidgetSEAudioComponent)
+		{
+			OpenWidgetSEAudioComponent->Stop();
+		}
+		
 		CloseWidget();
 
 		// イベントをこのウィジェットで処理したことを返す
@@ -189,10 +149,23 @@ FReply UPlayerExpUpgradeWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 	return FReply::Unhandled();
 }
 
+bool UPlayerExpUpgradeWidget::NowOpenWidget()
+{
+	if (bIsOpen) return true;
+	
+	return false;	
+}
+
 void UPlayerExpUpgradeWidget::OpenWidget()
 {
 	SetVisibility(ESlateVisibility::Visible);
 	SetIsEnabled(true);
+	
+	// 現在ウィジットがオープンしている
+	bIsOpen = true;
+
+	// 強化画面が開いている間、経験値バーを虹色に光らせる
+	SetExpBarRainbow(true);
 
 	// 強化画面の初期化
 	InitUpgradeWidget();
@@ -214,6 +187,11 @@ void UPlayerExpUpgradeWidget::CloseWidget()
 {
 	SetVisibility(ESlateVisibility::Hidden);
 	SetIsEnabled(false);
+
+	bIsOpen = false;
+
+	// 強化画面を閉じたら虹色演出を消す
+	SetExpBarRainbow(false);
 
 	// マウスカーソルを非表示にする
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -267,7 +245,13 @@ void UPlayerExpUpgradeWidget::InitUpgradeWidget()
 
 }
 
-void UPlayerExpUpgradeWidget::SetAttackMultiplier(float Multiplier)
+void UPlayerExpUpgradeWidget::SetExpBarRainbow(bool bVisible)
 {
+	ARobotController* RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!RobotController) return;
 
+	if (UPlayerHUDWidget* PlayerHUD = RobotController->GetPlayerHUD())
+	{
+		PlayerHUD->SetExpRainbowVisible(bVisible);
+	}
 }

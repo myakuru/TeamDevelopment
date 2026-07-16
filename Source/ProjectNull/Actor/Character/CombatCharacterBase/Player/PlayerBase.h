@@ -2,9 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "../CombatCharacterBase.h"
-
-#include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/CombatCharacterBase.h>
+#include <ProjectNull/System/Interface/CharacterInterface/CharacterInterface.h>
 
 #include "PlayerBase.generated.h"
 
@@ -44,8 +43,8 @@ class PROJECTNULL_API APlayerBase : public ACombatCharacterBase
 	GENERATED_BODY()
 public:
 	APlayerBase();
+	
 	virtual void BeginPlay() override;
-public:
 	virtual void Tick(float DeltaTime)													override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -58,7 +57,7 @@ public:
 	* @brief ダメージを受ける処理
 	* @param Damage ダメージ量
 	*/
-	virtual void ApplyDamaged(float InDamage = 1.f)override;
+	virtual void ApplyDamaged(float InDamage)override;
 	/* End Character Interface.*/
 
 	/**
@@ -81,6 +80,7 @@ public:
 	inline USpringArmComponent*				GetSpringArmComponent()			const	{ return SpringArmComponent; }
 	inline UPlayerGearComponent*			GetGearComponent()				const	{ return GearComponent; }
 	inline UTargetSearchComponent*			GetTargetSearchComponent()		const	{ return TargetSearchComponent; }
+	inline UAutoAttack*						GetAutoAttack()					const	{ return AutoAttack; }
 	inline UHitStopComponent*				GetHitStopComponent()			const	{ return HitStopComponent; }
 	inline UGroundAlignmentComponent*		GetGroundAlignmentComponent()	const	{ return GroundAlignmentComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance()			const	{ return SuperGameInstance; }

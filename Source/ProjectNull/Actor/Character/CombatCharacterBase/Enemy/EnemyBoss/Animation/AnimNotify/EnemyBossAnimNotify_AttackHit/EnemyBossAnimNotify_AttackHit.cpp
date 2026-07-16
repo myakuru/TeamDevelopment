@@ -118,6 +118,7 @@ void UEnemyBossAnimNotify_AttackHit::NotifyEnd(USkeletalMeshComponent* MeshComp,
 
 	AActor* Owner = MeshComp->GetOwner();			// メッシュの持ち主（Actor）を取得
 	AEnemyBossBase* Boss = Cast<AEnemyBossBase>(Owner);
+	if (!IsValid(Boss)) { return; }
 
 	if (Boss != nullptr)
 	{
