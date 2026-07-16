@@ -29,6 +29,8 @@ public:
 
 	void SaveToData(UMySaveGame* inSaveGame);
 
+	void SetBossWave();
+
 	UFUNCTION()
 	void InGameInitialize(int32 inNowStageIndex);
 

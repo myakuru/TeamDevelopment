@@ -13,13 +13,14 @@
 #include <ProjectNull/System/Result/ResultManager/ResultManager.h>
 #include <ProjectNull/Data/Result/ClearRankData/ClearRankData.h>
 #include <ProjectNull/Data/Result/RankConditionData/RankConditionData.h>
+#include <ProjectNull/System/WorldSystem/EnemySpawner/EnemySpawner.h>
 
 
 void UStageManager::Initialize() {
 	NowStageIndex = StageDefinition::OutGameStageIndex;
 
-	//制限時間切れでステージクリア処理を呼ぶ（一度だけバインド）
-	StageTimer.OnFinished.AddUObject(this, &UStageManager::InGameFinalize);
+	// 制限時間切れでボスウェーブに飛ぶ
+	StageTimer.OnFinished.AddUObject(this, &UStageManager::SetBossWave);
 
 	//ステージを調査
 	ChangeStageInvestigation(GetWorld());
@@ -70,6 +71,19 @@ void UStageManager::LoadFromSaveData(UMySaveGame* inSaveGame)
 void UStageManager::SaveToData(UMySaveGame* inSaveGame)
 {
 	inSaveGame->StageProgressList = *StageProgressList;
+}
+
+void UStageManager::SetBossWave()
+{
+	AActor* FoundActor = UGameplayStatics::GetActorOfClass(
+		GetWorld(), AEnemySpawner::StaticClass());
+
+	AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(FoundActor);
+
+	if (IsValid(EnemySpawner))
+	{
+		EnemySpawner->SetBossPhase();
+	}
 }
 
 void UStageManager::InGameInitialize(int32 inNowStageIndex)
