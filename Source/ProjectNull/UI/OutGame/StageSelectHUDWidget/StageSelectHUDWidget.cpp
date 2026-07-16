@@ -212,9 +212,6 @@ void UStageSelectHUDWidget::ChangeStageDetails(int32 InStageIndex)
 	//ステージインデックスをクランプ
 	int32 stageIndex = ClampStageIndex(InStageIndex);
 
-	//ステージのデーブデータをゲームインスタンスから取得しておく
-	auto* SaveData = GetWorld()->GetGameInstance<USuperGameInstance>()->GetCurrentSaveData();
-
 	//ステージ詳細更新
 	//ステージ名
 	StageNameText->SetText(StageDataAsset->GetStageData()[stageIndex].StageName);

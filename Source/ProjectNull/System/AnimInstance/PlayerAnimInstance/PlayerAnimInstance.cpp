@@ -11,7 +11,7 @@ UPlayerAnimInstance::UPlayerAnimInstance():
 	bShouldMove(false),
 	bIsFalling(false),
 	bIsDecelerating(false),
-	Velocity(FVector::ZeroVector),
+	//Velocity(FVector::ZeroVector),
 	GroundSpeed(0.f),
 	PrevGroundSpeed(0.f),
 	PlayerPoseSnapshot(FPoseSnapshot()),
@@ -34,33 +34,33 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	
-	if (!Player) { return; }
-
-	auto CharacterMovement = Player->GetCharacterMovement();
-	if (!CharacterMovement) { return; }
-
-	auto Controller = Player->GetController();
-	if (!Controller) { return; }
-
-	auto PlayerController = Cast<ARobotController>(Controller);
-	if (!PlayerController) { return; }
-
-	bHasMoveInput	= PlayerController->HasMoveInput();
-	PrevGroundSpeed = GroundSpeed;
-	bIsFalling		= CharacterMovement->IsFalling();
-	Velocity		= CharacterMovement->Velocity;
-	
-	GroundSpeed = Velocity.Size();
-	
-	bIsDecelerating = (GroundSpeed != PrevGroundSpeed) && (GroundSpeed < PrevGroundSpeed);
-	
-	bShouldEnterRunStop = GroundSpeed >= RunStopSpeedThreshold;
-
-	//UE_LOG(LogTemp, Display, TEXT("GroundSpeed %.2f"), GroundSpeed);
-	//UE_LOG(LogTemp, Display, TEXT("bHasMoveInput %d"), bHasMoveInput);
-	//UE_LOG(LogTemp, Display, TEXT("bShouldEnterRunStop %d"), bShouldEnterRunStop);
-	bShouldMove = GroundSpeed > MoveThresholdSpeed;
+	//
+	// if (!Player) { return; }
+	//
+	// auto CharacterMovement = Player->GetCharacterMovement();
+	// if (!CharacterMovement) { return; }
+	//
+	// auto Controller = Player->GetController();
+	// if (!Controller) { return; }
+	//
+	// auto PlayerController = Cast<ARobotController>(Controller);
+	// if (!PlayerController) { return; }
+	//
+	// bHasMoveInput	= PlayerController->HasMoveInput();
+	// PrevGroundSpeed = GroundSpeed;
+	// bIsFalling		= CharacterMovement->IsFalling();
+	// Velocity		= CharacterMovement->Velocity;
+	//
+	// GroundSpeed = Velocity.Size();
+	//
+	// bIsDecelerating = (GroundSpeed != PrevGroundSpeed) && (GroundSpeed < PrevGroundSpeed);
+	//
+	// bShouldEnterRunStop = GroundSpeed >= RunStopSpeedThreshold;
+	//
+	// //UE_LOG(LogTemp, Display, TEXT("GroundSpeed %.2f"), GroundSpeed);
+	// //UE_LOG(LogTemp, Display, TEXT("bHasMoveInput %d"), bHasMoveInput);
+	// //UE_LOG(LogTemp, Display, TEXT("bShouldEnterRunStop %d"), bShouldEnterRunStop);
+	// bShouldMove = GroundSpeed > MoveThresholdSpeed;
 }
 
 FPoseSnapshot& UPlayerAnimInstance::GetPlayerPoseSnapshot()

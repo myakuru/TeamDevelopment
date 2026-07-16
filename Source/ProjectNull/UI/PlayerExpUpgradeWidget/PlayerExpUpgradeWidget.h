@@ -40,6 +40,7 @@ public:
 	// 左ボタン押下を処理する
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
+	bool NowOpenWidget();
 
 protected:
 
@@ -57,6 +58,9 @@ protected:
 	virtual void CloseWidget();
 
 	void BackgroundImageFadeIn();
+
+	/** 経験値バーの虹色演出を切り替える（HUD経由） */
+	void SetExpBarRainbow(bool bVisible);
 
 	void InitUpgradeWidget();
 
@@ -112,6 +116,8 @@ protected:
 	bool bIsUpgradeWidgetFilledArray = true;
 
 	bool bIsUpgradeWidgetOpen = false;
+	
+	bool bIsOpen = false;
 
 	/** 現在表示中の行名（ChoicesExpUpgrade でセット） */
 	FName SelectedRowName = NAME_None;

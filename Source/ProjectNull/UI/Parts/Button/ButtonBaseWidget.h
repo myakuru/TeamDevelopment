@@ -5,13 +5,14 @@
 #include "ButtonBaseWidget.generated.h"
 
 class UButton;
+class USoundBase;
 
 /** デリゲート宣言(親デリゲート) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClickedButton);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHoveredButton);
 
 /**
- * 
+ * Widgetに使用するボタンのベース
  */
 UCLASS()
 class PROJECTNULL_API UButtonBaseWidget : public UUserWidget
@@ -35,7 +36,14 @@ protected:
 	void OnClickedButton();
 
 	virtual void DoClickedButton();
-
+	
+	/** 効果音 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "Parameter|Sound|SE")
+    TObjectPtr<USoundBase> HoverSound;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "Parameter|Sound|SE")
+	TObjectPtr<USoundBase> ClickSound;
+	
 public:
 
 	//デリゲートの宣言

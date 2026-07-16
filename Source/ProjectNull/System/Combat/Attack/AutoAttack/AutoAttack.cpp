@@ -1,15 +1,5 @@
 ﻿#include "AutoAttack.h"
 
-#include "NiagaraSystem.h"
-#include "NiagaraComponent.h"
-#include "NiagaraFunctionLibrary.h"
-
-#include <ProjectNull/Utility/DebugDrawLibrary/DebugDrawLibrary.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
-#include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
-
-#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 
 
@@ -33,6 +23,18 @@ void UAutoAttack::Initialize(const TObjectPtr<AActor>& Owner)
 		ConeSlashParams->Initialize(Owner);
 	}
 
+	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front)
+			&& AutoAttackParamsMap[EAutoAttackType::Front])
+	{
+		AutoAttackParamsMap[EAutoAttackType::Front]->Execute();
+	}
+
+	if (AutoAttackParamsMap.Contains(EAutoAttackType::Ring)
+			&& AutoAttackParamsMap[EAutoAttackType::Ring])
+	{
+		AutoAttackParamsMap[EAutoAttackType::Ring]->Execute();
+	}
+	
 	// 自動攻撃のタイマーをセット
 	GetWorld()->GetTimerManager().SetTimer(
 		AutoFrontConeAttackTimerHandle,
@@ -50,6 +52,15 @@ void UAutoAttack::Update(float DeltaTime)
 		ConeSlashParams->Update(DeltaTime);
 	}
 
+}
+
+void UAutoAttack::SetVisibility(bool bVisibility)
+{
+	for (auto& [Type, ConeSlashParams] : AutoAttackParamsMap)
+	{
+		if (!ConeSlashParams) { continue; }
+		ConeSlashParams->SetVisibility(bVisibility);
+	}
 }
 
 void UAutoAttack::StartAutoAttack()

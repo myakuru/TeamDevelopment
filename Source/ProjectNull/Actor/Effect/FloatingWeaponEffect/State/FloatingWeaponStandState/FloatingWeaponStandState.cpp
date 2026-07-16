@@ -4,6 +4,7 @@
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
 
 UFloatingWeaponStandState::UFloatingWeaponStandState():
+	StartTransformOffset(FTransform()),
 	Phase(0.0f),
 	StartPhase(0.0f),
 	Frequency(3.0f),

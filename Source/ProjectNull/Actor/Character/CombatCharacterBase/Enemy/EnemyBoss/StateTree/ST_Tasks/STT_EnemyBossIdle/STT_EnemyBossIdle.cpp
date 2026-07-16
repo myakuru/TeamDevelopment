@@ -28,6 +28,7 @@ EStateTreeRunStatus USTT_EnemyBossIdle::EnterState(FStateTreeExecutionContext& C
 
 EStateTreeRunStatus USTT_EnemyBossIdle::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
+	UE_LOG(LogTemp, Warning, TEXT("IdleState"));
 	//UE_LOG(LogTemp, Warning, TEXT("IdleUpdate"));
 	if (!IsValid(OwnerBoss))
 	{

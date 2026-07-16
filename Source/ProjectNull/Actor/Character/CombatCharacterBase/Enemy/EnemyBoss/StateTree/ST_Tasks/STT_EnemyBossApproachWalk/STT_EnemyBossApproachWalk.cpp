@@ -18,7 +18,7 @@ USTT_EnemyBossApproachWalk::USTT_EnemyBossApproachWalk(const FObjectInitializer&
 
 EStateTreeRunStatus USTT_EnemyBossApproachWalk::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Tick In"));
+	UE_LOG(LogTemp, Warning, TEXT("ApproachWalk Tick In"));
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
 

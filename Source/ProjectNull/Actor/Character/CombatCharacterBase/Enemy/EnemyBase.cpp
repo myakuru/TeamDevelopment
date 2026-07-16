@@ -13,6 +13,9 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
+
+#include "ProjectNull/Sound/SoundManager.h"
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -149,6 +152,13 @@ void AEnemyBase::NotfyAttackFinishTime()
 void AEnemyBase::ApplyDamaged(float InDamaged)
 {
 	if (!EnemyRuntimeData) { return; }
+	
+	//ダメージ効果音
+	GetWorld()->GetGameInstance<USuperGameInstance>()->
+	GetSoundManager()->PlayAtLocation(
+		EnemyManager->GetDamagedSound(),
+		GetActorLocation()
+	);
 
 	EnemyRuntimeData->AddHealth(-InDamaged);		// 渡された値分、FinalHPを減算
 	UE_LOG(LogTemp, Error, TEXT("Damage : %f"),InDamaged);
@@ -156,6 +166,14 @@ void AEnemyBase::ApplyDamaged(float InDamaged)
 	EnemyRuntimeData
 		->CalclateDamageToMaxHealthRatio(InDamaged);// 受けたダメージが最大体力に対して何割かを算出
 	OnHit();
+
+	// ダメージUI表示位置
+	const FVector DamageUILocation = GetActorLocation() + FVector(0.0f, 0.0f, 120.0f);
+
+	if (UDamageNumberPoolSubsystem* Pool = GetWorld()->GetSubsystem<UDamageNumberPoolSubsystem>())
+	{
+		Pool->ShowDamageNumber(DamageUILocation, InDamaged, false);
+	}
 
 	// 体力が0以下なら死亡フラグを立てる
 	if (EnemyRuntimeData->GetHealth() <= 0)
@@ -194,7 +212,7 @@ void AEnemyBase::FinalizeDeath()
 	if (USuperGameInstance* GameInstance =
 		GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
-		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
+		//GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
 		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
 
@@ -391,8 +409,8 @@ void AEnemyBase::SpawnDeathExperience()
 	if (UItemManagerSubsystem* ItemSubsystem =
 		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
 	{
-		const FLinearColor Color = EnemyStatus.ExpColor;
-		const float Size = EnemyStatus.ExpSize;
+		const FLinearColor Color	= EnemyStatus.ExpColor;
+		const float Size			= EnemyStatus.ExpSize;
 
 		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
 			GetActorLocation(),

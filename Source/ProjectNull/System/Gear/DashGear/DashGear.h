@@ -16,7 +16,6 @@ class PROJECTNULL_API UDashGear final : public UGearBase
 	GENERATED_BODY()
 public:
 	UDashGear();
-public:
 
 	void Initialize(
 		class APlayerBase* Player,

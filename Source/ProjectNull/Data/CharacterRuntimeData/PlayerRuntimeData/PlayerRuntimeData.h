@@ -115,9 +115,7 @@ public:
 		GearChangeEnergyCost(TArray<float>())
 	{
 	}
-
-public:
-
+	
 	inline bool CanChangeGear(int32 CurrentGearLevel)
 	{
 		const int32 Index = --CurrentGearLevel;
@@ -135,11 +133,11 @@ public:
 		const int32 Index = --CurrentGearLevel;
 		if (!GearChangeEnergyCost.IsValidIndex(Index)) { return; }
 		const float EnergyCost = GearChangeEnergyCost[Index];
-		UE_LOG(LogTemp, Warning, TEXT("hi EnergyCost %.0f"), EnergyCost);
+		//UE_LOG(LogTemp, Warning, TEXT("hi EnergyCost %.0f"), EnergyCost);
 		ExcessRatio = (GearEnergy / EnergyCost) - 1.0f;
-		UE_LOG(LogTemp, Warning, TEXT("hi ExcessRatio %.2f"), ExcessRatio);
+		//UE_LOG(LogTemp, Warning, TEXT("hi ExcessRatio %.2f"), ExcessRatio);
 
-		GearEnergy -= EnergyCost;
+		GearEnergy = 0.f;
 
 	}
 	
@@ -185,18 +183,15 @@ struct FExperienceParameterData;
 /** ギアパラメータ構造体 */
 struct FGearParameterData;
 
-struct FUpgradeState;
 
 /** プレイヤーのRuntimeデータクラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UPlayerRuntimeData final : public UCharacterRuntimeData
 {
 	GENERATED_BODY()
-
 public:
 	UPlayerRuntimeData();
 
-public:
 	void Initialize() override;
 
 	/**
@@ -222,6 +217,11 @@ public:
 	void ResetDataOnGearChange(int32 CurrentGearLevel);
 
 	void CalculateInvincibilityTime(const FGearParameterData& Data);
+	
+	/**
+	 * @brief 最終的な速度計算処理
+	 */
+	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
 
 	/**
 	 * @brief プレイヤーの攻撃力を計算する
@@ -240,6 +240,7 @@ public:
 
 	inline bool IsInvincible() const { return bIsInvincible; }
 	inline FGearRuntimeData& GetGearData() { return Gear; }
+	inline FSpeedRuntimeData& GetSpeed() { return Speed; }
 
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
@@ -253,7 +254,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnGearEnergyChanged OnGearEnergyChanged;
 
-
+	UPROPERTY()
 	TObjectPtr<ARobotController> RobotController;
 
 	/** Widget側で呼び出す */
@@ -276,11 +277,7 @@ private:
 	 */
 	void CalculateExperience(const FExperienceParameterData& Data);
 
-	/**
-	 * @brief 最終的な速度計算処理
-	 */
-	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
-
+	
 	/**
 	 * @brief 計算済みの速度をCharacterMovementに適用する
 	 */

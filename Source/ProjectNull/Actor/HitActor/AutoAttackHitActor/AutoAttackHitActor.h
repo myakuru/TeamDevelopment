@@ -25,23 +25,13 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	void SetHitEnabled(bool bEnabled);
+	void SetHitEnabled(bool bInEnabled);
 
 private:
 
-	UFUNCTION()
-	void OnAutoAttackBeginOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
-
-
 	void PerformHitSweep();
 
-	float SetAttackDamage();
+	float GetAttackDamage() const;
 
 
 	UPROPERTY()
@@ -53,8 +43,16 @@ private:
 	TObjectPtr<UBoxComponent> BoxComp;
 
 	/** ゲームインスタンスへの参照 */
+	UPROPERTY()
 	TObjectPtr<USuperGameInstance> GameInstance;
 
 	/** プレイヤーのランタイムデータへの参照 */
+	UPROPERTY()
 	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
+	/** 自動攻撃の攻撃力係数 */
+	UPROPERTY(EditAnywhere)
+	float AttackPowerScale;
+
+	bool bEnabled;
 };

@@ -14,9 +14,12 @@
 
 UFloatingWeaponEffect::UFloatingWeaponEffect():
 	OwnerAttack(nullptr),
+	OwnerActor(nullptr),
 	EffectSystem(nullptr),
 	EffectComponent(nullptr),
-	RelativeTransform(FTransform())
+	RelativeTransform(FTransform()),
+	States(TMap<EFloatingWeaponState, TObjectPtr<UFloatingWeaponStateBase>>()),
+	CurrentState(nullptr)
 {
 	
 }
@@ -107,6 +110,12 @@ FTransform UFloatingWeaponEffect::GetStandStartTransformOffset()
 	auto* StandState = Cast<UFloatingWeaponStandState>(States[EFloatingWeaponState::Stand]);
 	if (!StandState) { return FTransform(); }
 	return StandState->GetStartTransformOffset();
+}
+
+void UFloatingWeaponEffect::SetVisibility(bool bVisibility)
+{
+	if (!EffectComponent) { return;}
+	EffectComponent->SetVisibility(bVisibility);
 }
 
 void UFloatingWeaponEffect::UpdateTransform()

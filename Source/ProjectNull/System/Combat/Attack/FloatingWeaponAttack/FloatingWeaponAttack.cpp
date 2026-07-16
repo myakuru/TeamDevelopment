@@ -12,13 +12,21 @@
 #include <ProjectNull/Utility/GroundUtility/GroundUtility.h>
 
 UFloatingWeaponAttack::UFloatingWeaponAttack():
+	AutoAttack(nullptr),
+	FloatingWeaponEffect(nullptr),
+	SlashEffectArray(TArray<TObjectPtr<USlashEffectBase>>()),
+	AutoAttackHitActor(nullptr),
+	AutoAttackHitActorClass(nullptr),
+	StandTimeRatio(0.f),
 	Duration(1.0f),
 	ElapsedTime(0.0f),
 	RotationSpeed(1000.0f),
 	bPrevActive(false),
 	CurrentAngle(0.0f),
 	KnockbackPower(2.0f),
-	StartAngle(0.0f)
+	StartAngle(0.0f),
+	RotationInterpSpeed(0.0f),
+	bEffectVisibility(true)
 {
 
 }
@@ -66,7 +74,7 @@ void UFloatingWeaponAttack::Update(float DeltaTime)
 
 void UFloatingWeaponAttack::Execute(const FVector& InTargetLocation)
 {
-	auto Owner = GetOwnerActor();
+	const auto Owner = GetOwnerActor();
 	if (!Owner)					{ return; }
 
 	SetIsActive(true);
@@ -80,10 +88,29 @@ void UFloatingWeaponAttack::Execute(const FVector& InTargetLocation)
 	const auto RootComp = GetRootComponent();
 	if (!RootComp)				{ return; }
 
+	
+	if (!bEffectVisibility) { return; }
+	
 	for (auto& SlashEffect : SlashEffectArray)
 	{
 		if (!SlashEffect) { continue; }
-		SlashEffect->Start(RootComp);
+		SlashEffect->StartOnce(RootComp);
+	}
+}
+
+void UFloatingWeaponAttack::SetVisibility(bool bVisibility)
+{
+	bEffectVisibility = bVisibility;
+	
+	if (FloatingWeaponEffect)
+	{
+		FloatingWeaponEffect->SetVisibility(bVisibility);
+	}
+	
+	for (auto& SlashEffect : SlashEffectArray)
+	{
+		if (!SlashEffect) { continue; }
+		SlashEffect->SetVisibility(bVisibility);
 	}
 }
 

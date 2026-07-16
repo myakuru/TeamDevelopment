@@ -4,6 +4,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "SurvivalGameMode.generated.h"
 
+class ADamageNumberActor;
+
 /**
  * defaultのゲームモード
  */
@@ -21,5 +23,13 @@ public:
 protected:
 
 	void BeginPlay() override;
+
+private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage UI")
+	TSubclassOf<ADamageNumberActor> DamageNumberActorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage UI")
+	int32 DamageNumberPoolSize = 300;
 
 };

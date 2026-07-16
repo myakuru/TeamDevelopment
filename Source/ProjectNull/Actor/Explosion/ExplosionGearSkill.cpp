@@ -26,7 +26,7 @@ AExplosionGearSkill::AExplosionGearSkill()
 
 	// 自身をPlayerAttackOverlapとして設定
 	Collision->SetCollisionObjectType(
-		ECC_Player
+		ECC_PlayerAttack
 	);
 
 	// 当たり判定の種類設定(物理衝突を行わず、判定のみ行う)
@@ -57,11 +57,13 @@ void AExplosionGearSkill::BeginPlay()
 	FTimerDelegate timerDelegate;
 	timerDelegate.BindLambda([this] {
 			if (PreExplosionFX) {
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				auto* Effect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 					GetWorld(),
 					PreExplosionFX,
 					GetActorLocation()
 				);
+			Effect->SetWorldRotation(RootComponent->GetComponentQuat());
+				
 			}
 		}
 	);
@@ -90,6 +92,11 @@ void AExplosionGearSkill::Initialize(const FExplosionData& InData)
 {
 	Data = InData;
 
+	ApplyData();
+}
+
+void AExplosionGearSkill::ApplyData()
+{
 	Collision->SetSphereRadius(CollisionRadius * Data.Scale);
 	Collision->SetGenerateOverlapEvents(true);
 }
@@ -106,7 +113,7 @@ void AExplosionGearSkill::Explode()
 		);
 
 		NiagaraComp->SetWorldScale3D(FVector(Data.Scale));
-
+		NiagaraComp->SetWorldRotation(RootComponent->GetComponentQuat());
 	}
 
 	// カメラシェイクを爆発のスケールに応じて再生

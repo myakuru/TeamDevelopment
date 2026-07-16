@@ -6,6 +6,9 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
+#include "ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h"
+
 
 UGearBase::UGearBase():
 	OwnerPlayer(nullptr),
@@ -38,14 +41,22 @@ void UGearBase::Initialize(
 		if (!State) { continue; }
 
 		State->Initialize(Player, GearComponent, this);
+		State->SetGearSESound(GearSESound);
 	}
 
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance)		{ return; }
+
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	
 }
 
 void UGearBase::Execute(int32 CurrentGearLevel)
 {
-	if (!bCanExecute) { return; }
-
+	if (!bCanExecute)			{ return; }
+	if (!OwnerGearComponent ||
+		!PlayerRuntimeData)	{ return; }
+	
 	bIsActive			= true;
 	bCanExecute			= false;
 	ExecutedGearLevel	= CurrentGearLevel;
@@ -63,32 +74,48 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 	// 発動時間の更新
 	Duration = GearStatuses[StateIndex].Duration;
 	SimultaneousActivationCoolTime = GearStatuses[StateIndex].SimultaneousActivationCoolTime;
-
+	bAllowOtherGearActivation = false;
+	
+	const float CoolTime =  PlayerRuntimeData->IsInvincible() ?
+	GearStatuses[StateIndex].CoolTime * OwnerGearComponent->GetCoolTimeScale() :
+	GearStatuses[StateIndex].CoolTime;
 	// ギアのクールタイムをセットし、クールタイム終了時にリセット処理を呼ぶ
 	GetWorld()->GetTimerManager().SetTimer(
 		CoolTimerHandle,
 		this,
 		&UGearBase::Reset,
-		GearStatuses[StateIndex].CoolTime,
+		CoolTime,
 		false);
 
 	// 状態クラス実行処理
 	CurrentGearState->Execute(CurrentGearLevel);
+
+	if (CurrentGearState->GetGearLevelIndex() == kLv4Index)
+	{
+		OwnerGearComponent->SetIsInvincible(false);
+	}
+	
+	SetAutoAttackEffectVisibility(false);
 }
 
 void UGearBase::Update(float DeltaTime)
 {
 	if (!bIsActive)			{ return; }
-	if (!CurrentGearState)	{ return; }
+	if (!CurrentGearState ||
+		!OwnerGearComponent){ return; }
 
 	// 経過時間更新
 	ElapsedTime += DeltaTime;
 
 	// 状態クラスの更新
 	CurrentGearState->Update(DeltaTime);
-	
-	bAllowOtherGearActivation = ElapsedTime >= SimultaneousActivationCoolTime;
 
+	if (ElapsedTime >= SimultaneousActivationCoolTime
+		&& !bAllowOtherGearActivation)
+	{
+		bAllowOtherGearActivation = true;
+	}
+	
 	// 発動時間が終了したら
 	// 状態クラスの終了処理を呼び出し、更新を行わない
 	if (ElapsedTime >= Duration)
@@ -96,6 +123,18 @@ void UGearBase::Update(float DeltaTime)
 		CurrentGearState->End();
 		bIsActive	= false;
 		ElapsedTime = 0.0f;
+		SetAutoAttackEffectVisibility(true);
+		
+		if (CurrentGearState->GetGearLevelIndex() == kLv4Index)
+		{
+			const FTimerHandle& TimerHandle = OwnerGearComponent->GetInvincibilityTimerHandle();
+			const bool IsTimerActive = GetWorld()->GetTimerManager().IsTimerActive(TimerHandle);
+			if (IsTimerActive)
+			{
+				OwnerGearComponent->SetIsInvincible(true);
+			}
+		}
+		
 	}
 }
 
@@ -129,7 +168,7 @@ void UGearBase::Reset()
 {
 	bCanExecute = true;
 
-	auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
 	if (!SuperGameInstance) { return; }
 
 	const TObjectPtr<UPlayerParameterData> ParameterData
@@ -140,4 +179,13 @@ void UGearBase::Reset()
 	//UE_LOG(LogTemp, Display, TEXT("GearIndex %d"), GearIndex);
 
 }
+
+void UGearBase::SetAutoAttackEffectVisibility(bool bVisibility)
+{
+	if (!OwnerPlayer) { return; }
+	const auto AutoAttack = OwnerPlayer->GetAutoAttack();
+	if (!AutoAttack) { return; }
+	AutoAttack->SetVisibility(bVisibility);
+}
+
 

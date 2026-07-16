@@ -8,6 +8,9 @@
 /** 敵のHPが0を下回った時に呼び出される*/
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsAliveChanged,		bool			/*IsKnockBack*/);
 
+/** ダメージを受けたときに呼び出される */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDamageRatioChanged, float			/*DamageRatio*/);
+
 /**
  * 敵のランタイムな値を管理する
  */
@@ -24,8 +27,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
 	void ChangedIsAlive(const bool a_IsAlive);
 
+	/**
+	 * @brief 最終的なHP
+	 * @param InFinalHP 計算後の最終HP
+	 */
+	void SetFinalHP(float InFinalHP);
+
 	/** 敵の生存フラグが変更されたときに呼び出される*/
 	FOnIsAliveChanged		OnIsAliveChanged;
+
+	/** ダメージを受けたときに呼び出される */
+	FOnDamageRatioChanged	OnDamageRatioChanged;
+
+	/**
+	 * @brief 受けたダメージを最大体力に対する割合として算出する
+	 * @param InReciveDamage 受けたダメージ量
+	 */
+	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
+	void CalclateDamageToMaxHealthRatio(const float InReciveDamage);
 
 //private:
 
@@ -40,6 +59,10 @@ public:
 	/** 死亡判定*/
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	bool	IsAlive = true;
+
+	/**	最大HPに対して受けたダメージ割合 */
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	float	DamageToMaxHealthRatio = 0.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
 	int32	HitIndex = 0;												/** 攻撃が何連撃目か*/

@@ -6,6 +6,10 @@
 
 #include "DashGearStateBase.generated.h"
 
+namespace SEIndex {
+	inline constexpr int32 DashSESoundIndex	= 0;
+}
+
 /** ナイアガラシステムクラス */
 class UNiagaraSystem;
 
@@ -22,7 +26,6 @@ class PROJECTNULL_API UDashGearStateBase : public UGearStateBase
 	GENERATED_BODY()
 public:	
 	UDashGearStateBase();
-public:
 
 	virtual void Initialize(
 		class APlayerBase* InPlayer,

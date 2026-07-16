@@ -8,7 +8,14 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
-AAutoAttackHitActor::AAutoAttackHitActor()
+AAutoAttackHitActor::AAutoAttackHitActor():
+	HitActors(TSet<TObjectPtr<AActor>>()),
+	PreviousLocation(FVector::ZeroVector),
+	BoxComp(nullptr),
+	GameInstance(nullptr),
+	PlayerRuntimeData(nullptr),
+	AttackPowerScale(1.f),
+	bEnabled(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -18,16 +25,8 @@ AAutoAttackHitActor::AAutoAttackHitActor()
 	if (!BoxComp) { return; }
 	BoxComp->SetupAttachment(RootComponent);
 	BoxComp->SetCollisionEnabled(
-		ECollisionEnabled::QueryOnly);
+		ECollisionEnabled::Type::NoCollision);
 
-	BoxComp->SetGenerateOverlapEvents(true);
-	BoxComp->SetCollisionResponseToChannel(
-		ECC_Enemy,
-		ECR_Overlap);
-
-	BoxComp->OnComponentBeginOverlap.AddDynamic(
-		this,
-		&AAutoAttackHitActor::OnAutoAttackBeginOverlap);
 }
 
 void AAutoAttackHitActor::BeginPlay()
@@ -37,6 +36,9 @@ void AAutoAttackHitActor::BeginPlay()
 	// ゲームインスタンス取得
 	GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
 
+	if (!GameInstance) { return; }
+	PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+
 	if (!BoxComp) { return; }
 	PreviousLocation = BoxComp->GetComponentLocation();
 }
@@ -44,46 +46,35 @@ void AAutoAttackHitActor::BeginPlay()
 void AAutoAttackHitActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (!BoxComp) { return; }
-
+	
 	PerformHitSweep();
 
-	PreviousLocation = BoxComp->GetComponentLocation();
-
-	HitActors.Empty();
-}
-
-void AAutoAttackHitActor::SetHitEnabled(bool bEnabled)
-{
-	const ECollisionEnabled::Type CollisionType =
-		bEnabled
-		? ECollisionEnabled::QueryOnly
-		: ECollisionEnabled::NoCollision;
-
 	if (!BoxComp) { return; }
-	BoxComp->SetCollisionEnabled(CollisionType);
+	PreviousLocation = BoxComp->GetComponentLocation();
 }
 
-void AAutoAttackHitActor::OnAutoAttackBeginOverlap(
-	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
+void AAutoAttackHitActor::SetHitEnabled(bool bInEnabled)
 {
-	//// キャラクターインターフェースを実装しているか
-	//if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
-	//{
-	//	Interface->ApplyDamaged();
-	//	Interface->ApplyKnockBack(GetActorLocation());
-	//}
+	const bool bWasEnabled = bEnabled;
+	bEnabled = bInEnabled;
+
+	// OFF -> ON の瞬間だけ、ヒット済みリストと基準位置をリセット
+	if (bEnabled && !bWasEnabled)
+	{
+		HitActors.Empty();
+
+		if (BoxComp)
+		{
+			PreviousLocation = BoxComp->GetComponentLocation();
+		}
+	}
 }
 
 void AAutoAttackHitActor::PerformHitSweep()
 {
+	if (!bEnabled) { return; }
 	if (!BoxComp) { return; }
+	//UE_LOG(LogTemp, Display, TEXT("hi 生成"));
 
 	const FVector CurrentLocation =
 		BoxComp->GetComponentLocation();
@@ -119,36 +110,22 @@ void AAutoAttackHitActor::PerformHitSweep()
 		if (!HitActor) { continue; }
 		
 		// 既に当たった敵は除外
-		if (HitActors.Contains(HitActor))
-		{
-			continue;
-		}
+		if (HitActors.Contains(HitActor)) { continue; }
 
 		HitActors.Add(HitActor);
 
 		auto* Interface = Cast<ICharacterInterface>(HitActor);
 		if (!Interface) { continue; }
 
-		Interface->ApplyDamaged(SetAttackDamage());
+		Interface->ApplyDamaged(GetAttackDamage());
+		Interface->ApplyLocalHitPos(Hit.Location);
 		Interface->ApplyKnockBack(GetActorLocation());
-		UE_LOG(LogTemp, Display, TEXT("当たった"));
 	}
 }
 
-float AAutoAttackHitActor::SetAttackDamage()
+float AAutoAttackHitActor::GetAttackDamage() const
 {
-	if (GameInstance)
-	{
-		PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
-
-		if (PlayerRuntimeData)
-		{
-			float AttackDamage = PlayerRuntimeData->GetCharacterAttackPower();
-
-			return AttackDamage;
-		}
-	}
-
-	return 1.0f;
+	if (!PlayerRuntimeData) { return 1.f; }
+	return PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale);
 }
 

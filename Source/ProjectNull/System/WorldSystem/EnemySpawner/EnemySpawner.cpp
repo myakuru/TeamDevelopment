@@ -7,6 +7,7 @@
 #include "EnemySpawnPattern/EnemySpawnPatternBase.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyGrunt/EnemyGruntBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/System/WorldSystem/EnemySpawner/EnemyPhaseSpawnTable.h>
@@ -17,6 +18,14 @@ AEnemySpawner::AEnemySpawner()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+}
+
+void AEnemySpawner::SetFinalPhase()
+{
+	if (FinalPhase) { return; }
+	FinalPhase = true;
+
+	ApplySpawnModeByPhase(PhaseSpawnTable->FinalWave);
 }
 
 void AEnemySpawner::BeginPlay()
@@ -59,6 +68,12 @@ void AEnemySpawner::BeginPlay()
 	{
 		CachedSubsystem->OnPhaseChanged.AddUObject(this, &AEnemySpawner::HandlePhaseChanged);
 		HandlePhaseChanged(CachedSubsystem->GetPhase());
+		
+		CachedSubsystem = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
+		if (CachedSubsystem)
+		{
+			CachedSubsystem->SetPhaseThresholds(PhaseSpawnTable->PhaseWaves[0].PhaseUpDeathEnemyCount);
+		}
 	}
 }
 
@@ -192,14 +207,60 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 	// 新しいウェーブデータを取得
 	UEnemyWaveDataAsset* NewWaveData = 
 		const_cast<UEnemyWaveDataAsset*>(PhaseSpawnTable->FindWaveDataByPhase(NewPhase));
-	
+
 	if (!NewWaveData)
 	{
 		UE_LOG(LogTemp, Error, TEXT("No WaveData found Phase : %d"), NewPhase);
-		CurrentWaveData = nullptr;
+		//CurrentWaveData = nullptr;
 		return;
 	}
 
 	CurrentWaveData = NewWaveData;
 	NowPhase = NewPhase;
+
+	CachedSubsystem = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
+	if (CachedSubsystem)
+	{
+		CachedSubsystem->SetPhaseThresholds(PhaseSpawnTable->PhaseWaves[NewPhase].PhaseUpDeathEnemyCount);
+	}
+
+	// 中ボス出現
+	if (PhaseSpawnTable->FinalWave == NewPhase)
+	{
+		FinalPhase = true;
+
+		if (PhaseSpawnTable->StageBoss)
+		{
+
+			AEnemyBossBase* Boss = GetWorld()->SpawnActor<AEnemyBossBase>(
+				PhaseSpawnTable->StageBoss,
+				GetActorLocation(),
+				GetActorRotation());
+
+			if (!IsValid(Boss))
+			{
+				return;
+			}
+		}
+	}
+
+	// ボス出現
+	if (PhaseSpawnTable->BossWave == NewPhase)
+	{
+		BossPhase = true;
+
+		if (PhaseSpawnTable->StageBoss)
+		{
+
+			AEnemyBossBase* Boss = GetWorld()->SpawnActor<AEnemyBossBase>(
+				PhaseSpawnTable->StageBoss,
+				GetActorLocation(),
+				GetActorRotation());
+
+			if (!IsValid(Boss))
+			{
+				return;
+			}
+		}
+	}
 }

@@ -48,6 +48,8 @@ public:
 
 private:
 
+	void ApplyData();
+
 	void Explode();
 
 	/** スフィアコリジョンコンポーネント */
@@ -63,7 +65,7 @@ private:
 	TObjectPtr<UNiagaraSystem> PreExplosionFX;
 
 	/** 爆発パラメータデータ */
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FExplosionData Data;
 
 	/** カメラシェイククラス */

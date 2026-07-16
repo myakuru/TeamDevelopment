@@ -19,6 +19,7 @@ namespace InGameDefinition {
 }
 
 class UMySaveGame;
+class USoundManager;
 class UStageManager;
 class UWeaponManager;
 class UResultManager;
@@ -47,6 +48,9 @@ public:
 	/** セーブデータを取得する */
 	inline UMySaveGame* GetCurrentSaveData() const { return CurrentSaveData; }
 
+	/** サウンドマネージャーを取得する */
+	inline TObjectPtr<USoundManager> GetSoundManager() const { return SoundManager; }
+	
 	/** ステージマネージャーを取得する */
 	inline TObjectPtr<UStageManager> GetStageManagerSubsystem() const { return StageManager; }
 
@@ -70,6 +74,13 @@ protected:
 	/** セーブデータ */
 	UPROPERTY()
 	UMySaveGame* CurrentSaveData;
+	
+	/** サウンドマネージャー*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<USoundManager> SoundManagerClass;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<USoundManager> SoundManager;
 
 	/** ステージマネージャー */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

@@ -204,7 +204,7 @@ void UGearSpecialAction::UpdateTargetArmLength(
 		return;
 	}
 
-	auto SpringArm = Player->GetSpringArmComponent();
+	const auto SpringArm = Player->GetSpringArmComponent();
 	if (!SpringArm) { return; }
 
 	if (!CameraSequenceData.IsValidIndex(DataIndex)) { return; }

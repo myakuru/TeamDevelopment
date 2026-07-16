@@ -129,6 +129,9 @@ void UEnemyBossAnimNotify_AttackHit::NotifyEnd(USkeletalMeshComponent* MeshComp,
 	HitActors.Empty();
 }
 
+// ------------------------------------------------------------------------------------
+//		地面衝撃エフェクト生成処理
+// ------------------------------------------------------------------------------------
 bool UEnemyBossAnimNotify_AttackHit::TrySpawnGroundImpactEffect(
 	USkeletalMeshComponent* MeshComp, 
 	const FVector&			TraceCenter,
@@ -142,17 +145,24 @@ bool UEnemyBossAnimNotify_AttackHit::TrySpawnGroundImpactEffect(
 
 	if (!IsValid(World) || !IsValid(Owner)) { return false; }
 
+	// 地面を探すためのLineTraceの開始位置
+	// 攻撃判定より少し上からTraceを開始する
 	const FVector Start = TraceCenter + FVector(0.0f, 0.0f, GroundTraceUpDistance);
+	// 地面を探すためのLineTrace終了位置
+	// 攻撃判定中心より下方向へTraceする
 	const FVector End	= TraceCenter - FVector(0.0f, 0.0f, GroundTraceDownDistance);
 
 	FHitResult Hit;
 
+	// Trace用のパラメータ
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(BossGroundImpactEffect), true);
+	// 自分自身にはTraceが当たらないようにする
 	Params.AddIgnoredActor(Owner);
 
 	// これがないと Physical Material が取れない
 	Params.bReturnPhysicalMaterial = true;
 
+	// Visibilityチャンネルで地面方向へLineTraceする
 	const bool bHit = World->LineTraceSingleByChannel(
 		Hit,
 		Start,
@@ -161,6 +171,7 @@ bool UEnemyBossAnimNotify_AttackHit::TrySpawnGroundImpactEffect(
 		Params
 	);
 
+	// 地面Traceのデバッグ表示
 	if (bDrawGroundImpactDebug)
 	{
 		DrawDebugLine(
@@ -188,50 +199,65 @@ bool UEnemyBossAnimNotify_AttackHit::TrySpawnGroundImpactEffect(
 		}
 	}
 
+	// ヒットしなければエフェクトを出さない
 	if (!bHit)
 	{
 		return false;
 	}
-
+	
+	// デフォルトのサーフェイス
 	EPhysicalSurface SurfaceType = SurfaceType_Default;
 
+	// ヒットした物理マテリアルが有効なら、Surfaceを取得する
 	if (Hit.PhysMaterial.IsValid())
 	{
 		SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
 	}
 
+	// Surfaceに対応したNiagaraSystemを取得
 	UNiagaraSystem* Effect = GetGroundImpactEffect(SurfaceType);
 
+	// 対応エフェクトがない場合は生成しない
 	if (!Effect)
 	{
 		return false;
 	}
 
+	// エフェクトの生成位置
+	// ImpactPointそのままだと地面に埋まりやすいため、法線方向に少し浮かせる
 	const FVector SpawnLocation = Hit.ImpactPoint + Hit.ImpactNormal * 2.0f;
 
 	// エフェクトの向きとVelocityを作る
+
+	// 攻撃元ソケットの前方向を取得
 	const FVector SocketForward = SourceTransform.GetUnitAxis(EAxis::X);	// Xが前、Yが右、Zが上
 	const FVector SocketRight	= SourceTransform.GetUnitAxis(EAxis::Y);
 	const FVector SocketUp		= SourceTransform.GetUnitAxis(EAxis::Z);
 
-	// NiagaraのZ方向を地面の法線に合わせる
+	// ソケットの前方向を、地面の平面上に投影する
+	// これにより、坂道などでも地面に沿った前方向を作れる
 	FVector EffectForward = FVector::VectorPlaneProject(SocketForward, Hit.ImpactNormal).GetSafeNormal();
+	
+	// ソケットの前方向が地面法線とほぼ同じ方向だった場合、
+	// 平面投影した結果がゼロ近くなる時がある。
+	// その場合はOwnerの前方向を使う
 	if (EffectForward.IsNearlyZero())
 	{
 		EffectForward = FVector::VectorPlaneProject(MeshComp->GetOwner()->GetActorForwardVector(), Hit.ImpactNormal).GetSafeNormal();
 	}
 
-	// X方向 = 攻撃Socketの前方向　Z方向 = 地面の法線方向
+	// X方向 = 攻撃Socketの前方向　Z方向 = 地面の法線方向 に合わせた回転を作る
 	const FRotator SpawnRotation = FRotationMatrix::MakeFromXZ(EffectForward, Hit.ImpactNormal).Rotator();
 
 	// 攻撃方向に飛ぶ速度 + 地面から少し跳ねる速度
 	const FVector ImpactVelocity = EffectForward * VelocityPower + Hit.ImpactNormal * UpVelocityPower;
 
+	// Niagaraの生成
 	UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 		World,
 		Effect,
 		SpawnLocation,
-		SpawnRotation,
+		FRotator::ZeroRotator,
 		FVector(1.0f),
 		false,
 		false,

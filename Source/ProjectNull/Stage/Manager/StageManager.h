@@ -5,10 +5,13 @@
 #include <ProjectNull/SaveGame/StageProgressData.h>
 
 #include <ProjectNull/Data/Result/ResultData/ResultData.h>
+#include <ProjectNull/System/Timer/FGameTimer.h>
 #include "StageManager.generated.h"
 
 class UStageDataAsset;
 class UMySaveGame;
+class USoundBase;
+class UAudioComponent;
 
 /**
  * ステージの状況を管理するマネージャー
@@ -32,8 +35,20 @@ public:
 	UFUNCTION()
 	void InGameFinalize();
 
+	/** ステージ制限時間のカウントダウンを開始する（制限時間は StageDataAsset から取得） */
+	void StartStageTimer();
+
+	/** ステージタイマーの毎秒通知を購読するためのデリゲート参照（表示Widget用） */
+	FOnTimerTick& GetOnStageTimerTick() { return StageTimer.OnTick; }
+
+	/** ステージタイマーの終了通知を購読するためのデリゲート参照（表示Widget用） */
+	FOnTimerFinished& GetOnStageTimerFinished() { return StageTimer.OnFinished; }
+
 	UFUNCTION()
 	void OutGameInitialize();
+	
+	UFUNCTION()
+	void OutGameFinalize();
 
 	UFUNCTION()
 	void AddAcquiredWeapon(const FName& WeaponName) {
@@ -84,4 +99,20 @@ private:
 
 	/** クリア時にResultManagerに渡す情報 */
 	FResultData ResultData;
+
+	/** ステージ制限時間のタイマー */
+	FGameTimer StageTimer;
+	
+	/** BGM */
+	UPROPERTY(EditAnywhere,Category = "Sound")
+	TObjectPtr<USoundBase> OutGameBGMSound;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> OutGameBGMSoundComponent;
+	
+	UPROPERTY(EditAnywhere,Category = "Sound")
+	TObjectPtr<USoundBase> InGameBGMSound;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> InGameBGMSoundComponent;
 };

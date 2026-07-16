@@ -54,6 +54,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	float InsiteDistance = 400.0f;
 
+	/** 下がっているときに、一定以上離れたらステートを抜ける*/
+	UPROPERTY(EditAnywhere, Category = "Input")
+	float BackOutDistance = 600.0f;
+
 	/** 一定範囲外にターゲットが出たらステートを抜ける用*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	float GetOutDistance = 1200.0f;

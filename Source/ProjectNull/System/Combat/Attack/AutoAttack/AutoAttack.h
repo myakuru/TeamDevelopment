@@ -30,12 +30,13 @@ class PROJECTNULL_API UAutoAttack final : public UAttackBase
 	GENERATED_BODY()
 public:
 	UAutoAttack();
-public:
 
 	void Initialize(const TObjectPtr<AActor>& Owner)	override;
 	void Update(float DeltaTime)						override;
 	void Execute(const FVector& InTargetLocation = FVector::ZeroVector)		override { return; }
 
+	void SetVisibility(bool bVisibility);
+	
 	/** Getter */
 	inline float GetAutoAttackInterval() const	{ return AutoAttackInterval; }
 	inline float GetFrontToRingDelay() const	{ return FrontToRingDelay; }

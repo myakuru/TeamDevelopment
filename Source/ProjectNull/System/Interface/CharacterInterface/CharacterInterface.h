@@ -34,6 +34,12 @@ public:
 	virtual void ApplyDamaged(float InDamage)PURE_VIRTUAL(ICharacterInterface::ApplyDamaged, );
 
 	/**
+	 * @brief 当たった位置を渡す処理
+	 * @param WorldHitLocation	衝突した座標
+	 */
+	virtual void ApplyLocalHitPos(const FVector& WorldHitLocation) { return; }
+
+	/**
 	 * @brief ノックバックを受ける処理
 	 * @param OwnerLocation 攻撃者の位置
 	 */

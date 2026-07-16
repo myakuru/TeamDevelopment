@@ -13,7 +13,7 @@ class PROJECTNULL_API UFloatingWeaponStandState final : public UFloatingWeaponSt
 	
 public:
 	UFloatingWeaponStandState();
-public:
+	
 	void Initialize() override;
 	void Start()					override;
 	void Update(float DeltaTime)	override;

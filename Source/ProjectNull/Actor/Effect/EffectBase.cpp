@@ -15,7 +15,7 @@ UEffectBase::UEffectBase():
 
 void UEffectBase::Start(USceneComponent* RootComponent)
 {
-	if (!EffectSystem) { return; }
+	if (!EffectSystem || EffectComponent) { return; }
 
 	EffectComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		EffectSystem,
@@ -30,11 +30,42 @@ void UEffectBase::Start(USceneComponent* RootComponent)
 	EffectComponent->SetRelativeTransform(RelativeTransform);
 }
 
+void UEffectBase::StartOnce(USceneComponent* RootComponent)
+{
+	if (!EffectSystem) { return; }
+
+	const auto Comp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+		EffectSystem,
+		RootComponent,
+		NAME_None,
+		FVector::ZeroVector,
+		FRotator::ZeroRotator,
+		EAttachLocation::KeepRelativeOffset,
+		true);
+
+	if (!Comp) { return; }
+	Comp->SetRelativeTransform(RelativeTransform);
+	
+}
+
 void UEffectBase::DeactivateEffect()
 {
 	if (!EffectComponent) { return; }
 	EffectComponent->Deactivate();
 	EffectComponent = nullptr;
+}
+
+void UEffectBase::DeactivateImmediateEffect()
+{
+	if (!EffectComponent) { return; }
+	EffectComponent->DeactivateImmediate();
+	EffectComponent = nullptr;
+}
+
+void UEffectBase::SetVisibility(bool bVisibility)
+{
+	if (!EffectComponent) { return; }
+	EffectComponent->SetVisibility(bVisibility);
 }
 
 void UEffectBase::SetAbsolute(

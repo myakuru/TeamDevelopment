@@ -42,6 +42,10 @@ class APlayerBase;
 /** ギアの状態基底クラス */
 class UGearStateBase;
 
+class UPlayerRuntimeData;
+
+/** 効果音 */
+class USoundBase;
 
 /** ギアの基底クラス */
 UCLASS()
@@ -54,6 +58,7 @@ public:
 
 	/** 最大ギアレベル */
 	static constexpr int32 kMaxGearLevel = 4;
+	static constexpr int32 kLv4Index = 3;
 
 	/**
 	 * @brief ギアの初期化処理
@@ -107,12 +112,18 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UPlayerGearComponent> OwnerGearComponent;
 
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
 private:
 
 	/**
 	 * @brief ギアの発動時間終了時のリセット処理
 	 */
 	virtual void Reset();
+	
+	void SetAutoAttackEffectVisibility(bool bVisibility);
 
 	/** ギアの状態配列 */
 	UPROPERTY(EditAnywhere, Instanced)
@@ -121,8 +132,13 @@ private:
 	/** ギアのステータス配列 */
 	UPROPERTY(EditAnywhere)
 	TArray<FGearStatus> GearStatuses;
+	
+	/** 効果音 */
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<USoundBase>> GearSESound;
 
 	/** 現在のギア状態 */
+	UPROPERTY()
 	TObjectPtr<UGearStateBase> CurrentGearState;
 
 	/** 実行時のギアレベルを保持する用途 */

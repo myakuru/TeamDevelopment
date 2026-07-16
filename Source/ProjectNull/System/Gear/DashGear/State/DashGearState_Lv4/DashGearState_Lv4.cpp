@@ -1,10 +1,6 @@
 ﻿
 #include "DashGearState_Lv4.h"
 
-#include "Camera/CameraComponent.h"
-#include <GameFramework/SpringArmComponent.h>
-
-#include <ProjectNull/Actor/GhostActor/GhostActor.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Effect/AfterImageAttackEffect/AfterImageAttackEffect.h>
 
@@ -13,7 +9,6 @@
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
 #include <ProjectNull/System/Gear/DashGear/DashGear.h>
-
 #include <ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.h>
 
 #include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>

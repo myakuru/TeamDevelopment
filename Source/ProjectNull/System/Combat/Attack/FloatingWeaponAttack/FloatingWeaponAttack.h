@@ -25,11 +25,8 @@ class PROJECTNULL_API UFloatingWeaponAttack final : public UAttackBase
 {
 	GENERATED_BODY()
 public:
-
 	UFloatingWeaponAttack();
-
-public:
-
+	
 	void Initialize(const TObjectPtr<AActor>& Owner)			override;
 	void Update(float DeltaTime)								override;
 
@@ -39,6 +36,8 @@ public:
 	virtual void Execute(const FVector& InTargetLocation = FVector::ZeroVector)override;
 
 
+	void SetVisibility(bool bVisibility);
+	
 	bool IsAttackStateStep();
 
 	float TotalTransitionStateTime();
@@ -72,6 +71,7 @@ public:
 
 	/** ゲッター */
 	inline UAutoAttack* GetAutoAttack() const { return AutoAttack; }
+	inline AAutoAttackHitActor* GetAutoAttackHitActor() const { return AutoAttackHitActor; }
 	inline float GetStartAngle() const { return StartAngle; }
 	inline float GetCurrentAngle() const { return CurrentAngle; }
 	
@@ -133,4 +133,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float RotationInterpSpeed;
+	
+	bool bEffectVisibility;
 };

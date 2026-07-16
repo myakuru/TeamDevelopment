@@ -5,7 +5,12 @@
 #include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 
 UFloatingWeaponStateBase::UFloatingWeaponStateBase():
-	TransitionTime(0.0f)
+	Owner(nullptr),
+	OwnerActor(nullptr),
+	RadiusOffset(0.f),
+	TransitionTime(0.0f),
+	RelativeRotation(FRotator()),
+	RelativeTransform(FTransform())
 {
 }
 
