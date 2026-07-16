@@ -28,8 +28,6 @@ void UStageManager::Initialize() {
 		this,
 		&UStageManager::ChangeStageInvestigation
 	);
-	
-	StartStageTimer();
 }
 
 void UStageManager::LoadFromSaveData(UMySaveGame* inSaveGame)
@@ -76,6 +74,9 @@ void UStageManager::InGameInitialize(int32 inNowStageIndex)
 {
 	NowStageIndex = inNowStageIndex;
 
+	//ステージ開始時に制限時間タイマーを開始
+	StartStageTimer();
+
 	//取得ギアのリセット
 	AcquiredWeapons.Reset();
 
@@ -112,7 +113,11 @@ void UStageManager::StartStageTimer()
 
 void UStageManager::InGameFinalize()
 {
-	if (NowStageIndex < StageDefinition::OutGameStageIndex)return;
+	//アウトゲーム中（NowStageIndex == OutGameStageIndex）に呼ばれても処理しない
+	if (NowStageIndex <= StageDefinition::OutGameStageIndex)return;
+
+	//ボス撃破など制限時間以外の要因で呼ばれた場合に備えてタイマーを停止
+	StageTimer.StopTimer();
 
 	//次のステージ解放
 	if(NowStageIndex + 1 < StageProgressList->Num())
@@ -223,6 +228,10 @@ void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 
 	if (!isInGame)
 	{
+		//アウトゲームに遷移したら制限時間タイマーを確実に停止する
+		//（動いたままだと NowStageIndex = -1 の状態で InGameFinalize が発火してしまう）
+		StageTimer.StopTimer();
+
 		//OutGameInitialize();
 		//ゲーム起動時では再生出来ないため、次のtickに任せる
 		LoadedWorld->GetTimerManager().SetTimerForNextTick(
