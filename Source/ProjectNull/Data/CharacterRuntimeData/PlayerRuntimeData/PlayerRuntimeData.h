@@ -3,7 +3,6 @@
 
 #include "CoreMinimal.h"
 #include "../CharacterRuntimeData.h"
-#include "ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h"
 #include "PlayerRuntimeData.generated.h"
 
 /** 経験値が変更されたときに呼び出されるデリゲート */
@@ -291,12 +290,9 @@ private:
 	 * @param Value 反映する倍率
 	 */
 	void ApplyUpgradeEffect(EUpgradeEffectType Type, float Value);
-
-	/** 効果種別ごとの現在倍率を取得（未設定なら 1.0） */
-	float GetEffectMultiplier(EUpgradeEffectType Type) const;
-
+	
 	/** 指定Idの「現在レベル」の効果データを DataTable から取得（無ければ nullptr） */
-	const FExpUpgradeLevelData* FindCurrentLevelData(FName Id) const;
+	FExpUpgradeLevelData* FindCurrentLevelData(FName Id);
 
 	/**
 	 * @brief HPの更新処理
@@ -346,8 +342,5 @@ private:
 	/** 行名 -> 現在の強化レベル（配列インデックス） */
 	UPROPERTY()
 	TMap<FName, int32> UpgradeLevels;
-
-	/** 効果種別 -> 現在の倍率。効果を増やしてもここに項目が増えるだけで済む */
-	TMap<EUpgradeEffectType, float> EffectMultipliers;
 
 };
