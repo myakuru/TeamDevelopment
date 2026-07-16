@@ -2,10 +2,8 @@
 
 #include <ProjectNull/Component/HitStopComponent/HitStopComponent.h>
 
-#include <ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
-
 #include <ProjectNull/Actor/Effect/EffectBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 
@@ -13,6 +11,7 @@
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 #include <ProjectNull/System/Gear/GearBase.h>
+#include <ProjectNull/System/Combat/Attack/CollisionAttack/SphereAttack/SphereAttack.h>
 
 #include <GameFramework/CharacterMovementComponent.h>
 
@@ -27,8 +26,7 @@ UPlayerGearComponent::UPlayerGearComponent():
 		PlayerRuntimeData(nullptr),
 		PlayerParameterData(nullptr),
 		PlayerGears(TArray<TObjectPtr<UGearBase>>()),
-		SphereCollision(nullptr),
-		SphereCollisionClass(nullptr),
+		SphereAttack(nullptr),
 		InvincibleEffect(nullptr),
 		CurrentGearLevel(1),
 		HitStopDuration(0.f),

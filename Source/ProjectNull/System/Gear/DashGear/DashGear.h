@@ -26,7 +26,17 @@ public:
 	void SetSphereTransform(const FTransform& Transform) const;
 
 private:
-
+	/**
+	 * @brief 攻撃がHITした時に呼び出されるデリゲート登録関数
+	 */
+	void OnDashGearAttackBeginOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult);
+	
 	/**
 	 * @brief 球状攻撃クラス配列(ステートレベルが複数あるため)
 	 */

@@ -2,17 +2,15 @@
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
-#include <ProjectNull/Actor/CollisionActor/SphereCollision/SphereCollision.h>
 
-#include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/System/Combat/Attack/CollisionAttack/CollisionAttack.h>
 
+// 備忘録
+// 元は攻撃スケーラーという倍率変数があったが、
+// 攻撃の威力を変更して対応する
 
-
-UDashGear::UDashGear():
-	SphereCollision(nullptr),
-	SphereCollisionClass(nullptr),
-	AttackPowerScale(1.f)
+UDashGear::UDashGear()
+	:	SphereAttacks(TArray<TObjectPtr<UCollisionAttack>>())
 {
 }
 
@@ -67,22 +65,6 @@ void UDashGear::SetSphereTransform(const FTransform& Transform) const
 	SphereAttacks[CurrentExecuteAttackIndex]->ApplyCollisionTransform(Transform);
 }
 
-void UDashGear::SetSphereTransform(const FTransform& Transform)
-{
-	if (!SphereCollision) { return; }
-	SphereCollision->SetActorTransform(Transform);
-}
-
-void UDashGear::SetSphereRadius(float Radius)
-{
-	if (!SphereCollision) { return; }
-
-	auto SphereComp = SphereCollision->GetSphereComponent();
-	if (!SphereComp) { return; }
-
-	SphereComp->SetSphereRadius(Radius);
-}
-
 void UDashGear::OnDashGearAttackBeginOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
@@ -91,18 +73,8 @@ void UDashGear::OnDashGearAttackBeginOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	//UE_LOG(LogTemp, Display, TEXT("DashAttack"));
-
-	if (!OwnerPlayer) { return; }
-	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
-
+	if (!IsValid(OtherActor)) { return; }
 	const auto Interface = Cast<ICharacterInterface>(OtherActor);
-	if (!Interface) { return; }
-	Interface->ApplyDamaged(PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale));
-	Interface->ApplyKnockBack(PlayerLocation);
-	//Interface->ApplyLocalHitPos(OtherActor->GetActorLocation());
-
-
 
 	// TargetのActorのローカル座標を取得
 	FVector HitWorldLocation = OwnerPlayer->GetActorLocation();
@@ -136,4 +108,3 @@ void UDashGear::OnDashGearAttackBeginOverlap(
 
 	Interface->ApplyLocalHitPos(HitWorldLocation);
 }
-
