@@ -117,7 +117,7 @@ void ASphereCollision::GeneratedSphereComponents()
 #if WITH_EDITOR
 		FName LabelName = *FString::Printf(TEXT("#%d"), i);
 		UTextRenderComponent* Label = NewObject<UTextRenderComponent>(this, LabelName);
-		Label->SetHiddenInGame(false);
+		Label->SetHiddenInGame(true);
 		Label->SetupAttachment(NewSphere);
 		Label->SetText(FText::FromName(LabelName));
 		Label->SetWorldSize(30.f);
