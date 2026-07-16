@@ -1,5 +1,6 @@
 ﻿#include "ButtonBaseWidget.h"
 #include "Components/Button.h"
+#include "Components/AudioComponent.h"
 
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Sound/SoundManager.h>
@@ -19,7 +20,9 @@ void UButtonBaseWidget::OnHoveredButton()
 	if (HoverSound)
 	{
 		GetWorld()->GetGameInstance<USuperGameInstance>()->
-			GetSoundManager()->Play2D(HoverSound);
+			GetSoundManager()->Play2D(
+				HoverSound,1.0f,1.0f,0.0f,
+				nullptr,nullptr,true);
 	}
 	
 	DoHoveredButton();
@@ -35,9 +38,12 @@ void UButtonBaseWidget::OnClickedButton()
 {
 	if (ClickSound)
 	{
-		GetWorld()->GetGameInstance<USuperGameInstance>()->
-		GetSoundManager()->Spawn2D(ClickSound,1.0f,1.0f,0.0f,
+		UAudioComponent* audio = 
+			GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Spawn2D(ClickSound,1.0f,1.0f,0.0f,
 			nullptr,true,true);
+		
+		audio->bIsUISound = true;
 	}
 	
 	DoClickedButton();

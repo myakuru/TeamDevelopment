@@ -7,6 +7,7 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 #include <ProjectNull/Weapon/Data/WeaponData.h>
+#include <ProjectNull/UI/Parts/Button/ButtonBaseWidget.h>
 
 void UGetGearHUDWidget::SetGearData(const FName& inGearName)
 {
