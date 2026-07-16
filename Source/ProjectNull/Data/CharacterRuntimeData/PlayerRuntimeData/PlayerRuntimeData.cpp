@@ -140,7 +140,7 @@ void UPlayerRuntimeData::CalculateFinalSpeed(
 	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
 	
-	//Speed.Final *= GetEffectMultiplier(EUpgradeEffectType::PlayerSpeed);
+	Speed.Final *= GetEffectMultiplier(EUpgradeEffectType::PlayerSpeed);
 }
 
 void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Data)
@@ -204,7 +204,7 @@ void UPlayerRuntimeData::ApplySelectedUpgrade(FName Id)
 	UpdateUpgradeStates(Id);
 	
 	// ステータスの更新
-	//UpdateStatus();
+	UpdateStatus();
 }
 
 void UPlayerRuntimeData::ApplyUpgradeEffect(EUpgradeEffectType Type, float Value)
@@ -213,17 +213,11 @@ void UPlayerRuntimeData::ApplyUpgradeEffect(EUpgradeEffectType Type, float Value
 	EffectMultipliers.FindOrAdd(Type) = Value;
 }
 
-float UPlayerRuntimeData::GetEffectMultiplier(EUpgradeEffectType Type) const
-{
-	const float* Found = EffectMultipliers.Find(Type);
-	return Found ? *Found : 1.0f;
-}
-
-const FExpUpgradeLevelData* UPlayerRuntimeData::FindCurrentLevelData(FName Id) const
+FExpUpgradeLevelData* UPlayerRuntimeData::FindCurrentLevelData(FName Id)
 {
 	if (!CachedExpUpgradeTable) { return nullptr; }
 
-	const FExpUpgradeRow* Row = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(Id, TEXT(""));
+	FExpUpgradeRow* Row = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(Id, TEXT(""));
 	if (!Row) { return nullptr; }
 
 	const int32 LevelIndex = FCString::Atoi(*GetUpgradeLevel(Id).ToString());

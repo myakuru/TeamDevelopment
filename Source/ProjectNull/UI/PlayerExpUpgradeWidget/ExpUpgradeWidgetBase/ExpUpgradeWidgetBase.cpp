@@ -7,6 +7,7 @@
 #include "Input/Events.h"
 #include "Input/Reply.h"
 #include "ProjectNull/GameInstance/SuperGameInstance.h"
+#include "ProjectNull/Sound/SoundManager.h"
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 void UExpUpgradeWidgetBase::NativeConstruct()
@@ -71,6 +72,11 @@ void UExpUpgradeWidgetBase::NativeOnMouseEnter(const FGeometry& InGeometry, cons
 
 	// 状態を記録するだけ。実際のスケール変化は UpdateScale() が毎フレーム行う
 	bIsMouseOver = true;
+	
+	GetWorld()->GetGameInstance<USuperGameInstance>()->
+		GetSoundManager()->Play2D(
+			HoverSESound,1.0f,1.0f,0.0f,
+			nullptr,nullptr,true);
 }
 
 void UExpUpgradeWidgetBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)

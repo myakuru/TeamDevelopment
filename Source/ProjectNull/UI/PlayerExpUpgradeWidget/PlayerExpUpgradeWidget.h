@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
@@ -12,6 +10,9 @@ class USuperGameInstance;
 class UPlayerRuntimeData;
 
 class UImage;
+
+class USoundBase;
+class UAudioComponent;
 
 /**
  * 経験値がレベルアップしたら呼ばれるクラス
@@ -94,4 +95,17 @@ protected:
 	bool bIsUpgradeWidgetOpen = false;
 
 	bool bIsOpen = false;
+	
+	/** 音 */
+	UPROPERTY(EditAnywhere,Category = "Sound")
+	TObjectPtr<USoundBase>OpenWidgetSESound;
+	
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> OpenWidgetSEAudioComponent;
+	
+	UPROPERTY(EditAnywhere,Category = "Sound")
+	TObjectPtr<USoundBase>HoverSESound;
+	
+	UPROPERTY(EditAnywhere,Category = "Sound")
+	TObjectPtr<USoundBase>ClickSESound;
 };
