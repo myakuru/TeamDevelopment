@@ -12,7 +12,7 @@ void UPositionAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 	
 	SphereAttack = NewObject<USphereAttack>(this,SubSphereAttack);
 	if (!IsValid(SphereAttack)) { return; }
-	SphereAttack->Initialize(GetOwnerActor());
+	SphereAttack->Initialize(GetOwnerActor().Get());
 }
 
 void UPositionAttack::Execute(const FVector& InTargetLocation)

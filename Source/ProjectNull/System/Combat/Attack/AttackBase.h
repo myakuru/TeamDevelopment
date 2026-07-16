@@ -117,7 +117,7 @@ public:
 
 	/* Begin ProtectedMember Getters */
 	/** クラスのオーナーを取得 */
-	TObjectPtr<AActor> GetOwnerActor()const { return OwnerActor; }
+	TWeakObjectPtr<AActor> GetOwnerActor()const { return OwnerActor; }
 
 	/** ルートを取得 */
 	inline USceneComponent* GetRootComponent()const { return RootComponent; }
@@ -154,7 +154,7 @@ private:
 
 	/**	オーナー */
 	UPROPERTY()
-	TObjectPtr<AActor> OwnerActor;
+	TWeakObjectPtr<AActor> OwnerActor;
 	
 	/** アタッチ用のルート（位置・回転管理） */
 	UPROPERTY()

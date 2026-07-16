@@ -74,7 +74,7 @@ void UFloatingWeaponAttack::Update(float DeltaTime)
 
 void UFloatingWeaponAttack::Execute(const FVector& InTargetLocation)
 {
-	const auto Owner = GetOwnerActor();
+	const auto Owner = GetOwnerActor().Get();
 	if (!Owner)					{ return; }
 
 	SetIsActive(true);

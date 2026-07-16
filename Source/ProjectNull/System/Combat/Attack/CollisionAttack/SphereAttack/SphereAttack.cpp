@@ -11,7 +11,7 @@ USphereAttack::USphereAttack()
 
 void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 {
-	if (!InOwner) { return; }
+	if (!IsValid(InOwner)) { return; }
 
 	UAttackBase::Initialize(InOwner);
 
@@ -85,7 +85,7 @@ void USphereAttack::Execute(const FVector& InTargetLocation)
 {
 	UCollisionAttack::Execute(InTargetLocation);
 	
-	if (!SphereCollision) { return; }
+	if (!IsValid(SphereCollision)) { return; }
 	SphereCollision->SetJustExecuteTime(GetJustExecuteTime());			// 有効化された瞬間の時間をセット
 	SphereCollision->SetActorRelativeTransform(GetOffsetTransform());	// 補正用トランスフォーム値をコリジョンの基準としてセット
 	
@@ -103,7 +103,7 @@ void USphereAttack::Cancel()
 {
 	UCollisionAttack::Cancel();
 
-	if (!SphereCollision) { return; }
+	if (!IsValid(SphereCollision)) { return; }
 	SphereCollision->SetAllCollisionEnabled(ECollisionEnabled::NoCollision); // 当たり判定無効化
 }
 

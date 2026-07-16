@@ -65,8 +65,6 @@ void UAutoAttack::SetVisibility(bool bVisibility)
 
 void UAutoAttack::StartAutoAttack()
 {
-	if (!GetOwnerActor()) { return; }
-
 	if(AutoAttackParamsMap.Contains(EAutoAttackType::Front)
 		&& AutoAttackParamsMap[EAutoAttackType::Front])
 	{

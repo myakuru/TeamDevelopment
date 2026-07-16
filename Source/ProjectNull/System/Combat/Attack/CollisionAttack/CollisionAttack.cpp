@@ -43,7 +43,7 @@ void UCollisionAttack::OnCollisionBeginOverlap(
 	const FHitResult& SweepResult
 )
 {
-	if (!OtherActor || !GetOwnerActor()
+	if (!OtherActor || !GetOwnerActor().IsValid()
 		|| OtherActor == GetOwnerActor()) {
 		return;
 	}
@@ -70,7 +70,7 @@ void UCollisionAttack::OnCollisionEndOverlap(
 	int32 OtherBodyIndex
 )
 {
-	if (!OtherActor || !GetOwnerActor()
+	if (!OtherActor || !GetOwnerActor().IsValid()
 		|| OtherActor == GetOwnerActor()) {
 		return;
 	}
