@@ -63,6 +63,12 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	// ダッシュギアのレベル4状態クラスの初期化
 	// ================================================================
 	bExecuteFinalDash = false;
+	
+	//効果音
+	if (AfterImageAttackEffect && GearSESound.IsValidIndex(SEIndex::DashSESoundIndex))
+	{
+		AfterImageAttackEffect->SetSESound(GearSESound[SEIndex::DashSESoundIndex]);
+	}
 
 	// ギアスキル発動前のカメラステータスを保存
 	GearSpecialAction->Execute(Player->GetTransform());
