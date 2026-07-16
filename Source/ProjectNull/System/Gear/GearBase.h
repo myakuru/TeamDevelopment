@@ -119,6 +119,8 @@ private:
 	 * @brief ギアの発動時間終了時のリセット処理
 	 */
 	virtual void Reset();
+	
+	void SetAutoAttackEffectVisibility(bool bVisibility);
 
 	/** ギアの状態配列 */
 	UPROPERTY(EditAnywhere, Instanced)

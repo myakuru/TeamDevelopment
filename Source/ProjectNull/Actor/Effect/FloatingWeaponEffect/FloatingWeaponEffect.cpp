@@ -112,6 +112,12 @@ FTransform UFloatingWeaponEffect::GetStandStartTransformOffset()
 	return StandState->GetStartTransformOffset();
 }
 
+void UFloatingWeaponEffect::SetVisibility(bool bVisibility)
+{
+	if (!EffectComponent) { return;}
+	EffectComponent->SetVisibility(bVisibility);
+}
+
 void UFloatingWeaponEffect::UpdateTransform()
 {
 	if (!EffectComponent)	{ return; }

@@ -80,6 +80,7 @@ public:
 	inline USpringArmComponent*				GetSpringArmComponent()			const	{ return SpringArmComponent; }
 	inline UPlayerGearComponent*			GetGearComponent()				const	{ return GearComponent; }
 	inline UTargetSearchComponent*			GetTargetSearchComponent()		const	{ return TargetSearchComponent; }
+	inline UAutoAttack*						GetAutoAttack()					const	{ return AutoAttack; }
 	inline UHitStopComponent*				GetHitStopComponent()			const	{ return HitStopComponent; }
 	inline UGroundAlignmentComponent*		GetGroundAlignmentComponent()	const	{ return GroundAlignmentComponent; }
 	inline TObjectPtr<USuperGameInstance>	GetSuperGameInstance()			const	{ return SuperGameInstance; }

@@ -7,6 +7,7 @@
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 #include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
+#include "ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h"
 
 
 UGearBase::UGearBase():
@@ -92,6 +93,8 @@ void UGearBase::Execute(int32 CurrentGearLevel)
 	{
 		OwnerGearComponent->SetIsInvincible(false);
 	}
+	
+	SetAutoAttackEffectVisibility(false);
 }
 
 void UGearBase::Update(float DeltaTime)
@@ -119,6 +122,7 @@ void UGearBase::Update(float DeltaTime)
 		CurrentGearState->End();
 		bIsActive	= false;
 		ElapsedTime = 0.0f;
+		SetAutoAttackEffectVisibility(true);
 		
 		if (CurrentGearState->GetGearLevelIndex() == kLv4Index)
 		{
@@ -174,4 +178,13 @@ void UGearBase::Reset()
 	//UE_LOG(LogTemp, Display, TEXT("GearIndex %d"), GearIndex);
 
 }
+
+void UGearBase::SetAutoAttackEffectVisibility(bool bVisibility)
+{
+	if (!OwnerPlayer) { return; }
+	const auto AutoAttack = OwnerPlayer->GetAutoAttack();
+	if (!AutoAttack) { return; }
+	AutoAttack->SetVisibility(bVisibility);
+}
+
 

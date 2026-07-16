@@ -62,6 +62,12 @@ void UEffectBase::DeactivateImmediateEffect()
 	EffectComponent = nullptr;
 }
 
+void UEffectBase::SetVisibility(bool bVisibility)
+{
+	if (!EffectComponent) { return; }
+	EffectComponent->SetVisibility(bVisibility);
+}
+
 void UEffectBase::SetAbsolute(
 	bool bNewAbsoluteLocation,
 	bool bNewAbsoluteRotation,
