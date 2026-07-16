@@ -14,6 +14,8 @@ class UAnimationAsset;
 /** モデル残像エフェクトクラス */
 class UModelAfterimageTrailEffect;
 
+/** 効果音　*/
+class USoundBase;
 
 /** 残像攻撃データ */
 USTRUCT(BlueprintType)
@@ -82,7 +84,7 @@ public:
 	 * @brief 残像をスポーンするかどうかのフラグをセットする
 	 * @param bInEnableSpawn 
 	 */
-	void SetEnableSpawn(bool bInEnableSpawn) const;
+	bool SetEnableSpawn(bool bInEnableSpawn) const;
 	
 
 	/** モデル残像エフェクトクラス */
@@ -163,6 +165,8 @@ public:
 	 * @return 計算結果
 	 */
 	float GetMaxTime();
+	
+	void SetSESound(USoundBase* inSound);
 
 private:
 
@@ -188,4 +192,8 @@ private:
 
 	/** 攻撃開始時に基準とするトランフォーム情報 */
 	FTransform StartTransfrom;
+	
+	/** 効果音 */
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> DashSESound;
 };

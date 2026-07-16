@@ -28,16 +28,7 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 void UPlayerRuntimeData::Initialize()
 {
 
-	// プレイヤーの情報を取得する（0番:1P）
-	auto* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (!PlayerPawn) { return; }
-
-	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn))
-	{
-		Owner = PlayerBase;
-	}
-
-	UpdateStatus();
+	//UpdateStatus();
 
 	// プレイヤーのパラメータデータ取得
 	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
@@ -48,6 +39,7 @@ void UPlayerRuntimeData::Initialize()
 
 void UPlayerRuntimeData::AddExperience(float Amount)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("hi Amount %.0f"), Amount);
 	Experience.Add(Amount);
 	
 	// 変更があれば、経験値のバーのUIが更新される
@@ -119,11 +111,11 @@ void UPlayerRuntimeData::LevelUp()
 		RobotController->OpenPlayerExpUpgradeWidget();
 	}
 
-	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
+	UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
 	UE_LOG(LogTemp, Warning, TEXT("hi ExperienceToNextLevel %.0f"), Experience.ExperienceToNextLevel);
-	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);*/
-	//UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
+	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);
+	UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
 	
 }
 
@@ -144,7 +136,6 @@ void UPlayerRuntimeData::CalculateFinalSpeed(
 	int32 CurrentGearLevel)
 {
 	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(--CurrentGearLevel)) { return; }
-	UE_LOG(LogTemp, Warning, TEXT("hi 止まって"));
 	
 	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
@@ -158,6 +149,7 @@ void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Da
 void UPlayerRuntimeData::UpdateStatus()
 {
 	if (!Owner || !Owner->GetSuperGameInstance() || !Owner->GetSuperGameInstance()->GetPlayerParameterData()) {
+		//UE_LOG(LogTemp, Warning, TEXT("hi 止まって"));
 		return;
 	}
 

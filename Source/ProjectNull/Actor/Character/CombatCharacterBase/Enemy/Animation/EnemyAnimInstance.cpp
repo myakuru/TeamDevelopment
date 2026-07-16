@@ -8,7 +8,7 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!OwnerEnemy)
 	{
 		// 初回だけ取得
-		OwnerEnemy = Cast<AEnemyBase>(TryGetPawnOwner());
+		OwnerEnemy = Cast<AEnemyBase>(GetOwningActor());
 	}
 
 	if (!OwnerEnemy) { return; }

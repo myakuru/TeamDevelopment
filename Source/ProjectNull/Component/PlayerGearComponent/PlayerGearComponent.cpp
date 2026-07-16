@@ -278,7 +278,6 @@ void UPlayerGearComponent::OnInvincibilityStart()
 
 	const auto& GearRuntimeData = PlayerRuntimeData->GetGearData();
 	
-	SetIsInvincible(true);
 
 	GetWorld()->GetTimerManager().SetTimer(
 		InvincibilityTimerHandle,
@@ -290,8 +289,11 @@ void UPlayerGearComponent::OnInvincibilityStart()
 	const auto& CharacterMovement = OwnerPlayer->GetCharacterMovement();
 	if (!CharacterMovement) { return; }
 
+	if (PlayerRuntimeData->IsInvincible()) { return; }
+	
 	CharacterMovement->MaxWalkSpeed *= SpeedScale;
 	
+	SetIsInvincible(true);
 	//UE_LOG(LogTemp, Warning, TEXT("hi MaxWalkSpeed %.0f"),SpeedRuntimeData.Final);
 }
 
