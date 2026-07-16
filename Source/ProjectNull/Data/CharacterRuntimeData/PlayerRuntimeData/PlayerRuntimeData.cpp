@@ -96,7 +96,7 @@ void UPlayerRuntimeData::ApplyMovementSpeed()
 float UPlayerRuntimeData::GetPlayerAttackDamage()
 {
 	// プレイヤーの攻撃力を計算するロジックをここに実装
-	Attack.Final = Attack.Base * AttackMultiplier;
+	Attack.Final = Attack.Base * GetEffectMultiplier(EUpgradeEffectType::AttackDamage);
 
 	//UE_LOG(LogTemp, Error, TEXT("%f:Attack.Final"), Attack.Final);
 
@@ -169,6 +169,72 @@ void UPlayerRuntimeData::UpdateStatus()
 	ApplyMovementSpeed();
 }
 
+TArray<FValidUpgradeInfo> UPlayerRuntimeData::BuildUpgradeChoices(int32 Count)
+{
+	TArray<FValidUpgradeInfo> Result;
+	if (!CachedExpUpgradeTable) { return Result; }
+
+	// 行名を取得して重複なくランダム抽選する
+	TArray<FName> RowNames = CachedExpUpgradeTable->GetRowNames();
+	if (RowNames.Num() < Count) { return Result; }
+
+	for (int32 i = 0; i < Count; ++i)
+	{
+		const int32 Index = FMath::RandRange(0, RowNames.Num() - 1);
+		const FName RowName = RowNames[Index];
+		RowNames.RemoveAt(Index);
+
+		// 現在レベルに対応する説明文がなければ候補から除外する
+		const FExpUpgradeLevelData* LevelData = FindCurrentLevelData(RowName);
+		if (!LevelData) { continue; }
+
+		FValidUpgradeInfo Info;
+		Info.RowName = RowName;
+		Info.Description = LevelData->Description;
+		Info.CurrentLevel = GetUpgradeLevel(RowName);
+		Result.Add(Info);
+	}
+
+	return Result;
+}
+
+void UPlayerRuntimeData::ApplySelectedUpgrade(FName Id)
+{
+	// レベルを進める前に、いま提示している（現在レベルの）効果データを取得する
+	if (const FExpUpgradeLevelData* LevelData = FindCurrentLevelData(Id))
+	{
+		ApplyUpgradeEffect(LevelData->EffectType, LevelData->AttackMultiplier);
+	}
+
+	// 強化レベルを1段進める
+	UpdateUpgradeStates(Id);
+}
+
+void UPlayerRuntimeData::ApplyUpgradeEffect(EUpgradeEffectType Type, float Value)
+{
+	// 効果種別ごとに現在倍率を保持する。効果が増えても分岐は増えない
+	EffectMultipliers.FindOrAdd(Type) = Value;
+}
+
+float UPlayerRuntimeData::GetEffectMultiplier(EUpgradeEffectType Type) const
+{
+	const float* Found = EffectMultipliers.Find(Type);
+	return Found ? *Found : 1.0f;
+}
+
+const FExpUpgradeLevelData* UPlayerRuntimeData::FindCurrentLevelData(FName Id) const
+{
+	if (!CachedExpUpgradeTable) { return nullptr; }
+
+	const FExpUpgradeRow* Row = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(Id, TEXT(""));
+	if (!Row) { return nullptr; }
+
+	const int32 LevelIndex = FCString::Atoi(*GetUpgradeLevel(Id).ToString());
+	if (!Row->UpgradeLevels.IsValidIndex(LevelIndex)) { return nullptr; }
+
+	return &Row->UpgradeLevels[LevelIndex];
+}
+
 void UPlayerRuntimeData::UpdateUpgradeStates(FName Id)
 {
 	for(auto& UpgradeState : UpgradeStates)
@@ -193,26 +259,4 @@ FName UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 		}
 	}
 	return "null";
-}
-
-void UPlayerRuntimeData::UpgradeAttackMultiplier(
-	FName Id,
-	float InMultiplier)
-{
-	for (auto& UpgradeState : UpgradeStates)
-	{
-		if (UpgradeState.UpgradeId == Id)
-		{
-			if (Id == "0")
-			{
-				float Multiplier = InMultiplier;
-
-				UE_LOG(LogTemp, Error, TEXT("%f:Multiplier"), Multiplier);
-
-				// 強化画面での攻撃倍率の更新処理
-				SetPlayerAttackDamage(Multiplier);
-				break;
-			}
-		}
-	}
 }

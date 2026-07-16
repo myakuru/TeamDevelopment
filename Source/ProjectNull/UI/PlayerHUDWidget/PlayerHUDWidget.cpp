@@ -31,13 +31,13 @@ void UPlayerHUDWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	//タイマー開始（カウントダウンはStageManagerが所有）
-	if (USuperGameInstance* GI = GetWorld()->GetGameInstance<USuperGameInstance>())
+	/*if (USuperGameInstance* GI = GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
 		if (UStageManager* StageManager = GI->GetStageManagerSubsystem())
 		{
 			StageManager->StartStageTimer();
 		}
-	}
+	}*/
 
 	// スキルは3つある想定で、配列にまとめる(今後増やすとき、ここに追加)
 	SkillWidgets = { SkillWidget_0,SkillWidget_1,SkillWidget_2 };
