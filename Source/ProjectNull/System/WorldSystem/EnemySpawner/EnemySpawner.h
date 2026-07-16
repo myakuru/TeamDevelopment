@@ -84,6 +84,7 @@ public:
 	AEnemySpawner();
 
 	void SetFinalPhase();
+	void SetBossPhase();
 
 protected:
 	virtual void BeginPlay() override;

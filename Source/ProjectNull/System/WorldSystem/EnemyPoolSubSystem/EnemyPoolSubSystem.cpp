@@ -11,9 +11,9 @@ void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
     // EnemyDataが空の場合はSpawn時にActivateでクラッシュする
     if (!InPoolConfig->EnemyData)
     {
-        UE_LOG(LogTemp, Error,
+        /*UE_LOG(LogTemp, Error,
             TEXT("EnemyPool WarmUp Failure"),
-            *InPoolConfig->GetName());
+            *InPoolConfig->GetName());*/
         return;
     }
 
@@ -24,12 +24,12 @@ void UEnemyPoolSubSystem::WarmUp(UEnemyPoolConfig* InPoolConfig)
     // Actorが二重に生成されることを防ぐ
     if (Pools.Contains(Key))
     {
-        UE_LOG(LogTemp, Log,
-            TEXT("EnemyPool WarmUp Success"), *InPoolConfig->GetName());
+        /*UE_LOG(LogTemp, Log,
+            TEXT("EnemyPool WarmUp Success"), *InPoolConfig->GetName());*/
         return;
     }
 
-	UE_LOG(LogTemp, Log, TEXT("Enemy Pool Name %s"), *InPoolConfig->EnemyClass->GetName());
+	//UE_LOG(LogTemp, Log, TEXT("Enemy Pool Name %s"), *InPoolConfig->EnemyClass->GetName());
 
     // Poolを新規作成してPoolNum体分Actorを生成する
     FEnemyPool& Pool = Pools.FindOrAdd(Key);
@@ -57,9 +57,9 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
     // ここがnullだとActivate内のcheckでクラッシュするため事前にはじく
     if (!InPoolConfig->EnemyData)
     {
-        UE_LOG(LogTemp, Error,
+        /*UE_LOG(LogTemp, Error,
             TEXT("[EnemyPool] Spawn Failure"),
-            *InPoolConfig->GetName());
+            *InPoolConfig->GetName());*/
         return nullptr;
     }
 
@@ -69,16 +69,16 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
     // WarmUpが呼ばれていない場合はnullptrが返る
     if (!Pool)
     {
-        UE_LOG(LogTemp, Error,
-            TEXT("Pool not found for %s. Call WarmUp first."), *InPoolConfig->GetName());
+        /*UE_LOG(LogTemp, Error,
+            TEXT("Pool not found for %s. Call WarmUp first."), *InPoolConfig->GetName());*/
         return nullptr;
     }
 
     // Inactiveが空の場合はPoolNum不足
     if (Pool->Inactive.IsEmpty())
     {
-        UE_LOG(LogTemp, Warning,
-            TEXT("Pool exhausted for %s. Consider increasing PoolSize."), *InPoolConfig->GetName());
+       /* UE_LOG(LogTemp, Warning,
+            TEXT("Pool exhausted for %s. Consider increasing PoolSize."), *InPoolConfig->GetName());*/
         return nullptr;
     }
 
@@ -99,10 +99,10 @@ AEnemyBase* UEnemyPoolSubSystem::Spawn(UEnemyPoolConfig* InPoolConfig, const FVe
 void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
 {
     if (!Enemy) { return; }
-	UE_LOG(LogTemp, Warning,
+	/*UE_LOG(LogTemp, Warning,
 		TEXT("Return Enemy:%s Alive:%d"),
 		*Enemy->GetName(),
-		Enemy->GetAliveFlg() ? 1 : 0);
+		Enemy->GetAliveFlg() ? 1 : 0);*/
    // UE_LOG(LogTemp, Warning, TEXT("Return In"));
 
     // どのPoolConfigのActorかを逆引きする
@@ -116,9 +116,9 @@ void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
 	// すでにInactiveなら二重返却
 	if (Pool->Inactive.Contains(Enemy))
 	{
-		UE_LOG(LogTemp, Error,
+		/*UE_LOG(LogTemp, Error,
 			TEXT("[EnemyPool] Duplicate Return : %s"),
-			*Enemy->GetName());
+			*Enemy->GetName());*/
 
 		return;
 	}
@@ -129,10 +129,10 @@ void UEnemyPoolSubSystem::Return(AEnemyBase* Enemy)
     Pool->Inactive.Add(Enemy);
 
     //UE_LOG(LogTemp, Warning, TEXT("Return Out"));
-	UE_LOG(LogTemp, Warning,
+	/*UE_LOG(LogTemp, Warning,
 		TEXT("[EnemyPool] Return | Active:%d | Inactive:%d"),
 		Pool->Active.Num(),
-		Pool->Inactive.Num());
+		Pool->Inactive.Num());*/
 }
 
 AEnemyBase* UEnemyPoolSubSystem::CreateNewEnemy(UEnemyPoolConfig* InData)
@@ -156,7 +156,7 @@ bool UEnemyPoolSubSystem::IsPoolFull(UEnemyPoolConfig* InPoolConfig) const
 {
 	if (!InPoolConfig)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[EnemyPool] IsPoolFull: PoolConfig is null"));
+		//UE_LOG(LogTemp, Error, TEXT("[EnemyPool] IsPoolFull: PoolConfig is null"));
 		return true;
 	}
 
@@ -165,20 +165,20 @@ bool UEnemyPoolSubSystem::IsPoolFull(UEnemyPoolConfig* InPoolConfig) const
 
 	if (!Pool)
 	{
-		UE_LOG(LogTemp, Error, TEXT("EnemyPool IsPoolFull: Pool not found: %s"), *InPoolConfig->GetName());
+		//UE_LOG(LogTemp, Error, TEXT("EnemyPool IsPoolFull: Pool not found: %s"), *InPoolConfig->GetName());
 		return true;
 	}
 
 	const int32 ActiveNum = Pool->Active.Num();
 	const int32 InactiveNum = Pool->Inactive.Num();
 
-	UE_LOG(LogTemp, Warning,
+	/*UE_LOG(LogTemp, Warning,
 		TEXT("EnemyPool %s | Active:%d | Inactive:%d | PoolFull:%s"),
 		*InPoolConfig->GetName(),
 		ActiveNum,
 		InactiveNum,
 		InactiveNum <= 0 ? TEXT("true") : TEXT("false")
-	);
+	);*/
 
 	return InactiveNum <= 0;
 }

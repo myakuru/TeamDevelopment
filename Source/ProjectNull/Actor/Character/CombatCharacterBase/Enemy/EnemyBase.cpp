@@ -431,40 +431,40 @@ void AEnemyBase::PlayAnimation(int32 InNextAnimIndex, bool InbLoop,float InBlend
 {
 	if (!EnemyManager)
 	{
-		UE_LOG(LogTemp, Error, TEXT("EnemyManager is null"));
+		//UE_LOG(LogTemp, Error, TEXT("EnemyManager is null"));
 		return;
 	}
 
 	if (!ISMManagerClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ISMManagerClass is null"));
+		//UE_LOG(LogTemp, Error, TEXT("ISMManagerClass is null"));
 		return;
 	}
 
 	AEnemyISMManager* ISMManager = EnemyManager->GetISMManager(ISMManagerClass);
 	if (!ISMManager)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ISMManager not found"));
+		//UE_LOG(LogTemp, Error, TEXT("ISMManager not found"));
 		return;
 	}
 
 	UEnemyAnimDataAsset* AnimData = ISMManager->GetAnimDataAsset();
 	if (!AnimData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("AnimDataAsset is null"));
+		//UE_LOG(LogTemp, Error, TEXT("AnimDataAsset is null"));
 		return;
 	}
 
 	if (!AnimData->Animations.IsValidIndex(InNextAnimIndex))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid AnimIndex: %d / Num: %d"),
-			InNextAnimIndex, AnimData->Animations.Num());
+		/*UE_LOG(LogTemp, Error, TEXT("Invalid AnimIndex: %d / Num: %d"),
+			InNextAnimIndex, AnimData->Animations.Num());*/
 		return;
 	}
 
 	if (!EnemyRuntimeData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("EnemyRuntimeData is null"));
+		//UE_LOG(LogTemp, Error, TEXT("EnemyRuntimeData is null"));
 		return;
 	}
 
