@@ -139,6 +139,8 @@ void UPlayerRuntimeData::CalculateFinalSpeed(
 	
 	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
+	
+	//Speed.Final *= GetEffectMultiplier(EUpgradeEffectType::PlayerSpeed);
 }
 
 void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Data)
@@ -200,6 +202,9 @@ void UPlayerRuntimeData::ApplySelectedUpgrade(FName Id)
 
 	// 強化レベルを1段進める
 	UpdateUpgradeStates(Id);
+	
+	// ステータスの更新
+	//UpdateStatus();
 }
 
 void UPlayerRuntimeData::ApplyUpgradeEffect(EUpgradeEffectType Type, float Value)
