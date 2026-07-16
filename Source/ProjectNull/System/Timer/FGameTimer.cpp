@@ -17,6 +17,9 @@ FGameTimer::~FGameTimer()
 
 void FGameTimer::StartTimer(UWorld* InWorld, float StartTime)
 {
+	// 既に動いているタイマーがあれば止めてから開始する（多重登録防止）
+	StopTimer();
+
 	World = InWorld;
 	RemainingTime = StartTime;
 
