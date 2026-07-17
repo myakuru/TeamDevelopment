@@ -17,7 +17,7 @@ UAttackBase::UAttackBase():
 void UAttackBase::Initialize(const TObjectPtr<AActor>& Owner)
 {
 	OwnerActor		= Owner;
-	if (OwnerActor.IsValid()) { return; }
+	if (!OwnerActor.IsValid()) { return; }
 	
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OwnerActor))
