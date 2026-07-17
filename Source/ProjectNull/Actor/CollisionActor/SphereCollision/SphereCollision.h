@@ -96,9 +96,6 @@ public:
 	/**	発動してからの最大有効時間を取得 */
 	float GetMaxDuration() const { return MaxDuration; }
 
-	/**	発動するまでの最大待ち時間を取得 */
-	float GetMaxActivationDelay() const { return MaxActivationDelay; }
-
 	/**	球コンポーネント配列の取得 */
 	const TArray<TObjectPtr<USphereComponent>>& GetSphereComponents() const
 	{

@@ -112,7 +112,7 @@ private:
 
 	/**	ギアチェンジによる無敵用スフィアコリジョン */
 	UPROPERTY(EditAnywhere,Instanced)
-	TObjectPtr<USphereAttack> SphereAttack;
+	TObjectPtr<USphereAttack> GearChangeSphere;
 
 	/** 無敵状態を表現するエフェクトActor */
 	UPROPERTY(EditAnywhere, Instanced, Category = "Effect")

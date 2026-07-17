@@ -26,7 +26,7 @@ UPlayerGearComponent::UPlayerGearComponent():
 		PlayerRuntimeData(nullptr),
 		PlayerParameterData(nullptr),
 		PlayerGears(TArray<TObjectPtr<UGearBase>>()),
-		SphereAttack(nullptr),
+		GearChangeSphere(nullptr),
 		InvincibleEffect(nullptr),
 		CurrentGearLevel(1),
 		HitStopDuration(0.f),
@@ -172,10 +172,10 @@ void UPlayerGearComponent::OnGearBeginOverlap(const TObjectPtr<AActor>& OtherAct
 
 void UPlayerGearComponent::InitializeSphereCollision()
 {
-	if (!IsValid(SphereAttack)) { return; }
+	if (!IsValid(GearChangeSphere)) { return; }
 
 	// 攻撃がHITした時に呼びたい関数をコリジョンのデリゲートに登録
-	SphereAttack->GetDelegateOnOverlapIn().AddUObject(
+	GearChangeSphere->GetDelegateOnOverlapIn().AddUObject(
 			this
 		,	&ThisClass::OnGearBeginOverlap
 		);
@@ -202,7 +202,7 @@ void UPlayerGearComponent::UpdateSkillCooldown(
 void UPlayerGearComponent::SetIsInvincible(bool bInIsInvincible)
 {
 	if (!PlayerRuntimeData ||
-		!SphereAttack) { return; }
+		!GearChangeSphere) { return; }
 
 	PlayerRuntimeData->SetIsInvincible(bInIsInvincible);
 

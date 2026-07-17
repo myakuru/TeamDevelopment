@@ -50,8 +50,7 @@ public:
 	 * @return ターゲットが範囲内にいる場合はtrue
 	 */
 	virtual bool IsTargetInRange(AActor* Target) { return false; }
-
-
+	
 	/**
 	 * @brief 攻撃方向を計算する
 	 * @param ForwardVector 基準となる前方ベクトル(オーナーの前方ベクトル)
@@ -79,6 +78,11 @@ public:
 		HitActors.Remove(InActor);
 	}
 
+	/**
+	 * @brief HITしたアクター配列の要素をすべて削除
+	 */
+	void ResetAllActors() { HitActors.Reset(); }
+	
 
 	/* Begin ProtectedMember Setters */
 	/**
@@ -129,7 +133,7 @@ public:
 	FTransform GetOffsetTransform()const { return OffsetTransform; }
 
 	/**	最終的なダメージ量を取得 */
-	float GetFinalDamage()const { return FinalDamage; }
+	float GetFinalDamage() const;
 
 	/** 攻撃開始までの待ち時間 */
 	float GetAttackStartDelay()const { return AttackStartDelay; }
@@ -171,11 +175,6 @@ private:
 	/**	攻撃本来の威力 */
 	UPROPERTY(EditAnywhere)
 	float AttackPower = 1.f;
-
-	/** 最終的なダメージ量 */
-	/** 「威力 + 最終的なオーナーの攻撃力」でダメージを決定 */
-	UPROPERTY()
-	float FinalDamage = 0.f;
 
 	/**
 	* @brief 攻撃開始までの待ち時間

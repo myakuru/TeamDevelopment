@@ -27,7 +27,7 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 		);
 
 		// 攻撃の最大時間を加算して「攻撃の最大有効時間」として使う
-		AddDuration(SphereCollision->GetBaseAttackDuration());
+		SetDuration(SphereCollision->GetBaseAttackDuration());
 
 		// 指定したコリジョンチャンネルとそれに対するレスポンスをセット
 		SphereCollision->SetAllCollisionResponseToChannel(
