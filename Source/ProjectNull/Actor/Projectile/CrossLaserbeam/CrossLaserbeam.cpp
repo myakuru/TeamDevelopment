@@ -14,7 +14,7 @@ ACrossLaserbeam::ACrossLaserbeam():
 	BoxCompArray(TArray<TObjectPtr<UBoxComponent>>()),
 	NiagaraEffectArray(TArray<TObjectPtr<UEffectBase>>()),
 	PlayerRuntimeData(nullptr),
-	AttackPowerScale(1.f)
+	AttackPower(1.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -109,7 +109,7 @@ void ACrossLaserbeam::OnLaserBeginOverlap(
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		Interface->ApplyDamaged(PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale));
+		Interface->ApplyDamaged(AttackPower + PlayerRuntimeData->GetCharacterAttackPower());
 		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }

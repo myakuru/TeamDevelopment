@@ -14,7 +14,7 @@ AAutoAttackHitActor::AAutoAttackHitActor():
 	BoxComp(nullptr),
 	GameInstance(nullptr),
 	PlayerRuntimeData(nullptr),
-	AttackPowerScale(1.f),
+	AttackPower(1.f),
 	bEnabled(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -126,6 +126,6 @@ void AAutoAttackHitActor::PerformHitSweep()
 float AAutoAttackHitActor::GetAttackDamage() const
 {
 	if (!PlayerRuntimeData) { return 1.f; }
-	return PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale);
+	return AttackPower + PlayerRuntimeData->GetCharacterAttackPower();
 }
 
