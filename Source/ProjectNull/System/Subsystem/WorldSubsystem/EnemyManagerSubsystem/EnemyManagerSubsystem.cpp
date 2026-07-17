@@ -163,6 +163,7 @@ AEnemyISMManager* UEnemyManagerSubsystem::GetISMManager(TSubclassOf<AEnemyISMMan
 
 USoundBase* UEnemyManagerSubsystem::GetDamagedSound() const
 {
+	if (!ManagerConfig) { return nullptr; }
 	return ManagerConfig->DamagedSESound;
 }
 
