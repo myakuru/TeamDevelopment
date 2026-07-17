@@ -27,7 +27,7 @@ public:
 	 * inOwningActor : Concurrency制御で「このアクターごと」に再生数を制限したい場合に指定
 	 * inIsUISound : UIサウンドとして扱うかどうかです。trueにすると、ゲームの一時停止中でも再生できるなど、UI向けの扱いに
 	 */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Play2D(USoundBase* inSound,float inVolume = 1.0f,float inPitch = 1.0f,
 		float inStart = 0.0f,USoundConcurrency* inConcurrencySettings = nullptr,
 		const AActor* inOwningActor = nullptr,bool inIsUISound = false);
@@ -37,7 +37,7 @@ public:
 	 * inPersistAcrossLevelTransition : レベル遷移後も再生を継続するか
 	 * inAutoDestroy : 再生終了時にUAudioComponentを自動破棄するか
 	 */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	UAudioComponent* Spawn2D(
 		USoundBase* inSound,float inVolume = 1.0f,float inPitch = 1.0f,
 		float inStart = 0.0f,USoundConcurrency* inConcurrencySettings = nullptr,
@@ -48,7 +48,7 @@ public:
 	 *  ConcurrencySettings : 同時再生数を制御する設定です
 	 *  OwningActor : Concurrencyをアクター単位で管理したい場合に指定します
 	 */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void PlayAtLocation(USoundBase* inSound, const FVector& inLocation,
 	FRotator inRotation = FRotator::ZeroRotator,float inVolume = 1.0f,
 	float inPitch = 1.0f,float inStart = 0.0f,USoundAttenuation* inAttenuationSettings = nullptr,

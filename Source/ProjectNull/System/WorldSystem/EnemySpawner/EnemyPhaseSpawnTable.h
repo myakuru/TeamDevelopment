@@ -4,6 +4,7 @@
 #include "Engine/DataAsset.h"
 #include "EnemySpawnPattern/EnemyWaveDataAsset.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyMidBossBase/EnemyMidBossBase.h>
 #include "EnemyPhaseSpawnTable.generated.h"
 
 // フェーズとWaveDataAssetの対応を1セットにまとめた構造体
@@ -23,6 +24,10 @@ struct FPhaseSpawnWave
 	// フェーズの上昇に必要な倒した敵の数
 	UPROPERTY(EditAnywhere)
 	int32 PhaseUpDeathEnemyCount = 0;
+
+	// 出現インターバル
+	UPROPERTY(EditAnywhere)
+	float PhaseInterval = 2.0f;
 
     // そのフェーズで使うフェーズデータ
     UPROPERTY(EditAnywhere)
@@ -50,7 +55,7 @@ public:
 
 	// 中ボス
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AEnemyBossBase> StageTyuuBoss;
+	TSubclassOf<AEnemyMidBossBase> StageTyuuBoss;
 
 	// 出現するボス
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

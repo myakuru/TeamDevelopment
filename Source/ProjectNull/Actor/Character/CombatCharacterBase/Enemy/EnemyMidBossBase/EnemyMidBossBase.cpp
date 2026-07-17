@@ -90,7 +90,7 @@ void AEnemyMidBossBase::UpdateParams()
 	// ヒットポイントの更新
 	{
 		// 計算後の最終的なHPをセット
-		EnemyMidBossRuntimeData->SetFinalHP(EnemyStatus.HPScaling.GetFinalValue(killCount));
+		EnemyMidBossRuntimeData->SetFinalHP(EnemyStatus.FinalHP);
 	}
 
 	// 攻撃パラメータの更新
@@ -100,7 +100,7 @@ void AEnemyMidBossBase::UpdateParams()
 			EnemyStatus.AttackScaling.CalculateFinalScaling(killCount);
 
 		// 基礎攻撃力と倍率をセット
-		EnemyMidBossRuntimeData->SetBaseAttackPower(EnemyStatus.AttackScaling.Base);
+		EnemyMidBossRuntimeData->SetBaseAttackPower(EnemyStatus.FinalAttack);
 		EnemyMidBossRuntimeData->SetAttackScaling(AttackScale);
 	}
 }
@@ -135,7 +135,7 @@ void AEnemyMidBossBase::FinalizeDeath()
 	// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
 	if (IsValid(GameProgress)) 
 	{
-		GameProgress->AddKillCount();
+		GameProgress->AddTyuuBossCount();
 	}
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
