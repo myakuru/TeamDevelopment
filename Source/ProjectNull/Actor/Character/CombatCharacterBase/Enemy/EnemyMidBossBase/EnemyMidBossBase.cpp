@@ -60,6 +60,11 @@ void AEnemyMidBossBase::BeginPlay()
 	const FVector playerLocation = PPlayerPawn->GetActorLocation();
 	FVector SpawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
 
+	if (!GetCharacterMovement())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("キャラクタームーブメントがない尾"));
+	}
+
 	FHitResult HitResult;
 	if (!IsIntersectingStaticObjects(HitResult, SpawnLocation)) { return; }
 	SetActorLocation(SpawnLocation);
