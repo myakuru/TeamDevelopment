@@ -13,7 +13,7 @@ ALaserbeam::ALaserbeam():
 	BoxComp(nullptr),
 	NiagaraEffectArray(TArray<TObjectPtr<UEffectBase>>()),
 	PlayerRuntimeData(nullptr),
-	AttackPowerScale(1.f)
+	AttackPower(1.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -71,7 +71,7 @@ void ALaserbeam::OnLaserbeamBeginOverlap(
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		Interface->ApplyDamaged(PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale));
+		Interface->ApplyDamaged(AttackPower + PlayerRuntimeData->GetCharacterAttackPower());
 		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }
