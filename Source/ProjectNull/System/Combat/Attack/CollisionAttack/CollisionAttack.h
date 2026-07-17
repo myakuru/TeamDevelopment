@@ -17,29 +17,6 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnOverrlapInDelegate,const TObjectPtr<AActo
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnOverrlapOutDelegate,const TObjectPtr<AActor>&	/* HitActor */);
 
 /**
- * @brief 点滅しながら当たり判定を行う際に必要なパラメータ群
- */
-USTRUCT()
-struct FBlinkingHitElemental
-{
-	GENERATED_BODY()
-
-public:
-	
-	/**
-	 * @brief 点滅的に攻撃判定を行うか
-	 */
-	UPROPERTY(EditAnywhere)
-	bool bIsBlinking = false;
-
-	/**
-	 * @brief 点滅する間隔
-	 */
-	UPROPERTY(EditAnywhere)
-	float BlinkInterval = 0.1f;
-};
-
-/**
  * コリジョンを持った攻撃の基底
  */
 UCLASS()
@@ -92,11 +69,6 @@ public:
 	// End Delegate Getters~
 	
 protected:
-	/**
-	 * @brief 現在が攻撃を有効化するタイミングかを調べる
-	 * @return 当たり判定をONにするタイミングであればtrue
-	 */
-	virtual bool IsHitCheckActiveNow(const float InElapsedTime) const;
 	
 	/**
 	 * @brief 当たり判定をオーバーラップした時の処理
@@ -142,7 +114,6 @@ protected:
 
 	/**	攻撃が有効化された瞬間の時間を取得 */
 	virtual float GetJustExecuteTime() const { return JustExecuteTime; }
-
 	/*End PrivateMember Getters~ */
 
 private:
@@ -180,10 +151,4 @@ private:
 	 */
 	UPROPERTY()
 	float JustExecuteTime = 0.f;
-
-	/**
-	 * @brief 攻撃に点滅処理を施す際に必要なパラメータ群
-	 */
-	UPROPERTY(EditAnywhere)
-	FBlinkingHitElemental BlinkingElement;
 };

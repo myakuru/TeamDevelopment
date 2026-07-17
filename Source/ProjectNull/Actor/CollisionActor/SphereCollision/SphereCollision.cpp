@@ -2,6 +2,7 @@
 
 #include "Components/SphereComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Tests/ToolMenusTestUtilities.h"
 
 // Sets default values
 ASphereCollision::ASphereCollision()
@@ -45,27 +46,31 @@ void ASphereCollision::Update(float InDeltaTime)
 	{
 		if (!SphereComponents.IsValidIndex(i)) { continue; }
 		const auto Sphere = SphereComponents[i];
-		const auto& Entry = SphereEntries[i];
+		auto& Entry = SphereEntries[i];
 		
-		const float ActivationTime = JustExecuteTime + Entry.ActivationDelay;	// 発動する瞬間の時間
-		const float DeactivationTime = ActivationTime + Entry.Duration;			// 攻撃を無効化する瞬間の時間
-		
-		// 有効化されて、まだ無効化されていないか
-		const bool bShouldBeActive =
-			CurrentTimeSeconds >= ActivationTime && CurrentTimeSeconds < DeactivationTime;
-	
-		// 現在の球コンポーネントの状態が有効かどうか
-		const bool bIsCurrentActive =
-			Sphere->GetCollisionEnabled() != ECollisionEnabled::NoCollision;
-	
-		// 状態に変化がないなら何もしない
-		if (bShouldBeActive == bIsCurrentActive)
+		// 攻撃開始時間を経過していないなら処理を飛ばす
+		if (CurrentTimeSeconds<JustExecuteTime+Entry.ActivationDelay)
 		{
 			continue;
 		}
-	
-		Sphere->SetCollisionEnabled(
-			bShouldBeActive ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+		
+		// 点滅有効時の当たり判定有効無効切り替え更新処理
+		if (Entry.BlinkingHitElemental.bIsBlinking)
+		{
+			UpdateBlinkingHitCheck(
+				Sphere,
+				Entry.BlinkingHitElemental,
+				CurrentTimeSeconds
+				);
+		}
+		// 通常の当たり判定有効無効切り替え更新処理
+		else
+		{
+			UpdateDefaultHitCheck(
+				Sphere,
+				Entry,
+				CurrentTimeSeconds);
+		}
 	}
 }
 
@@ -95,6 +100,59 @@ void ASphereCollision::SetAllCollisionEnabled(const ECollisionEnabled::Type InEn
 	
 		Entry->SetCollisionEnabled(InEnabled);
 	}
+}
+
+void ASphereCollision::UpdateBlinkingHitCheck(
+		const TObjectPtr<USphereComponent>& InSphereComponent
+	,	FBlinkingHitElemental& OutBlinkingHitElemental
+	,	const float InCurrentTime)
+{
+	// 有効化された時間から何秒経ったかを算出
+	const float ElapsedTime = InCurrentTime - JustExecuteTime;
+	
+	// 経過時間をインターバルで割って、出力された数値が「奇数か偶数」かを取得
+	// 0.0f ~ 0.4fなら「0」, 0.5f ~ 1.0fなら「1」...
+	const int32 Phase = FMath::FloorToInt(ElapsedTime / OutBlinkingHitElemental.BlinkInterval);
+	
+	// 現在の点滅のON,OFFを取得(trueがON)
+	const bool bCurrentActive = (Phase % 2) == 0;
+	
+	// ONとOFFが切り替わった瞬間であればコリジョンのON・OFFを切り替える
+	if (bCurrentActive != OutBlinkingHitElemental.bPrevBlinking)
+	{
+		InSphereComponent->SetCollisionEnabled(
+			bCurrentActive ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	}
+	
+	OutBlinkingHitElemental.bPrevBlinking = bCurrentActive;
+	
+	UE_LOG(LogTemp,Warning,TEXT("BlinkingHitElemental: Phase %d"),bCurrentActive);
+}
+
+void ASphereCollision::UpdateDefaultHitCheck(
+		const TObjectPtr<USphereComponent>& InSphereComponent
+	,	const FSphereElemental& InBlinkingHitElemental
+	,	const float InCurrentTime)
+{
+	const float ActivationTime = JustExecuteTime + InBlinkingHitElemental.ActivationDelay;	// 発動する瞬間の時間
+	const float DeactivationTime = ActivationTime + InBlinkingHitElemental.Duration;		// 攻撃を無効化する瞬間の時間
+		
+	// 有効化されて、まだ無効化されていないか
+	const bool bShouldBeActive =
+		InCurrentTime >= ActivationTime && InCurrentTime < DeactivationTime;
+	
+	// 現在の球コンポーネントの状態が有効かどうか
+	const bool bIsCurrentActive =
+		InSphereComponent->GetCollisionEnabled() != ECollisionEnabled::NoCollision;
+	
+	// 状態に変化がないなら何もしない
+	if (bShouldBeActive == bIsCurrentActive)
+	{
+		return;
+	}
+	
+	InSphereComponent->SetCollisionEnabled(
+		bShouldBeActive ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 }
 
 void ASphereCollision::GeneratedSphereComponents()
