@@ -118,19 +118,19 @@ void AEnemyBase::UpdateParams()
 	if (!GameProgress||!EnemyRuntimeData) { return; }
 
 	// 倒した敵数を元に
-	const int32 killCount = GameProgress->GetKillCount();
+	const int32 NowPhase = GameProgress->GetPhase();
 
 	// ヒットポイントの更新
 	{
 		// 計算後の最終的なHPをセット
-		EnemyRuntimeData->SetFinalHP(EnemyStatus.HPScaling.GetFinalValue(killCount));
+		EnemyRuntimeData->SetFinalHP(EnemyStatus.HPScaling.GetFinalValue(NowPhase));
 	}
 
 	// 攻撃パラメータの更新
 	{
 		// 最終的な攻撃倍率の更新
 		float AttackScale =
-			EnemyStatus.AttackScaling.CalculateFinalScaling(killCount);
+			EnemyStatus.AttackScaling.CalculateFinalScaling(NowPhase);
 
 		// 基礎攻撃力と倍率をセット
 		EnemyRuntimeData->SetBaseAttackPower(EnemyStatus.AttackScaling.Base);

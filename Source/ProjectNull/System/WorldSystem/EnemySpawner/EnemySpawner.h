@@ -98,6 +98,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemySpawner")
 	void SpawnEnemy();
 
+	void SetInterval(float Interval) { SpawnParams.SpawnInterval = Interval; }
+
 	/** フェーズとWaveDataの対応表、エディタでセットする*/
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UEnemyPhaseSpawnTable> PhaseSpawnTable = nullptr;
