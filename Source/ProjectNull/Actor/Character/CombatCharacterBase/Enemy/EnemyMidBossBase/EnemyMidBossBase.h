@@ -166,6 +166,10 @@ protected:
 	virtual void SetEnemyStatusData(UEnemyDataAsset* InData);
 	//~ End Setter
 
+	bool IsIntersectingStaticObjects(FHitResult& HitResult, FVector& SpawnLocationXY);
+
+	FVector CalculateEnemySpawnPointInRing(const FVector& Center) const;
+
 
 private:
 
@@ -196,4 +200,11 @@ private:
 	/** 使用する攻撃情報 */
 	UPROPERTY()
 	FEnemyAttackData AttackData;
+
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	float SpawnRayStartHeight = 2000.0f;
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	float SpawnRayEndDepth = 2000.0f;
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	float SpawnRadius = 1000.0f;
 };

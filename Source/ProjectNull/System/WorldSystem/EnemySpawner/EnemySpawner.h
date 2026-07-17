@@ -98,7 +98,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemySpawner")
 	void SpawnEnemy();
 
-	void SetInterval(float Interval) { SpawnParams.SpawnInterval = Interval; }
+	void SetInterval(float Interval)	{ SpawnParams.SpawnInterval = Interval; }
+	void SetSpawnStop(bool bStop)		{ SpawnStop = bStop; }
 
 	/** フェーズとWaveDataの対応表、エディタでセットする*/
 	UPROPERTY(EditAnywhere)
@@ -157,4 +158,6 @@ private:
 
 	/** ボス専用フェーズチェック*/
 	bool BossPhase = false;
+
+	bool SpawnStop = false;
 };

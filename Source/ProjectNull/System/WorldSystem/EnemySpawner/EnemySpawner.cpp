@@ -99,6 +99,8 @@ void AEnemySpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AEnemySpawner::SpawnEnemy()
 {
+	if (SpawnStop) 
+	{ return; }
 	// 出現対象が存在しなかったら実行しない
 	//if (!EnemyClass) { return; }
 

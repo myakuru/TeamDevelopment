@@ -54,6 +54,20 @@ void AEnemyMidBossBase::BeginPlay()
 
 	// 中ボスのデータをセット
 	SetEnemyStatusData(EnemyDataAsset);
+
+	// 座標
+	TObjectPtr<APawn> PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	const FVector playerLocation = PPlayerPawn->GetActorLocation();
+	FVector SpawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
+
+	if (!GetCharacterMovement())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("キャラクタームーブメントがない尾"));
+	}
+
+	FHitResult HitResult;
+	if (!IsIntersectingStaticObjects(HitResult, SpawnLocation)) { return; }
+	SetActorLocation(SpawnLocation);
 }
 
 bool AEnemyMidBossBase::IsInChaseDistance()
@@ -245,4 +259,63 @@ void AEnemyMidBossBase::FinalizeAttackEnd()
 
 	// Runtimeクラスに攻撃終了時間を登録
 	EnemyMidBossRuntimeData->NotifyAttackFinishTime();
+}
+
+
+bool AEnemyMidBossBase::IsIntersectingStaticObjects(
+	FHitResult& HitResult,
+	FVector& SpawnLocation)
+{
+	UWorld* World = GetWorld();
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+
+	if (!IsValid(World) || !IsValid(Capsule))
+	{
+		return false;
+	}
+
+	const FVector RayStart =
+		SpawnLocation + FVector(0.0f, 0.0f, SpawnRayStartHeight);
+
+	const FVector RayEnd =
+		SpawnLocation - FVector(0.0f, 0.0f, SpawnRayEndDepth);
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	const bool bHit = World->LineTraceSingleByChannel(
+		HitResult,
+		RayStart,
+		RayEnd,
+		ECC_Visibility,
+		QueryParams
+	);
+
+	if (bHit)
+	{
+		const float CapsuleHalfHeight =
+			Capsule->GetScaledCapsuleHalfHeight();
+
+		constexpr float GroundOffset = 2.0f;
+
+		SpawnLocation = HitResult.ImpactPoint;
+		SpawnLocation.Z += CapsuleHalfHeight + GroundOffset;
+	}
+
+	return bHit;
+}
+
+FVector AEnemyMidBossBase::CalculateEnemySpawnPointInRing(const FVector& Center) const
+{
+	// ランダム角度
+	float angle = FMath::RandRange(0.0f, 360.0f);
+
+	// XYオフセット
+	FVector offset = {
+		FMath::Cos(FMath::DegreesToRadians(angle)) * SpawnRadius,
+		FMath::Sin(FMath::DegreesToRadians(angle)) * SpawnRadius,
+		0.0f
+	};
+
+	return Center + offset;
 }

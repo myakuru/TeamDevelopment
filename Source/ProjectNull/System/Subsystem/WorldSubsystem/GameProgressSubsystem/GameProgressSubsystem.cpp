@@ -2,6 +2,8 @@
 #include "GameProgressSubsystem.h"
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Stage/Manager/StageManager.h>
+#include <ProjectNull/System/WorldSystem/EnemySpawner/EnemySpawner.h>
+#include "Kismet/GameplayStatics.h"
 
 void UGameProgressSubsystem::Initialize(
 	FSubsystemCollectionBase& Collection
@@ -82,6 +84,16 @@ void UGameProgressSubsystem::UpdatePhase()
 	if (BossWave)
 	{
 		GameClearFlg = true;
+
+		AActor* FoundActor = UGameplayStatics::GetActorOfClass(
+			GetWorld(), AEnemySpawner::StaticClass());
+
+		AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(FoundActor);
+
+		if (IsValid(EnemySpawner))
+		{
+			EnemySpawner->SetSpawnStop(true);
+		}
 	}
 
 
