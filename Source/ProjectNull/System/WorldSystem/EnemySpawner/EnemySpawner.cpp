@@ -8,6 +8,7 @@
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyGrunt/EnemyGruntBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyMidBossBase/EnemyMidBossBase.h>
 
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/System/WorldSystem/EnemySpawner/EnemyPhaseSpawnTable.h>
@@ -224,6 +225,7 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 	}
 
 	CurrentWaveData = NewWaveData;
+	SpawnParams.SpawnInterval = PhaseSpawnTable->PhaseWaves[NewPhase].PhaseInterval;
 	NowPhase = NewPhase;
 
 	CachedSubsystem = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
@@ -245,15 +247,15 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 	{
 		FinalPhase = true;
 
-		if (PhaseSpawnTable->StageBoss)
+		if (PhaseSpawnTable->StageTyuuBoss)
 		{
 
-			AEnemyBossBase* Boss = GetWorld()->SpawnActor<AEnemyBossBase>(
-				PhaseSpawnTable->StageBoss,
+			AEnemyMidBossBase* MidBoss = GetWorld()->SpawnActor<AEnemyMidBossBase>(
+				PhaseSpawnTable->StageTyuuBoss,
 				GetActorLocation(),
 				GetActorRotation());
 
-			if (!IsValid(Boss))
+			if (!IsValid(MidBoss))
 			{
 				return;
 			}
