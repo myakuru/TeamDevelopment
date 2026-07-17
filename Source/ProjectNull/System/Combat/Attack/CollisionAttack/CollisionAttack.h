@@ -68,9 +68,8 @@ public:
 	}
 	// End Delegate Getters~
 	
-	
-	
 protected:
+	
 	/**
 	 * @brief 当たり判定をオーバーラップした時の処理
 	 * リストへ追加などを行う
@@ -96,7 +95,7 @@ protected:
 		int32 OtherBodyIndex);
 
 	/*~Begin PrivateMember Setters*/
-	virtual void AddDuration(const float InDuration) { Duration += InDuration; }
+	virtual void SetDuration(const float InDuration) { MaxDuration = InDuration; }
 	/*End PrivateMember Setters~*/
 
 	/*~Begin PrivateMember Getters*/
@@ -111,11 +110,10 @@ protected:
 	virtual TEnumAsByte<ECollisionResponse> GetTargetResponse() const { return TargetResponse; }
 
 	/**	攻撃の継続時間を取得 */
-	virtual float GetAttackDuration() const { return Duration; }
+	virtual float GetAttackDuration() const { return MaxDuration; }
 
 	/**	攻撃が有効化された瞬間の時間を取得 */
 	virtual float GetJustExecuteTime() const { return JustExecuteTime; }
-
 	/*End PrivateMember Getters~ */
 
 private:
@@ -143,10 +141,10 @@ private:
 	TEnumAsByte<ECollisionResponse> TargetResponse;
 
 	/**
-	 * @brief 攻撃の継続時間
+	 * @brief 攻撃の最大継続時間
 	 */
-	UPROPERTY(EditAnywhere)
-	float Duration = 1.f;
+	UPROPERTY()
+	float MaxDuration = 0.f;
 
 	/**
 	 * @brief 攻撃が有効化された瞬間の時間

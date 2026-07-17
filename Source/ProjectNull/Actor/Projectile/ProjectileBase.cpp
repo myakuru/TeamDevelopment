@@ -15,7 +15,7 @@
 AProjectileBase::AProjectileBase():
 	OwnerActor(nullptr),
 	PlayerRuntimeData(nullptr),
-	AttackPowerScale(1.f),
+	AttackPower(1.f),
 	Root(nullptr),
 	SphereCollision(nullptr),
 	StaticMesh(nullptr),
@@ -104,7 +104,7 @@ void AProjectileBase::HandleCollision(AActor* OtherActor)
 	// キャラクターインターフェースを実装しているか
 	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		Interface->ApplyDamaged(PlayerRuntimeData->GetFinalAttackPower(AttackPowerScale));
+		Interface->ApplyDamaged(AttackPower + PlayerRuntimeData->GetCharacterAttackPower());
 		Interface->ApplyKnockBack(OwnerActor->GetActorLocation());
 	}
 

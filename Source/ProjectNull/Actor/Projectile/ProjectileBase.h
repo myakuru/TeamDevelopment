@@ -45,8 +45,8 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 	
-	UPROPERTY(EditAnywhere)
-	float AttackPowerScale;
+	UPROPERTY(EditAnywhere,Category="Attack")
+	float AttackPower;
 	
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -98,5 +98,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float AliveTime;
-	
 };

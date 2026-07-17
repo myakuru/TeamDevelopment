@@ -54,6 +54,8 @@ public:
 	void TryConsumeFastFallRequest();
 	void ApplyLocalHitPos(const FVector& HitWorldLocation)override;
 	void SpawnDeathEffect();
+	bool IsIntersectingStaticObjects(FHitResult& HitResult, FVector& SpawnLocationXY);
+	FVector CalculateEnemySpawnPointInRing(const FVector& Center) const;
 	/** 視界にPawnが入った時に呼ばれる（PawnSensingのコールバック）*/
 	UFUNCTION()
 	void OnSeePlayer(APawn* Pawn);
@@ -253,5 +255,12 @@ protected:
 	float NoisePower = 1.5f;
 	UPROPERTY(EditAnywhere, Category = "HitColor")
 	float HitEmissivePower = 10.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	float SpawnRayStartHeight = 100.0f;
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	float SpawnRayEndDepth = 0.0f;
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	float SpawnRadius = 1000.0f;
 
 };

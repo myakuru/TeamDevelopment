@@ -49,5 +49,5 @@ private:
 	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
 	
 	UPROPERTY(EditAnywhere)
-	float AttackPowerScale;
+	float AttackPower;
 };

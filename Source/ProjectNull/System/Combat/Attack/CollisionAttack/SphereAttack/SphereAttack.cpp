@@ -27,7 +27,7 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 		);
 
 		// 攻撃の最大時間を加算して「攻撃の最大有効時間」として使う
-		AddDuration(SphereCollision->GetBaseAttackDuration());
+		SetDuration(SphereCollision->GetBaseAttackDuration());
 
 		// 指定したコリジョンチャンネルとそれに対するレスポンスをセット
 		SphereCollision->SetAllCollisionResponseToChannel(
@@ -40,19 +40,19 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 		{
 			if (!IsValid(Sphere)) { continue; }
 			Sphere->OnComponentBeginOverlap.AddDynamic(
-					this
-				,	&ThisClass::OnCollisionBeginOverlap
+				this
+				, &ThisClass::OnCollisionBeginOverlap
 			);
-			
+
 			Sphere->OnComponentEndOverlap.AddDynamic(
-					this
-				,	&ThisClass::OnCollisionEndOverlap
+				this
+				, &ThisClass::OnCollisionEndOverlap
 			);
 		}
 
 		Cancel();
 	}
-	
+
 	// 警告を出力するなら専用アクターを生成
 	if (IsShowWarning)
 	{
@@ -62,18 +62,20 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 			if (SphereCollision->GetSphereEntries().IsValidIndex(i))
 			{
 				const FSphereElemental& Sphere = SphereCollision->GetSphereEntries()[i];
-				TObjectPtr<AWarningShapeActor> WarningShape = GetWorld()->SpawnActor<AWarningShapeActor>(WarningShapeActor);
-				WarningShape->AttachToComponent(SphereCollision->GetSphereComponents()[i],FAttachmentTransformRules::KeepRelativeTransform);
-				
+				TObjectPtr<AWarningShapeActor> WarningShape = GetWorld()->SpawnActor<AWarningShapeActor>(
+					WarningShapeActor);
+				WarningShape->AttachToComponent(SphereCollision->GetSphereComponents()[i],
+				                                FAttachmentTransformRules::KeepRelativeTransform);
+
 				// 実行までの時間をセット
 				WarningShape->SetActivationDelay(Sphere.ActivationDelay);
-				if (const auto& SphereComponent=SphereCollision->GetSphereComponents()[i])
+				if (const auto& SphereComponent = SphereCollision->GetSphereComponents()[i])
 				{
 					// 目標半径
 					WarningShape->SetTargetRadius(
 						SphereComponent->GetScaledSphereRadius());
 				}
-				
+
 				WarningShape->Initialize();
 				// 要素を追加
 				WarningShapes.Add(WarningShape);
@@ -81,18 +83,19 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 		}
 	}
 }
+
 void USphereAttack::Execute(const FVector& InTargetLocation)
 {
 	UCollisionAttack::Execute(InTargetLocation);
-	
+
 	if (!IsValid(SphereCollision)) { return; }
-	SphereCollision->SetJustExecuteTime(GetJustExecuteTime());			// 有効化された瞬間の時間をセット
-	SphereCollision->SetActorRelativeTransform(GetOffsetTransform());	// 補正用トランスフォーム値をコリジョンの基準としてセット
-	
+	SphereCollision->SetJustExecuteTime(GetJustExecuteTime()); // 有効化された瞬間の時間をセット
+	SphereCollision->SetActorRelativeTransform(GetOffsetTransform()); // 補正用トランスフォーム値をコリジョンの基準としてセット
+
 	// 警告を出力するなら実行
 	if (IsShowWarning)
 	{
-		for (const auto& Warning:WarningShapes)
+		for (const auto& Warning : WarningShapes)
 		{
 			Warning->Execute();
 		}
@@ -110,16 +113,16 @@ void USphereAttack::Cancel()
 void USphereAttack::Update(float InDeltaTime)
 {
 	UCollisionAttack::Update(InDeltaTime);
-	
-	if (!IsActive()) { return; }
 
+	if (!IsActive()) { return; }
+	
 	if (!IsValid(SphereCollision)) { return; }
 	SphereCollision->Update(InDeltaTime);
-	
+
 	// 警告を出力するなら更新
 	if (IsShowWarning)
 	{
-		for (const auto& Warning:WarningShapes)
+		for (const auto& Warning : WarningShapes)
 		{
 			Warning->Update(InDeltaTime);
 		}
@@ -129,6 +132,6 @@ void USphereAttack::Update(float InDeltaTime)
 void USphereAttack::ApplyCollisionTransform(const FTransform& InTransform)
 {
 	if (!IsValid(SphereCollision)) { return; }
-	
+
 	SphereCollision->SetActorTransform(InTransform);
 }

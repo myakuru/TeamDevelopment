@@ -9,6 +9,35 @@ class UTextRenderComponent;
 class USphereComponent;
 
 /**
+ * @brief 点滅しながら当たり判定を行う際に必要なパラメータ群
+ */
+USTRUCT()
+struct FBlinkingHitElemental
+{
+	GENERATED_BODY()
+
+public:
+
+	/**
+	 * @brief 前フレーム時の点滅がONかOFFか
+	 */
+	UPROPERTY()
+	bool bPrevBlinking = true;
+	
+	/**
+	 * @brief 点滅的に攻撃判定を行うか
+	 */
+	UPROPERTY(EditAnywhere)
+	bool bIsBlinking = false;
+
+	/**
+	 * @brief 点滅する間隔
+	 */
+	UPROPERTY(EditAnywhere)
+	float BlinkInterval = 0.1f;
+};
+
+/**
  * @brief 攻撃に使用する球のパラメータ群
  */
 USTRUCT()
@@ -17,6 +46,12 @@ struct FSphereElemental
 	GENERATED_BODY()
 
 public:
+	/**
+	 * @brief 点滅に使用するパラメータ群
+	 */
+	UPROPERTY(EditAnywhere)
+	FBlinkingHitElemental BlinkingHitElemental;
+	
 	/**
 	 * @brief トランスフォーム系
 	 */
@@ -96,9 +131,6 @@ public:
 	/**	発動してからの最大有効時間を取得 */
 	float GetMaxDuration() const { return MaxDuration; }
 
-	/**	発動するまでの最大待ち時間を取得 */
-	float GetMaxActivationDelay() const { return MaxActivationDelay; }
-
 	/**	球コンポーネント配列の取得 */
 	const TArray<TObjectPtr<USphereComponent>>& GetSphereComponents() const
 	{
@@ -114,6 +146,30 @@ public:
 	/* End Getters~ */
 
 private:
+	/**
+	 * @brief 点滅処理有効時のコリジョン有効無効切り替え更新処理
+	 * @param InSphereComponent 球コンポーネント 
+	 * @param OutBlinkingHitElemental 球に対応する点滅パラメータ群
+	 * @param InCurrentTime 現在の時間
+	 */
+	void UpdateBlinkingHitCheck(
+				const TObjectPtr<USphereComponent>& InSphereComponent
+			,	FBlinkingHitElemental& OutBlinkingHitElemental
+			,	const float InCurrentTime
+		);
+
+	/**
+	 * @brief 点滅処理無効時のコリジョン有効無効切り替え更新処理
+	 * @param InSphereComponent 球コンポーネント
+	 * @param InSphereElemental 球に対応するパラメータ群
+	 * @param InCurrentTime 現在の時間
+	 */
+	void UpdateDefaultHitCheck(
+			const TObjectPtr<USphereComponent>& InSphereComponent
+		,	const FSphereElemental& InSphereElemental
+		,	const float InCurrentTime
+		);
+	
 	/**
 	 * @brief 構造体配列から球コンポーネントを生成
 	 */

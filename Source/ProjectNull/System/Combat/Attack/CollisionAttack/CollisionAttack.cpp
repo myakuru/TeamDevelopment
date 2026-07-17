@@ -2,8 +2,8 @@
 #include <ProjectNull\System\Interface\CharacterInterface\CharacterInterface.h>
 
 UCollisionAttack::UCollisionAttack()
-	:	Duration(1.f)
-	,	JustExecuteTime(0.f)
+	: MaxDuration(0.f)
+	  , JustExecuteTime(0.f)
 {
 }
 
@@ -15,7 +15,7 @@ void UCollisionAttack::Update(const float InDeltaTime)
 	UAttackBase::Update(InDeltaTime);
 
 	// 発動した瞬間から有効時間分経過していたら終了
-	if (GetWorld()->GetTimeSeconds() > Duration + JustExecuteTime)
+	if (GetWorld()->GetTimeSeconds() > MaxDuration + JustExecuteTime)
 	{
 		Cancel();
 		return;
@@ -24,14 +24,20 @@ void UCollisionAttack::Update(const float InDeltaTime)
 
 void UCollisionAttack::Execute(const FVector& InTargetLocation)
 {
-	SetIsActive(true);								// 攻撃有効化
-	SetCanExecute(false);							// 攻撃実行不可にする
-	JustExecuteTime = GetWorld()->GetTimeSeconds();	// 「発動した時間」として現在の時間を保存
+	SetIsActive(true); // 攻撃有効化
+	SetCanExecute(false); // 攻撃実行不可にする
+	JustExecuteTime = GetWorld()->GetTimeSeconds(); // 「発動した時間」として現在の時間を保存
+	
+	// 既に持っているアクター配列をリセット
+	if (!GetHitActors().IsEmpty())
+	{
+		ResetAllActors();
+	}
 }
 
 void UCollisionAttack::Cancel()
 {
-	SetIsActive(false);		// 攻撃無効化
+	SetIsActive(false); // 攻撃無効化
 }
 
 void UCollisionAttack::OnCollisionBeginOverlap(
@@ -44,22 +50,20 @@ void UCollisionAttack::OnCollisionBeginOverlap(
 )
 {
 	if (!OtherActor || !GetOwnerActor().IsValid()
-		|| OtherActor == GetOwnerActor()) {
+		|| OtherActor == GetOwnerActor())
+	{
 		return;
 	}
-
-	if (!GetHitActors().Contains(OtherActor))
+	
+	// キャラクターインターフェースを実装しているか
+	if (auto* interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		// キャラクターインターフェースを実装しているか
-		if (auto* interface = Cast<ICharacterInterface>(OtherActor))
-		{
-			interface->ApplyDamaged(GetFinalDamage());
-			interface->ApplyKnockBack(GetOwnerActor()->GetActorLocation());
-			AddHitActors(OtherActor);
-			
-			// 攻撃がHITした瞬間のデリゲートの発火
-			OnOverlapInDelegate.Broadcast(OtherActor);
-		}
+		interface->ApplyDamaged(GetFinalDamage());
+		interface->ApplyKnockBack(GetOwnerActor()->GetActorLocation());
+		AddHitActors(OtherActor);
+
+		// 攻撃がHITした瞬間のデリゲートの発火
+		OnOverlapInDelegate.Broadcast(OtherActor);
 	}
 }
 
@@ -71,14 +75,15 @@ void UCollisionAttack::OnCollisionEndOverlap(
 )
 {
 	if (!OtherActor || !GetOwnerActor().IsValid()
-		|| OtherActor == GetOwnerActor()) {
+		|| OtherActor == GetOwnerActor())
+	{
 		return;
 	}
-	
+
 	if (GetHitActors().Contains(OtherActor))
 	{
 		RemoveActor(OtherActor);
-		
+
 		// HIT判定から抜け出した瞬間のデリゲートの発火
 		OnOverlapOutDelegate.Broadcast(OtherActor);
 	}

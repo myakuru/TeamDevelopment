@@ -104,6 +104,15 @@ void AEnemyBossBase::BeginPlay()
 		float AttackScale = EnemyBossStatus.FinalAttack;
 	}
 
+	// 座標
+	TObjectPtr<APawn> PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	const FVector playerLocation = PPlayerPawn->GetActorLocation();
+	FVector SpawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
+
+	FHitResult HitResult;
+	if (!IsIntersectingStaticObjects(HitResult, SpawnLocation)) { return; }
+	SetActorLocation(SpawnLocation);
+
 }
 
 // Called every frame
@@ -428,4 +437,39 @@ void AEnemyBossBase::SpawnDeathEffect()
 			true    // bPreCullCheck
 		);
 	}
+}
+
+
+
+bool AEnemyBossBase::IsIntersectingStaticObjects(FHitResult& HitResult, FVector& SpawnLocationXY)
+{
+	// Rayの座標を求める
+	FVector RayStart = SpawnLocationXY + FVector(0.0f, 0.0f, SpawnRayStartHeight);
+	FVector RayEnd = SpawnLocationXY - FVector(0.0f, 0.0f, SpawnRayEndDepth);
+
+	// Rayがワールドの静的オブジェクトに衝突しているか調べる
+	const bool IsIntersect = GetWorld()->LineTraceSingleByChannel(HitResult, RayStart, RayEnd, ECollisionChannel::ECC_Visibility);
+
+	// 衝突していたら衝突した座標を出現座標にする
+	if (IsIntersect)
+	{
+		SpawnLocationXY = HitResult.Location;
+	}
+
+	return IsIntersect;
+}
+
+FVector AEnemyBossBase::CalculateEnemySpawnPointInRing(const FVector& Center) const
+{
+	// ランダム角度
+	float angle = FMath::RandRange(0.0f, 360.0f);
+
+	// XYオフセット
+	FVector offset = {
+		FMath::Cos(FMath::DegreesToRadians(angle)) * SpawnRadius,
+		FMath::Sin(FMath::DegreesToRadians(angle)) * SpawnRadius,
+		0.0f
+	};
+
+	return Center + offset;
 }

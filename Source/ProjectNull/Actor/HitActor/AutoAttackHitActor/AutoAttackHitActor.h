@@ -52,7 +52,7 @@ private:
 	
 	/** 自動攻撃の攻撃力係数 */
 	UPROPERTY(EditAnywhere)
-	float AttackPowerScale;
+	float AttackPower;
 
 	bool bEnabled;
 };
