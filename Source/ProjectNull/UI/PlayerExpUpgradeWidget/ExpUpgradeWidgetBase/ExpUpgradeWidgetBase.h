@@ -114,6 +114,7 @@ private:
 
 	FName UpgradeRowName = NAME_None;
 	
+	/** 効果音 */
 	UPROPERTY()
 	TObjectPtr<USoundBase>HoverSESound;
 };
