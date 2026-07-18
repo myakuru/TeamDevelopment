@@ -11,7 +11,6 @@
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 
 #include <ProjectNull/System/Gear/GearBase.h>
-#include <ProjectNull/System/Combat/Attack/CollisionAttack/SphereAttack/SphereAttack.h>
 
 #include <GameFramework/CharacterMovementComponent.h>
 
@@ -19,6 +18,7 @@
 #include <ProjectNull/Weapon/Data/WeaponData.h>
 #include <ProjectNull/Weapon/Instance/WeaponInstance.h>
 #include "NiagaraComponent.h"
+#include "Components/SphereComponent.h"
 
 
 UPlayerGearComponent::UPlayerGearComponent():
@@ -26,7 +26,7 @@ UPlayerGearComponent::UPlayerGearComponent():
 		PlayerRuntimeData(nullptr),
 		PlayerParameterData(nullptr),
 		PlayerGears(TArray<TObjectPtr<UGearBase>>()),
-		GearChangeSphere(nullptr),
+		GearChangeSphereComp(nullptr),
 		InvincibleEffect(nullptr),
 		CurrentGearLevel(1),
 		HitStopDuration(0.f),
@@ -40,6 +40,9 @@ UPlayerGearComponent::UPlayerGearComponent():
 		EffectDeactivateScaleThreshold(0.1f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	
+	GearChangeSphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("GearChangeSphere"));
+	
 }
 
 void UPlayerGearComponent::BeginPlay()
@@ -159,26 +162,46 @@ void UPlayerGearComponent::ChangeGear()
 	OnInvincibilityStart();
 }
 
-void UPlayerGearComponent::OnGearBeginOverlap(const TObjectPtr<AActor>& OtherActor) const
+void UPlayerGearComponent::OnGearBeginOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
 {
-	auto HitStopComp = OwnerPlayer->GetHitStopComponent();
-	if (!HitStopComp) { return; }
+	if (!OtherActor || 
+		!OwnerPlayer ||
+		!PlayerRuntimeData) { return; }
 
-	HitStopComp->StartHitStop(
-		HitStopDuration,
-		HitStopTimeDilation
-	);
+	// キャラクターインターフェースを実装しているか
+	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
+	{
+		Interface->ApplyDamaged(InvincibilityAttackPowerScale + PlayerRuntimeData->GetCharacterAttackPower());
+		Interface->ApplyKnockBack(OwnerPlayer->GetActorLocation());
+	}
+	
+	// const auto HitStopComp = OwnerPlayer->GetHitStopComponent();
+	// if (!HitStopComp) { return; }
+	//
+	// HitStopComp->StartHitStop(
+	// 	HitStopDuration,
+	// 	HitStopTimeDilation
+	// );
 }
 
 void UPlayerGearComponent::InitializeSphereCollision()
 {
-	if (!IsValid(GearChangeSphere)) { return; }
-
-	// 攻撃がHITした時に呼びたい関数をコリジョンのデリゲートに登録
-	GearChangeSphere->GetDelegateOnOverlapIn().AddUObject(
-			this
-		,	&ThisClass::OnGearBeginOverlap
-		);
+	if (!GearChangeSphereComp ||
+		!IsValid(OwnerPlayer)) { return; }
+	
+	GearChangeSphereComp->AttachToComponent(OwnerPlayer->GetRootComponent(),
+											FAttachmentTransformRules::KeepRelativeTransform);
+	GearChangeSphereComp->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+	GearChangeSphereComp->OnComponentBeginOverlap.AddDynamic(
+		this,
+		&UPlayerGearComponent::OnGearBeginOverlap);
+	
 }
 
 void UPlayerGearComponent::UpdateSkillCooldown(
@@ -202,10 +225,16 @@ void UPlayerGearComponent::UpdateSkillCooldown(
 void UPlayerGearComponent::SetIsInvincible(bool bInIsInvincible)
 {
 	if (!PlayerRuntimeData ||
-		!GearChangeSphere) { return; }
+		!GearChangeSphereComp) { return; }
 
 	PlayerRuntimeData->SetIsInvincible(bInIsInvincible);
 
+	const ECollisionEnabled::Type CollisionType = bInIsInvincible
+	? ECollisionEnabled::Type::QueryAndPhysics
+	: ECollisionEnabled::Type::NoCollision;
+	
+	GearChangeSphereComp->SetCollisionEnabled(CollisionType);
+	
 	if (bInIsInvincible)
 	{
 		StartInvincibleEffect();
