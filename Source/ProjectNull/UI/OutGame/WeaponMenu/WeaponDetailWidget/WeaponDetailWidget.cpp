@@ -8,6 +8,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
+#include "Components/ScrollBox.h"
 #include <ProjectNull/UI/OutGame/WeaponMenu/WeaponListItemWidget/WeaponListItemWidget.h>
 #include <ProjectNull/UI/OutGame/WeaponMenu/EffectListItemWidget/EffectListItem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
@@ -28,9 +29,7 @@ bool UWeaponDetailWidget::Initialize()
 	for (int i = 0; i < 6; i++) {
 		UEffectListItem* newItem = CreateWidget<UEffectListItem>(GetWorld(), EffectListItemClass);
 		//newItem->Initialize();
-		int32 row = i % 3;
-		int32 column = i / 3;
-		EffectList->AddChildToUniformGrid(newItem, row, column);
+		EffectList->AddChild(newItem);
 		EffectListItems.Add(newItem);
 	}
 
@@ -52,9 +51,7 @@ void UWeaponDetailWidget::SetWeaponData(const FWeaponData& InWeaponData)
 		UEffectListItem* newItem = CreateWidget<UEffectListItem>(GetWorld(), EffectListItemClass);
 		newItem->OnEffectListItemClicked.AddUniqueDynamic(this, &UWeaponDetailWidget::ListEffectOnClicked);
 		//newItem->Initialize();
-		int32 row = i % 3;
-		int32 column = i / 3;
-		EffectList->AddChildToUniformGrid(newItem, row, column);
+		EffectList->AddChild(newItem);
 		EffectListItems.Add(newItem);
 	}
 

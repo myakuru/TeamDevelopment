@@ -68,7 +68,7 @@ void AExplosionGearSkill::Initialize(const FExplosionData& InData)
 
 void AExplosionGearSkill::StartExplosionSequence()
 {
-	
+	ApplyData();
 
 
 	FTimerDelegate timerDelegate;

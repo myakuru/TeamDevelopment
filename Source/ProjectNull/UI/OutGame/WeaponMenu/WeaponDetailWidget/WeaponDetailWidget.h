@@ -11,6 +11,7 @@ class UTextBlock;
 class UImage;
 class UBorder;
 class UUniformGridPanel;
+class UScrollBox;
 class UEffectListItem;
 struct FWeaponData;
 struct FWeaponInstance;
@@ -49,10 +50,7 @@ private:
 	TObjectPtr<UTextBlock> WeaponName;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UBorder> BackGround;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UUniformGridPanel> EffectList;
+	TObjectPtr<UScrollBox> EffectList;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> Icon;

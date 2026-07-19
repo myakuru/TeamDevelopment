@@ -13,10 +13,10 @@ bool UWeaponListItemWidget::Initialize()
 {
 	Super::Initialize();
 
-	WeaponName->SetText(FText());
+	if(WeaponName)WeaponName->SetText(FText());
 
-	BackGround->SetBrushColor(UnselectedBackGroundColor);
-	Overlay->SetBrushColor(UnHoveredOverlayColor);
+	if(BackGround)BackGround->SetBrushColor(UnselectedBackGroundColor);
+	if(Overlay)Overlay->SetBrushColor(UnHoveredOverlayColor);
 
 	if (Button) {
 		Button->OnClicked.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonClicked);
