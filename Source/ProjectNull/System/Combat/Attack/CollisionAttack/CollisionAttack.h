@@ -109,8 +109,8 @@ protected:
 	 */
 	virtual TEnumAsByte<ECollisionResponse> GetTargetResponse() const { return TargetResponse; }
 
-	/**	攻撃の継続時間を取得 */
-	virtual float GetAttackDuration() const { return MaxDuration; }
+	/**	攻撃の最大継続時間を取得 */
+	virtual float GetMaxDuration() const { return MaxDuration; }
 
 	/**	攻撃が有効化された瞬間の時間を取得 */
 	virtual float GetJustExecuteTime() const { return JustExecuteTime; }

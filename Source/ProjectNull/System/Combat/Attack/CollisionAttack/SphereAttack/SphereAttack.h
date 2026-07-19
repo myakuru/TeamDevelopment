@@ -80,6 +80,11 @@ private:
 	 */
 	UPROPERTY()
 	TArray<TObjectPtr<AWarningShapeActor>> WarningShapes;
+
+	/**
+	 * @brief 攻撃をキャンセルするタイマーハンドル
+	 */
+	FTimerHandle CancelTimerHandle;
 	
 	/**
 	 * @brief 警告を出すか
