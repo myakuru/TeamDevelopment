@@ -15,7 +15,7 @@ ACapsuleCollision::ACapsuleCollision():
 	{
 		CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("Capsule");
 		if (!CapsuleComponent) { return; }
-		CapsuleComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		CapsuleComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);	
 		CapsuleComponent->SetupAttachment(RootComponent);
 	}
 }

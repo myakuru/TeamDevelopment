@@ -40,7 +40,8 @@ void UDashGear::Execute(int32 CurrentGearLevel)
 	CurrentExecuteAttackIndex = CurrentGearLevel - 1;
 	
 	// 攻撃有効化
-	if (!SphereAttacks.IsValidIndex(CurrentExecuteAttackIndex)) { return; }
+	if (!SphereAttacks.IsValidIndex(CurrentExecuteAttackIndex) ||
+		!SphereAttacks[CurrentExecuteAttackIndex]) { return; }
 	SphereAttacks[CurrentExecuteAttackIndex]->Execute();
 }
 
@@ -53,15 +54,17 @@ void UDashGear::Update(float DeltaTime)
 		SetBlocksMovement(false);
 	}
 	
-	if (!SphereAttacks.IsValidIndex(CurrentExecuteAttackIndex)) { return; }
+	if (!SphereAttacks.IsValidIndex(CurrentExecuteAttackIndex) ||
+		!SphereAttacks[CurrentExecuteAttackIndex]) { return; }
 	SphereAttacks[CurrentExecuteAttackIndex]->Update(DeltaTime);
 }
 
 void UDashGear::SetSphereTransform(const FTransform& Transform) const
 {
 	// コリジョンのトランスフォームを指定の値を基に変化させる
-	if (!SphereAttacks.IsValidIndex(CurrentExecuteAttackIndex)) { return; }
-	UE_LOG(LogTemp,Warning,TEXT("SetActorLocation!!"));
+	if (!SphereAttacks.IsValidIndex(CurrentExecuteAttackIndex) ||
+		!SphereAttacks[CurrentExecuteAttackIndex]) { return; }
+	//UE_LOG(LogTemp,Warning,TEXT("SetActorLocation!!"));
 	SphereAttacks[CurrentExecuteAttackIndex]->ApplyCollisionTransform(Transform);
 }
 
@@ -74,6 +77,7 @@ void UDashGear::OnDashGearAttackBeginOverlap(
 	const FHitResult& SweepResult)
 {
 	if (!IsValid(OtherActor)) { return; }
+	if (!IsValid(OwnerPlayer)) { return;}
 	const auto Interface = Cast<ICharacterInterface>(OtherActor);
 
 	// TargetのActorのローカル座標を取得

@@ -33,7 +33,7 @@ void UFloatingWeaponEffect::Initialize()
 		State->SetOwnerActor(OwnerActor);
 		State->Initialize();
 	}
-	ChangeState(EFloatingWeaponState::Transition);
+	ChangeState(EFloatingWeaponState::Attack);
 }
 
 void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)

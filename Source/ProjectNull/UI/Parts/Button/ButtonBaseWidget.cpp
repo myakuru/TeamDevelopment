@@ -11,8 +11,8 @@ void UButtonBaseWidget::NativeConstruct()
 
 	Button->bIsVariable = true;
 
-	Button->OnHovered.AddDynamic(this, &UButtonBaseWidget::OnHoveredButton);
-	Button->OnClicked.AddDynamic(this, &UButtonBaseWidget::OnClickedButton);
+	Button->OnHovered.AddUniqueDynamic(this, &UButtonBaseWidget::OnHoveredButton);
+	Button->OnClicked.AddUniqueDynamic(this, &UButtonBaseWidget::OnClickedButton);
 }
 
 void UButtonBaseWidget::OnHoveredButton()
