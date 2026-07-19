@@ -1,5 +1,4 @@
-﻿
-#include "DashGearState_Lv4.h"
+﻿#include "DashGearState_Lv4.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Effect/AfterImageAttackEffect/AfterImageAttackEffect.h>
@@ -8,17 +7,20 @@
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 
+#include <ProjectNull/System/Combat/Attack/CollisionAttack/CollisionAttack.h>
+
 #include <ProjectNull/System/Gear/DashGear/DashGear.h>
 #include <ProjectNull/System/Gear/State/GearSpecialActionState/GearSpecialActionState.h>
 
 #include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
 
-UDashGearState_Lv4::UDashGearState_Lv4():
+UDashGearState_Lv4::UDashGearState_Lv4() :
 	RobotController(nullptr),
 	AfterImageAttackEffect(nullptr),
 	StanceTime(FThresholdRange()),
 	DashTime(FThresholdRange()),
 	StanceAnimMontage(TObjectPtr<UAnimMontage>()),
+	DashCollision(nullptr),
 	StanceAnimBlendOutTime(0.2f),
 	bExecuteFinalDash(false),
 	SpecialAttackSphereRadius(200.f)
@@ -35,6 +37,8 @@ void UDashGearState_Lv4::Initialize(
 		InGearComponent,
 		InOwner);
 
+	if (!IsValid(InPlayer)) { return;; }
+
 	// ギア発動時間初期化
 	InitializeGearDuration();
 
@@ -50,11 +54,15 @@ void UDashGearState_Lv4::Initialize(
 
 	if (!GearSpecialAction) { return; }
 	GearSpecialAction->Initialize(this);
+
+	// 攻撃クラスの初期化
+	if (!IsValid(DashCollision)) { return; }
+	DashCollision->Initialize(InPlayer);
 }
 
 void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 {
-	if (!Player || 
+	if (!Player ||
 		!RobotController ||
 		!DashGear ||
 		!GearSpecialAction) { return; }
@@ -63,7 +71,7 @@ void UDashGearState_Lv4::Execute(int32 CurrentGearLevel)
 	// ダッシュギアのレベル4状態クラスの初期化
 	// ================================================================
 	bExecuteFinalDash = false;
-	
+
 	//効果音
 	if (AfterImageAttackEffect && GearSESound.IsValidIndex(SEIndex::DashSESoundIndex))
 	{
@@ -112,12 +120,12 @@ void UDashGearState_Lv4::Update(float DeltaTime)
 	GearSpecialAction->Update(DeltaTime, ElapsedTime);
 
 	// 最終ダッシュの更新処理
-	UpdateFinalDash(DeltaTime,ElapsedTime);	 
+	UpdateFinalDash(DeltaTime, ElapsedTime);
 }
 
 void UDashGearState_Lv4::End()
 {
-	if (!Player || 
+	if (!Player ||
 		!RobotController) { return; }
 
 	EndDash();
@@ -133,14 +141,14 @@ void UDashGearState_Lv4::End()
 }
 
 void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
-{	
-	if (!Player)	{ return; }
+{
+	if (!Player) { return; }
 
 	auto Mesh = Player->GetMesh();
-	if (!Mesh)		{ return; }
+	if (!Mesh) { return; }
 
 	// 構え状態なら解除処理を行わない
-	if (StanceTime.IsWithinRange(ElapsedTime))	{ return; }
+	if (StanceTime.IsWithinRange(ElapsedTime)) { return; }
 
 	BlendOutStanceAnimation();
 
@@ -150,7 +158,7 @@ void UDashGearState_Lv4::UpdateCombatStance(float ElapsedTime)
 
 void UDashGearState_Lv4::UpdateAttackSphereCollision(float ElapsedTime)
 {
-	if(	!StanceTime.IsWithinRange(ElapsedTime) &&
+	if (!StanceTime.IsWithinRange(ElapsedTime) &&
 		!DashTime.IsWithinRange(ElapsedTime)) { return; }
 
 	const auto GroundAlignmentRootComp = Player->GetGroundAlignmentRootComponent();
@@ -164,18 +172,32 @@ void UDashGearState_Lv4::UpdateFinalDash(
 	float DeltaTime,
 	float ElapsedTime)
 {
-	if (!Player)	{ return; }
+	if (!Player) { return; }
 
 	const auto Mesh = Player->GetMesh();
-	if (!Mesh)		{ return; }
+	if (!Mesh) { return; }
 
 	if (!DashTime.IsWithinRange(ElapsedTime)) { return; }
 
+	// 攻撃クラスのNullチェック
+	const bool IsValidAttackCollision=IsValid(DashCollision);
+	
+	// まだ突進を有効化してないなら実行
 	if (!bExecuteFinalDash)
 	{
 		ExecuteDash();
+		if (IsValidAttackCollision)
+		{
+			DashCollision->Execute();
+		}
 	}
 
+	// 突進攻撃の更新
+	if (IsValidAttackCollision)
+	{
+		DashCollision->Update(DeltaTime);
+	}
+	
 	bExecuteFinalDash = true;
 
 	// プレイヤースケルタルメッシュの描画無効にする
@@ -213,5 +235,3 @@ void UDashGearState_Lv4::BlendOutStanceAnimation()
 
 	PlayerAnimInstance->Montage_Stop(StanceAnimBlendOutTime, StanceAnimMontage);
 }
-
- 

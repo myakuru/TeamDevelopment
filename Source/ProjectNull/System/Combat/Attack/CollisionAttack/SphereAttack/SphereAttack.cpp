@@ -100,6 +100,14 @@ void USphereAttack::Execute(const FVector& InTargetLocation)
 			Warning->Execute();
 		}
 	}
+	
+	// 攻撃を確実にキャンセルするためのタイマーをセット
+	GetWorld()->GetTimerManager().SetTimer(
+			CancelTimerHandle
+		,	this
+		,	&USphereAttack::Cancel
+		,	GetMaxDuration()
+		);
 }
 
 void USphereAttack::Cancel()

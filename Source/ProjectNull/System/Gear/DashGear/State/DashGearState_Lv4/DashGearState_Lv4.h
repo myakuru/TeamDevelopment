@@ -17,6 +17,9 @@ class UAfterImageAttackEffect;
 /** アニメーションモンタージュ */
 class UAnimMontage;
 
+/** コリジョンを持った攻撃クラス */
+class UCollisionAttack;
+
 /** ダッシュギアのレベル4状態クラス */
 UCLASS(EditInlineNew, Blueprintable)
 class PROJECTNULL_API UDashGearState_Lv4 final : public UDashGearStateBase
@@ -74,7 +77,8 @@ private:
 	 * @brief 構え状態のアニメーションブレンドアウト
 	 */
 	void BlendOutStanceAnimation();
-
+	
+private:
 	/** ロボットコントローラークラス */
 	UPROPERTY()
 	TObjectPtr<ARobotController>			RobotController;
@@ -83,6 +87,10 @@ private:
 	UPROPERTY(EditAnywhere,Instanced,Category = "Ghost")
 	TObjectPtr<UAfterImageAttackEffect>		AfterImageAttackEffect;
 
+	/** 球コリジョンを持った攻撃クラス(ダッシュギアの最後の突進に使用) */
+	UPROPERTY(EditAnywhere,Instanced,Category = "Ghost")
+	TObjectPtr<UCollisionAttack> DashCollision;
+	
 	/** 構えアニメーションの時間閾値 */
 	UPROPERTY(EditAnywhere)
 	FThresholdRange StanceTime;
