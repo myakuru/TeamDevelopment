@@ -10,6 +10,8 @@
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyMidBossRuntimeData\EnemyMidBossRuntimeData.h>
 #include <ProjectNull\System\Subsystem\WorldSubsystem\GameProgressSubsystem\GameProgressSubsystem.h>
 
+#include "GameFramework/CharacterMovementComponent.h"
+
 AEnemyMidBossBase::AEnemyMidBossBase()
 	:	EnemyDataAsset(nullptr)
 	,	EnemyStatus(FEnemyStatus())
@@ -59,11 +61,6 @@ void AEnemyMidBossBase::BeginPlay()
 	TObjectPtr<APawn> PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	const FVector playerLocation = PPlayerPawn->GetActorLocation();
 	FVector SpawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
-
-	if (!GetCharacterMovement())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("キャラクタームーブメントがない尾"));
-	}
 
 	FHitResult HitResult;
 	if (!IsIntersectingStaticObjects(HitResult, SpawnLocation)) { return; }
@@ -135,7 +132,7 @@ void AEnemyMidBossBase::Tick(float InDeltaTime)
 		EnemyMidBossRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
 	}
 	
-	UE_LOG(LogTemp,Warning,TEXT("StateEnum : %d"),EnemyStatus.StateTag);
+	UE_LOG(LogTemp,Warning,TEXT("MoveSpeed : %f"),GetCharacterMovement()->GetMaxSpeed());
 
 	// 攻撃可能化の判断処理
 	CheckCanAttack();
