@@ -105,12 +105,34 @@ void AEnemyBossBase::BeginPlay()
 	}
 
 	// 座標
-	TObjectPtr<APawn> PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	const FVector playerLocation = PPlayerPawn->GetActorLocation();
-	FVector SpawnLocation = CalculateEnemySpawnPointInRing(playerLocation);
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (!IsValid(PlayerPawn))
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerPawnが取得できません"));
+		return;
+	}
+
+	const FVector PlayerLocation = PlayerPawn->GetActorLocation();
+	FVector SpawnLocation = CalculateEnemySpawnPointInRing(PlayerLocation);
 
 	FHitResult HitResult;
-	if (!IsIntersectingStaticObjects(HitResult, SpawnLocation)) { return; }
+	const bool bHitGround = IsIntersectingStaticObjects(HitResult, SpawnLocation);
+
+	UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("Player=%s Candidate=%s Hit=%s HitActor=%s"),
+		*PlayerLocation.ToString(),
+		*SpawnLocation.ToString(),
+		bHitGround ? TEXT("true") : TEXT("false"),
+		*GetNameSafe(HitResult.GetActor())
+	);
+
+	if (!bHitGround)
+	{
+		UE_LOG(LogTemp, Error, TEXT("地面を検出できなかったため、ボスが初期位置に残ります"));
+		return;
+	}
 	SetActorLocation(SpawnLocation);
 
 }
