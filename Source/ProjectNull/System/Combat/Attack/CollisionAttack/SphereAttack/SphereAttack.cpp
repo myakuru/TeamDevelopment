@@ -14,7 +14,7 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 	if (!IsValid(InOwner)) { return; }
 
 	UAttackBase::Initialize(InOwner);
-
+	
 	// 攻撃用のSphereCollisionアクターの設定
 	{
 		SphereCollision = GetWorld()->SpawnActor<ASphereCollision>(SubSphereCollision);
@@ -51,8 +51,6 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 				, &ThisClass::OnCollisionEndOverlap
 			);
 		}
-
-		Cancel();
 	}
 
 	// 警告を出力するなら専用アクターを生成

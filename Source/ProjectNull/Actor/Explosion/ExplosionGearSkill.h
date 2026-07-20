@@ -11,6 +11,7 @@ class UNiagaraSystem;
 
 /** スフィアコリジョンコンポーネント */
 class USphereComponent;
+class UPlayerRuntimeData;
 
 USTRUCT(BlueprintType)
 struct FExplosionData {
@@ -82,6 +83,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CollisionRadius = 0.0f;
 
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
 	/** タイマーハンドル */
 	FTimerHandle ExplosionTimerHandle;
 	FTimerHandle PreExplosionTimerHandle;

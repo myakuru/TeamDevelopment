@@ -165,10 +165,10 @@ void APlayerBase::ApplyDamaged(float InDamage)
 	if (!SuperGameInstance) { return; }
 
 	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
-	if (PlayerRuntimeData)	{ return; }
+	if (!IsValid(PlayerRuntimeData))	{ return; }
 
 	PlayerRuntimeData->SubtractHealth(InDamage);
-	//UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
+	UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)

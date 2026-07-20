@@ -46,12 +46,12 @@ void UFloatingWeaponAttack::Initialize(const TObjectPtr<AActor>& Owner)
 	if (!RootComp)				{ return; }
 
 	if (!AutoAttackHitActor)	{ return; }
-
 	// 自動攻撃の当たり判定アクターを
 	AutoAttackHitActor->AttachToComponent(
 		RootComp,
 		FAttachmentTransformRules::KeepRelativeTransform);
-
+	AutoAttackHitActor->SetOwner(Owner);
+	
 	if (!FloatingWeaponEffect)	{ return; }
 	
 	FloatingWeaponEffect->SetOwnerAttack(this);
