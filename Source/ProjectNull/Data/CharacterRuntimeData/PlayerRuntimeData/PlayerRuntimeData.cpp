@@ -16,6 +16,7 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 	if (!CachedExpUpgradeTable)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DT_ExpUpgrade がロードできません"));
+		return;
 	}
 
 	// 要素数分の初期化
@@ -27,14 +28,29 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 
 void UPlayerRuntimeData::Initialize()
 {
+	Level = 1;
 
-	//UpdateStatus();
+	// 経験値をリセット
+	Experience = FExperienceRuntimeData();
 
-	// プレイヤーのパラメータデータ取得
-	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
+	// 強化効果の倍率を全消去（これが残っていると前回の強化が効き続ける）
+	EffectMultipliers.Empty();
 
-	// プレイヤーのHPを更新
-	//Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
+	// 全強化レベルを0に戻す
+	UpgradeStates.Empty();
+	if (CachedExpUpgradeTable)
+	{
+		for (const FName& RowName : CachedExpUpgradeTable->GetRowNames())
+		{
+			UpgradeStates.Add({ RowName, "0" });
+		}
+	}
+
+	// ギアの実行時データのみリセット
+	// （GearChangeEnergyCost はエディタ設定値なので構造体ごと再構築せず、フィールド単位で戻す）
+	Gear.GearEnergy = 0.0f;
+	Gear.ExcessRatio = 0.0f;
+	Gear.GearChangeInvincibilityTime = 0.0f;
 }
 
 void UPlayerRuntimeData::AddExperience(float Amount)
