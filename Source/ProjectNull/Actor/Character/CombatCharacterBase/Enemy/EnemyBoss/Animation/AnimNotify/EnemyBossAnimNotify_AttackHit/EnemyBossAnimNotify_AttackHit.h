@@ -96,6 +96,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	FName VelocityParameterName = TEXT("User.ImpactEffectVelocity");
 
+	UPROPERTY(EditAnywhere, Category = "Owner")
+	TSubclassOf<AActor> HitActor;
+
+	// 攻撃ごとの固有の倍率補正, 1.0が攻撃力そのまま、倍率でかけていくので、1.2などを設定するとよい
+	UPROPERTY(EditAnywhere, Category = "Power")
+	float UniqueAttackPower = 1.0f;
+
 private:
 
 	/** この攻撃で当たったアクター（二重ヒット防止）*/

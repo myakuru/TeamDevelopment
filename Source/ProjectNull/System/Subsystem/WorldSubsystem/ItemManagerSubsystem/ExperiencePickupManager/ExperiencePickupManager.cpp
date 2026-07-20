@@ -49,8 +49,8 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 	if (!Owner) { return; }
 
 	//名前とラベルを変更
-	Owner->SetIsTemporarilyHiddenInEditor(true);
 #if WITH_EDITOR
+	Owner->SetIsTemporarilyHiddenInEditor(true);
 	Owner->SetActorLabel(TEXT("ExperienceNiagaraActor"));
 #endif
 

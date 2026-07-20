@@ -458,6 +458,11 @@ void AEnemyBossBase::BossDeathMaterialChange()
 	}
 }
 
+const float AEnemyBossBase::GetAttackDamage(const float Mag) const
+{
+	{ return EnemyBossRuntimeData->GetFinalAttackPower(Mag); }
+}
+
 void AEnemyBossBase::SpawnDeathEffect()
 {
 	if (IsValid(SpawnedDeathEffect))

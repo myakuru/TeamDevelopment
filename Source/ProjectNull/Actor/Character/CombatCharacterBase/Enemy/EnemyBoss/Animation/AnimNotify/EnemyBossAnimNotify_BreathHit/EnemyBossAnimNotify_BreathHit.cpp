@@ -10,6 +10,10 @@
 #include "DrawDebugHelpers.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 #include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/System/Interface/CharacterInterface/CharacterInterface.h>
 
 // ------------------------------------------------------------------------------------
 // 当たり判定の開始処理
@@ -71,57 +75,12 @@ void UEnemyBossAnimNotify_BreathHit::NotifyTick(USkeletalMeshComponent* MeshComp
 	const FVector Forward2 = Boss->GetActorForwardVector();
 	const FVector End = Start + Forward2 * Range;
 
-	// デバッグ表示
-	/*if(bDrawDebug)
-	{
-		DrawDebugLine(
-			World,
-			Start,
-			End,
-			FColor::Cyan,
-			true,
-			0.5f,
-			0,
-			3.0f
-		);
-
-		DrawDebugSphere(
-			World,
-			Start,
-			12.0f,
-			12,
-			FColor::Green,
-			false,
-			0.05f
-		);
-
-		DrawDebugSphere(
-			World,
-			End,
-			12.0f,
-			12,
-			FColor::Blue,
-			false,
-			0.05f
-		);
-	}*/
-
 	TArray<FHitResult> Hits;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Owner);
 
 	Owner->GetWorld()->LineTraceMultiByChannel(
 		Hits, Start, End, ECC_Pawn, Params);
-
-	// Niagaraに終点を渡す
-	/*const FVector BeamEnd = Hits.IsEmpty() ? End : Hits[0].ImpactPoint;
-	if (BreathNiagara.IsValid())
-	{
-		if (UNiagaraComponent* NC = BreathNiagara.Get())
-		{
-			NC->SetNiagaraVariableVec3(TEXT("BeamEnd"), BeamEnd);
-		}
-	}*/
 
 	// ヒットした全アクターに個別にダメージを送る
 	for (const FHitResult& Hit : Hits)
@@ -130,7 +89,7 @@ void UEnemyBossAnimNotify_BreathHit::NotifyTick(USkeletalMeshComponent* MeshComp
 		if (!IsValid(HitActor)) continue;
 
 		// IDamageableInterface を実装していなければスキップ
-		IDamageableInterface* Damageable = Cast<IDamageableInterface>(HitActor);
+		ICharacterInterface* Damageable = Cast<ICharacterInterface>(HitActor);
 		if (!Damageable) continue;
 
 		// クールダウン中はスキップ
@@ -138,16 +97,22 @@ void UEnemyBossAnimNotify_BreathHit::NotifyTick(USkeletalMeshComponent* MeshComp
 		if (Cooldown > 0.f) continue;
 
 		int Damage = 10;
+		if (HitOwnerActor)
+		{
+			AEnemyBossBase* Chara = Cast<AEnemyBossBase>(HitOwnerActor);
+			if (Chara)
+			{
+				Damage = Chara->GetAttackDamage(UniqueAttackPower);
+			}
+			if (auto* Player = Cast<APlayerBase>(HitActor))
+			{
+				USuperGameInstance* GameInstance = World->GetGameInstance<USuperGameInstance>();
+				GameInstance->GetPlayerRuntimeData()->SubtractHealth(-Damage);
+			}
+		}
 
-		Damageable->ReceiveDamage(Damage);
+		Damageable->ApplyDamaged(Damage);
 		Cooldown = HitInterval;
-
-		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
-		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
-		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
-		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
-		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
-		//UE_LOG(LogTemp, Warning, TEXT("BreathHitBreathHit"));
 	}
 
 	/*if (bDrawDebug)
