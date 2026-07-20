@@ -29,6 +29,8 @@ class PROJECTNULL_API UWeaponListItemWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+
+	void NativeConstruct()override;
 	
 	UFUNCTION(BlueprintCallable)
 	bool Initialize()override;

@@ -21,6 +21,9 @@ class PROJECTNULL_API UEffectListItem : public UUserWidget
 	GENERATED_BODY()
 
 public:
+
+	void NativeConstruct()override;
+
 	UFUNCTION(BlueprintCallable)
 	bool Initialize()override;
 

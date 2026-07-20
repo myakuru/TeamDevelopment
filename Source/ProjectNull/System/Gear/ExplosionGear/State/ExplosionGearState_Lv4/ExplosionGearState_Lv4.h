@@ -6,6 +6,8 @@
 #include "../ExplosionGearStateBase.h"
 #include "ExplosionGearState_Lv4.generated.h"
 
+class UPlayerCutsceneComponent;
+
 /**
  * 
  */
@@ -17,6 +19,12 @@ class PROJECTNULL_API UExplosionGearState_Lv4 : public UExplosionGearStateBase
 public:
 	UExplosionGearState_Lv4();
 
+	void Execute(int32 CurrentGearLevel)		override;
+
 	inline const int32 GetGearLevelIndex() const override { return kLv4Index; }
+
+
+	UPROPERTY(EditAnywhere, Instanced, Category = "Cutscene")
+	TObjectPtr<UPlayerCutsceneComponent> CutsceneComponent;
 	
 };
