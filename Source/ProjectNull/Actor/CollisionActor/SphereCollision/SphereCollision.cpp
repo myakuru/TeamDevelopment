@@ -169,14 +169,14 @@ void ASphereCollision::GeneratedSphereComponents()
 	{
 		FName Name = *FString::Printf(TEXT("Sphere_%d"), i);
 		USphereComponent* NewSphere = NewObject<USphereComponent>(this, Name);
-		NewSphere->SetupAttachment(RootComponent);
-		NewSphere->RegisterComponent();
-		AddInstanceComponent(NewSphere); // Componentsパネル/ビューポートに表示
 		
 		NewSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		NewSphere->SetSphereRadius(SphereEntries[i].Radius);
 		NewSphere->SetRelativeTransform(SphereEntries[i].Transform);
 		NewSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		AddInstanceComponent(NewSphere); // Componentsパネル/ビューポートに表示
+		NewSphere->SetupAttachment(RootComponent);
+		NewSphere->RegisterComponent();
 		SphereComponents.Add(NewSphere);
 		
 		// SyncSphereComponents内、Sphere生成の直後に追加

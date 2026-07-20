@@ -16,8 +16,9 @@ UENUM(BlueprintType)
 enum class EUpgradeEffectType : uint8
 {
 	/** 攻撃力の倍率 */
-	AttackDamage	UMETA(DisplayName = "攻撃力"),
-	PlayerSpeed		UMETA(DisplayName = "プレイヤーの移動速度"),
+	AttackDamage			UMETA(DisplayName = "攻撃力"),
+	PlayerSpeed				UMETA(DisplayName = "プレイヤーの移動速度"),
+	PlayerGearCoolTime		UMETA(DisplayName = "ギアのクールタイム"),
 };
 
 /** 1レベル分の強化情報 */

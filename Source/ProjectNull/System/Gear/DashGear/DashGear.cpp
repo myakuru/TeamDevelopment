@@ -41,7 +41,7 @@ void UDashGear::Execute(int32 CurrentGearLevel)
 	
 	// 攻撃有効化
 	if (!SphereAttacks.IsValidIndex(CurrentExecuteAttackIndex) ||
-		!SphereAttacks[CurrentExecuteAttackIndex]) { return; }
+		!IsValid(SphereAttacks[CurrentExecuteAttackIndex])) { return; }
 	SphereAttacks[CurrentExecuteAttackIndex]->Execute();
 }
 

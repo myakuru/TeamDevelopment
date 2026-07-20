@@ -141,6 +141,8 @@ void UExplosionGearStateBase::SpawnExplosionsInCircle(
 		initializeData.Delay = ExplosionData.Delay + Interval * i;
 		initializeData.IgnitionDelay = ExplosionData.IgnitionDelay;
 		initializeData.Scale = ExplosionData.Scale;
+		
+		if (!Explosion) { return; }
 		Explosion->Initialize(initializeData);
 		Explosion->StartExplosionSequence();
 

@@ -4,6 +4,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/ScrollBox.h"
 #include "Kismet/GameplayStatics.h"
 
 //ゲームインスタンス
@@ -96,12 +97,14 @@ void UStageSelectHUDWidget::CreateStageButtons()
 		ButtonWidget->OnClickedStage.AddUniqueDynamic(
 			this, &UStageSelectHUDWidget::OnClickedStageButton);
 
-		UCanvasPanelSlot* CanvasSlot =
+		if(StageList)StageList->AddChild(ButtonWidget);
+
+		/*UCanvasPanelSlot* CanvasSlot =
 			StageCanvas->AddChildToCanvas(ButtonWidget);
 
 		if (!CanvasSlot)continue;
 
-		CanvasSlot->SetPosition(StageButtonWidgetFirstPosition + (StageButtonWidgetInterval * i));
+		CanvasSlot->SetPosition(StageButtonWidgetFirstPosition + (StageButtonWidgetInterval * i));*/
 
 		if (!bIsUnlocked)break;
 	}

@@ -17,6 +17,9 @@ void UAttackBase::Initialize(const TObjectPtr<AActor>& Owner)
 	OwnerActor		= Owner;
 	if (!OwnerActor.IsValid()) { return; }
 
+	bIsActive=false;
+	bCanExecute=false;
+	
 	RootComponent	= NewObject<USceneComponent>(OwnerActor.Get());
 	if (!RootComponent) { return; }
 	RootComponent->RegisterComponent();
