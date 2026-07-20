@@ -153,12 +153,21 @@ void AEnemyBase::ApplyDamaged(float InDamaged)
 {
 	if (!EnemyRuntimeData) { return; }
 	
-	//ダメージ効果音
-	GetWorld()->GetGameInstance<USuperGameInstance>()->
-	GetSoundManager()->PlayAtLocation(
-		EnemyManager->GetDamagedSound(),
-		GetActorLocation()
-	);
+	
+	//ダメージ効果音                                                               
+	if (EnemyManager)                                                              
+	{                                                                              
+		if (auto* GI = GetWorld()->GetGameInstance<USuperGameInstance>())      
+		{                                                                      
+			if (USoundManager* SoundManager = GI->GetSoundManager())       
+			{                                                              
+				SoundManager->PlayAtLocation(                     
+						EnemyManager->GetDamagedSound(),               
+						GetActorLocation()                       
+				);                                                     
+			}                                                              
+		}                                                                      
+	}                                                        
 
 	EnemyRuntimeData->AddHealth(-InDamaged);		// 渡された値分、FinalHPを減算
 
