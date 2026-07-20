@@ -33,10 +33,6 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> AchievementText;
 
-	/** 達成条件アイコン */
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UImage> AchievementIcon;
-
 	/** 背景 */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UBorder> BackGround;
@@ -44,6 +40,12 @@ private:
 	/** ラップ */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UBorder> Overlap;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> ClearIcon;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> FailedIcon;
 
 	/** 条件をクリアしていた時の背景色 */
 	UPROPERTY(EditAnywhere)
