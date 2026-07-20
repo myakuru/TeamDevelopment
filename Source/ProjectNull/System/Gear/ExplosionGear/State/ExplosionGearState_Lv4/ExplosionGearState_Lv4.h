@@ -24,7 +24,9 @@ public:
 	inline const int32 GetGearLevelIndex() const override { return kLv4Index; }
 
 
-	UPROPERTY(EditAnywhere, Instanced, Category = "Cutscene")
+private:
+	
+	UPROPERTY()
 	TObjectPtr<UPlayerCutsceneComponent> CutsceneComponent;
 	
 };
