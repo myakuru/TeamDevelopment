@@ -43,9 +43,10 @@ bool UEvaluationPanel::Initialize()
 	if (!ResultAchievementWidgetClass || !AchieveList) return false;
 
 	// 全てのクリア条件を取得してUIとリストにセット
-	for (const FClearRankData& clearRankData : resultManager->GetSortedClearRankDatas()) {
+	TArray<FClearRankData> clearRankDatas = resultManager->GetSortedClearRankDatas();
+	for (int i = 1; i < clearRankDatas.Num();i++) {
 		UResultAchievementWidget* newItem = CreateWidget<UResultAchievementWidget>(GetWorld(), ResultAchievementWidgetClass);
-		newItem->Initialize(clearRankData.ConditionData);
+		newItem->Initialize(clearRankDatas[i].ConditionData);
 
 		Achievements.Enqueue(newItem);
 		AchieveList->AddChild(newItem);
