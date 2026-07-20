@@ -135,12 +135,31 @@ void AEnemyBossBase::BeginPlay()
 	}
 	SetActorLocation(SpawnLocation);
 
+	//SpawnedDeathEffect =
+	//	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+	//		GetWorld(),
+	//		DeathEffect,
+	//		GetActorLocation(),
+	//		GetActorRotation(),
+	//		GetActorScale3D(),
+	//		false, // 後から止めるためAutoDestroyはfalse
+	//		true,
+	//		ENCPoolMethod::None,
+	//		false
+	//	);
+
 }
 
 // Called every frame
 void AEnemyBossBase::Tick(float DeltaTime)
 {
 	ACombatCharacterBase::Tick(DeltaTime);
+
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::J))
+	{
+		EnemyBossRuntimeData->AddHealthDebug();
+	}
+
 	UAnimInstance* Anim = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
 	if (IsValid(Anim))
 	{
@@ -330,13 +349,23 @@ void AEnemyBossBase::EndLocalHitFlash()
 
 void AEnemyBossBase::BossFinalize()
 {
+	if (IsValid(SpawnedDeathEffect))
+	{
+		SpawnedDeathEffect->DeactivateImmediate();
+		SpawnedDeathEffect->SetVisibility(false, true);
+		SpawnedDeathEffect->DestroyComponent();
+		SpawnedDeathEffect = nullptr;
+
+		UE_LOG(LogTemp, Warning, TEXT("DeathEffectを停止しました"));
+	}
+
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 	SetActorTickEnabled(false);
 
 	//SpawnDeathEffect();
 
-	if (DeathEffect)
+	if (DestroyEffect)
 	{
 		FTransform AdjustedTransform = GetActorTransform();
 		FRotator Rot = AdjustedTransform.GetRotation().Rotator();
@@ -347,14 +376,12 @@ void AEnemyBossBase::BossFinalize()
 		Loc.Z -= 90.0f;
 		AdjustedTransform.SetLocation(Loc);
 
-		FTransform MeshTransform = GetMesh()->GetComponentTransform();
-
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			DestroyEffect,
-			MeshTransform.GetLocation(),
-			MeshTransform.Rotator(),
-			MeshTransform.GetScale3D(),
+			AdjustedTransform.GetLocation(),
+			AdjustedTransform.Rotator(),
+			FVector(1.0f),
 			true,   // bAutoDestroy
 			true,   // bAutoActivate
 			ENCPoolMethod::None,
@@ -362,7 +389,7 @@ void AEnemyBossBase::BossFinalize()
 		);
 	}
 
-	DeathEffect->ReleaseRef();
+	//DestroyEffect->ReleaseRef();
 
 	// StateTreeを停止
 	if (StateTreeComp)
@@ -433,6 +460,13 @@ void AEnemyBossBase::BossDeathMaterialChange()
 
 void AEnemyBossBase::SpawnDeathEffect()
 {
+	if (IsValid(SpawnedDeathEffect))
+	{
+		SpawnedDeathEffect->DeactivateImmediate();
+		SpawnedDeathEffect->DestroyComponent();
+		SpawnedDeathEffect = nullptr;
+	}
+
 	// 敵が死んだ際にパーティクルを出す
 	if (DeathEffect)
 	{
@@ -447,16 +481,16 @@ void AEnemyBossBase::SpawnDeathEffect()
 
 		FTransform MeshTransform = GetMesh()->GetComponentTransform();
 
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		SpawnedDeathEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			DeathEffect,
 			MeshTransform.GetLocation(),
 			MeshTransform.Rotator(),
 			MeshTransform.GetScale3D(),
-			true,   // bAutoDestroy
-			true,   // bAutoActivate
+			false,		// bAutoDestroy
+			true,		// bAutoActivate
 			ENCPoolMethod::None,
-			true    // bPreCullCheck
+			true		// bPreCullCheck
 		);
 	}
 }
