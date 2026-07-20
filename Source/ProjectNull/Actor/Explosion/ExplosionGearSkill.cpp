@@ -12,6 +12,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraShakeBase.h"
+#include "ProjectNull/GameInstance/SuperGameInstance.h"
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
 
 // Sets default values
 AExplosionGearSkill::AExplosionGearSkill()
@@ -54,7 +56,9 @@ void AExplosionGearSkill::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
 	
 }
 
@@ -140,6 +144,8 @@ void AExplosionGearSkill::Explode()
 	Collision->UpdateOverlaps();
 	Collision->GetOverlappingActors(actors);
 
+	if (!PlayerRuntimeData) { return;}
+	
 	// 検索したActorからEnemyBaseを見つけてヒット処理を行う
 	for (AActor* actor : actors) {
 		AEnemyBase* enemy = Cast<AEnemyBase>(actor);
@@ -147,11 +153,11 @@ void AExplosionGearSkill::Explode()
 			UE_LOG(LogTemp, Warning, TEXT("Not Enemy"));
 			continue;
 		}
-
+		
 		// キャラクターインターフェースを実装しているか
 		if (auto* interface = Cast<ICharacterInterface>(enemy))
 		{
-			interface->ApplyDamaged(Data.Damage);
+			interface->ApplyDamaged(Data.Damage + PlayerRuntimeData->GetCharacterAttackPower());
 			interface->ApplyKnockBack(GetActorLocation());
 		}
 	}
