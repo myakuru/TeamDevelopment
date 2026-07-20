@@ -10,6 +10,7 @@ class UBackgroundBlur;
 class UTextBlock;
 class UImage;
 class UTexture2D;
+class UScrollBox;
 class UStageButtonWidget;
 class UReturnButtonWidget;
 
@@ -132,6 +133,9 @@ protected:
 	/** 戻るボタン */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UReturnButtonWidget> ReturnButton;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UScrollBox> StageList;
 
 	/** アニメーション */
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
