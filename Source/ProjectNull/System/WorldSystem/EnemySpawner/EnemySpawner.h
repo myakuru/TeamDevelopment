@@ -83,6 +83,9 @@ class PROJECTNULL_API AEnemySpawner : public AActor
 public:	
 	AEnemySpawner();
 
+	void SetFinalPhase();
+	void SetBossPhase();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -94,6 +97,9 @@ public:
 	/// </summary>
 	UFUNCTION(BlueprintCallable, Category = "EnemySpawner")
 	void SpawnEnemy();
+
+	void SetInterval(float Interval)	{ SpawnParams.SpawnInterval = Interval; }
+	void SetSpawnStop(bool bStop)		{ SpawnStop = bStop; }
 
 	/** フェーズとWaveDataの対応表、エディタでセットする*/
 	UPROPERTY(EditAnywhere)
@@ -146,4 +152,12 @@ private:
 	/// 現在のフェーズデータ
 	/// </sumamry>
 	int NowPhase = 0;
+
+	/** 最終フェーズチェック*/
+	bool FinalPhase = false;
+
+	/** ボス専用フェーズチェック*/
+	bool BossPhase = false;
+
+	bool SpawnStop = false;
 };

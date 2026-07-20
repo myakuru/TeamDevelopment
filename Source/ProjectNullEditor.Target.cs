@@ -11,5 +11,6 @@ public class ProjectNullEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V6;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
 		ExtraModuleNames.Add("ProjectNull");
+		ExtraModuleNames.Add("ProjectNullEditor");
 	}
 }

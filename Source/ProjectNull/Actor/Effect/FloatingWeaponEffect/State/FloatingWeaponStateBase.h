@@ -2,39 +2,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "UObject/Object.h"
-#include "../../FloatingWeaponEffect/FloatingWeaponEffect.h"
+#include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
+
 #include "FloatingWeaponStateBase.generated.h"
 
-// 浮遊武器クラス
+/** 浮遊武器クラス */
 class UFloatingWeaponEffect;
 
-/// <summary>
-// 浮遊武器の状態基底クラス
-/// </summary>
+/** 浮遊武器の状態基底クラス */
 UCLASS()
 class PROJECTNULL_API UFloatingWeaponStateBase : public UObject
 {
 	GENERATED_BODY()
-
 public:
 
 	UFloatingWeaponStateBase();
-
-public:
-
+	
 	virtual void Initialize() { return; }
-
-	/// <summary>
-	/// 開始処理
-	/// </summary>
+	
 	virtual void Start() { return; }
 	virtual void Start(EFloatingWeaponState SetNextState) { return; }
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	/// <param name="DeltaTime">デルタタイム</param>
+	/** 更新処理 */
 	virtual void Update(float DeltaTime);
 
 	// セッター
@@ -58,11 +49,11 @@ protected:
 
 	// 持ち主の浮遊武器クラス
 	UPROPERTY()
-	UFloatingWeaponEffect* Owner;
+	TObjectPtr<UFloatingWeaponEffect> Owner;
 
 	// 持ち主のアクタークラス
 	UPROPERTY()
-	AActor* OwnerActor;
+	TObjectPtr<AActor> OwnerActor;
 
 	// エフェクトの半径オフセット
 	UPROPERTY(EditAnywhere)
@@ -73,5 +64,4 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FTransform RelativeTransform;
-	
 };

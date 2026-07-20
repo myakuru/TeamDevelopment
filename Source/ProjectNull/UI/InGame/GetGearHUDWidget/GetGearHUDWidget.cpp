@@ -7,15 +7,16 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 #include <ProjectNull/Weapon/Data/WeaponData.h>
+#include <ProjectNull/UI/Parts/Button/ButtonBaseWidget.h>
 
-void UGetGearHUDWidget::SetGearData(const FText& inGearName)
+void UGetGearHUDWidget::SetGearData(const FName& inGearName)
 {
 	UWeaponManager* weaponMan =
 		GetWorld()->GetGameInstance<USuperGameInstance>()
 		->GetWeaponManager();
 
 	FWeaponData weaponData;
-	if (!weaponMan->GetWeaponMaster(FName(*inGearName.ToString()), weaponData))return;
+	if (!weaponMan->GetWeaponMaster(inGearName, weaponData))return;
 
 	if (GearName) {
 		GearName->SetText(weaponData.DisplayName);
@@ -48,6 +49,12 @@ void UGetGearHUDWidget::OpenUI()
 	);
 
 	PC->SetInputMode(InputMode);
+
+	//フェードインアニメーション再生
+	if (FadeInAnim)
+	{
+		PlayAnimation(FadeInAnim);
+	}
 }
 
 void UGetGearHUDWidget::NativeOnInitialized()
@@ -66,6 +73,24 @@ void UGetGearHUDWidget::NativeDestruct()
 }
 
 void UGetGearHUDWidget::RemoveSelf()
+{
+	//フェードアウトアニメーション再生
+	if (FadeOutAnim)
+	{
+		PlayAnimation(FadeOutAnim);
+
+		FWidgetAnimationDynamicEvent AnimationFinishedEvent;
+		AnimationFinishedEvent.BindDynamic(this, &UGetGearHUDWidget::OnFadeOutAnimFinished);
+
+		BindToAnimationFinished(FadeOutAnim, AnimationFinishedEvent);
+
+		return;
+	}
+
+	OnFadeOutAnimFinished();
+}
+
+void UGetGearHUDWidget::OnFadeOutAnimFinished()
 {
 	APlayerController* PC =
 		GetWorld()->GetFirstPlayerController();

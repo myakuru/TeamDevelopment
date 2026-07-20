@@ -1,32 +1,35 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+
 #include "Components/ActorComponent.h"
+
 #include "PlayerGearComponent.generated.h"
 
 class UGearBase;
-
 class APlayerBase;
-
+class UPlayerRuntimeData;
+class UPlayerParameterData;
+class UEffectBase;
+class USphereComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTNULL_API UPlayerGearComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
 public:	
 	UPlayerGearComponent();
-
 protected:
 	virtual void BeginPlay() override;
-
 public:	
 	/** 最大ギアレベル */
 	static constexpr int32 kMaxGearLevel = 4;
-
 	static constexpr int32 kMaxGearNum = 3;
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(
+		float DeltaTime,
+		ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool IsMovementBlockedByGear() const;
 
@@ -35,14 +38,39 @@ public:
 	void ChangeGear();
 
 	/** セッター */
+	void SetIsInvincible(bool bInIsInvincible);
+	void SetPlayerGears(UGearBase* InGear,int32 Index); 
 
+	
 	/** ゲッター */
-	inline const TArray<UGearBase*>& GetPlayerGears() const { return PlayerGears; }
-	inline int32 GetCurrentGearLevel() const				{ return CurrentGearLevel; }
-
+	inline const TArray<UGearBase*>&	GetPlayerGears()			const	{ return PlayerGears; }
+	inline int32						GetCurrentGearLevel()		const	{ return CurrentGearLevel; }
+	inline const FTimerHandle&			GetInvincibilityTimerHandle() const	{ return InvincibilityTimerHandle; }
+	inline float 						GetCoolTimeScale()			const	{ return CoolTimeScale; }
 private:
+	
+	/**
+	 * @brief 攻撃がHITした時の処理
+	 */
+	UFUNCTION()
+	void OnGearBeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+	
+	/**
+	 * @brief 無敵時間用スフィア判定初期化
+	 */
+	void InitializeSphereCollision();
 
-	void SetIsInvincible(bool SetFlg);
+
+	void UpdateSkillCooldown(
+		int32 Index,
+		UGearBase* Gear);
+
 
 	bool CanChangeGear() const;
 
@@ -61,19 +89,72 @@ private:
 	 */
 	void UpdateCollisionByInvincibility();
 
+	void UpdateEffectScale(float InDeltaTime);
+	
+	/**
+	 * @brief ギアのWidget更新
+	 * @param DeltaTime デルタタイム
+	 */
 	void UpdateGearWidget(float DeltaTime);
 
+	void StartInvincibleEffect();
+
+	void DeactivateEffect();
+
+	/** 持ち主のプレイヤークラス */
 	UPROPERTY()
-	TObjectPtr<APlayerBase> OwnerPlayer;
+	TObjectPtr<APlayerBase>				OwnerPlayer;
 
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData>		PlayerRuntimeData;
+
+	/** プレイヤーのParameterDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerParameterData>	PlayerParameterData;
+
+	/** ギアを管理する配列 */
 	UPROPERTY(EditAnywhere, Instanced)
-	TArray<TObjectPtr<UGearBase>> PlayerGears;
+	TArray<TObjectPtr<UGearBase>>		PlayerGears;
 
+	/**	ギアチェンジによる無敵用スフィアコリジョン */
+	UPROPERTY(EditAnywhere,Instanced)
+	TObjectPtr<USphereComponent> GearChangeSphereComp;
+
+	/** 無敵状態を表現するエフェクトActor */
+	UPROPERTY(EditAnywhere, Instanced, Category = "Effect")
+	TObjectPtr<UEffectBase>				InvincibleEffect;
+
+	/** 現在のギアレベル */
 	UPROPERTY(EditAnywhere)
 	int32 CurrentGearLevel;
+
+	/** ヒットストップの長さ */
+	UPROPERTY(EditAnywhere)
+	float HitStopDuration;
+
+	/** ヒットストップのTimeScale */
+	UPROPERTY(EditAnywhere)
+	float HitStopTimeDilation;
 
 	/** ギアチェンジによる無敵時間ハンドル */
 	FTimerHandle InvincibilityTimerHandle;
 
-	float ffff = 20.0f;
+	UPROPERTY(EditAnywhere)
+	float InvincibilityAttackPowerScale;
+
+	UPROPERTY(EditAnywhere)
+	float CoolTimeScale;
+
+	UPROPERTY(EditAnywhere)
+	float SpeedScale;
+	
+	UPROPERTY(EditAnywhere)
+	float TargetEffectScale;
+	
+	UPROPERTY(EditAnywhere)
+	float EffectScaleInterpSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float EffectDeactivateScaleThreshold;
 };

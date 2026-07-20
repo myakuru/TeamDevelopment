@@ -1,22 +1,30 @@
 ﻿#include "StageManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 //ゲームインスタンス
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
 #include <ProjectNull/SaveGame/MySaveGame.h>
 #include <ProjectNull/SaveGame/StageProgressData.h>
 
 #include <ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
 
-void UStageManager::Initialize() {
+#include <ProjectNull/System/Result/ResultManager/ResultManager.h>
+#include <ProjectNull/Data/Result/ClearRankData/ClearRankData.h>
+#include <ProjectNull/Data/Result/RankConditionData/RankConditionData.h>
+#include <ProjectNull/System/WorldSystem/EnemySpawner/EnemySpawner.h>
 
+
+void UStageManager::Initialize() {
 	NowStageIndex = StageDefinition::OutGameStageIndex;
 
-	if (!StageDataAsset)return;
+	// 制限時間切れでボスウェーブに飛ぶ
+	StageTimer.OnFinished.AddUObject(this, &UStageManager::SetBossWave);
 
 	//ステージを調査
 	ChangeStageInvestigation(GetWorld());
-
+	
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(
 		this,
 		&UStageManager::ChangeStageInvestigation
@@ -34,20 +42,27 @@ void UStageManager::LoadFromSaveData(UMySaveGame* inSaveGame)
 	if (StageProgressList->Num() < StageCount)
 	{
 		StageProgressList->SetNum(StageCount);
+
+		// 最初のステージは解放しておく
+		if (StageCount > 0) {
+
+			//ステージのクリア状況を初期化(デバッグ用)
+			for (int i = 0; i < StageCount; i++)
+			{
+				(*StageProgressList)[i].MissionClears.SetNum(3);
+
+				(*StageProgressList)[i].bUnlocked = false;
+			}
+
+			(*StageProgressList)[0].bUnlocked = true;
+		}
+
 	}
 
-	// 最初のステージは解放しておく
-	if (StageCount > 0) {
-
-		//ステージのクリア状況を初期化(デバッグ用)
-		//for(int i = 0; i < StageCount; i++)
-		//{
-		//	CurrentSaveData->StageProgressList[i].MissionClears.SetNum(3);
-
-		//	CurrentSaveData->StageProgressList[i].bUnlocked = false;
-		//}
-
-		(*StageProgressList)[0].bUnlocked = true;
+	if ((*StageProgressList)[0].MissionClears.IsEmpty()) {
+		for (int i = 0; i < StageCount; i++) {
+			(*StageProgressList)[i].MissionClears.SetNum(3);
+		}
 	}
 }
 
@@ -56,12 +71,31 @@ void UStageManager::SaveToData(UMySaveGame* inSaveGame)
 	inSaveGame->StageProgressList = *StageProgressList;
 }
 
-void UStageManager::StageStart(int32 inNowStageIndex)
+void UStageManager::SetBossWave()
+{
+	AActor* FoundActor = UGameplayStatics::GetActorOfClass(
+		GetWorld(), AEnemySpawner::StaticClass());
+
+	AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(FoundActor);
+
+	if (IsValid(EnemySpawner))
+	{
+		EnemySpawner->SetBossPhase();
+	}
+}
+
+void UStageManager::InGameInitialize(int32 inNowStageIndex)
 {
 	NowStageIndex = inNowStageIndex;
 
+	//ステージ開始時に制限時間タイマーを開始
+	StartStageTimer();
+
 	//取得ギアのリセット
 	AcquiredWeapons.Reset();
+
+	// クリア状況を初期化
+	ResultData = FResultData();
 
 	//マウスを隠す
 	APlayerController* PC =
@@ -71,11 +105,33 @@ void UStageManager::StageStart(int32 inNowStageIndex)
 
 	FInputModeGameOnly InputMode;
 	PC->SetInputMode(InputMode);
+	
+	//BGM再生
+	if (InGameBGMSound && !InGameBGMSoundComponent)
+	{
+		InGameBGMSoundComponent = 
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Spawn2D(InGameBGMSound,1.0f,
+				1.0f,0.0f,nullptr,
+				true,true);
+	}
 }
 
-void UStageManager::StageClear()
+void UStageManager::StartStageTimer()
 {
-	if (NowStageIndex < StageDefinition::OutGameStageIndex)return;
+	if (!StageDataAsset)return;
+
+	//制限時間は StageDataAsset から取得して開始
+	StageTimer.StartTimer(GetWorld(), StageDataAsset->GetStageTimerLimit());
+}
+
+void UStageManager::InGameFinalize()
+{
+	//アウトゲーム中（NowStageIndex == OutGameStageIndex）に呼ばれても処理しない
+	if (NowStageIndex <= StageDefinition::OutGameStageIndex)return;
+
+	//ボス撃破など制限時間以外の要因で呼ばれた場合に備えてタイマーを停止
+	StageTimer.StopTimer();
 
 	//次のステージ解放
 	if(NowStageIndex + 1 < StageProgressList->Num())
@@ -86,10 +142,71 @@ void UStageManager::StageClear()
 	//セーブ
 	GetWorld()->GetGameInstance<USuperGameInstance>()->SaveGameData();
 
-	//取得ギアのリセット
-	AcquiredWeapons.Reset();
+	//クリア情報反映処理
+	USuperGameInstance* gameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (gameInstance) {
 
-	UGameplayStatics::OpenLevel(this, "StageSelectLevel");
+		UResultManager* resultManager = gameInstance->GetResultManager();
+		if (resultManager && !resultManager->GetSortedClearRankDatas().IsEmpty()) {
+
+			// デバッグ用にクリア条件を満たす
+			SetResultFlag(EResultFlag::ReachedFinalBoss);
+			SetResultFlag(EResultFlag::ReachedMidBoss);
+
+			// ResultDataに取得した武器のリストをセットしてResultManagerに渡す
+			ResultData.RewardWeaponIDs = AcquiredWeapons;
+			resultManager->SetResultData(ResultData);
+
+			// クリア条件をチェックしてデータに反映
+			TArray<FClearRankData> clearRankDatas = resultManager->GetSortedClearRankDatas();
+			//sortedClearRankDatasはただのクリアも含めているため1つ飛ばす
+			for (int i = 1; i < clearRankDatas.Num(); i++) { 
+				(*StageProgressList)[NowStageIndex].MissionClears[i - 1] =
+					(*StageProgressList)[NowStageIndex].MissionClears[i - 1] ||
+					clearRankDatas[i].ConditionData->IsConditionMet(ResultData);
+			}
+
+		}
+	}
+	AcquiredWeapons.Reset();
+	UGameplayStatics::OpenLevel(this, "ResultLevel");
+	
+	//BGM停止
+	if (InGameBGMSoundComponent && InGameBGMSoundComponent->IsPlaying())
+	{
+		InGameBGMSoundComponent->Stop();
+		InGameBGMSoundComponent = nullptr;
+	}
+}
+
+void UStageManager::OutGameInitialize()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Has BegunPlay = %d"),
+	GetWorld()->HasBegunPlay());
+	
+	//BGM再生
+	if (OutGameBGMSound && !OutGameBGMSoundComponent)
+	{
+		OutGameBGMSoundComponent = 
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Spawn2D(OutGameBGMSound,1.0f,
+				1.0f,0.0f,nullptr,
+				true,true);
+		
+		UE_LOG(LogTemp, Warning, TEXT("After Spawn = %p"),
+			OutGameBGMSoundComponent.Get());
+		
+	}
+}
+
+void UStageManager::OutGameFinalize()
+{
+	//BGM停止
+	if (OutGameBGMSoundComponent && OutGameBGMSoundComponent->IsPlaying())
+	{
+		OutGameBGMSoundComponent->Stop();
+		OutGameBGMSoundComponent = nullptr;
+	}
 }
 
 void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
@@ -104,6 +221,14 @@ void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 			LoadedWorld,
 			true
 		));
+	
+	//ログ
+	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
+	UE_LOG(LogTemp, Log, TEXT("-  StageManager  -"));
+	UE_LOG(LogTemp, Log, TEXT("NowLevelName : %s"), *LevelName.ToString());
+	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
+
+	bool isInGame = false;
 
 	//データアセットを探索
 	for (int i = 0; i < StageDataAsset->GetStageData().Num(); i++)
@@ -112,15 +237,35 @@ void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)
 		//一致
 		if (StageData.LevelName == LevelName)
 		{
+			//アウトゲームを終わらせる
+			OutGameFinalize();
+			
 			//ステージ開始(マウスが持ってかれるぞ！！)
-			StageStart(i + StageDefinition::FirstStageIndex);
+			InGameInitialize(i + StageDefinition::FirstStageIndex);
+
+			isInGame = true;
 		}
+	}
+
+	if (!isInGame)
+	{
+		//アウトゲームに遷移したら制限時間タイマーを確実に停止する
+		//（動いたままだと NowStageIndex = -1 の状態で InGameFinalize が発火してしまう）
+		StageTimer.StopTimer();
+
+		//OutGameInitialize();
+		//ゲーム起動時では再生出来ないため、次のtickに任せる
+		LoadedWorld->GetTimerManager().SetTimerForNextTick(
+			FTimerDelegate::CreateUObject(
+				this,
+				&UStageManager::OutGameInitialize
+			)
+		);
 	}
 
 	//ログ
 	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
 	UE_LOG(LogTemp, Log, TEXT("-  StageManager  -"));
-	UE_LOG(LogTemp, Log, TEXT("NowLevelName : %s"), *LevelName.ToString());
 	UE_LOG(LogTemp, Log, TEXT("NowStageIndex : %d"),NowStageIndex);
 	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
 }

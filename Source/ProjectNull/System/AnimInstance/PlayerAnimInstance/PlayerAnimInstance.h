@@ -15,7 +15,6 @@ class PROJECTNULL_API UPlayerAnimInstance final : public UAnimInstance
 	GENERATED_BODY()
 public:
 	UPlayerAnimInstance();
-public:
 
 	void NativeInitializeAnimation()				override;
 	void NativeUpdateAnimation(float DeltaSeconds)	override;
@@ -31,17 +30,13 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsFalling;
 
-	/** 戦闘構え状態か */
-	UPROPERTY(BlueprintReadOnly)
-	bool bIsCombatStance;
-
 	/** 減速中か */
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsDecelerating;
 	
 	/** 速度 */
-	UPROPERTY(BlueprintReadOnly)
-	FVector Velocity;
+	//UPROPERTY(BlueprintReadOnly)
+	//FVector Velocity;
 
 	/** 地面での速度 */
 	UPROPERTY(BlueprintReadOnly)

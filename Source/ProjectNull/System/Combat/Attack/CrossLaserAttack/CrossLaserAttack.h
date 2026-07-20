@@ -21,7 +21,7 @@ public:
 	UCrossLaserAttack();
 public:
 	void Initialize(const TObjectPtr<AActor>& Owner) override;
-	void Execute()override;
+	void Execute(const FVector& InTargetLocation = FVector::ZeroVector)override;
 	void Update(float DeltaTime)override;
 
 	void End();

@@ -4,9 +4,11 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
-#include <ProjectNull/Actor/MyCineCameraActor/MyCineCameraActor.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
+#include <ProjectNull/UI/InGame/HitDamageWidget/DamageNumberActor/DamageNumberActor.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
+#include <ProjectNull/System/WorldSystem/EnemySpawner/EnemySpawner.h>
 
 ASurvivalGameMode::ASurvivalGameMode()
 {
@@ -17,53 +19,41 @@ void ASurvivalGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OpeningCameraActor = Cast<AMyCineCameraActor>(
-		UGameplayStatics::GetActorOfClass(GetWorld(), AMyCineCameraActor::StaticClass()));
-
-	if (!OpeningCameraActor) return;
-
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-
-	if (ARobotController* RC = Cast<ARobotController>(PC))
+	if (UDamageNumberPoolSubsystem* Pool = GetWorld()->GetSubsystem<UDamageNumberPoolSubsystem>())
 	{
-		RC->SetCanReceiveInput(false);
-	}
-
-	if (PC)
-	{
-		PC->SetViewTargetWithBlend(OpeningCameraActor, TargetBlendSpeed);
-
-		// プレイヤーの初期位置をz+1000に設定
-		if (APlayerBase* Player = Cast<APlayerBase>(PC->GetPawn()))
-		{
-			PlayerLocation = Player->GetActorLocation();
-			Player->SetActorLocation(PlayerLocation);
-		}
-	}
-
-	OpeningCameraActor->OnCutsceneFinished.AddDynamic(this, &ASurvivalGameMode::OnCutsceneFinished);
-	OpeningCameraActor->PlayOpeningCutscene();
-}
-
-void ASurvivalGameMode::OnCutsceneFinished()
-{
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	APlayerBase* Player = PC ? Cast<APlayerBase>(PC->GetPawn()) : nullptr;
-
-	if (ARobotController* RC = Cast<ARobotController>(PC))
-	{
-		RC->SetCanReceiveInput(true);
-	}
-
-	if (PC && Player)
-	{
-		PC->SetViewTargetWithBlend(Player, TargetBlendSpeed);
+		Pool->InitializePool(DamageNumberActorClass, DamageNumberPoolSize);
 	}
 }
 
 void ASurvivalGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::Y))
+	{
+		AActor* FoundActor = UGameplayStatics::GetActorOfClass(
+			GetWorld(), AEnemySpawner::StaticClass());
+
+		AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(FoundActor);
+
+		if (IsValid(EnemySpawner))
+		{
+			EnemySpawner->SetFinalPhase();
+		}
+	}
+
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::U))
+	{
+		AActor* FoundActor = UGameplayStatics::GetActorOfClass(
+			GetWorld(), AEnemySpawner::StaticClass());
+
+		AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(FoundActor);
+
+		if (IsValid(EnemySpawner))
+		{
+			EnemySpawner->SetBossPhase();
+		}
+	}
 
 	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 	if (enemyManager)

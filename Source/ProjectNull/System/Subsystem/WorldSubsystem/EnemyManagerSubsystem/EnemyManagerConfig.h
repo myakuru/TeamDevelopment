@@ -4,6 +4,8 @@
 #include "Engine/DataAsset.h"
 #include "EnemyManagerConfig.generated.h"
 
+class USoundBase;
+
 UCLASS(BlueprintType)
 class PROJECTNULL_API UEnemyManagerConfig : public UDataAsset
 {
@@ -15,4 +17,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<float> UpdateLimitDistance;
 	
+	/** SE */
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> DamagedSESound;
 };

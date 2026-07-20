@@ -8,65 +8,47 @@ UEnemyRuntimeData::UEnemyRuntimeData()
 {
 }
 
-// 次のアニメーションに使用するデータをセット
-void UEnemyRuntimeData::SetNextAnimData(int32 NextIndex, bool RoopFlg, bool ChangeFlg)
+void UEnemyRuntimeData::StartAnimMonitor(int32 a_AnimIndex, bool bLooping, float Duration)
 {
-	NextAnimIndex = NextIndex;
-	AnimRoopFlg = RoopFlg;
-	AnimChangeFlg = ChangeFlg;
+	CPUAnim.AnimIndex	= a_AnimIndex;
+	CPUAnim.bLooping	= bLooping;
+	CPUAnim.bFinished	= false;
+	CPUAnim.ElapsedTime = 0.0f;
+	CPUAnim.Duration	= Duration;
 }
 
-void UEnemyRuntimeData::UpdateAnimation(float DeltaTime, float BlendSpeed)
+void UEnemyRuntimeData::SetAttackFinishTime(float InLastTime)
 {
-	/* 備忘録 */
-	// アニメション進行度を知る
-	// Executeの度にAnimFrameを更新
-	// 
-
-	PrevAnimTime = AnimTime;
-
-	// アニメーションブレンド中はCurrentAnimTimeを止めてブレンドするため
-	// アニメーションブレンド用のフラグがFalseの時のみAnimTimeを更新
-	if (!AnimChangeFlg)
-	{
-		AnimTime += DeltaTime;
-	}
-	else
-	{
-		AnimBlendWeight += DeltaTime / BlendSpeed;
-		NextAnimTime += DeltaTime;
-		// 1.0fでクランプする
-		AnimBlendWeight = FMath::Min(AnimBlendWeight, 1.0f);
-	}
+	AttackFinishTime = InLastTime;
 }
 
-void UEnemyRuntimeData::ComplateAnimBlend()
+void UEnemyRuntimeData::SetTargetLocation(const FVector& InTargetLocation)
 {
-	// ブレンド完了したら切り替える（最初ではなく最後）
-	//if (AnimBlendWeight >= 1.0f)
-	{
-		AnimBlendWeight = 0.0f;
-		AnimChangeFlg = false;
-
-		// ここで初めてアニメ切り替え
-		AnimIndex = NextAnimIndex;
-		AnimTime = NextAnimTime;	// 1回だけリセット
-		NextAnimTime = 0.0f;
-	}
+	TargetLocation = InTargetLocation;
+	OnTargetLocationChanged.Broadcast(TargetLocation);
 }
 
-void UEnemyRuntimeData::AnimationReset()
+void UEnemyRuntimeData::SetFinalHP(float InFinalHP)
 {
-	AnimTime = 0.0f;
-	PrevAnimTime = 0.0f;
+	Health.Max = Health.Current = InFinalHP;
+}
 
-	AnimIndex = 0;
-	NextAnimIndex = 0;
-	NextAnimTime = 0.0f;
+void UEnemyRuntimeData::SetBaseAttackPower(float InBasePower)
+{
+	Attack.Base = InBasePower;
+}
 
-	AnimNumFrames = 0.0f;
+void UEnemyRuntimeData::UpdateAnimationMonitor(float DeltaTime)
+{
+	if (CPUAnim.bLooping)	{ return; }
+	if (CPUAnim.bFinished)	{ return; }
 
-	AnimBlendWeight = 0.0f;
+	CPUAnim.ElapsedTime += DeltaTime;
+
+	if (CPUAnim.ElapsedTime >= CPUAnim.Duration)
+	{
+		CPUAnim.bFinished = true;
+	}
 }
 
 void UEnemyRuntimeData::CalcDistanceToTarget(const FVector& a_TargetPos, const FVector& a_OwnerPos)
@@ -89,6 +71,12 @@ void UEnemyRuntimeData::CalcDistanceToTarget(const FVector& a_TargetPos, const F
 		TargetDistanceSqr = NewTargetDistSqr;
 		OnTargetDistChanged.Broadcast(TargetDistanceSqr);
 	}
+}
+
+void UEnemyRuntimeData::CalclateDamageToMaxHealthRatio(const float InReciveDamage)
+{
+	DamageToMaxHealthRatio = InReciveDamage / Health.Max;
+	OnDamageRatioChanged.Broadcast(DamageToMaxHealthRatio);
 }
 
 void UEnemyRuntimeData::ChangedEnemyState(EEnemyState a_StateEnum)

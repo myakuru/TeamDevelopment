@@ -13,7 +13,8 @@ public:
 
 	FGearStatus():
 		Duration(0.f),
-		CoolTime(0.f)
+		CoolTime(0.f),
+		SimultaneousActivationCoolTime(0.f)
 	{
 	}
 
@@ -26,6 +27,10 @@ public:
 	/* ギアクールタイム */
 	UPROPERTY(EditAnywhere)
 	float CoolTime;
+
+	/** ギアの同時発動を許可するまでのクールタイム */
+	UPROPERTY(EditAnywhere)
+	float SimultaneousActivationCoolTime;
 };
 
 /** プレイヤーギアコンポーネントクラス */
@@ -37,6 +42,10 @@ class APlayerBase;
 /** ギアの状態基底クラス */
 class UGearStateBase;
 
+class UPlayerRuntimeData;
+
+/** 効果音 */
+class USoundBase;
 
 /** ギアの基底クラス */
 UCLASS()
@@ -49,6 +58,7 @@ public:
 
 	/** 最大ギアレベル */
 	static constexpr int32 kMaxGearLevel = 4;
+	static constexpr int32 kLv4Index = 3;
 
 	/**
 	 * @brief ギアの初期化処理
@@ -71,6 +81,8 @@ public:
 	 */
 	virtual void Update(float DeltaTime);
 
+	void ForceStop();
+
 	/** Getter */
 	inline float GetElapsedTime()		const		{ return ElapsedTime; }
 	inline bool CanExecute()			const		{ return bCanExecute; }
@@ -78,6 +90,7 @@ public:
 	inline bool IsActive()				const		{ return bIsActive; }
 	inline bool IsMovementBlocked()		const		{ return bBlocksMovement; }
 	inline FTimerHandle GetCoolTimerHandle() const	{ return CoolTimerHandle; }
+	inline bool AllowOtherGearActivation()	const	{ return bAllowOtherGearActivation; }
 
 	float GetGearDuration(int32 Index) const;
 	float GetGearCoolTime(int32 Index) const;
@@ -99,12 +112,18 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UPlayerGearComponent> OwnerGearComponent;
 
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
 private:
 
 	/**
 	 * @brief ギアの発動時間終了時のリセット処理
 	 */
 	virtual void Reset();
+	
+	void SetAutoAttackEffectVisibility(bool bVisibility);
 
 	/** ギアの状態配列 */
 	UPROPERTY(EditAnywhere, Instanced)
@@ -113,8 +132,13 @@ private:
 	/** ギアのステータス配列 */
 	UPROPERTY(EditAnywhere)
 	TArray<FGearStatus> GearStatuses;
+	
+	/** 効果音 */
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<USoundBase>> GearSESound;
 
 	/** 現在のギア状態 */
+	UPROPERTY()
 	TObjectPtr<UGearStateBase> CurrentGearState;
 
 	/** 実行時のギアレベルを保持する用途 */
@@ -129,6 +153,9 @@ private:
 	/** ギアスキル発動時間 */
 	float Duration;
 
+	/** ギアの同時発動を許可するまでのクールタイム */
+	float SimultaneousActivationCoolTime;
+
 	/** ギアスキルが実行されているかどうか */
 	bool bIsActive;
 
@@ -140,4 +167,7 @@ private:
 
 	/** ギアの装備インデックス */
 	int32 GearIndex;
+
+	/** このギアの動作中に、他のギアの発動を許可するか */
+	bool bAllowOtherGearActivation;
 };

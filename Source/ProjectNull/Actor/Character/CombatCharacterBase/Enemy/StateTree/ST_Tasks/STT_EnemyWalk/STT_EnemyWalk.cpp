@@ -6,8 +6,8 @@
 USTT_EnemyWalk::USTT_EnemyWalk(const FObjectInitializer& a_ObjInit)
 	:	Super(a_ObjInit)
 	,	MoveDir(FVector::ZeroVector)
-	,	AfterGroundNormal(FVector::ZeroVector)
 	,	GravityVelocity(FVector::ZeroVector)
+	,	AfterGroundNormal(FVector::ZeroVector)
 	,	MoveSpeed(600.f)
 	,	RotationInterpSpeed(5.f)
 	,	WarkableFloorAngle(45.f)
@@ -29,13 +29,6 @@ EStateTreeRunStatus USTT_EnemyWalk::EnterState(FStateTreeExecutionContext& a_Con
 	// パラメータの初期化
 	InitializeWalkParams();
 
-	// 前ステートの終了フラグをリセット
-	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
-	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(static_cast<uint32>(EEnemyState::Walk), true, true);
-
-	OwnerEnemy->PlayAnimation(0, true);
-
 	return EStateTreeRunStatus::Running;
 }
 
@@ -48,11 +41,6 @@ EStateTreeRunStatus USTT_EnemyWalk::Tick(FStateTreeExecutionContext& a_Context, 
 	Move(a_DeltaTime);
 
 	return EStateTreeRunStatus::Running;
-}
-
-void USTT_EnemyWalk::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
-{
-	Super::ExitState(a_Context, a_Transition);
 }
 
 void USTT_EnemyWalk::Move(const float a_DeltaTime)

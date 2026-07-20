@@ -5,25 +5,38 @@ void UStageButtonWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (StageButton)
-	{
-		StageButton->bIsVariable = true;
 
-		StageButton->OnClicked.AddUniqueDynamic(this, &UStageButtonWidget::OnClickedStageButton);
-		StageButton->OnHovered.AddUniqueDynamic(this, &UStageButtonWidget::OnHoveredStageButton);
-	}
+	//Baseが持ているホバー・クリックデリゲートに、
+	//ステージボタン用のデリゲートを登録する
+	OnHovered.AddUniqueDynamic
+	(this, &UStageButtonWidget::DoHoveredStageButton);
+
+	OnClicked.AddUniqueDynamic
+	(this, &UStageButtonWidget::DoClickedStageButton);
 }
 
-void UStageButtonWidget::OnClickedStageButton()
+void UStageButtonWidget::DoHoveredButton()
 {
-	if (!OnClicked.IsBound() || !bUnlocked)return;
-	OnClicked.Broadcast(StageIndex);
+	if (!bUnlocked)return;
+	Super::DoHoveredButton();
 }
 
-void UStageButtonWidget::OnHoveredStageButton()
+void UStageButtonWidget::DoClickedButton()
 {
-	if (!OnHovered.IsBound() || !bUnlocked)return;
-	OnHovered.Broadcast(StageIndex);
+	if (!bUnlocked)return;
+	Super::DoClickedButton();
+}
+
+void UStageButtonWidget::DoHoveredStageButton()
+{
+	if (!OnHoveredStage.IsBound() || !bUnlocked)return;
+	OnHoveredStage.Broadcast(StageIndex);
+}
+
+void UStageButtonWidget::DoClickedStageButton()
+{
+	if (!OnClickedStage.IsBound() || !bUnlocked)return;
+	OnClickedStage.Broadcast(StageIndex);
 }
 
 void UStageButtonWidget::Setup(int32 InStageIndex,bool bInUnlocked)

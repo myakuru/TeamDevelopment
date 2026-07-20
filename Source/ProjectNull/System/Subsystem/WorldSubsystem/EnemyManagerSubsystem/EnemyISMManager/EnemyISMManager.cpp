@@ -1,5 +1,13 @@
 ﻿#include "EnemyISMManager.h"
 
+#include "Stats/Stats.h"
+
+DECLARE_CYCLE_STAT(
+	TEXT("Enemy Update"),
+	STAT_EnemyUpdate,
+	STATGROUP_Game
+);
+
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/Texture2D.h"
 #include "RenderGraphUtils.h"
@@ -96,11 +104,11 @@ void AEnemyISMManager::InitAnimStateTexture()
 			RT->RenderTargetFormat = RTF_RGBA16f;
 			// MipMap無効
 			// 画像ではなくてデータとして扱うため、値が保管されてしまうと壊れる
-			RT->bAutoGenerateMips = false;
-			RT->bCanCreateUAV = true;	// GPUから書き込み可能に
-			RT->Filter = TF_Nearest;	// Linearだと保管されるためNearest
+			RT->bAutoGenerateMips	= false;
+			RT->bCanCreateUAV		= true;			// GPUから書き込み可能に
+			RT->Filter				= TF_Nearest;	// Linearだと保管されるためNearest
 			RT->InitAutoFormat(MaxInstances, 2);	// MaxInstances列、2行のイメージ
-			RT->UpdateResourceImmediate(true);	// GPUリソース生成
+			RT->UpdateResourceImmediate(true);		// GPUリソース生成
 			return RT;
 		};
 
@@ -119,7 +127,7 @@ void AEnemyISMManager::InitAnimInfoTexture()
 
 	// Width = アニメ数、Height = 1でテクスチャーを生成
 	// PF_A32B32G32R32Fは1ピクセルに4つ分のfloatを入れれる
-	AnimInfoTexture = UTexture2D::CreateTransient(NumAnims, 1, PF_A32B32G32R32F);
+	AnimInfoTexture			= UTexture2D::CreateTransient(NumAnims, 1, PF_A32B32G32R32F);
 	AnimInfoTexture->Filter = TF_Nearest; // ポイントサンプリング（データなので補間しない）
 
 	// ロックして書き込み
@@ -186,10 +194,10 @@ void AEnemyISMManager::RequestAnimChange(int32 InstanceIndex, int32 NextAnimInde
 	// ゲームスレッドからリクエストをキューに積む
 	// DispatchAnimUpdateで一括処理する
 	FGPUAnimChangeRequest Req;
-	Req.InstanceIndex = InstanceIndex;
-	Req.NextAnimIndex = NextAnimIndex;
-	Req.bLooping = bLooping ? 1 : 0;
-	Req.BlendSpeed = BlendSpeed;
+	Req.InstanceIndex	= InstanceIndex;
+	Req.NextAnimIndex	= NextAnimIndex;
+	Req.bLooping		= bLooping ? 1 : 0;
+	Req.BlendSpeed		= BlendSpeed;
 	PendingChangeRequests.Add(Req);
 }
 
@@ -234,7 +242,7 @@ void AEnemyISMManager::RegisterEnemy(AEnemyBase* Enemy)
 	// 前回のインデックスが残っている場合の対処
 	if (Enemy->ISMInstanceIndex != INDEX_NONE)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[ISMManager] RegisterEnemy: 既存インデックスを解除して再登録: %d"), Enemy->ISMInstanceIndex);
+		//UE_LOG(LogTemp, Warning, TEXT("[ISMManager] RegisterEnemy: 既存インデックスを解除して再登録: %d"), Enemy->ISMInstanceIndex);
 		ReleaseIndex(Enemy->ISMInstanceIndex);
 		Enemy->ISMInstanceIndex = INDEX_NONE;
 	}
@@ -262,6 +270,9 @@ void AEnemyISMManager::RegisterEnemy(AEnemyBase* Enemy)
 		false	// MarkRenderStateDirtyをfalseにしてレンダリング状態の更新を遅延させる
 	);
 
+	ActiveIndices.Add(Index);
+	ActiveCount += 1;
+
 	Enemies.Add(Enemy);
 }
 
@@ -280,6 +291,10 @@ void AEnemyISMManager::UnregisterEnemy(AEnemyBase* Enemy)
 	// インスタンスをISMから解除してインデックスを解放する
 	ReleaseIndex(Enemy->ISMInstanceIndex);
 
+	ActiveIndices.Remove(Enemy->ISMInstanceIndex);
+
+	ActiveCount -= 1;
+
 	// インスタンスを解放してEnemyからインデックスをクリアする
 	Enemy->ISMInstanceIndex = INDEX_NONE;
 	Enemies.Remove(Enemy);
@@ -288,6 +303,8 @@ void AEnemyISMManager::UnregisterEnemy(AEnemyBase* Enemy)
 void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 {
 	if (Enemies.Num() == 0) { return; }
+
+	
 
 	// ② CSをDispatchしてGPU側のAnimStateRTを更新
 	DispatchAnimUpdate(DeltaTime);
@@ -323,7 +340,8 @@ void AEnemyISMManager::UpdateEnemies(float DeltaTime)
 	// ④ 処理済みのリクエストをクリア
 	PendingChangeRequests.Reset();
 
-	DebugReadbackAnimStateRT();
+	// デバッグ : GPU結果表示
+	//DebugReadbackAnimStateRT();
 }
 
 // デバッグ用：AnimStateRTの中身をCPUに読み戻してログに出す
@@ -340,19 +358,19 @@ void AEnemyISMManager::DebugReadbackAnimStateRT()
 	const int32 Width = AnimStateRT->SizeX;
 	const int32 Height = AnimStateRT->SizeY;
 
-	if (Pixels.Num() >= Width * Height && Height > 1)
-	{
-		const FFloat16Color Row0 = Pixels[0 + 0 * Width];
-		const FFloat16Color Row1 = Pixels[0 + 1 * Width];
+	//if (Pixels.Num() >= Width * Height && Height > 1)
+	//{
+	//	const FFloat16Color Row0 = Pixels[0 + 0 * Width];
+	//	const FFloat16Color Row1 = Pixels[0 + 1 * Width];
 
-		UE_LOG(LogTemp, Warning,
-			TEXT("[AnimStateRT] Inst0 Row0: R=%.2f G=%.2f B=%.2f A=%.2f"),
-			(float)Row0.R, (float)Row0.G, (float)Row0.B, (float)Row0.A);
+	//	UE_LOG(LogTemp, Warning,
+	//		TEXT("[AnimStateRT] Inst0 Row0: R(CurrentFrame)=%.2f G(PrevFrame)=%.2f B(NextAnimFrame)=%.2f A(StartFrame)=%.2f"),
+	//		(float)Row0.R, (float)Row0.G, (float)Row0.B, (float)Row0.A);
 
-		UE_LOG(LogTemp, Warning,
-			TEXT("[AnimStateRT] Inst0 Row1: R=%.2f G=%.2f B=%.2f A=%.2f"),
-			(float)Row1.R, (float)Row1.G, (float)Row1.B, (float)Row1.A);
-	}
+	//	UE_LOG(LogTemp, Warning,
+	//		TEXT("[AnimStateRT] Inst0 Row1: R(NumFrames)=%.2f G(BlendFlg)=%.2f B(NextStartFrame)=%.2f A(BlendWeight)=%.2f"),
+	//		(float)Row1.R, (float)Row1.G, (float)Row1.B, (float)Row1.A);
+	//}
 
 	static int kari = 0;
 	if (kari > 1) { return; }
@@ -364,14 +382,14 @@ void AEnemyISMManager::DebugReadbackAnimStateRT()
 		Mip.BulkData.Lock(LOCK_READ_ONLY));
 
 	const int32 NumAnims = AnimDataAsset->Animations.Num();
-	for (int32 i = 0; i < NumAnims; ++i)
+	/*for (int32 i = 0; i < NumAnims; ++i)
 	{
 		UE_LOG(LogTemp, Warning,
 			TEXT("[AnimInfoTexture] Anim[%d]: StartTime=%.2f NumFrames=%.2f"),
 			i,
 			(float)Data[i].R,
 			(float)Data[i].G);
-	}
+	}*/
 
 
 
@@ -382,6 +400,8 @@ void AEnemyISMManager::DebugReadbackAnimStateRT()
 void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 {
 	if (!AnimStateRT) { return; }
+
+	SCOPE_CYCLE_COUNTER(STAT_EnemyUpdate);
 
 	const int32 NumInstances = Enemies.Num();
 	const int32 NumRequests = PendingChangeRequests.Num();
@@ -403,6 +423,8 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 	// AnimInfoTexture用のRHIも受け取る
 	FTextureRHIRef AnimInfoTextureRHI = AnimInfoTexture->GetResource()->TextureRHI;
 
+	TArray<uint32> ActiveIndicesCopy = ActiveIndices;
+
 	// ここまでで、GPU側で処理を行うためのリソースの準備
 
 	// GameThreadで準備したTextureをRenderThreadに渡して
@@ -411,7 +433,7 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 	// このラムダ式の中身をRenderThreadに投げる
 	ENQUEUE_RENDER_COMMAND(AnimUpdate)(
 		[this, DeltaTime, NumInstances, NumRequests, RequestsCopy, AnimStateRTRHI,
-		AnimInfoTextureRHI](FRHICommandListImmediate& RHICmdList)
+		AnimInfoTextureRHI, ActiveIndicesCopy](FRHICommandListImmediate& RHICmdList)
 		{
 			// RDGBuilderを作成（Render Dependency Graph）
 			// GPU処理の依存関係、読み書き、同期、バリアをUEに管理させる仕組み
@@ -424,6 +446,18 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 
 			// UAVを作る
 			FRDGBufferUAVRef AnimStateUAV = GraphBuilder.CreateUAV(AnimStateBuf);
+
+			// ActiveIndexBufferをRDGに登録
+			FRDGBufferRef ActiveIndexBuffer = CreateStructuredBuffer(
+				GraphBuilder,
+				TEXT("ActiveInstanceIndexBuffer"),
+				sizeof(uint32),
+				ActiveCount,
+				ActiveIndicesCopy.GetData(),
+				sizeof(uint32) * ActiveCount
+			);
+			// SRVを作る
+			FRDGBufferSRVRef ActiveIndexSRV = GraphBuilder.CreateSRV(ActiveIndexBuffer);
 
 			// Pass 1: アニメ変更リクエストの適用（リクエストがある時だけ）
 			if (NumRequests > 0)
@@ -449,10 +483,11 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 					GraphBuilder.AllocParameters<FApplyChangeRequestCS::FParameters>();
 
 				// シェーダーに渡す値をセット
-				Pass1Params->GPUAnimStateBuffer = AnimStateUAV;				// 変更前の状態を読む用
-				Pass1Params->ChangeRequestBuffer = RequestSRV;					// 変更要求一覧
-				Pass1Params->ChangeRequestCount = (uint32)NumRequests;	// 変更要求数
-				Pass1Params->InstanceCount = (uint32)NumInstances;				// インスタンス総数
+				Pass1Params->GPUAnimStateBuffer		= AnimStateUAV;			// 変更前の状態を読む用
+				Pass1Params->ChangeRequestBuffer	= RequestSRV;			// 変更要求一覧
+				Pass1Params->ChangeRequestCount		= (uint32)NumRequests;	// 変更要求数
+				Pass1Params->InstanceCount			= (uint32)NumInstances;	// インスタンス総数
+				Pass1Params->MaxInstances			= (uint32)MaxInstances;
 
 				// Pass1のComputeShaderを指定
 				// FApplyChangeRequestCSというGlobalShaderを取得
@@ -495,16 +530,17 @@ void AEnemyISMManager::DispatchAnimUpdate(float DeltaTime)
 
 			FAnimUpdateCS::FParameters* Pass2Params = GraphBuilder.AllocParameters<FAnimUpdateCS::FParameters>();
 
-			Pass2Params->DeltaTime = DeltaTime;
-			Pass2Params->SampleRate = 30.0f;
-			Pass2Params->InstanceCount = (uint32)NumInstances;
-			Pass2Params->MaxInstances = (uint32)MaxInstances;
-			Pass2Params->AnimStateTextureReadWrite = AnimStateRTUAV;
-			Pass2Params->AnimInfoTexture = AnimInfoSRV;
-			Pass2Params->GPUAnimStateBuffer = AnimStateUAV;
+			Pass2Params->DeltaTime					= DeltaTime;
+			Pass2Params->SampleRate					= 30.0f;
+			Pass2Params->ActiveInstanceCount		= (uint32)NumInstances;
+			Pass2Params->MaxInstances				= (uint32)MaxInstances;
+			Pass2Params->AnimStateTextureReadWrite	= AnimStateRTUAV;
+			Pass2Params->AnimInfoTexture			= AnimInfoSRV;
+			Pass2Params->GPUAnimStateBuffer			= AnimStateUAV;
+			Pass2Params->ActiveInstanceIndexBuffer	= ActiveIndexSRV;
 
 			TShaderMapRef<FAnimUpdateCS> Pass2CS(GetGlobalShaderMap(GMaxRHIFeatureLevel));
-			const int32 Pass2Groups = FMath::CeilToInt((float)NumInstances / 64.0f);
+			const int32 Pass2Groups = FMath::CeilToInt((float)MaxInstances / 64.0f);
 			{
 				/* CeilToInt()・小数点以下を切り上げる */
 				// 0.1->1, 0.5->1, 1.0->1, 1.1->2, 3.9->4

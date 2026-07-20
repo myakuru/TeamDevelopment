@@ -1,25 +1,35 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "EnemySpawnPattern/EnemyWaveDataAsset.h"
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyMidBossBase/EnemyMidBossBase.h>
 #include "EnemyPhaseSpawnTable.generated.h"
 
-// ƒtƒF[ƒY‚ÆWaveDataAsset‚Ì‘Î‰‚ğ1ƒZƒbƒg‚É‚Ü‚Æ‚ß‚½\‘¢‘Ì
+// ãƒ•ã‚§ãƒ¼ã‚ºã¨WaveDataAssetã®å¯¾å¿œã‚’1ã‚»ãƒƒãƒˆã«ã¾ã¨ã‚ãŸæ§‹é€ ä½“
 USTRUCT()
 struct FPhaseSpawnWave
 {
     GENERATED_BODY()
 
-    // ‘Î‰‚·‚éƒtƒF[ƒY”Ô†
+    // å¯¾å¿œã™ã‚‹ãƒ•ã‚§ãƒ¼ã‚ºç•ªå·
     UPROPERTY(EditAnywhere)
     int32 Phase = 1;
 
-    // ŠeƒtƒF[ƒY‚Å¶¬‚·‚éƒGƒlƒ~[‚Ì”
+    // å„ãƒ•ã‚§ãƒ¼ã‚ºã§ç”Ÿæˆã™ã‚‹ã‚¨ãƒãƒŸãƒ¼ã®æ•°
     UPROPERTY(EditAnywhere)
     int32 PhaseCreateEnemyNum = 1;
 
-    // ‚»‚ÌƒtƒF[ƒY‚Åg‚¤ƒtƒF[ƒYƒf[ƒ^
+	// ãƒ•ã‚§ãƒ¼ã‚ºã®ä¸Šæ˜‡ã«å¿…è¦ãªå€’ã—ãŸæ•µã®æ•°
+	UPROPERTY(EditAnywhere)
+	int32 PhaseUpDeathEnemyCount = 0;
+
+	// å‡ºç¾ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«
+	UPROPERTY(EditAnywhere)
+	float PhaseInterval = 2.0f;
+
+    // ãã®ãƒ•ã‚§ãƒ¼ã‚ºã§ä½¿ã†ãƒ•ã‚§ãƒ¼ã‚ºãƒ‡ãƒ¼ã‚¿
     UPROPERTY(EditAnywhere)
     TObjectPtr<UEnemyWaveDataAsset> WaveData = nullptr;
 };
@@ -31,11 +41,27 @@ class PROJECTNULL_API UEnemyPhaseSpawnTable : public UDataAsset
 
 public:
 
-    // ƒtƒF[ƒYƒf[ƒ^‚Ì”z—ñ
+    // ãƒ•ã‚§ãƒ¼ã‚ºãƒ‡ãƒ¼ã‚¿ã®é…åˆ—
     UPROPERTY(EditAnywhere)
     TArray<FPhaseSpawnWave> PhaseWaves;
 
-    // ƒtƒF[ƒY‚É‘Î‰‚µ‚½ƒf[ƒ^ƒAƒZƒbƒg‚ğ’T‚·
+	// æœ€çµ‚ã‚¦ã‚§ãƒ¼ãƒ–ã®è¨­å®š
+	UPROPERTY(EditAnywhere)
+	int FinalWave = 0;
+
+	// ãƒœã‚¹å°‚ç”¨ã‚¦ã‚§ãƒ¼ãƒ–ã®è¨­å®š
+	UPROPERTY(EditAnywhere)
+	int BossWave = 0;
+
+	// ä¸­ãƒœã‚¹
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemyMidBossBase> StageTyuuBoss;
+
+	// å‡ºç¾ã™ã‚‹ãƒœã‚¹
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AEnemyBossBase> StageBoss;
+
+    // ãƒ•ã‚§ãƒ¼ã‚ºã«å¯¾å¿œã—ãŸãƒ‡ãƒ¼ã‚¿ã‚¢ã‚»ãƒƒãƒˆã‚’æ¢ã™
     const UEnemyWaveDataAsset* FindWaveDataByPhase(int32 InPhase) const
     {
         for (const FPhaseSpawnWave& Row : PhaseWaves)
@@ -48,7 +74,7 @@ public:
         return nullptr;
     }
 
-    // ƒtƒF[ƒY‚É‘Î‰‚µ‚½ƒGƒlƒ~[”‚ğ•Ô‚·
+    // ãƒ•ã‚§ãƒ¼ã‚ºã«å¯¾å¿œã—ãŸã‚¨ãƒãƒŸãƒ¼æ•°ã‚’è¿”ã™
     const int32 FindEnemyNumByPhase(int32 InPhase) const
     {
         for (const FPhaseSpawnWave& Row : PhaseWaves)

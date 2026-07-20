@@ -11,6 +11,28 @@ class UImage;
 class UExpUpgradeWidget0;
 class UPlayerRuntimeData;
 struct FExpUpgradeRow;
+class USoundBase;
+
+USTRUCT(BlueprintType)
+struct FUIParameter
+{
+	GENERATED_BODY()
+	
+	/** 通常時（非ホバー）の目標スケール */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FVector2D UiScaleMax = { 0.0f,0.0f };
+
+	/** 出現アニメーションの開始スケール */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FVector2D UiScaleMin = { 0.0f,0.0f };
+
+	/** ホバー時の目標スケール */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FVector2D UiScaleHover = { 0.0f,0.0f };
+
+	/** 現在のUIのスケール */
+	FVector2D UiScale = { 0.0f,0.0f };
+};
 
 /**
  * データーテーブルから取得したテキストをUIにするクラスのベースクラス
@@ -32,7 +54,8 @@ public:
 	/** マウスがウィジェット上にあるかどうかを取得 */
 	bool IsMouseOver() const { return bIsMouseOver; }
 
-	void ImageRotation();
+	/** 毎フレーム呼び出し、現在のマウス状態に応じて目標スケールへ補間する */
+	void UpdateScale();
 
 	void InitExpUpgradeWidget();
 
@@ -43,6 +66,8 @@ public:
 
 	FName GetUpgradeRowName() const { return UpgradeRowName; }
 
+	/** 効果音 */
+	void SetHoverSESound(USoundBase* inSound){HoverSESound = inSound;}
 protected:
 	/** テキストを表示するためのウィジェット */
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -52,20 +77,17 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UImage> UpgradeImage;
 
-	/** UIのスケールの変化速度 */
+	/** スケール補間の速さ（大きいほど速く目標へ近づく） */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	FVector2D UiScaleSpeed = { 0.0f,0.0f };
+	float ScaleInterpSpeed = 10.0f;
 
-	/** UIの最大スケール */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	FVector2D UiScaleMax = { 0.0f,0.0f };
-
-	/** UIの最小スケール */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	FVector2D UiScaleMin = { 0.0f,0.0f };
-
-	/** 現在のUIのスケール */
-	FVector2D UiScale = { 0.0f,0.0f };
+	// UIの画像のスケール値の変更
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "UIの画像のスケール値")
+	FUIParameter UIImageParameter;
+	
+	// UIのテキストのスケール値の変更
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "UIのテキストのスケール値")
+	FUIParameter UITextParameter;
 
 private:
 
@@ -91,4 +113,8 @@ private:
 	UDataTable* GetExpUpgradeTable();
 
 	FName UpgradeRowName = NAME_None;
+	
+	/** 効果音 */
+	UPROPERTY()
+	TObjectPtr<USoundBase>HoverSESound;
 };

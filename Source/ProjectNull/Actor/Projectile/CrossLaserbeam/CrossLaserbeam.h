@@ -8,24 +8,24 @@
 #include "CrossLaserbeam.generated.h"
 
 class UBoxComponent;
+class UEffectBase;
+class UPlayerRuntimeData;
 
 UCLASS(Blueprintable)
 class PROJECTNULL_API ACrossLaserbeam : public AActor
 {
 	GENERATED_BODY()
-	
 public:	
 	ACrossLaserbeam();
-
 protected:
 	virtual void BeginPlay() override;
-
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	void SetLaserEnabled(bool bEnabled);
 	
 private:
+
 
 	UFUNCTION()
 	void OnLaserBeginOverlap(
@@ -35,25 +35,19 @@ private:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+
+	static const int32 LaserbeamNum = 4;
 	
-	UFUNCTION()
-	void OnLaserEndOverlap(
-		UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex);
+	UPROPERTY(EditAnywhere,Instanced)
+	TArray<TObjectPtr<UBoxComponent>> BoxCompArray;
 
-	void OnHit(const TObjectPtr<AActor>& Actor);
+	UPROPERTY(EditAnywhere, Instanced)
+	TArray<TObjectPtr<UEffectBase>>	NiagaraEffectArray;
 
-
-	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<UBoxComponent>> LaserBoxes;
-
+	/** プレイヤーのRuntimeDataクラス */
 	UPROPERTY()
-	TSet<TWeakObjectPtr<AActor>> HitActors;
-
-	FTimerHandle HitIntervalTimerHandle;
-
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
 	UPROPERTY(EditAnywhere)
-	float HitInterval;
+	float AttackPower;
 };

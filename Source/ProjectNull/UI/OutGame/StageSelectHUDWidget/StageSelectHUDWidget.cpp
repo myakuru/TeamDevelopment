@@ -1,9 +1,10 @@
 ﻿#include "StageSelectHUDWidget.h"
 #include "Components/CanvasPanel.h"
+#include "Components/BackgroundBlur.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/TextBlock.h"
-#include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/ScrollBox.h"
 #include "Kismet/GameplayStatics.h"
 
 //ゲームインスタンス
@@ -14,6 +15,8 @@
 #include <ProjectNull/SaveGame/MySaveGame.h>
 //ステージのデータアセット
 #include<ProjectNull/UI/OutGame/StageDataAsset/StageDataAsset.h>
+//リターンボタン
+#include<ProjectNull/UI/Parts/Button/ReturnButton/ReturnButtonWidget.h>
 //ステージボタンUI
 #include<ProjectNull/UI/OutGame/StageSelectHUDWidget/StageSelectHUDParts/StageButtonWidget.h>
 
@@ -32,14 +35,12 @@ void UStageSelectHUDWidget::NativeConstruct()
 		return;
 	}
 
-	if (ReturnButton)
-	{
-		ReturnButton->OnClicked.AddDynamic(this, &UStageSelectHUDWidget::OnClickedReturnButton);
-	}
-
 	ChangeStageDetails(CurrentSelectedStageIndex);
 
 	CreateStageButtons();
+
+	ReturnButton->OnClicked.AddUniqueDynamic
+	(this, &UStageSelectHUDWidget::ReturnButtonClicked);
 
 	//マウスカーソル表示
 	APlayerController* PC =
@@ -55,6 +56,16 @@ void UStageSelectHUDWidget::NativeConstruct()
 	);
 
 	PC->SetInputMode(InputMode);
+
+	//アニメーション再生
+	if (FadeAnim)
+	{
+		PlayAnimation(FadeAnim);
+	}
+
+	if (MissionAnim) {
+		PlayAnimation(MissionAnim,0.f,0);
+	}
 }
 
 void UStageSelectHUDWidget::CreateStageButtons()
@@ -80,18 +91,20 @@ void UStageSelectHUDWidget::CreateStageButtons()
 		ButtonWidget->Setup(i, bIsUnlocked);
 
 		//デリゲートのバインド
-		ButtonWidget->OnHovered.AddUniqueDynamic(
+		ButtonWidget->OnHoveredStage.AddUniqueDynamic(
 			this, &UStageSelectHUDWidget::OnHoveredStageButton);
 
-		ButtonWidget->OnClicked.AddUniqueDynamic(
+		ButtonWidget->OnClickedStage.AddUniqueDynamic(
 			this, &UStageSelectHUDWidget::OnClickedStageButton);
 
-		UCanvasPanelSlot* CanvasSlot =
+		if(StageList)StageList->AddChild(ButtonWidget);
+
+		/*UCanvasPanelSlot* CanvasSlot =
 			StageCanvas->AddChildToCanvas(ButtonWidget);
 
 		if (!CanvasSlot)continue;
 
-		CanvasSlot->SetPosition(StageButtonWidgetFirstPosition + (StageButtonWidgetInterval * i));
+		CanvasSlot->SetPosition(StageButtonWidgetFirstPosition + (StageButtonWidgetInterval * i));*/
 
 		if (!bIsUnlocked)break;
 	}
@@ -101,23 +114,67 @@ void UStageSelectHUDWidget::OnClickedStageButton(int32 InStageIndex)
 {
 	if (!StageDataAsset || StageDataAsset->GetStageData().Num() == 0)return;
 
+	if (!FadeAnim || IsAnimationPlaying(FadeAnim))return;
+
 	if (CurrentSelectedStageIndex != InStageIndex) {
 		CurrentSelectedStageIndex = ClampStageIndex(InStageIndex);
 	}
 
-	UGameplayStatics::OpenLevel(this, FName(StageDataAsset->GetStageData()[CurrentSelectedStageIndex].LevelName));
+	//フェードアウトアニメーション再生
+	if (FadeAnim)
+	{
+		PlayAnimation(
+			FadeAnim,0.f,1,
+			EUMGSequencePlayMode::Reverse);
+
+		FWidgetAnimationDynamicEvent AnimationFinishedEvent;
+		AnimationFinishedEvent.BindDynamic(this, &UStageSelectHUDWidget::OpenCurrentSelectedStageLevel);
+
+		BindToAnimationFinished(FadeAnim, AnimationFinishedEvent);
+
+		return;
+	}
+
+	OpenCurrentSelectedStageLevel();
 }
 
 void UStageSelectHUDWidget::OnHoveredStageButton(int32 InStageIndex)
 {
+	if (!FadeAnim || IsAnimationPlaying(FadeAnim))return;
+
 	CurrentSelectedStageIndex = ClampStageIndex(InStageIndex);
 
 	ChangeStageDetails(CurrentSelectedStageIndex);
 }
 
-void UStageSelectHUDWidget::OnClickedReturnButton()
+void UStageSelectHUDWidget::OpenCurrentSelectedStageLevel()
 {
-	UGameplayStatics::OpenLevel(this, "MainHubLevel");
+	UGameplayStatics::OpenLevel(this, FName(StageDataAsset->GetStageData()[CurrentSelectedStageIndex].LevelName));
+}
+
+void UStageSelectHUDWidget::ReturnButtonClicked()
+{
+	if (!FadeAnim || IsAnimationPlaying(FadeAnim))return;
+
+	//フェードアウトアニメーション再生
+	if (FadeAnim)
+	{
+		PlayAnimation(
+			FadeAnim, 0.f, 1,
+			EUMGSequencePlayMode::Reverse);
+
+		FWidgetAnimationDynamicEvent AnimationFinishedEvent;
+		AnimationFinishedEvent.BindDynamic(this, &UStageSelectHUDWidget::OpenReturnLevel);
+
+		BindToAnimationFinished(FadeAnim, AnimationFinishedEvent);
+
+		return;
+	}
+}
+
+void UStageSelectHUDWidget::OpenReturnLevel()
+{
+	UGameplayStatics::OpenLevel(this, ReturnButton->GetOpenLevelName());
 }
 
 int32 UStageSelectHUDWidget::ClampStageIndex(int32 InStageIndex)
@@ -153,9 +210,6 @@ void UStageSelectHUDWidget::ChangeStageDetails(int32 InStageIndex)
 
 	//ステージインデックスをクランプ
 	int32 stageIndex = ClampStageIndex(InStageIndex);
-
-	//ステージのデーブデータをゲームインスタンスから取得しておく
-	auto* SaveData = GetWorld()->GetGameInstance<USuperGameInstance>()->GetCurrentSaveData();
 
 	//ステージ詳細更新
 	//ステージ名

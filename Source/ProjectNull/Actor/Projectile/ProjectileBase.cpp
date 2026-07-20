@@ -6,9 +6,23 @@
 #include "Components/StaticMeshComponent.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Effect/EffectBase.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
 
 
-AProjectileBase::AProjectileBase()
+AProjectileBase::AProjectileBase():
+	OwnerActor(nullptr),
+	PlayerRuntimeData(nullptr),
+	AttackPower(1.f),
+	Root(nullptr),
+	SphereCollision(nullptr),
+	StaticMesh(nullptr),
+	ProjectileMovement(nullptr),
+	ProjectileEffect(nullptr),
+	AliveTimerHandle(FTimerHandle()),
+	AliveTime(2.f)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
@@ -32,14 +46,6 @@ AProjectileBase::AProjectileBase()
 		ECC_GameTraceChannel1,
 		ECR_Overlap);
 
-	/*SphereCollision->SetCollisionResponseToChannel(
-		ECC_WorldStatic,
-		ECR_Block);
-
-	SphereCollision->SetCollisionResponseToChannel(
-		ECC_WorldDynamic,
-		ECR_Block);*/
-
 	// ================================================================
 	// スケルタルメッシュの初期化
 	// ================================================================
@@ -61,6 +67,10 @@ void AProjectileBase::BeginPlay()
 
 	Super::BeginPlay();
 
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	
 	if (!SphereCollision) { return; }
 
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(
@@ -73,19 +83,29 @@ void AProjectileBase::BeginPlay()
 		this,
 		&AProjectileBase::OnProjectileStop);
 
-	//UE_LOG(LogTemp, Display, TEXT("呼!"));
+	GetWorld()->GetTimerManager().SetTimer(
+		AliveTimerHandle,
+		this,
+		&AProjectileBase::ActorDestroy,
+		AliveTime,
+		false);
 
+	if (!ProjectileEffect) { return; }
+	ProjectileEffect->Start(Root);
 }
 
 void AProjectileBase::HandleCollision(AActor* OtherActor)
 {
-	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
+	if (!OtherActor || 
+		OtherActor == this ||
+		!OwnerActor ||
+		!PlayerRuntimeData) { return; }
 
 	// キャラクターインターフェースを実装しているか
-	if (auto* interface = Cast<ICharacterInterface>(OtherActor))
+	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		interface->ApplyDamaged();
-		interface->ApplyKnockBack(OwnerActor->GetActorLocation());
+		Interface->ApplyDamaged(AttackPower + PlayerRuntimeData->GetCharacterAttackPower());
+		Interface->ApplyKnockBack(OwnerActor->GetActorLocation());
 	}
 
 	Destroy();
@@ -109,6 +129,12 @@ void AProjectileBase::OnCollisionOverlap(
 }
 
 void AProjectileBase::OnProjectileStop(const FHitResult& Hit)
+{
+	Destroy();
+
+}
+
+void AProjectileBase::ActorDestroy()
 {
 	Destroy();
 

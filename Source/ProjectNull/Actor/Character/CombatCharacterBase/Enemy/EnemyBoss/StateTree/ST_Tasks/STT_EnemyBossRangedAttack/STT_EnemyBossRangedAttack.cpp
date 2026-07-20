@@ -6,7 +6,6 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
 #include "Kismet/GameplayStatics.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -19,6 +18,7 @@ USTT_EnemyBossRangedAttack::USTT_EnemyBossRangedAttack(const FObjectInitializer&
 
 EStateTreeRunStatus USTT_EnemyBossRangedAttack::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
+	UE_LOG(LogTemp, Warning, TEXT("RangedAttackState"));
 	// どれかポインタがなければリターン
 	if (!HasValidRefs()) { return EStateTreeRunStatus::Failed; }
 
@@ -58,23 +58,21 @@ EStateTreeRunStatus USTT_EnemyBossRangedAttack::EnterState(FStateTreeExecutionCo
 	AEnemyBossBase* Boss = Cast<AEnemyBossBase>(OwnerBoss);
 	if (!IsValid(Boss)) { return EStateTreeRunStatus::Failed; }
 
-	// AnimInstanceを取得して再生
-	USkeletalMeshComponent* Mesh = Boss->GetMesh();
-	UAnimInstance* Anim = Mesh ? Mesh->GetAnimInstance() : nullptr;
-	if (!IsValid(Anim))
-	{
-		return EStateTreeRunStatus::Failed;
-	}
-
-	// EnterState：最初の一撃を再生
 	const FBossAttackPattern& Atk = Boss->GetCurrentAttack();
-	if (Atk.AttackMontages.Num() == 0) { return EStateTreeRunStatus::Failed; }
+	if (!Atk.AttackMontages.IsValidIndex(1)) { return EStateTreeRunStatus::Failed; } // 2つ必須
 
-	Anim->Montage_Play(Atk.AttackMontages[0]);
 	return EStateTreeRunStatus::Running;
 }
 
 void USTT_EnemyBossRangedAttack::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::ExitState(Context, Transition);
+
+	AEnemyBossBase* Boss = GetBoss();
+	if (!IsValid(Boss))
+	{
+		return;
+	}
+
+	Boss->SetPrevAction(Boss->GetCurrentAction());
 }

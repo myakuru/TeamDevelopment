@@ -7,8 +7,6 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/System/Controller/RobotController/RobotController.h>
-#include <ProjectNull/UI/PlayerExpUpgradeWidget/PlayerExpUpgradeWidget.h>
-#include <ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h>
 
 UPlayerRuntimeData::UPlayerRuntimeData() :
 	Owner(nullptr),
@@ -18,63 +16,66 @@ UPlayerRuntimeData::UPlayerRuntimeData() :
 	if (!CachedExpUpgradeTable)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DT_ExpUpgrade がロードできません"));
+		return;
 	}
 
 	// 要素数分の初期化
 	for (const FName& RowName : CachedExpUpgradeTable->GetRowNames())
 	{
-		UpgradeStates.Add({ RowName, 0 });
+		UpgradeStates.Add({ RowName, "0"});
 	}
-
 }
 
 void UPlayerRuntimeData::Initialize()
 {
+	Level = 1;
 
-	// プレイヤーの情報を取得する（0番:1P）
-	auto* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (!PlayerPawn) { return; }
+	// 経験値をリセット
+	Experience = FExperienceRuntimeData();
 
-	if (auto* PlayerBase = Cast<APlayerBase>(PlayerPawn))
+	// 強化効果の倍率を全消去（これが残っていると前回の強化が効き続ける）
+	EffectMultipliers.Empty();
+
+	// 全強化レベルを0に戻す
+	UpgradeStates.Empty();
+	if (CachedExpUpgradeTable)
 	{
-		Owner = PlayerBase;
+		for (const FName& RowName : CachedExpUpgradeTable->GetRowNames())
+		{
+			UpgradeStates.Add({ RowName, "0" });
+		}
 	}
 
-
-	if (!RobotController)
-	{
-		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
-	}
-
-	UpdateStatus();
-
-	// プレイヤーのパラメータデータ取得
-	//const TObjectPtr<UPlayerParameterData> ParameterData = Owner->GetSuperGameInstance()->GetCharacterParameterData();
-
-	// プレイヤーのHPを更新
-	//Health.Current = ParameterData->GetPlayerParameterData()->GetMaxHealth();
+	// ギアの実行時データのみリセット
+	// （GearChangeEnergyCost はエディタ設定値なので構造体ごと再構築せず、フィールド単位で戻す）
+	Gear.GearEnergy = 0.0f;
+	Gear.ExcessRatio = 0.0f;
+	Gear.GearChangeInvincibilityTime = 0.0f;
 }
 
 void UPlayerRuntimeData::AddExperience(float Amount)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("hi Amount %.0f"), Amount);
 	Experience.Add(Amount);
+	
+	// 変更があれば、経験値のバーのUIが更新される
+	OnExperienceChanged.Broadcast(Experience.Current, Experience.ExperienceToNextLevel);
 	
 	// 経験値によるレベルアップ
 	while (Experience.Current >= Experience.ExperienceToNextLevel)
 	{
 		Experience.Current -= Experience.ExperienceToNextLevel;
-
+		
+		OnExperienceChanged.Broadcast(1.0f, 1.0f);
+		
 		LevelUp();
 	}
-
-	// 変更があれば、経験値のバーのUIが更新される
-	OnExperienceChanged.Broadcast(Experience.Current, Experience.ExperienceToNextLevel);
 }
 
 void UPlayerRuntimeData::AddGearEnergy(float Amount)
 {
 	Gear.GearEnergy += Amount;
-	UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
+	//UE_LOG(LogTemp, Warning, TEXT("hi GearEnergy %.0f"), Gear.GearEnergy);
 	OnGearEnergyChanged.Broadcast(Gear.GearEnergy);
 }
 
@@ -100,22 +101,37 @@ void UPlayerRuntimeData::ApplyMovementSpeed()
 	Owner->GetCharacterMovement()->MaxWalkSpeed = Speed.Final;
 }
 
+float UPlayerRuntimeData::GetPlayerAttackDamage()
+{
+	// プレイヤーの攻撃力を計算するロジックをここに実装
+	Attack.Final = Attack.Base * GetEffectMultiplier(EUpgradeEffectType::AttackDamage);
+
+	//UE_LOG(LogTemp, Error, TEXT("%f:Attack.Final"), Attack.Final);
+
+	return Attack.Final;
+}
+
 void UPlayerRuntimeData::LevelUp()
 {
 	Level++;
 
 	UpdateStatus();
 
+	if (!RobotController)
+	{
+		RobotController = Cast<ARobotController>(UGameplayStatics::GetPlayerController(this, 0));
+	}
+
 	if (RobotController)
 	{
 		RobotController->OpenPlayerExpUpgradeWidget();
 	}
 
-	/*UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
+	UE_LOG(LogTemp, Warning, TEXT("hi Total %.0f"), Experience.Total);
 	UE_LOG(LogTemp, Warning, TEXT("hi Current %.0f"), Experience.Current);
 	UE_LOG(LogTemp, Warning, TEXT("hi ExperienceToNextLevel %.0f"), Experience.ExperienceToNextLevel);
-	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);*/
-	//UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
+	UE_LOG(LogTemp, Warning, TEXT("hi Level %d"), Level);
+	UE_LOG(LogTemp, Warning, TEXT("hi Final %.0f"), Speed.Final);
 	
 }
 
@@ -131,11 +147,16 @@ void UPlayerRuntimeData::CalculateExperience(const FExperienceParameterData& Dat
 	Experience.CalculateExperienceToNextLevel(Data.BaseExperienceToNextLevel, Data.ExperienceToNextLevelIncreasePerLevel, Level);
 }
 
-void UPlayerRuntimeData::CalculateFinalSpeed(const FSpeedParameterData& Data, int32 CurrentGearLevel)
+void UPlayerRuntimeData::CalculateFinalSpeed(
+	const FSpeedParameterData& Data,
+	int32 CurrentGearLevel)
 {
-	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(CurrentGearLevel)) { return; }
+	if (!Data.GearLevelSpeedMultiplierArray.IsValidIndex(--CurrentGearLevel)) { return; }
+	
 	const float GearLevelSpeedMultiplier = Data.GearLevelSpeedMultiplierArray[CurrentGearLevel];
 	Speed.Final = (Data.Base + Level * Data.ScalePerLevelSpeed) * GearLevelSpeedMultiplier;
+	
+	Speed.Final *= GetEffectMultiplier(EUpgradeEffectType::PlayerSpeed);
 }
 
 void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Data)
@@ -146,6 +167,7 @@ void UPlayerRuntimeData::CalculateInvincibilityTime(const FGearParameterData& Da
 void UPlayerRuntimeData::UpdateStatus()
 {
 	if (!Owner || !Owner->GetSuperGameInstance() || !Owner->GetSuperGameInstance()->GetPlayerParameterData()) {
+		//UE_LOG(LogTemp, Warning, TEXT("hi 止まって"));
 		return;
 	}
 
@@ -157,19 +179,84 @@ void UPlayerRuntimeData::UpdateStatus()
 	ApplyMovementSpeed();
 }
 
+TArray<FValidUpgradeInfo> UPlayerRuntimeData::BuildUpgradeChoices(int32 Count)
+{
+	TArray<FValidUpgradeInfo> Result;
+	if (!CachedExpUpgradeTable) { return Result; }
+
+	// 行名を取得して重複なくランダム抽選する
+	TArray<FName> RowNames = CachedExpUpgradeTable->GetRowNames();
+	if (RowNames.Num() < Count) { return Result; }
+
+	for (int32 i = 0; i < Count; ++i)
+	{
+		const int32 Index = FMath::RandRange(0, RowNames.Num() - 1);
+		const FName RowName = RowNames[Index];
+		RowNames.RemoveAt(Index);
+
+		// 現在レベルに対応する説明文がなければ候補から除外する
+		const FExpUpgradeLevelData* LevelData = FindCurrentLevelData(RowName);
+		if (!LevelData) { continue; }
+
+		FValidUpgradeInfo Info;
+		Info.RowName = RowName;
+		Info.Description = LevelData->Description;
+		Info.CurrentLevel = GetUpgradeLevel(RowName);
+		Result.Add(Info);
+	}
+
+	return Result;
+}
+
+void UPlayerRuntimeData::ApplySelectedUpgrade(FName Id)
+{
+	// レベルを進める前に、いま提示している（現在レベルの）効果データを取得する
+	if (const FExpUpgradeLevelData* LevelData = FindCurrentLevelData(Id))
+	{
+		ApplyUpgradeEffect(LevelData->EffectType, LevelData->AttackMultiplier);
+	}
+
+	// 強化レベルを1段進める
+	UpdateUpgradeStates(Id);
+	
+	// ステータスの更新
+	UpdateStatus();
+}
+
+void UPlayerRuntimeData::ApplyUpgradeEffect(EUpgradeEffectType Type, float Value)
+{
+	// 効果種別ごとに現在倍率を保持する。効果が増えても分岐は増えない
+	EffectMultipliers.FindOrAdd(Type) = Value;
+}
+
+FExpUpgradeLevelData* UPlayerRuntimeData::FindCurrentLevelData(FName Id)
+{
+	if (!CachedExpUpgradeTable) { return nullptr; }
+
+	FExpUpgradeRow* Row = CachedExpUpgradeTable->FindRow<FExpUpgradeRow>(Id, TEXT(""));
+	if (!Row) { return nullptr; }
+
+	const int32 LevelIndex = FCString::Atoi(*GetUpgradeLevel(Id).ToString());
+	if (!Row->UpgradeLevels.IsValidIndex(LevelIndex)) { return nullptr; }
+
+	return &Row->UpgradeLevels[LevelIndex];
+}
+
 void UPlayerRuntimeData::UpdateUpgradeStates(FName Id)
 {
 	for(auto& UpgradeState : UpgradeStates)
 	{
 		if (UpgradeState.UpgradeId == Id)
 		{
-			UpgradeState.Level++;
+			int32 CurrentLevel = FCString::Atoi(*UpgradeState.Level.ToString());
+			CurrentLevel++;
+			UpgradeState.Level = FName(*FString::FromInt(CurrentLevel));
 			break;
 		}
 	}
 }
 
-int32 UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
+FName UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 {
 	for(const auto& UpgradeState : UpgradeStates)
 	{
@@ -178,5 +265,5 @@ int32 UPlayerRuntimeData::GetUpgradeLevel(FName Id) const
 			return UpgradeState.Level;
 		}
 	}
-	return 0;
+	return "null";
 }

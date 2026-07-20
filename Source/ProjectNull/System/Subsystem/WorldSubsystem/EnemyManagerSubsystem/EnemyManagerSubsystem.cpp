@@ -1,6 +1,12 @@
 ﻿
 #include "EnemyManagerSubsystem.h"
 
+DECLARE_CYCLE_STAT(
+	TEXT("Enemy Manager Update"),
+	STAT_EnemyUpdateManager,
+	STATGROUP_Game
+);
+
 #include "Kismet/GameplayStatics.h"
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManagerConfig.h>
@@ -69,6 +75,8 @@ void UEnemyManagerSubsystem::RemoveEnemy(AEnemyBase* Enemy)
 
 void UEnemyManagerSubsystem::UpdateEnemies(float DeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_EnemyUpdateManager);
+
 	FrameCount++;
 
 	// 定期的にカウントリセット
@@ -150,6 +158,33 @@ AEnemyISMManager* UEnemyManagerSubsystem::GetISMManager(TSubclassOf<AEnemyISMMan
 	else
 	{
 		return nullptr;
+	}
+}
+
+USoundBase* UEnemyManagerSubsystem::GetDamagedSound() const
+{
+	if (!ManagerConfig) { return nullptr; }
+	return ManagerConfig->DamagedSESound;
+}
+
+void UEnemyManagerSubsystem::DestroyAllEnemy()
+{
+	// FinalizeDeath中にEnemyGruntListが変更されても問題ないようにコピー
+	const TArray<TObjectPtr<AEnemyBase>> EnemyListCopy = EnemyGruntList;
+
+	for (AEnemyBase* Enemy : EnemyListCopy)
+	{
+		if (!IsValid(Enemy))
+		{
+			continue;
+		}
+
+		if (!Enemy->GetAliveFlg())
+		{
+			continue;
+		}
+
+		Enemy->FinalizeDeath();
 	}
 }
 

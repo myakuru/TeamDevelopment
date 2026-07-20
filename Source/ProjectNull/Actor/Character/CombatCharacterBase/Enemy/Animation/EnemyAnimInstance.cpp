@@ -1,5 +1,14 @@
 ﻿#include "EnemyAnimInstance.h"
-#include "../EnemyBase.h"
+
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+
+void UEnemyAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+
+	OwnerEnemy = Cast<AEnemyBase>(TryGetPawnOwner());
+	if (!IsValid(OwnerEnemy)) { return; }
+}
 
 void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -8,7 +17,7 @@ void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!OwnerEnemy)
 	{
 		// 初回だけ取得
-		OwnerEnemy = Cast<AEnemyBase>(TryGetPawnOwner());
+		OwnerEnemy = Cast<AEnemyBase>(GetOwningActor());
 	}
 
 	if (!OwnerEnemy) { return; }

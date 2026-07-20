@@ -16,13 +16,6 @@ void AEnemyGruntBase::BeginPlay()
 	AEnemyBase::BeginPlay();
 }
 
-void AEnemyGruntBase::TransitionIdleToWalk()
-{
-	if (EnemyStatus.StateTag != EEnemyState::Idle) { return; }
-
-	NotifyChangedStateEnum(EEnemyState::Walk);
-}
-
 // Called every frame
 void AEnemyGruntBase::Tick(float DeltaTime)
 {
@@ -39,30 +32,25 @@ void AEnemyGruntBase::OnUpdate(APawn* Player, float DeltaTime)
 {
 	if (!Player) { return; }
 
-	/*PrevAnimTime = AnimTime;
-	AnimTime += DeltaTime;
-
-	if (AnimChangeFlg)
-	{
-		PlayAnimation(0,true);
-	}*/
-
-	//EnemyRuntimeData->UpdateAnimation(DeltaTime, EnemyStatus.BlendSpeed);
-
 	// プレイヤーの座標を取得
 	const FVector playerLocation = Player->GetActorLocation();
-
 	EnemyRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
-
-	/*if (EnemyStatus.StateTag == EEnemyState::Hit)
-	{
-		MoveToKnockBack(FVector::ZeroVector, 0, DeltaTime);
-		return;
-	}*/
 
 	// 攻撃可能か判断
 	CheckCanAttack();
-	
+
 	// IdleステートからWalkステートへの切り替え処理
 	TransitionIdleToWalk();
+}
+
+void AEnemyGruntBase::TransitionIdleToWalk()
+{
+	// 「棒立ち」で無いか、「追跡可能距離内」なら処理を飛ばす
+	if (EnemyStatus.StateTag != EEnemyState::Idle ||
+		IsInChaseDistance())
+	{
+		return;
+	}
+
+	NotifyChangedStateEnum(EEnemyState::Walk);
 }

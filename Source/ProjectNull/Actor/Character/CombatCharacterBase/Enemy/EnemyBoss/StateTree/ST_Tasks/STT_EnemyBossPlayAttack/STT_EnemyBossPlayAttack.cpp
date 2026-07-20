@@ -60,7 +60,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 	// 指定した配列内にアニメーションがあるかチェック
 	if (!Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick AnimEnd"));
+		//UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick AnimEnd"));
 		return EStateTreeRunStatus::Succeeded;
 	}
 	// 現在のアニメーションモンタージュを取得
@@ -69,17 +69,17 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 	if (!Anim->Montage_IsPlaying(Cur))
 	{
 		Boss->AdvanceHitIndex();
-		// 次のアニメーションがあり、flgがtrueなら次のアニメーションを実行
+		// 次のアニメーションがあり、flgがtrueなら
+		// 上述の処理に入り直して次のアニメーションを実行
 		if (Atk.AttackMontages.IsValidIndex(Boss->GetHitIndex()))
 		{
-			Anim->Montage_Play(Atk.AttackMontages[Boss->GetHitIndex()]);
-
+			bMontageStarted = false;
 			return EStateTreeRunStatus::Running;
 		}
 		return EStateTreeRunStatus::Succeeded;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick Out"));
+	//UE_LOG(LogTemp, Warning, TEXT("PlayAttack Tick Out"));
 
 	return EStateTreeRunStatus::Running;
 
@@ -96,7 +96,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::Tick(FStateTreeExecutionContext& C
 // タスク開始時の処理
 EStateTreeRunStatus USTT_EnemyBossPlayAttack::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
-	UE_LOG(LogTemp, Warning, TEXT("PlayAttack EnterState In"));
+	//UE_LOG(LogTemp, Warning, TEXT("PlayAttack EnterState In"));
 
 	Super::EnterState(Context, Transition);
 
@@ -117,10 +117,7 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::EnterState(FStateTreeExecutionCont
 	bMontageStarted = false;
 
 	// 攻撃の瞬間に移動を止める（残った移動でクルッと回るのを防ぐ）
-	//if (AAIController* AICon = Cast<AAIController>(AIC))
-	{
-		AIC->StopMovement();
-	}
+	AIC->StopMovement();
 
 	Boss->ResetHitIndex();
 
@@ -130,4 +127,12 @@ EStateTreeRunStatus USTT_EnemyBossPlayAttack::EnterState(FStateTreeExecutionCont
 void USTT_EnemyBossPlayAttack::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition)
 {
 	Super::ExitState(Context, Transition);
+
+	AEnemyBossBase* Boss = GetBoss();
+	if (!IsValid(Boss))
+	{
+		return;
+	}
+
+	Boss->SetPrevAction(Boss->GetCurrentAction());
 }

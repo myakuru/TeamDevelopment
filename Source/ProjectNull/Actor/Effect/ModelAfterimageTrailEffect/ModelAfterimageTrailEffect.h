@@ -2,7 +2,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "UObject/Object.h"
+
 #include "ModelAfterimageTrailEffect.generated.h"
 
 /** ゴーストアクタークラス
@@ -17,7 +19,6 @@ class PROJECTNULL_API UModelAfterimageTrailEffect : public UObject
 	GENERATED_BODY()
 public:
 	UModelAfterimageTrailEffect();
-public:
 
 	/**
 	 * @brief 更新処理
@@ -90,7 +91,7 @@ private:
 
 	/** 残像をまとめる配列 */
 	UPROPERTY()
-	TArray<AGhostActor*> GhostActors;
+	TArray<TWeakObjectPtr<AGhostActor>> GhostActors;
 
 	/** 残像追加時間管理 */
 	float TrailAddTimer;

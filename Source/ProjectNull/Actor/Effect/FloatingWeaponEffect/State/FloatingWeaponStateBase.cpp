@@ -2,10 +2,15 @@
 #include "FloatingWeaponStateBase.h"
 
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/FloatingWeaponEffect.h>
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
+#include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 
 UFloatingWeaponStateBase::UFloatingWeaponStateBase():
-	TransitionTime(0.0f)
+	Owner(nullptr),
+	OwnerActor(nullptr),
+	RadiusOffset(0.f),
+	TransitionTime(0.0f),
+	RelativeRotation(FRotator()),
+	RelativeTransform(FTransform())
 {
 }
 
@@ -17,19 +22,27 @@ void UFloatingWeaponStateBase::Update(float DeltaTime)
 
 float UFloatingWeaponStateBase::GetTransitionStateTime() const
 {
-	if (!Owner || !Owner->GetOwnerAttack()) { return 0.0f; }
-	return Owner->GetOwnerAttack()->TotalTransitionStateTime() * 0.5f;
+	if (!Owner)			{ return 0.f; }
+
+	auto OwnerAttack = Owner->GetOwnerAttack();
+	if (!OwnerAttack)	{ return 0.f; }
+
+	return OwnerAttack->TotalTransitionStateTime() * 0.5f;
 }
 
 float UFloatingWeaponStateBase::GetStandStateTime() const
 {
-	if (!Owner || !Owner->GetOwnerAttack()) { return 0.0f; }
-	return Owner->GetOwnerAttack()->StandStateTime();
+	if (!Owner)			{ return 0.f; }
+
+	auto OwnerAttack = Owner->GetOwnerAttack();
+	if (!OwnerAttack)	{ return 0.f; }
+
+	return OwnerAttack->StandStateTime();
 }
 
 void UFloatingWeaponStateBase::UpdateTransitionTime(float DeltaTime)
 {
-	if (TransitionTime <= 0.0f) { return; }
+	if (TransitionTime <= 0.f) { return; }
 	TransitionTime -= DeltaTime;
-	TransitionTime = std::max(TransitionTime, 0.0f);
+	TransitionTime = std::max(TransitionTime, 0.f);
 }

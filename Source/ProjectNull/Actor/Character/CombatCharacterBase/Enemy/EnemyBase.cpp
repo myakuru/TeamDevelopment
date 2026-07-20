@@ -1,22 +1,21 @@
 ﻿#include "EnemyBase.h"
 #include "EnemyDataAsset.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "Components/StateTreeComponent.h"
-#include <ProjectNull/Utility/StateMachine/StateMachine.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Component/EnemyAttackComponent/EnemyAttackComponent.h>
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
-#include <ProjectNull\Data\CharacterRuntimeData\EnemyRuntimeData\EnemyRuntimeData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/States/EnemyStateChase/EnemyStateChase.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ExperiencePickupManager/ExperiencePickupManager.h>
-#include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/Animation/AnimDataAsset.h>
-#include <ProjectNull/Utility/Common/Definitions/CollisionChannels.h>
+#include <ProjectNull/System/Subsystem/WorldSubsystem/DamageNumberPoolSubsystem/DamageNumberPoolSubsystem.h>
+
+#include "ProjectNull/Sound/SoundManager.h"
 
 AEnemyBase::AEnemyBase()
 	:	EnemyManager(nullptr)
@@ -58,41 +57,33 @@ void AEnemyBase::NotifyChangedStateEnum(EEnemyState a_TargetState)
 	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
 }
 
-void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse)
+void AEnemyBase::NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse InNewResponse)
 {
 	if (!CapsuleComponent) { return; }
 
-	CapsuleComponent->SetCollisionResponseToChannel(Channel, NewResponse);
+	CapsuleComponent->SetCollisionResponseToChannel(Channel, InNewResponse);
 }
 
-void AEnemyBase::OnEnterSlope()
+float AEnemyBase::GetFinalAttackPower() const
 {
-	/* 備忘録 */
-	// 坂道の範囲内に入った場合
-	// １．フラグを立てる
-	// ２．移動処理内で坂道移動処理を実行
-	// ３．判定処理をタイマーに格納して毎フレーム計算を回避
+	if (!EnemyRuntimeData) { return 1.f; }
+	return EnemyRuntimeData->GetCharacterAttackPower();
 }
 
 void AEnemyBase::BeginPlay()
 {
 	AActor::BeginPlay();
 
-	// 敵管理クラスの情報取得
-	//EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-
-
-	// 敵が生成された際に敵管理クラス経由でリストへ登録する
-	//if (EnemyManager) {
-		//EnemyManager->RegisterEnemy(this);
-	//}
-
 	// コンポーネントに自身の参照を渡す
+	if (EnemyAttackComponent)
 	{
-		if (EnemyAttackComponent)
-		{
-			EnemyAttackComponent->SetOwnerEnemy(this);
-		}
+		EnemyAttackComponent->SetOwnerEnemy(this);
+	}
+
+	if (CapsuleComponent)
+	{
+		// プレイヤーなどPawnとの物理的なぶつかりを無視
+		CapsuleComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	}
 
 	// ゲームの進行に合わせて敵パラメータを設定
@@ -124,111 +115,87 @@ void AEnemyBase::RegisterDelegates()
 
 void AEnemyBase::UpdateParams()
 {
-	if (!GameProgress) { return; }
+	if (!GameProgress||!EnemyRuntimeData) { return; }
 
 	// 倒した敵数を元に
-	const int32 killCount = GameProgress->GetKillCount();
+	const int32 NowPhase = GameProgress->GetPhase();
 
 	// ヒットポイントの更新
-	EnemyStatus.FinalHP = EnemyStatus.HPScaling.GetFinalValue(killCount);
-
-	// 攻撃力の更新
-	EnemyStatus.FinalAttack = EnemyStatus.AttackScaling.GetFinalValue(killCount);
-}
-
-void AEnemyBase::SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight)
-{
-	if (EnemyStatus.StateTag == EEnemyState::Hit)return;
-	// 吹き飛ばしに使う数値を決める
-	int KnockBackPowerLevel = AttackPower - EnemyWeight;
-	if (KnockBackPowerLevel < 0)
 	{
-		KnockBackPowerLevel = 0;
+		// 計算後の最終的なHPをセット
+		EnemyRuntimeData->SetFinalHP(EnemyStatus.HPScaling.GetFinalValue(NowPhase));
 	}
 
-	const FName RowName = FName(*FString::FromInt(KnockBackPowerLevel));
-
-	// RowNameから型付で取得
-	const FKnockBackData* KnockBackData =
-		KnockBackDataTable->FindRow<FKnockBackData>(RowName, TEXT("KnockBack"));
-	if (!KnockBackData)
+	// 攻撃パラメータの更新
 	{
-		UE_LOG(LogTemp, Warning, TEXT("KnockBack row not found: %s"), *RowName.ToString());
-		return;
+		// 最終的な攻撃倍率の更新
+		float AttackScale =
+			EnemyStatus.AttackScaling.CalculateFinalScaling(NowPhase);
+
+		// 基礎攻撃力と倍率をセット
+		EnemyRuntimeData->SetBaseAttackPower(EnemyStatus.AttackScaling.Base);
+		EnemyRuntimeData->SetAttackScaling(AttackScale);
 	}
-
-	// 水平方向
-	FVector HorizontalDir = GetActorLocation() - PlayerLocation;
-	HorizontalDir.Z = 0.0f;
-	HorizontalDir.Normalize();
-
-	// 吹き飛び角度
-	const float Rad = FMath::DegreesToRadians(KnockBackData->LaunchAngleDeg);
-	// 水平方向の角度とラジアン角をもとに上向きの角度を作る
-	FVector LanchDir = HorizontalDir * FMath::Cos(Rad) + FVector::UpVector * FMath::Sin(Rad);
-	LanchDir.Normalize();
-
-	EnemyStatus.KNockBackVelocity	= LanchDir * KnockBackData->LaunchSpeed;
-	SetEnemyState(EEnemyState::Hit);
-	//EnemyStatus.CanAttack			= false;
 }
 
-void AEnemyBase::SetEnemyState(EEnemyState a_TargetState)
+void AEnemyBase::SetEnemyState(EEnemyState InTargetState)
 {
-	EnemyStatus.StateTag = a_TargetState;
-
-	EnemyRuntimeData->ChangedEnemyState(a_TargetState);
+	EnemyStatus.StateTag = InTargetState;
 }
 
-void AEnemyBase::ApplyDamaged(float a_Damage)
+void AEnemyBase::NotfyAttackFinishTime()
 {
-	// 渡された値分、FinalHPを減算
-	EnemyRuntimeData->AddHealth(-a_Damage);
+	if (!EnemyRuntimeData) { return; }
+	EnemyRuntimeData->SetAttackFinishTime(GetWorld()->GetTimeSeconds());
+}
+
+void AEnemyBase::ApplyDamaged(float InDamaged)
+{
+	if (!EnemyRuntimeData) { return; }
+	
+	
+	//ダメージ効果音                                                               
+	if (EnemyManager)                                                              
+	{                                                                              
+		if (auto* GI = GetWorld()->GetGameInstance<USuperGameInstance>())      
+		{                                                                      
+			if (USoundManager* SoundManager = GI->GetSoundManager())       
+			{                                                              
+				SoundManager->PlayAtLocation(                     
+						EnemyManager->GetDamagedSound(),               
+						GetActorLocation()                       
+				);                                                     
+			}                                                              
+		}                                                                      
+	}                                                        
+
+	EnemyRuntimeData->AddHealth(-InDamaged);		// 渡された値分、FinalHPを減算
+
+	EnemyRuntimeData
+		->CalclateDamageToMaxHealthRatio(InDamaged);// 受けたダメージが最大体力に対して何割かを算出
 	OnHit();
 
+	// ダメージUI表示位置
+	const FVector DamageUILocation = GetActorLocation() + FVector(0.0f, 0.0f, 120.0f);
+
+	if (UDamageNumberPoolSubsystem* Pool = GetWorld()->GetSubsystem<UDamageNumberPoolSubsystem>())
+	{
+		Pool->ShowDamageNumber(DamageUILocation, InDamaged, false);
+	}
+
 	// 体力が0以下なら死亡フラグを立てる
-	/*if (EnemyRuntimeData->GetHealth() <= 0)
+	if (EnemyRuntimeData->GetHealth() <= 0)
 	{
 		EnemyStatus.IsAlive = false;
 		EnemyRuntimeData->ChangedIsAlive(EnemyStatus.IsAlive);
 		OnDeath();
-	}*/
+	}
 }
 
-void AEnemyBase::MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime)
+void AEnemyBase::ApplyKnockBack(const FVector& InOwnerLocation)
 {
-	//FVector CurrentLocation = GetActorLocation();
-
-	//// 重力（仮）
-	//const float Gravity = -980.0f;
-
-	//// 重力を速度に加算
-	//EnemyStatus.KNockBackVelocity.Z += Gravity * DeltaTime;
-
-	//// 位置更新
-	//FVector NextLocation = CurrentLocation + EnemyStatus.KNockBackVelocity * DeltaTime;
-
-	//FHitResult HitResult;
-	//SetActorLocation(NextLocation, true, &HitResult);
-
-	//// どこかに当たったら停止
-	//if (HitResult.bBlockingHit)
-	//{
-	//	AActor* HitActor = HitResult.GetActor();
-
-	//	if (HitActor)
-	//	{
-	//		// プレイヤー or エネミーなら無視
-	//		if (HitActor->IsA(ACharacter::StaticClass()) ||
-	//			HitActor->IsA(AEnemyBase::StaticClass()))
-	//		{
-	//			return; // 停止しない
-	//		}
-	//	}
-
-	//	EnemyStatus.StateTag = EEnemyState::Idle;
-	//	EnemyStatus.KNockBackVelocity = FVector::ZeroVector;
-	//}
+	if (!EnemyRuntimeData) { return; }
+	EnemyRuntimeData->SetTargetLocation(InOwnerLocation);
 }
 
 void AEnemyBase::FinalizeDeath()
@@ -244,16 +211,16 @@ void AEnemyBase::FinalizeDeath()
 	}
 
 	{
-		//SpawnDeathEffect();
+		SpawnDeathEffect();
 
-		//SpawnDeathExperience();
+		SpawnDeathExperience();
 	}
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
 	if (USuperGameInstance* GameInstance =
 		GetWorld()->GetGameInstance<USuperGameInstance>())
 	{
-		GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
+		//GameInstance->GetPlayerRuntimeData()->AddExperience(EnemyStatus.Exp);
 		GameInstance->GetPlayerRuntimeData()->AddGearEnergy(EnemyStatus.GearEnergy);
 	}
 
@@ -268,11 +235,15 @@ void AEnemyBase::FinalizeDeath()
 
 void AEnemyBase::CheckCanAttack()
 {
+	if (!EnemyRuntimeData) { return; }
+
 	// 既に攻撃中なら処理を飛ばす
-	if (EnemyStatus.StateTag == EEnemyState::Attack) { return; }
+	if (EnemyStatus.StateTag == EEnemyState::Attack||
+		EnemyStatus.StateTag == EEnemyState::Death) { return; }
+
 
 	// プレイヤーとの距離が攻撃可能距離内か
-	if (EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance))
+	if (IsInAttackDistance())
 	{
 		NotifyChangedStateEnum(EEnemyState::Attack);
 	}
@@ -300,7 +271,7 @@ FRotator AEnemyBase::CalculateRotationToMoveDirection(const FRotator& CurrentRot
 							RotationInterpSpeed);
 }
 
-void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
+void AEnemyBase::Activate(const FVector& InLocalPos, UEnemyDataAsset* InData)
 {
 	// ヌルチェック
 	check(InData != nullptr);
@@ -309,8 +280,7 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 
-	EnemyStatus.StateTag = EEnemyState::Idle;
-	EnemyRuntimeData->ChangedEnemyState(EEnemyState::Idle);
+	SetEnemyState(EEnemyState::Idle);
 
 	EnemyStatus.IsAlive = true;
 
@@ -323,6 +293,8 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	// 敵管理クラスの情報取得
 	EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
 
+	// ゲーム進行管理クラスの情報取得
+	GameProgress = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
 
 	// 敵が生成された際に敵管理クラス経由でリストへ登録する
 	if (EnemyManager) {
@@ -337,7 +309,7 @@ void AEnemyBase::Activate(const FVector& LocalPos, UEnemyDataAsset* InData)
 	// ゲームの進行に合わせて敵パラメータを設定
 	UpdateParams();
 
-	SetActorLocation(LocalPos);
+	SetActorLocation(InLocalPos);
 
 	/** ISMManagerへの自己登録*/
 	if (auto* ISMManager = EnemyManager->GetISMManager(ISMManagerClass))
@@ -386,20 +358,29 @@ void AEnemyBase::Deactivate()
 	}
 }
 
+bool AEnemyBase::IsInAttackDistance()
+{
+	return EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.AttackDistance);
+}
+
+bool AEnemyBase::IsInChaseDistance()
+{
+	return EnemyStatus.TargetDistanceSqr < FMath::Square(EnemyStatus.ChaseDistance);
+}
+
 void AEnemyBase::SetEnemyStatusData(UEnemyDataAsset* InData)
 {
 	if (!InData) { return; }
 
 	EnemyStatus.MoveSpeed = InData->MoveSpeed;
 	EnemyStatus.RotationInterpSpeed = InData->RotationInterpSpeed;
-	EnemyStatus.FinalHP = InData->FinalHP;
 	EnemyStatus.HPScaling = InData->HPScaling;
-	EnemyStatus.FinalAttack = InData->FinalAttack;
 	EnemyStatus.AttackScaling = InData->AttackScaling;
 	EnemyStatus.KnockBackWeight = InData->KnockBackWeight;
 	EnemyStatus.Exp = InData->Exp;
 	EnemyStatus.GearEnergy = InData->GearEnergy;
 	EnemyStatus.AttackDistance = InData->AttackDistance;
+	EnemyStatus.ChaseDistance = InData->ChaseDistance;
 }
 
 void AEnemyBase::SpawnDeathEffect()
@@ -407,11 +388,20 @@ void AEnemyBase::SpawnDeathEffect()
 	// 敵が死んだ際にパーティクルを出す
 	if (EnemyParticle.DeathEffect)
 	{
+		FTransform AdjustedTransform = GetActorTransform();
+		FRotator Rot = AdjustedTransform.GetRotation().Rotator();
+		Rot.Yaw -= 90.0f;
+		AdjustedTransform.SetRotation(Rot.Quaternion());
+
+		FVector Loc = AdjustedTransform.GetLocation();
+		Loc.Z -= 90.0f;
+		AdjustedTransform.SetLocation(Loc);
+
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			EnemyParticle.DeathEffect,
-			GetActorLocation(),
-			GetActorRotation(),
+			AdjustedTransform.GetLocation(),
+			AdjustedTransform.GetRotation().Rotator(),
 			FVector(1.0f),
 			true,   // bAutoDestroy
 			true,   // bAutoActivate
@@ -427,8 +417,8 @@ void AEnemyBase::SpawnDeathExperience()
 	if (UItemManagerSubsystem* ItemSubsystem =
 		GetWorld()->GetSubsystem<UItemManagerSubsystem>())
 	{
-		const FLinearColor Color = EnemyStatus.ExpColor;
-		const float Size = EnemyStatus.ExpSize;
+		const FLinearColor Color	= EnemyStatus.ExpColor;
+		const float Size			= EnemyStatus.ExpSize;
 
 		ItemSubsystem->GetExperiencePickupManager().SpawnExperience(
 			GetActorLocation(),
@@ -446,53 +436,55 @@ float AEnemyBase::GetCapsuleHalfHeight()const
 	return CapsuleComponent->GetScaledCapsuleHalfHeight();
 }
 
-void AEnemyBase::PlayAnimation(int32 NextAnimIndex, bool bLoop)
+void AEnemyBase::PlayAnimation(int32 InNextAnimIndex, bool InbLoop,float InBlendSpeed)
 {
 	if (!EnemyManager)
 	{
-		UE_LOG(LogTemp, Error, TEXT("EnemyManager is null"));
+		//UE_LOG(LogTemp, Error, TEXT("EnemyManager is null"));
 		return;
 	}
 
 	if (!ISMManagerClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ISMManagerClass is null"));
+		//UE_LOG(LogTemp, Error, TEXT("ISMManagerClass is null"));
 		return;
 	}
 
 	AEnemyISMManager* ISMManager = EnemyManager->GetISMManager(ISMManagerClass);
 	if (!ISMManager)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ISMManager not found"));
+		//UE_LOG(LogTemp, Error, TEXT("ISMManager not found"));
 		return;
 	}
 
 	UEnemyAnimDataAsset* AnimData = ISMManager->GetAnimDataAsset();
 	if (!AnimData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("AnimDataAsset is null"));
+		//UE_LOG(LogTemp, Error, TEXT("AnimDataAsset is null"));
 		return;
 	}
 
-	if (!AnimData->Animations.IsValidIndex(NextAnimIndex))
+	if (!AnimData->Animations.IsValidIndex(InNextAnimIndex))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid AnimIndex: %d / Num: %d"),
-			NextAnimIndex, AnimData->Animations.Num());
+		/*UE_LOG(LogTemp, Error, TEXT("Invalid AnimIndex: %d / Num: %d"),
+			InNextAnimIndex, AnimData->Animations.Num());*/
 		return;
 	}
 
 	if (!EnemyRuntimeData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("EnemyRuntimeData is null"));
+		//UE_LOG(LogTemp, Error, TEXT("EnemyRuntimeData is null"));
 		return;
 	}
 
-	const float Duration = AnimData->Animations[NextAnimIndex].NumFrames / 30.0f;
+	//const float Duration = AnimData->Animations[NextAnimIndex].NumFrames / 30.0f;
+	float Duration = (AnimData->Animations[InNextAnimIndex].NumFrames - AnimData->Animations[InNextAnimIndex].StartTime) / 30.0f;
 
-	EnemyRuntimeData->SetNextAnimData(NextAnimIndex, bLoop, true);
-	ISMManager->RequestAnimChange(ISMInstanceIndex, NextAnimIndex, bLoop, 1.2f);
+	//EnemyRuntimeData->SetNextAnimData(NextAnimIndex, bLoop, true);
+	EnemyRuntimeData->StartAnimMonitor(InNextAnimIndex, InbLoop, Duration);
+	ISMManager->RequestAnimChange(ISMInstanceIndex, InNextAnimIndex, InbLoop, InBlendSpeed);
 
-	if (!bLoop && GetWorld())
+	if (!InbLoop && GetWorld())
 	{
 		AnimFinishTime = GetWorld()->GetTimeSeconds() + Duration;
 	}

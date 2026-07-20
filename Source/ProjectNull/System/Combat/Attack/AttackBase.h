@@ -24,8 +24,9 @@ public:
 
 	/**
 	 * @brief 有効化処理
+	 * @param InTargetLocation	ターゲットの座標 
 	 */
-	virtual void Execute() PURE_VIRTUAL(UAttackBase::Execute, );
+	virtual void Execute(const FVector& InTargetLocation = FVector::ZeroVector) PURE_VIRTUAL(UAttackBase::Execute, );
 	
 	/**
 	 * @brief 中止処理
@@ -49,10 +50,10 @@ public:
 	 * @return ターゲットが範囲内にいる場合はtrue
 	 */
 	virtual bool IsTargetInRange(AActor* Target) { return false; }
-
+	
 	/**
 	 * @brief 攻撃方向を計算する
-	 * @param forwardVector 基準となる前方ベクトル(オーナーの前方ベクトル)
+	 * @param ForwardVector 基準となる前方ベクトル(オーナーの前方ベクトル)
 	 * @return 計算された攻撃方向ベクトル
 	 */
 	virtual FVector CalcAttackDir(const FVector& ForwardVector)const;
@@ -77,8 +78,13 @@ public:
 		HitActors.Remove(InActor);
 	}
 
+	/**
+	 * @brief HITしたアクター配列の要素をすべて削除
+	 */
+	void ResetAllActors() { HitActors.Reset(); }
+	
 
-	/* Begin ProtectedMenber Setters */
+	/* Begin ProtectedMember Setters */
 	/**
 	 * @brief オーナークラスのセット
 	 * @param InOwnerActor 変更先のオーナーアドレス
@@ -101,36 +107,36 @@ public:
 
 	/**
 	 * @brief 攻撃処理の有効無効の切り替え
-	 * @param bInIsActive trueで有効
+	 * @param InIsActive trueで有効
 	 */
-	void SetIsActive(const bool InbIsActive) { bIsActive = InbIsActive; }
-	/* End ProtectedMenber Setters */
+	void SetIsActive(const bool InIsActive) { bIsActive = InIsActive; }
+
+	/** 補正値トランスフォームをセット */
+	virtual void SetOffestTransform(const FTransform& InOffsetTransform)
+	{
+		OffsetTransform = InOffsetTransform;
+	}
+	/* End ProtectedMember Setters */
 
 
-	/* Begin ProtectedMenber Getters */
-	/**
-	 * @brief クラスのオーナーを取得
-	 * @return クラスのオーナー
-	 */
-	TObjectPtr<AActor> GetOwnerActor()const { return OwnerActor; }
+	/* Begin ProtectedMember Getters */
+	/** クラスのオーナーを取得 */
+	TWeakObjectPtr<AActor> GetOwnerActor()const { return OwnerActor; }
 
-	/**
-	 * @brief ルートを取得
-	 * @return ルートコンポーネント
-	 */
-	TObjectPtr<USceneComponent> GetRootComponent()const { return RootComponent; }
+	/** ルートを取得 */
+	inline USceneComponent* GetRootComponent()const { return RootComponent; }
 
-	/**
-	 * @brief 攻撃を当てたアクターリストを取得
-	 * @return 攻撃が当たったアクターのリスト
-	 */
+	/** 攻撃を当てたアクターリストを取得 */
 	TSet<TWeakObjectPtr<AActor>> GetHitActors()const { return HitActors; }
 
-	/**
-	 * @brief オフセットトランスフォームを取得
-	 * @return オフセットトランスフォーム
-	 */
+	/** オフセットトランスフォームを取得 */
 	FTransform GetOffsetTransform()const { return OffsetTransform; }
+
+	/**	最終的なダメージ量を取得 */
+	float GetFinalDamage() const;
+
+	/** 攻撃開始までの待ち時間 */
+	float GetAttackStartDelay()const { return AttackStartDelay; }
 
 	/**
 	 * @brief 攻撃実行可能か
@@ -143,7 +149,7 @@ public:
 	 * @return 有効であればtrue
 	 */
 	bool IsActive()		const { return bIsActive; }
-	/* End ProtectedMenber Getters */
+	/* End ProtectedMember Getters */
 
 	inline bool AbsoluteRotation() const { return bAbsoluteRotation;}
 
@@ -152,7 +158,7 @@ private:
 
 	/**	オーナー */
 	UPROPERTY()
-	TObjectPtr<AActor> OwnerActor;
+	TWeakObjectPtr<AActor> OwnerActor;
 	
 	/** アタッチ用のルート（位置・回転管理） */
 	UPROPERTY()
@@ -162,18 +168,28 @@ private:
 	UPROPERTY()
 	TSet<TWeakObjectPtr<AActor>> HitActors;
 
-	/**	攻撃可能フラグ */
-	UPROPERTY()
-	bool bCanExecute = true;
-
-	/**	攻撃有効フラグ */
-	UPROPERTY()
-	bool bIsActive = false;
-
 	/** 攻撃時の位置・回転・スケールのオフセット値 */
 	UPROPERTY(EditAnywhere)
 	FTransform OffsetTransform = FTransform();
 
+	/**	攻撃本来の威力 */
+	UPROPERTY(EditAnywhere)
+	float AttackPower = 1.f;
+
+	/**
+	* @brief 攻撃開始までの待ち時間
+	*/
+	UPROPERTY(EditAnywhere)
+	float AttackStartDelay = 0.f;
+
+	/**	攻撃可能フラグ */
+	UPROPERTY()
+	bool bCanExecute = false;
+
+	/**	攻撃有効フラグ */
+	UPROPERTY()
+	bool bIsActive = false;
+	
 	UPROPERTY(EditAnywhere)
 	bool bAbsoluteScale;
 

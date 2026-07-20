@@ -9,7 +9,6 @@
 #include <ProjectNull/System/Subsystem/WorldSubsystem/ItemManagerSubsystem/ItemManagerSubsystem.h>
 #include <ProjectNull/System/WorldSystem/EnemyPoolSubSystem/EnemyPoolSubSystem.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyISMManager/EnemyISMManager.h>
-#include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Data/CharacterRuntimeData/EnemyRuntimeData/EnemyRuntimeData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
@@ -27,11 +26,6 @@ EStateTreeRunStatus USTT_EnemyDead::EnterState(FStateTreeExecutionContext& a_Con
 	OwnerEnemy = Cast<AEnemyBase>(a_Context.GetOwner());
 	if (!OwnerEnemy) { return EStateTreeRunStatus::Failed; }
 
-	// 前ステートの終了フラグをリセット
-	OwnerEnemy->GetEnemyRuntimeData()->ResetAnimFinished();
-	// 再生したいアニメを設定（インデックス・ループOFF・ブレンド開始）
-	OwnerEnemy->GetEnemyRuntimeData()->SetNextAnimData(static_cast<uint32>(EEnemyState::Death), true, true);
-
 	return EStateTreeRunStatus::Running;
 }
 
@@ -41,10 +35,13 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 
 	Super::Tick(a_Context, a_DeltaTime);
 
-	// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
-	if (OwnerEnemy->GetEnemyRuntimeData()->GetAnimFinished())
+	if (auto EnemyRuntime = OwnerEnemy->GetEnemyRuntimeData())
 	{
-		return EStateTreeRunStatus::Succeeded;
+		// アニメが1周したらSucceededを返してStateTreeに遷移を委ねる
+		if (EnemyRuntime->GetAnimFinished())
+		{
+			return EStateTreeRunStatus::Succeeded;
+		}
 	}
 
 	return EStateTreeRunStatus::Running;
@@ -52,9 +49,9 @@ EStateTreeRunStatus USTT_EnemyDead::Tick(FStateTreeExecutionContext& a_Context, 
 
 void USTT_EnemyDead::ExitState(FStateTreeExecutionContext& a_Context, const FStateTreeTransitionResult& a_Transition)
 {
-	if (!OwnerEnemy) { return; }
-
 	Super::ExitState(a_Context, a_Transition);
+	
+	if (!OwnerEnemy) { return; }
 
 	// 死亡処理の実行
 	OwnerEnemy->FinalizeDeath();

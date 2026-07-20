@@ -2,11 +2,12 @@
 #include "ReflectiveLaser.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Components/SphereComponent.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
+
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
 
 AReflectiveLaser::AReflectiveLaser():
 	BulletSpeed(0.f),
@@ -30,9 +31,13 @@ AReflectiveLaser::AReflectiveLaser(int32 InReflectionCount):
 
 void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 {
-	if (!OtherActor || OtherActor == this || !OwnerActor) { return; }
+	if (!OtherActor || 
+		OtherActor == this || 
+		!OwnerActor ||
+		!PlayerRuntimeData) { return; }
 
-	auto Enemy = Cast<AEnemyBase>(OtherActor);
+	
+	const auto Enemy = Cast<AEnemyBase>(OtherActor);
 	if (!Enemy) { return; }
 
 	if (ReflectedEnemies.Contains(Enemy)) { return; }
@@ -41,6 +46,13 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 	{
 		Destroy();
 		return;
+	}
+
+	// キャラクターインターフェースを実装しているか
+	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
+	{
+		Interface->ApplyDamaged(AttackPower + PlayerRuntimeData->GetCharacterAttackPower());
+		Interface->ApplyKnockBack(OwnerActor->GetActorLocation());
 	}
 
 	ReflectionCount--;
@@ -57,7 +69,7 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 			ReflectLaserBullet(TargetLocation);
 		});
 
-	auto CurrentProjectileMovementComp = GetProjectileMovement();
+	const auto CurrentProjectileMovementComp = GetProjectileMovement();
 	if (!CurrentProjectileMovementComp) { return; }
 
 	CurrentProjectileMovementComp->Velocity = FVector::ZeroVector;
@@ -73,10 +85,10 @@ void AReflectiveLaser::HandleCollision(AActor* OtherActor)
 
 void AReflectiveLaser::ReflectLaserBullet(const FVector& FindLocation)
 {
-	auto Player = Cast<APlayerBase>(OwnerActor);
+	const auto Player = Cast<APlayerBase>(OwnerActor);
 	if (!Player) { return; }
 
-	auto TargetSearchComp = Player->GetTargetSearchComponent();
+	const auto TargetSearchComp = Player->GetTargetSearchComponent();
 	if (!TargetSearchComp) { return; }
 
 	const TArray<FEnemyDistanceData> DataArray
@@ -108,7 +120,7 @@ void AReflectiveLaser::ReflectLaserBullet(const FVector& FindLocation)
 		return;
 	}
 
-	auto CurrentProjectileMovementComp = GetProjectileMovement();
+	const auto CurrentProjectileMovementComp = GetProjectileMovement();
 	if (!CurrentProjectileMovementComp) { return; }
 
 	CurrentProjectileMovementComp->Velocity = ToEnemyVector * BulletSpeed;

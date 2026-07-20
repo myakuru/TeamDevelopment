@@ -9,8 +9,8 @@ AAIC_EnemyBoss::AAIC_EnemyBoss(const class FObjectInitializer& ObjectInitializer
 {
 	// BTとBBのコンポーネントの作成だけ行う
 	// 実際にどれを使うのかはBPで指定
-	BehaviorComp = ObjectInitializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("UBehaviorComp"));
-	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("UBlackboardComp"));
+	BehaviorComp	= ObjectInitializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("UBehaviorComp"));
+	BlackboardComp	= ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("UBlackboardComp"));
 }
 
 void AAIC_EnemyBoss::OnPossess(APawn* InPawn)

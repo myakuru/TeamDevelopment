@@ -11,6 +11,7 @@ class UNiagaraSystem;
 
 /** スフィアコリジョンコンポーネント */
 class USphereComponent;
+class UPlayerRuntimeData;
 
 USTRUCT(BlueprintType)
 struct FExplosionData {
@@ -46,9 +47,17 @@ public:
 
 	void Initialize(const FExplosionData& InData);
 
+	UFUNCTION(BlueprintCallable)
+	void StartExplosionSequence();
+
+	UFUNCTION(BlueprintCallable)
+	void Explode();
+
 private:
 
-	void Explode();
+	void ApplyData();
+
+	
 
 	/** スフィアコリジョンコンポーネント */
 	UPROPERTY(VisibleAnywhere)
@@ -63,7 +72,7 @@ private:
 	TObjectPtr<UNiagaraSystem> PreExplosionFX;
 
 	/** 爆発パラメータデータ */
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FExplosionData Data;
 
 	/** カメラシェイククラス */
@@ -74,6 +83,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CollisionRadius = 0.0f;
 
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
 	/** タイマーハンドル */
 	FTimerHandle ExplosionTimerHandle;
 	FTimerHandle PreExplosionTimerHandle;

@@ -1,6 +1,8 @@
 ﻿#include "ExperiencePickupManager.h"
 #include "NiagaraComponent.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include "GameFramework/Pawn.h"
 
 /**
@@ -8,10 +10,10 @@
 */
 namespace ExperienceNiagaraParams
 {
-	static const FName Positions = TEXT("User.Positions");
-	static const FName Colors = TEXT("User.Colors");
-	static const FName Sizes = TEXT("User.Sizes");
-	static const FName SpawnCount = TEXT("User.SpawnCount");
+	static const FName Positions	= TEXT("User.Positions");
+	static const FName Colors		= TEXT("User.Colors");
+	static const FName Sizes		= TEXT("User.Sizes");
+	static const FName SpawnCount	= TEXT("User.SpawnCount");
 }
 
 // 
@@ -21,9 +23,11 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 {
 	if (!World) { return; }
 
+	spWorld = World;
+
 	UNiagaraSystem* LoadedNiagaraSystem = LoadObject<UNiagaraSystem>(
 		nullptr,
-		TEXT("/Game/FreeNiagaraPack/Effects/Matsuura_Test_Niagara/ExperiencePickup.ExperiencePickup")
+		TEXT("/Game/Actor/Item/PickupItem/ExperiencePickup.ExperiencePickup")
 		// アセットを右クリック → Copy Reference で正確なパスを取得
 	);
 
@@ -34,8 +38,21 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 
 
 	// 描画専用Actorをスポーン
-	AActor* Owner = World->SpawnActor<AActor>();
+	//AActor* Owner = World->SpawnActor<AActor>();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Name = FName(TEXT("ExperienceNiagaraActor"));
+	SpawnParams.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
+
+	AActor* Owner = World->SpawnActor<AActor>(AActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	
 	if (!Owner) { return; }
+
+	//名前とラベルを変更
+	Owner->SetIsTemporarilyHiddenInEditor(true);
+#if WITH_EDITOR
+	Owner->SetActorLabel(TEXT("ExperienceNiagaraActor"));
+#endif
 
 	NiagaraOwnerActor = Owner;
 
@@ -68,7 +85,7 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 		Exp.LifeTime -= DeltaTime;
 		if (Exp.LifeTime <= 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ExperiencePickupManager: TimeRemove"));
+			//UE_LOG(LogTemp, Warning, TEXT("ExperiencePickupManager: TimeRemove"));
 			ExperienceList.RemoveAt(i);
 			continue;
 		}
@@ -80,6 +97,14 @@ void FExperiencePickupManager::Update(APawn* Player, float DeltaTime)
 		{
 			PendingExpValue += Exp.ExpValue;
 			ExperienceList.RemoveAt(i);
+
+			//spWorld.Get()
+			if (USuperGameInstance* GameInstance =
+				spWorld.Get()->GetGameInstance<USuperGameInstance>())
+			{
+				GameInstance->GetPlayerRuntimeData()->AddExperience(PendingExpValue);
+				//UE_LOG(LogTemp, Warning, TEXT("Experience : %f"), PendingExpValue);
+			}
 			continue;
 		}
 
@@ -121,14 +146,17 @@ void FExperiencePickupManager::SpawnExperience(
 	FExperiencePickupData NewExp;
 	NewExp.Location = Location;
 	NewExp.ExpValue = ExpValue;
-	NewExp.Color = Color;
-	NewExp.Size = Size;
+	NewExp.Color	= Color;
+	NewExp.Size		= Size;
 
 	ExperienceList.Add(NewExp);
 }
 
 void FExperiencePickupManager::Clear()
 {
+	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
+	UE_LOG(LogTemp, Log, TEXT("-  FExperiencePickupManager:Clear  -"));
+
 	ExperienceList.Empty();
 	PendingExpValue = 0.0f;
 
@@ -140,7 +168,14 @@ void FExperiencePickupManager::Clear()
 	{
 		NiagaraOwnerActor->Destroy();
 		NiagaraOwnerActor = nullptr;
+
+		UE_LOG(LogTemp, Log, TEXT("- NiagaraOwnerActor:Destroy -"));
 	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("- NiagaraOwnerActor:None -"));
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("----------------------------------"));
 }
 
 float FExperiencePickupManager::ConsumeCollectedExp()

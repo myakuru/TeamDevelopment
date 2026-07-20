@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "ProjectNull/System/Combat/CombatTypes/CombatTypes.h"
 #include "EnemyAttackComponent.generated.h"
 
 /**
@@ -39,6 +40,11 @@ public:
 public:
 
 	/**
+	 * @brief 全ての攻撃終了
+	 */
+	void AllAtackDeactivate();
+
+	/**
 	 * @brief 全ての攻撃が終了しているか
 	 * @return 終了しているならtrue
 	 */
@@ -49,10 +55,19 @@ public:
 	 * @return 終了しているならtrue
 	 */
 	// 指定方法が未定の為今は未実装
-	//bool IsAttackDeactivate();
+	bool IsAttackDeactivate();
+
+	/**
+	 * @brief 攻撃有効化
+	 * @param AttackIndex 有効化したいインデックス番号
+	 */
+	void AttackActive(EEnemyAttackType InAttackType);
 
 	void TestActive();
 
+	/**	ターゲットの座標をセット */
+	void SetTargetLocation(const FVector& InTargetLocation) { TargetLocation = InTargetLocation; }
+	
 private:
 
 	/**
@@ -63,7 +78,19 @@ private:
 
 	/**
 	 * @brief 攻撃オブジェクトリスト
+	 * キー : EEnemyAttackType 攻撃タイプ
 	 */
 	UPROPERTY(EditAnywhere, Instanced)
-	TArray<TObjectPtr<UAttackBase>> EnemyAttacks;
+	TMap<EEnemyAttackType, TObjectPtr<UAttackBase>> EnemyAttacks;
+
+	/**
+	 * @brief それぞれの攻撃に対応したタイマーハンドル
+	 */
+	TMap<EEnemyAttackType,FTimerHandle> AttackTimerHandles;
+
+	/**
+	 * @brief ターゲットの座標
+	 */
+	UPROPERTY()
+	FVector TargetLocation;
 };

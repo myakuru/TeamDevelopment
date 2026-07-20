@@ -2,7 +2,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "UObject/Object.h"
+
 #include "EffectBase.generated.h"
 
 /** Niagaraエフェクトクラス */
@@ -13,32 +15,41 @@ class UNiagaraComponent;
 
 
 /** エフェクト中間基底クラス */
-UCLASS()
+UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UEffectBase : public UObject
 {
 	GENERATED_BODY()
-
 public:
-
 	UEffectBase();
 
-public:
-
 	void Start(USceneComponent* RootComponent);
+	void StartOnce(USceneComponent* RootComponent);
+
+	void DeactivateEffect();
+	void DeactivateImmediateEffect();
+	
+	void SetVisibility(bool bVisibility);
+	
+	void SetAbsolute(
+		bool bNewAbsoluteLocation,
+		bool bNewAbsoluteRotation,
+		bool bNewAbsoluteScale);
+	
+	inline UNiagaraComponent* GetEffectComponent() const { return EffectComponent; }
 
 protected:
 
 	/** 持ち主のクラス */
 	UPROPERTY()
-	TObjectPtr<AActor> OwnerActor;
+	TObjectPtr<AActor>				OwnerActor;
 
 	/** Niagaraシステム */
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UNiagaraSystem> EffectSystem;
+	TObjectPtr<UNiagaraSystem>		EffectSystem;
 
 	/** Niagaraコンポーネント */
 	UPROPERTY()
-	TObjectPtr<UNiagaraComponent> EffectComponent;
+	TObjectPtr<UNiagaraComponent>	EffectComponent;
 
 	/** エフェクトのRelativeTransform */
 	UPROPERTY(EditAnywhere)

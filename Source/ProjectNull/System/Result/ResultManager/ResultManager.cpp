@@ -4,6 +4,9 @@
 #include "ResultManager.h"
 #include <ProjectNull/Data/Result/RewardData/RewardData.h>
 #include <ProjectNull/Weapon/Data/EffectPoolDataAsset/EffectPoolDataAsset.h>
+#include <ProjectNull/Data/Result/RankConditionData/RankConditionData.h>
+#include <ProjectNull/Weapon/Manager/WeaponManager.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
 
 void UResultManager::Initialize()
 {
@@ -31,9 +34,10 @@ void UResultManager::Initialize()
 	}
 }
 
-void UResultManager::SetResultData(const FResultData& ResultData)
+void UResultManager::SetResultData(FResultData ResultData)
 {
 	CurrentResultData = ResultData;
+	RewardWeapons.Empty();
 	EvoluteReward();
 }
 
@@ -43,18 +47,8 @@ void UResultManager::EvoluteReward()
 
 	// 評価ランク決定
 	for (int i = 0; i < SortedClearRankDatas.Num(); i++) {
-		
-		// フェーズがその評価の規定値まで達しているか
-		if (CurrentResultData.ClearPhase < SortedClearRankDatas[i].ClearPhase)break;
 
-		// 中ボス出現までフェーズを進めているか
-		if (CurrentResultData.bReachedMidBossPhase != SortedClearRankDatas[i].bReachedMidBossPhase)break;
-
-		// 中ボスを倒しているか
-		if (CurrentResultData.bReachedFinalPhase != SortedClearRankDatas[i].bReachedFinalPhase)break;
-
-		// クリア時間がその評価の規定値以下か
-		if (CurrentResultData.ClearTime > SortedClearRankDatas[i].ClearTime)break;
+		if (!SortedClearRankDatas[i].ConditionData->IsConditionMet(CurrentResultData))break;
 
 		rewardRow = SortedClearRankDatas[i].RewardRow;
 	}
@@ -68,6 +62,15 @@ void UResultManager::EvoluteReward()
 	// 決定した評価ランクに応じて取得した武器に追加効果を付与する
 	for (FName weaponID : CurrentResultData.RewardWeaponIDs) {
 		GenerateWeapon(weaponID, data);
+	}
+
+	USuperGameInstance* gameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!gameInstance)return;
+
+	UWeaponManager* weaponManager = gameInstance->GetWeaponManager();
+	if (!weaponManager)return;
+	for (FWeaponInstance weapon : RewardWeapons) {
+		weaponManager->AddWeapon(weapon);
 	}
 }
 
@@ -89,6 +92,7 @@ void UResultManager::GenerateWeapon(FName WeaponID, FRewardData* RewardData)
 
 			if (randomValue < currentWeight) {
 				effectCount = weightedEffectCount.EffectCount;
+				break;
 			}
 		}
 	}
@@ -120,6 +124,7 @@ void UResultManager::GenerateWeapon(FName WeaponID, FRewardData* RewardData)
 
 			if (randomValue < currentWeight) {
 				effect.Level = weightedEffectLevel.EffectLevel;
+				break;
 			}
 		}
 

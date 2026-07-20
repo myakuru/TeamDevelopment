@@ -19,8 +19,10 @@ namespace InGameDefinition {
 }
 
 class UMySaveGame;
+class USoundManager;
 class UStageManager;
 class UWeaponManager;
+class UResultManager;
 class UMapActorManager;
 class UPlayerParameterData;
 class UPlayerRuntimeData;
@@ -46,6 +48,9 @@ public:
 	/** セーブデータを取得する */
 	inline UMySaveGame* GetCurrentSaveData() const { return CurrentSaveData; }
 
+	/** サウンドマネージャーを取得する */
+	inline TObjectPtr<USoundManager> GetSoundManager() const { return SoundManager; }
+	
 	/** ステージマネージャーを取得する */
 	inline TObjectPtr<UStageManager> GetStageManagerSubsystem() const { return StageManager; }
 
@@ -59,6 +64,9 @@ public:
 	/** ギアマネージャーを取得する */
 	UWeaponManager* GetWeaponManager() const { return WeaponManager; }
 
+	/** リザルトマネージャー取得 */
+	UResultManager* GetResultManager() const { return ResultManager; }
+
 	/** マップアクターマネージャーを取得する */
 	UMapActorManager* GetMapActorManager() const { return MapActorManager; }
 protected:
@@ -66,6 +74,13 @@ protected:
 	/** セーブデータ */
 	UPROPERTY()
 	UMySaveGame* CurrentSaveData;
+	
+	/** サウンドマネージャー*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<USoundManager> SoundManagerClass;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<USoundManager> SoundManager;
 
 	/** ステージマネージャー */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -79,7 +94,14 @@ protected:
 	TSubclassOf<UWeaponManager> WeaponManagerClass;
 
 	UPROPERTY(BlueprintReadOnly)
-	UWeaponManager* WeaponManager;
+	TObjectPtr<UWeaponManager> WeaponManager;
+
+	/** リザルトマネージャー */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UResultManager> ResultManagerClass;
+
+	UPROPERTY()
+	TObjectPtr<UResultManager> ResultManager;
 
 	/** マップアクターマネージャー */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

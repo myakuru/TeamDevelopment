@@ -1,141 +1,202 @@
 ﻿
 #include "DashGearStateBase.h"
 
-#include <ProjectNull/System/Gear/GearBase.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
+
+#include <ProjectNull/Actor/Effect/EffectBase.h>
+#include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+
+#include <ProjectNull/System/Gear/GearBase.h>
+#include <ProjectNull/System/Gear/DashGear/DashGear.h>
 #include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
+
+#include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
+
+#include <GameFramework/CharacterMovementComponent.h>
+
+#include <ProjectNull/Utility/GroundUtility/GroundUtility.h>
 
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
 UDashGearStateBase::UDashGearStateBase():
-	DashAttackRangeSquared(30000.0f),
+	DashAnimMontage(nullptr),
+	DashEffect(nullptr),
+	DashGear(nullptr),
+	DashDir(FVector::ZeroVector),
+	StartQuat(FQuat::Identity),
 	DashSpeed(2000.0f),
-	DashEffectDuration(0.3f)
+	DashEffectDuration(0.3f),
+	MontageBlendOutTime(0.2f),
+	DashSphereRadius(200.f),
+	MaxDashSlopeAngle(30.f),
+	TargetCameraLagSpeed(10.f)
 {
+}
+
+void UDashGearStateBase::Initialize(
+	APlayerBase* InPlayer, 
+	UPlayerGearComponent* InGearComponent,
+	UGearBase* InOwner)
+{
+	UGearStateBase::Initialize(
+		InPlayer,
+		InGearComponent,
+		InOwner
+	);
+
+	DashGear = Cast<UDashGear>(Owner);
 }
 
 void UDashGearStateBase::Execute(int32 CurrentGearLevel)
 {
 	UGearStateBase::Execute(CurrentGearLevel);
 
-	PlayDashEffect();
-
-	if (!Player) { return; }
-
-	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
-	if (!PlayerAnimInstance) { return; }
-
-	PlayerAnimInstance->Montage_Play(DashAnimMontage);
-
+	ExecuteDash();
+	
+	DashGear->Execute(CurrentGearLevel);
 }
 
 void UDashGearStateBase::Update(float DeltaTime)
 {
-	if (!Owner || !Player) { return; }
+	UGearStateBase::Update(DeltaTime);
 
 	Dash();
 }
 
 void UDashGearStateBase::End()
 {
-	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(Player->GetPlayerAnimInstance());
-	if (!PlayerAnimInstance) { return; }
+	UGearStateBase::End();
+	EndDash();
+}
 
-	PlayerAnimInstance->Montage_Stop(0.2f);
+void UDashGearStateBase::ExecuteDash()
+{
+	if (!Player || 
+		!DashGear) { return; }
+	
+	//ダッシュ効果音
+	if (GearSESound.IsValidIndex(SEIndex::DashSESoundIndex))
+	{
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(GearSESound[SEIndex::DashSESoundIndex]);
+	}
+		
+	auto GroundAlignmentComp = Player->GetGroundAlignmentComponent();
+	if (!GroundAlignmentComp) { return; }
+
+	auto RootComp = GroundAlignmentComp->GetRootComponent();
+	if (!RootComp) { return; }
+
+	auto CharacterMovementComp = Player->GetCharacterMovement();
+	if (!CharacterMovementComp) { return; }
+
+	FVector CurrentFloorNormal = FVector::ZeroVector;
+	float SlopeAngle = 0.f;
+	if (Player->GetCurrentFloorNormal(CurrentFloorNormal))
+	{
+		float Dot = FVector::DotProduct(CurrentFloorNormal.GetSafeNormal(), FVector::UpVector);
+		Dot = FMath::Clamp(Dot, -1.0f, 1.0f);
+		SlopeAngle = FMath::RadiansToDegrees(FMath::Acos(Dot));
+	}
+	//UE_LOG(LogTemp, Display, TEXT("SlopeAngle X%.2f"), SlopeAngle);
+
+	const bool IsOnGround = CharacterMovementComp->IsMovingOnGround();
+
+	if (MaxDashSlopeAngle <= SlopeAngle && IsOnGround)
+	{
+		DashGear->ForceStop();
+		return;
+	}
+
+	InitializeStartDashData(RootComp);
+	PlayDashNiagaraEffect(RootComp);
+	PlayDashAnimation();
+	SetEnableSpawnAfterimage(true);
+
+	Player->SetTargetCameraLagSpeed(TargetCameraLagSpeed);
+}
+
+void UDashGearStateBase::EndDash()
+{
+	BlendOutDashAnimation();
+	DeactivateNiagaraEffect();
+	SetEnableSpawnAfterimage(false);
+
+	if (!Player) { return; }
+	Player->ResetTargetCameraLagSpeed();
+}
+
+void UDashGearStateBase::InitializeStartDashData(USceneComponent* InGroundAlignmentComp)
+{
+	if (!InGroundAlignmentComp) { return; }
+	DashDir		= InGroundAlignmentComp->GetForwardVector();
+	StartQuat	= InGroundAlignmentComp->GetComponentQuat();
 }
 
 void UDashGearStateBase::Dash()
 {
-	if (!Player) { return; }
+	if (!Player ||
+		!Owner)				{ return; }
 
-	const FVector Dir = Player->GetActorForwardVector();
-	Player->LaunchCharacter(Dir * DashSpeed, true, true);
+	Player->LaunchCharacter(DashDir * DashSpeed, true, true);
+	//UE_LOG(LogTemp, Display, TEXT("DashDir X%.2f Y%.2f Z%.2f"), DashDir.X,DashDir.Y,DashDir.Z);
 
 	if (Owner) {
 		Owner->SetBlocksMovement(true);
 	}
-
-	UpdateDashAttack();
+	
 }
 
-void UDashGearStateBase::PlayDashEffect()
+void UDashGearStateBase::PlayDashNiagaraEffect(USceneComponent* InGroundAlignmentComp)
 {
-	UNiagaraComponent* NiagaraComp = nullptr;
-	if (!Player) { return; }
+	if (!DashEffect) { return; }
+	DashEffect->Start(InGroundAlignmentComp);
+	// 位置だけ親に追従
+	DashEffect->SetAbsolute(false, true, true);
 
-	if (DashEffect)
-	{
-		NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			DashEffect,
-			Player->GetRootComponent(),
-			NAME_None,
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::KeepRelativeOffset,
-			true
-		);
-	}
+	auto EffectComp = DashEffect->GetEffectComponent();
+	if (!EffectComp) { return; }
 
-
-	if (NiagaraComp)
-	{
-		NiagaraComp->SetAutoDestroy(true);
-
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle,
-			[NiagaraComp]()
-			{
-				if (NiagaraComp)
-				{
-					NiagaraComp->Deactivate();
-				}
-			},
-			DashEffectDuration,
-			false
-		);
-	}
+	EffectComp->SetWorldRotation(StartQuat);
 }
 
-void UDashGearStateBase::UpdateDashAttack()
+void UDashGearStateBase::DeactivateNiagaraEffect()
+{
+	if (!DashEffect) { return; }
+	DashEffect->DeactivateEffect();
+}
+
+void UDashGearStateBase::PlayDashAnimation()
 {
 	if (!Player) { return; }
 
-	const FVector PlayerLocation = Player->GetActorLocation();
+	const auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
+	if (!PlayerAnimInstance) { return; }
 
-	UEnemyManagerSubsystem* enemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!enemyManager) { return; }
-
-	for (const auto& enemy : enemyManager->GetEnemyList())
-	{
-		if (!enemy) { continue; }
-
-		const float DistSq = FVector::DistSquared(PlayerLocation, enemy->GetActorLocation());
-
-		if (DistSq <= DashAttackRangeSquared)
-		{
-			// キャラクターインターフェースを実装しているか
-			if (auto* interface = Cast<ICharacterInterface>(enemy))
-			{
-				interface->ApplyDamaged();
-				interface->ApplyKnockBack(PlayerLocation);
-			}
-		}
-	}
-
-	//DrawDebugSphere(
-	//	GetWorld(),
-	//	Player->GetActorLocation(),
-	//	FMath::Sqrt(DashAttackRangeSquared),
-	//	16,
-	//	FColor::Green,
-	//	false,
-	//	0.1f
-	//);
+	PlayerAnimInstance->Montage_Play(DashAnimMontage);
 }
 
+void UDashGearStateBase::BlendOutDashAnimation()
+{
+	if (!Player) { return; }
 
+	auto PlayerAnimInstance = Player->GetPlayerAnimInstance();
+	if (!PlayerAnimInstance) { return; }
+
+	PlayerAnimInstance->Montage_Stop(MontageBlendOutTime);
+}
+
+void UDashGearStateBase::SetEnableSpawnAfterimage(bool bInEnableSpawn)
+{
+	if (!Player) { return; }
+	auto ModelAfterimageTrailEffect = Player->GetModelAfterimageTrailEffect();
+
+	if (!ModelAfterimageTrailEffect) { return; }
+	ModelAfterimageTrailEffect->SetEnableSpawn(bInEnableSpawn);
+}

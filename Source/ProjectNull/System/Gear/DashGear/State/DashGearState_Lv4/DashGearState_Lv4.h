@@ -6,12 +6,19 @@
 
 #include "DashGearState_Lv4.generated.h"
 
+class UGearSpecialAction;
+
 /** ロボットコントローラークラス */
 class ARobotController;
 
 /** 残像攻撃エフェクトクラス */
 class UAfterImageAttackEffect;
 
+/** アニメーションモンタージュ */
+class UAnimMontage;
+
+/** コリジョンを持った攻撃クラス */
+class UCollisionAttack;
 
 /** ダッシュギアのレベル4状態クラス */
 UCLASS(EditInlineNew, Blueprintable)
@@ -41,42 +48,17 @@ private:
 	void InitializeGearDuration();
 
 	/**
-	 * @brief 復元する際の開始データ初期化
-	 */
-	void InitializeRestoreStartData();
-
-	/**
 	 * @brief 戦闘構え状態を更新
 	 * @param ElapsedTime 経過時間
 	 */
 	void UpdateCombatStance(float ElapsedTime);
 
 	/**
-	 * @brief カメラデータ更新処理
-	 * @param DeltaTime デルタタイム
+	 * @brief 攻撃用スフィア判定更新
 	 * @param ElapsedTime 経過時間
 	 */
-	void UpdateCameraData(float DeltaTime, float InElapsedTime);
+	void UpdateAttackSphereCollision(float ElapsedTime);
 
-	/**
-	 * @brief カメラの回転更新処理
-	 * @param DataIndex 更新したいデータインデックス
-	 * @param InLerpAlpha 補間値
-	 */
-	void UpdateCameraRotation(
-		int32 DataIndex,
-		float InLerpAlpha);
-
-	/**
-	 * @brief プレイヤーとカメラとの距離更新
-	 * @param DataIndex 更新したいデータインデックス
-	 * @param InLerpAlpha 補間値
-	 */
-	void UpdateTargetArmLength(
-		int32 DataIndex,
-		float InLerpAlpha);
-
-	
 	/**
 	 * @brief 最終ダッシュの更新処理
 	 * @param DeltaTime デルタタイム
@@ -87,34 +69,28 @@ private:
 		float ElapsedTime);
 
 	/**
-	 * @brief 前区間の有効なカメラデータ取得
-	 * @param DataIndex データインデックス
-	 * @return カメラデータ
+	 * @brief 構え状態のアニメーション再生
 	 */
-	const FCameraSequenceData* GetPreviousValidCameraData(int32 DataIndex) const;
+	void PlayStanceAnimation();
 
 	/**
-	 * @brief 経過時間に基づいて、どの区間かどうか調べ、インデックスを返す
-	 * @param InElapsedTime 経過時間
-	 * @return 区間インデックス
+	 * @brief 構え状態のアニメーションブレンドアウト
 	 */
-	int32 GetCurrentSectionIndex(float InElapsedTime);
-
-	/**
-	 * @brief 区間内での開始時間
-	 * @param InTargetIndex 計算する地点インデックス
-	 * @return 経過時間
-	 */
-	float GetElapsedTimeToIndex(int32 InTargetIndex);
+	void BlendOutStanceAnimation();
 	
+private:
 	/** ロボットコントローラークラス */
 	UPROPERTY()
-	TObjectPtr<ARobotController> RobotController;
+	TObjectPtr<ARobotController>			RobotController;
 
 	/** 残像攻撃エフェクトクラス */
 	UPROPERTY(EditAnywhere,Instanced,Category = "Ghost")
-	TObjectPtr<UAfterImageAttackEffect>  AfterImageAttackEffect;
+	TObjectPtr<UAfterImageAttackEffect>		AfterImageAttackEffect;
 
+	/** 球コリジョンを持った攻撃クラス(ダッシュギアの最後の突進に使用) */
+	UPROPERTY(EditAnywhere,Instanced,Category = "Ghost")
+	TObjectPtr<UCollisionAttack> DashCollision;
+	
 	/** 構えアニメーションの時間閾値 */
 	UPROPERTY(EditAnywhere)
 	FThresholdRange StanceTime;
@@ -123,11 +99,18 @@ private:
 	UPROPERTY(EditAnywhere)
 	FThresholdRange DashTime;
 
-	/** カメラデータをまとめる配列 */
-	UPROPERTY(EditAnywhere, Category = "Camera")
-	TArray<FCameraSequenceData> CameraData;
+	/** 構え状態のアニメーションモンタージュ */
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> StanceAnimMontage;
 
-	/** ギアスキル開始時プレイヤーのTransform */
-	FTransform StartPlayerTransform;
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	float StanceAnimBlendOutTime;
 
+	bool bExecuteFinalDash;
+
+	UPROPERTY(EditAnywhere)
+	float SpecialAttackSphereRadius;
+
+	UPROPERTY(EditAnywhere,Instanced)
+	TObjectPtr<UGearSpecialAction> GearSpecialAction;
 };

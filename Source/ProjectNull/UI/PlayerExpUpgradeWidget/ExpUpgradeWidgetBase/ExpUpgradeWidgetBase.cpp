@@ -7,6 +7,7 @@
 #include "Input/Events.h"
 #include "Input/Reply.h"
 #include "ProjectNull/GameInstance/SuperGameInstance.h"
+#include "ProjectNull/Sound/SoundManager.h"
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 
 void UExpUpgradeWidgetBase::NativeConstruct()
@@ -15,10 +16,12 @@ void UExpUpgradeWidgetBase::NativeConstruct()
 
 	if (UpgradeText)
 	{
+		// 自動的に改行してもらう
 		UpgradeText->SetWrappingPolicy(ETextWrappingPolicy::AllowPerCharacterWrapping);
 	}
 
-	UiScale = UiScaleMin;
+	UIImageParameter.UiScale = UIImageParameter.UiScaleMin;
+	UITextParameter.UiScale = UITextParameter.UiScaleMin;
 }
 
 UDataTable* UExpUpgradeWidgetBase::GetExpUpgradeTable()
@@ -33,55 +36,47 @@ UDataTable* UExpUpgradeWidgetBase::GetExpUpgradeTable()
 	return CachedExpUpgradeTable;
 }
 
-void UExpUpgradeWidgetBase::ImageRotation()
+void UExpUpgradeWidgetBase::UpdateScale()
 {
-	if (UpgradeImage)
-	{
-		if (UiScale.X <= UiScaleMax.X)
-		{
-			UiScale.X += GetWorld()->GetDeltaSeconds() * UiScaleSpeed.X;
+	if (!UpgradeImage) return;
+	if (!UpgradeText)  return;
 
-			UpgradeImage->SetRenderScale(UiScale);
-		}
+	// ホバー中は拡大サイズ、そうでなければ通常サイズを目標にする
+	const FVector2D TargetImageScale = bIsMouseOver ? UIImageParameter.UiScaleHover : UIImageParameter.UiScaleMax;
+	
+	const FVector2D TargetTextScale = bIsMouseOver ? UITextParameter.UiScaleHover : UITextParameter.UiScaleMax;
 
-		if (UiScale.Y >= UiScaleMax.Y)
-		{
-			UiScale.Y -= GetWorld()->GetDeltaSeconds() * UiScaleSpeed.Y;
+	// 毎フレーム目標スケールへ補間する。
+	UIImageParameter.UiScale = FMath::Vector2DInterpTo(UIImageParameter.UiScale, TargetImageScale, GetWorld()->GetDeltaSeconds(), ScaleInterpSpeed);
 
-			UpgradeImage->SetRenderScale(UiScale);
-		}
-	}
+	UITextParameter.UiScale = FMath::Vector2DInterpTo(UITextParameter.UiScale, TargetTextScale, GetWorld()->GetDeltaSeconds(), ScaleInterpSpeed);
+	
+	// カードの大きさを変更
+	UpgradeImage->SetRenderScale(UIImageParameter.UiScale);
+	
+	// テキストの大きさも変更
+	UpgradeText->SetRenderScale(UITextParameter.UiScale);
 }
 
 void UExpUpgradeWidgetBase::InitExpUpgradeWidget()
 {
-	if(UiScale.X >= UiScaleMax.X)
-	{
-		UiScale = UiScaleMin;
-	}
+	// 出現アニメーションを最初から再生できるように初期スケールへ戻す
+	UIImageParameter.UiScale = UIImageParameter.UiScaleMin;
+	UITextParameter.UiScale = UITextParameter.UiScaleMin;
+	bIsMouseOver = false;
 }
 
 void UExpUpgradeWidgetBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
+	// 状態を記録するだけ。実際のスケール変化は UpdateScale() が毎フレーム行う
 	bIsMouseOver = true;
-
-	if (UpgradeImage)
-	{
-		if (UiScale.X <= UiScaleMax.X) return;
-
-		if (UiScale.X <= UiScaleMax.X + 0.5f)
-		{
-			UiScale.X += GetWorld()->GetDeltaSeconds() * 10.0f;
-		}
-		if (UiScale.Y <= UiScaleMax.Y + 1.0f)
-		{
-			UiScale.Y += GetWorld()->GetDeltaSeconds() * 10.0f;
-		}
-
-		UpgradeImage->SetRenderScale(UiScale);
-	}
+	
+	GetWorld()->GetGameInstance<USuperGameInstance>()->
+		GetSoundManager()->Play2D(
+			HoverSESound,1.0f,1.0f,0.0f,
+			nullptr,nullptr,true);
 }
 
 void UExpUpgradeWidgetBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
@@ -89,21 +84,6 @@ void UExpUpgradeWidgetBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent
 	Super::NativeOnMouseLeave(InMouseEvent);
 
 	bIsMouseOver = false;
-
-	if (UpgradeImage)
-	{
-		if (UiScale.X <= UiScaleMax.X) return;
-
-		if (UiScale.X >= UiScaleMax.X)
-		{
-			UiScale.X -= GetWorld()->GetDeltaSeconds() * 10.0f;
-		}
-		if (UiScale.Y >= UiScaleMax.Y)
-		{
-			UiScale.Y -= GetWorld()->GetDeltaSeconds() * 10.0f;
-		}
-		UpgradeImage->SetRenderScale(UiScale);
-	}
 }
 
 void UExpUpgradeWidgetBase::SetDescriptionText(const FText& Description)

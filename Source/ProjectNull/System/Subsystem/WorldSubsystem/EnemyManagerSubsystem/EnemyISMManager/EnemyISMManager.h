@@ -110,6 +110,10 @@ private:
 	*/
 	TArray<int32> FreeIndices;
 
+	/** CS内の更新先をこのIndexの数値のものを行うためのリスト*/
+	UPROPERTY()
+	TArray<uint32> ActiveIndices;
+
 	/** 現在のインスタンス総数（末尾追加の際のインデックスとして利用）*/
 	int32 MaxInstanceCount = 0;
 
@@ -149,6 +153,8 @@ private:
 	*	削除するのではなく、スケール0で負荷しにしてFreeListに積む
 	*/
 	void ReleaseIndex(int32 Index);
+
+	int32 ActiveCount = 0;
 
 
 };

@@ -12,6 +12,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraShakeBase.h"
+#include "ProjectNull/GameInstance/SuperGameInstance.h"
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
 
 // Sets default values
 AExplosionGearSkill::AExplosionGearSkill()
@@ -26,7 +28,7 @@ AExplosionGearSkill::AExplosionGearSkill()
 
 	// 自身をPlayerAttackOverlapとして設定
 	Collision->SetCollisionObjectType(
-		ECC_Player
+		ECC_PlayerAttack
 	);
 
 	// 当たり判定の種類設定(物理衝突を行わず、判定のみ行う)
@@ -54,15 +56,36 @@ void AExplosionGearSkill::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	
+}
+
+//SpawnActorDeferredを使ってBeginPlay前にInitializeを呼ぶ必要あり
+void AExplosionGearSkill::Initialize(const FExplosionData& InData)
+{
+	Data = InData;
+
+	
+}
+
+void AExplosionGearSkill::StartExplosionSequence()
+{
+	ApplyData();
+
+
 	FTimerDelegate timerDelegate;
 	timerDelegate.BindLambda([this] {
-			if (PreExplosionFX) {
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-					GetWorld(),
-					PreExplosionFX,
-					GetActorLocation()
-				);
-			}
+		if (PreExplosionFX) {
+			auto* Effect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				PreExplosionFX,
+				GetActorLocation()
+			);
+			Effect->SetWorldRotation(RootComponent->GetComponentQuat());
+
+		}
 		}
 	);
 
@@ -82,20 +105,18 @@ void AExplosionGearSkill::BeginPlay()
 		Data.IgnitionDelay + Data.Delay,
 		false
 	);
-	
 }
 
-//SpawnActorDeferredを使ってBeginPlay前にInitializeを呼ぶ必要あり
-void AExplosionGearSkill::Initialize(const FExplosionData& InData)
+void AExplosionGearSkill::ApplyData()
 {
-	Data = InData;
-
 	Collision->SetSphereRadius(CollisionRadius * Data.Scale);
 	Collision->SetGenerateOverlapEvents(true);
 }
 
 void AExplosionGearSkill::Explode()
 {
+	ApplyData();
+	
 	
 	// 爆発エフェクト再生
 	if (ExplosionFX) {
@@ -106,12 +127,12 @@ void AExplosionGearSkill::Explode()
 		);
 
 		NiagaraComp->SetWorldScale3D(FVector(Data.Scale));
-
+		NiagaraComp->SetWorldRotation(RootComponent->GetComponentQuat());
 	}
 
 	// カメラシェイクを爆発のスケールに応じて再生
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
-	if (playerController) {
+	if (playerController && ExplosionCameraShakeClass) {
 		playerController->ClientStartCameraShake(
 			ExplosionCameraShakeClass,
 			Data.Scale
@@ -123,6 +144,8 @@ void AExplosionGearSkill::Explode()
 	Collision->UpdateOverlaps();
 	Collision->GetOverlappingActors(actors);
 
+	if (!PlayerRuntimeData) { return;}
+	
 	// 検索したActorからEnemyBaseを見つけてヒット処理を行う
 	for (AActor* actor : actors) {
 		AEnemyBase* enemy = Cast<AEnemyBase>(actor);
@@ -130,11 +153,11 @@ void AExplosionGearSkill::Explode()
 			UE_LOG(LogTemp, Warning, TEXT("Not Enemy"));
 			continue;
 		}
-
+		
 		// キャラクターインターフェースを実装しているか
 		if (auto* interface = Cast<ICharacterInterface>(enemy))
 		{
-			interface->ApplyDamaged(Data.Damage);
+			interface->ApplyDamaged(Data.Damage + PlayerRuntimeData->GetCharacterAttackPower());
 			interface->ApplyKnockBack(GetActorLocation());
 		}
 	}

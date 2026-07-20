@@ -19,6 +19,8 @@ class UStaticMeshComponent;
 /** 飛び道具移動専用コンポーネント */
 class UProjectileMovementComponent;
 
+class UEffectBase;
+class UPlayerRuntimeData;
 
 /** 発射物の中間基底クラス */
 UCLASS(Blueprintable)
@@ -32,14 +34,20 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
-
-
+	
 	virtual void HandleCollision(AActor* OtherActor);
 
 	/** 持ち主のアクタークラス */
 	UPROPERTY()
 	TObjectPtr<AActor> OwnerActor;
-
+	
+	/** プレイヤーのRuntimeDataクラス */
+	UPROPERTY()
+	TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData;
+	
+	UPROPERTY(EditAnywhere,Category="Attack")
+	float AttackPower;
+	
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -65,7 +73,8 @@ private:
 	UFUNCTION()
 	void OnProjectileStop(const FHitResult& Hit);
 
-	
+	void ActorDestroy();
+
 	/** ルートコンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
@@ -81,4 +90,12 @@ private:
 	/** 飛び道具移動専用コンポーネント */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+	UPROPERTY(EditAnywhere,Instanced)
+	TObjectPtr<UEffectBase> ProjectileEffect;
+
+	FTimerHandle AliveTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	float AliveTime;
 };

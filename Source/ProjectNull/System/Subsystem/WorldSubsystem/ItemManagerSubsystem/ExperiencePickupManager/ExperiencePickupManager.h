@@ -89,4 +89,6 @@ private:
 	*/
 	TWeakObjectPtr<AActor>			  NiagaraOwnerActor;
 	TWeakObjectPtr<UNiagaraComponent> NiagaraComponent;
+
+	TWeakObjectPtr<UWorld> spWorld;
 };

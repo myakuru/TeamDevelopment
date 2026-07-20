@@ -4,13 +4,45 @@
 
 class UAnimMontage;
 
+UENUM(BlueprintType)
+enum class EBossActionType : uint8
+{
+	None,
+	PlayAttack,			// 近接攻撃を出す
+	Strafe,				// プレイヤーの周りを回って様子見
+	Idle,				// その場で様子見
+	ApproachWalk,		// 歩いて近づく
+	ApproachRun,		// 走って近づく
+	JumpAttack,			// 跳びかかる
+	RangedAttack,		// 遠距離攻撃
+	Breath				// ブレス
+};
+
+//USTRUCT(BlueprintType)
+//struct FBossActionType
+//{
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	EBossActionType ActionType = EBossActionType::None;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	bool PlayMontage = false;
+//};
+
 USTRUCT(BlueprintType)
 struct FBossAttackPattern
 {
 	GENERATED_BODY()
 
+	/** 攻撃パターン名*/
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FName Name;
+
+	/** 攻撃パターンEnum*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EBossActionType ActionType = EBossActionType::None;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FBossActionType ActionType;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinRange = 0.0f;
@@ -18,27 +50,16 @@ struct FBossAttackPattern
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaxRange = 300.0f;
 
+	/** アニメーションモンタージュ、単発なら要素1、連撃なら複数*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TObjectPtr<UAnimMontage>> AttackMontages;
-};
-
-UENUM(BlueprintType)
-enum class EBossActionType : uint8
-{
-	None,
-	PlayAttack,			// 近接攻撃を出す
-	Strafe,					// プレイヤーの周りを回って様子見
-	ApproachWalk,	// 歩いて近づく
-	ApproachRun,		// 走って近づく
-	JumpAttack,			// 跳びかかる
-	RangedAttack		// 遠距離攻撃
 };
 
 /// <summary>
 /// 敵基本ステータス
 /// </summary>
 USTRUCT(BlueprintType)
-struct FBossEnemyStatus
+struct FEnemyBossStatus
 {
 	GENERATED_BODY()
 

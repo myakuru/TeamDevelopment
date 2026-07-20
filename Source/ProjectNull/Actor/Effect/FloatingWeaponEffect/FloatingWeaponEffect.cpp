@@ -6,7 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
-#include <ProjectNull/System/Combat/Attack/FanAttackBase/FloatingWeaponAttack/FloatingWeaponAttack.h>
+#include <ProjectNull/System/Combat/Attack/FloatingWeaponAttack/FloatingWeaponAttack.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStateBase.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponAttackState/FloatingWeaponAttackState.h>
 #include <ProjectNull/Actor/Effect/FloatingWeaponEffect/State/FloatingWeaponStandState/FloatingWeaponStandState.h>
@@ -14,9 +14,12 @@
 
 UFloatingWeaponEffect::UFloatingWeaponEffect():
 	OwnerAttack(nullptr),
+	OwnerActor(nullptr),
 	EffectSystem(nullptr),
 	EffectComponent(nullptr),
-	RelativeTransform(FTransform())
+	RelativeTransform(FTransform()),
+	States(TMap<EFloatingWeaponState, TObjectPtr<UFloatingWeaponStateBase>>()),
+	CurrentState(nullptr)
 {
 	
 }
@@ -30,7 +33,7 @@ void UFloatingWeaponEffect::Initialize()
 		State->SetOwnerActor(OwnerActor);
 		State->Initialize();
 	}
-	ChangeState(EFloatingWeaponState::Transition);
+	ChangeState(EFloatingWeaponState::Attack);
 }
 
 void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
@@ -45,6 +48,8 @@ void UFloatingWeaponEffect::Start(USceneComponent* RootComponent)
 		FRotator::ZeroRotator,
 		EAttachLocation::KeepRelativeOffset,
 		true);
+
+	//EffectComponent->SetAbsolute(false, false, false);
 }
 
 void UFloatingWeaponEffect::Update(float DeltaTime)
@@ -92,7 +97,9 @@ FTransform UFloatingWeaponEffect::GetAttackStartTransformOffset()
 	FTransform ResultTransform;
 	if (!AttakState) { return ResultTransform; }
 
-	ResultTransform = AttakState->CalcAttackStateTransformOffset(OwnerAttack, OwnerAttack->StartAngle);
+	ResultTransform = AttakState->CalcAttackStateTransformOffset(
+		OwnerAttack,
+		OwnerAttack->GetStartAngle());
 	return ResultTransform;
 }
 
@@ -105,9 +112,16 @@ FTransform UFloatingWeaponEffect::GetStandStartTransformOffset()
 	return StandState->GetStartTransformOffset();
 }
 
+void UFloatingWeaponEffect::SetVisibility(bool bVisibility)
+{
+	if (!EffectComponent) { return;}
+	EffectComponent->SetVisibility(bVisibility);
+}
+
 void UFloatingWeaponEffect::UpdateTransform()
 {
-	if (!EffectComponent) { return; }
+	if (!EffectComponent)	{ return; }
+	
 	EffectComponent->SetRelativeTransform(RelativeTransform);
 }
 

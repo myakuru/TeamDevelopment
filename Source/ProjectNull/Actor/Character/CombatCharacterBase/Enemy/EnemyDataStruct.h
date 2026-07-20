@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "ProjectNull/System/Combat/CombatTypes/CombatTypes.h"
 #include "EnemyDataStruct.generated.h"
 
 // アニメーション用Enum
@@ -27,13 +28,19 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 Base = 100;
 
-	// 倍率
-	UPROPERTY(EditAnywhere)
-	float Scale = 1.0f;
-
 	// 倍率増加量
 	UPROPERTY(EditAnywhere)
 	float ScalePerKill = 0.005f;
+
+	/**
+	 * @brief Kill数に応じた倍率を計算
+	 * @param Count キル数
+	 * @return 計算結果の最終的倍率
+	 */
+	float CalculateFinalScaling(const int32 Count = 0.f)
+	{
+		return 1.f + Count * ScalePerKill;
+	}
 
 	/// <summary>
 	/// 基礎数値 * 倍率
@@ -41,7 +48,7 @@ public:
 	/// <returns>最終的な数値を返す</returns>
 	int32 GetFinalValue(int32 Count)
 	{
-		Scale = 1.0f + Count * ScalePerKill;
+		float Scale = CalculateFinalScaling(Count);
 		return static_cast<int32>(Base * Scale);
 	}
 };
@@ -108,6 +115,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AttackDistance = 20.0f;
 
+	/**	追跡可能距離 */
+	UPROPERTY(EditAnywhere)
+	float ChaseDistance = 20.f;
+
+	/**	攻撃のインターバル(秒) */
+	UPROPERTY(EditAnywhere)
+	float AttackInterval = 1.f;
+
 	// パーティクルのサイズ
 	UPROPERTY(EditAnywhere, Category = "Experience")
 	float ExpSize = 1.0f;
@@ -117,11 +132,11 @@ public:
 	FLinearColor ExpColor = FLinearColor::Blue;
 
 	// 最終的なヒットポイント
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	int32	FinalHP = 100;
 
 	// 最終的な攻撃力
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	int32	FinalAttack = 1;
 
 	/**	ステートタグ */
@@ -132,6 +147,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "AnimBlend")
 	float BlendSpeed = 1.2f;
 	
+	/**	発動したい攻撃の種類(攻撃リストのキーとしても使用) */
+	UPROPERTY(VisibleAnywhere, Category = "AttackType")
+	EEnemyAttackType AttackType = EEnemyAttackType::Attack1;
+
 	/** 生存フラグ*/
 	UPROPERTY()
 	bool IsAlive = true;

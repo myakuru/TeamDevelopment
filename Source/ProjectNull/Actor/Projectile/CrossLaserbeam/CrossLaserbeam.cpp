@@ -1,56 +1,58 @@
 ﻿
 #include "CrossLaserbeam.h"
 
+
 #include "Components/BoxComponent.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+#include <ProjectNull/Actor/Effect/EffectBase.h>
 
+#include "ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h"
+#include "ProjectNull/GameInstance/SuperGameInstance.h"
 
-ACrossLaserbeam::ACrossLaserbeam()
+ACrossLaserbeam::ACrossLaserbeam():
+	BoxCompArray(TArray<TObjectPtr<UBoxComponent>>()),
+	NiagaraEffectArray(TArray<TObjectPtr<UEffectBase>>()),
+	PlayerRuntimeData(nullptr),
+	AttackPower(1.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(RootComponent);
 
-	LaserBoxes.SetNum(4);
+	BoxCompArray.SetNum(LaserbeamNum);
 
-	for (int32 Index = 0; Index < 4; ++Index)
+	for (int32 Index = 0; Index < LaserbeamNum; ++Index)
 	{
-		auto& Box = LaserBoxes[Index];
+		auto& BoxComp = BoxCompArray[Index];
 
 		FString Name = FString::Printf(
 			TEXT("LaserBox_%d"),
 			Index);
 
-		Box = CreateDefaultSubobject<UBoxComponent>(*Name);
-		if (!Box) { continue; }
-		Box->SetupAttachment(RootComponent);
-		Box->SetCollisionEnabled(
-			ECollisionEnabled::QueryOnly);
-
-		Box->SetGenerateOverlapEvents(true);
-		Box->SetCollisionResponseToChannel(
+		BoxComp = CreateDefaultSubobject<UBoxComponent>(*Name);
+		if (!BoxComp) { continue; }
+		BoxComp->SetupAttachment(RootComponent);
+		BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		BoxComp->SetGenerateOverlapEvents(true);
+		BoxComp->SetCollisionResponseToChannel(
 			ECC_GameTraceChannel1,
 			ECR_Overlap);
-		Box->OnComponentBeginOverlap.AddDynamic(
+
+		BoxComp->OnComponentBeginOverlap.AddDynamic(
 			this,
 			&ACrossLaserbeam::OnLaserBeginOverlap);
-		Box->OnComponentEndOverlap.AddDynamic(
-			this,
-			&ACrossLaserbeam::OnLaserEndOverlap);
 	}
+
 }
 
 void ACrossLaserbeam::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	/*GetWorld()->GetTimerManager().SetTimer(
-		HitIntervalTimerHandle,
-		this,
-		&ACrossLaserbeam::OnHit,
-		HitInterval,
-		true);*/
+
+	const auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
 }
 
 void ACrossLaserbeam::Tick(float DeltaTime)
@@ -66,13 +68,28 @@ void ACrossLaserbeam::SetLaserEnabled(bool bEnabled)
 		? ECollisionEnabled::QueryOnly
 		: ECollisionEnabled::NoCollision;
 
-	for (auto& Box : LaserBoxes)
+	for (auto& BoxComp : BoxCompArray)
 	{
-		if (!Box) { continue; }
+		if (!BoxComp) { continue; }
 
-		Box->SetCollisionEnabled(CollisionType);
+		BoxComp->SetCollisionEnabled(CollisionType);
+	}
+
+	
+
+	for (auto& Effect : NiagaraEffectArray)
+	{
+		if (bEnabled)
+		{
+			Effect->Start(RootComponent);
+		}
+		else 
+		{
+			Effect->DeactivateImmediateEffect();
+		}
 	}
 }
+
 
 void ACrossLaserbeam::OnLaserBeginOverlap(
 	UPrimitiveComponent* OverlappedComponent,
@@ -82,32 +99,18 @@ void ACrossLaserbeam::OnLaserBeginOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (!OtherActor || OtherActor == this) { return; }
+	if (!OtherActor ||
+		OtherActor == this) {
+		return;
+	}
 
-	OnHit(OtherActor);
-	//HitActors.Add(Enemy);
-}
-
-void ACrossLaserbeam::OnLaserEndOverlap(
-	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex)
-{
-	auto Enemy = Cast<AEnemyBase>(OtherActor);
-
-	if (!Enemy) { return; }
-
-	//HitActors.Remove(Enemy);
-}
-
-void ACrossLaserbeam::OnHit(const TObjectPtr<AActor>& Actor)
-{
+	if (!PlayerRuntimeData) { return; }
+	
 	// キャラクターインターフェースを実装しているか
-	if (auto* interface = Cast<ICharacterInterface>(Actor))
+	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
 	{
-		interface->ApplyDamaged();
-		interface->ApplyKnockBack(GetActorLocation());
-		//HitActors.Add(Actor);
+		Interface->ApplyDamaged(AttackPower + PlayerRuntimeData->GetCharacterAttackPower());
+		Interface->ApplyKnockBack(GetActorLocation());
 	}
 }
+

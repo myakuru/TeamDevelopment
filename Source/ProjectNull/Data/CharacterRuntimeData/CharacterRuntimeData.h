@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "ProjectNull/Data/ExpUpgradeDataTable/ExpUpgradeDataTable.h"
 #include "CharacterRuntimeData.generated.h"
 
 
@@ -15,12 +16,25 @@ struct FAttackRuntimeData
 public:
 
 	FAttackRuntimeData() :
+		Base(0.0f),
+		Scaling(1.0f),
 		Final(0.0f)
 	{
 	}
 
-	/** 最終的な攻撃力 */
+	/** 基礎攻撃力とスケール値から最終的な攻撃力を算出 */
+	float GetFinalPower();
+
+	/**	基礎攻撃力 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	float Base;
+
+	/**	倍率 */
+	UPROPERTY()
+	float Scaling;
+
+	/** 最終的な攻撃力 */
+	UPROPERTY()
 	float Final;
 };
 
@@ -66,19 +80,40 @@ public:
 public:
 	virtual void Initialize() { return; }
 
-	/** ゲッター */
+	/** 体力を加算する処理 */
+	void AddHealth(float Amount) { SetHealth(Health.Current + Amount); }
+
+public:
+
+	/*~Begin Setters */
+	/**
+	 * @brief 攻撃倍率のセット
+	 * @param InScaling セットする倍率
+	 */
+	void SetAttackScaling(float InScaling) { Attack.Scaling = InScaling; }
+	
+	/** 体力を固定値にセットする処理 */
+	void SetHealth(float InCurrentHealth) { Health.SetCurrent(InCurrentHealth); }
+	/* End Setters~*/
+
+
+	/*~Begin Getters */
 	/** 体力を取得する処理 */
 	float GetHealth() const { return Health.Current; }
 
 	/** 体力の最大値を取得 */
 	float GetMaxHealth() const { return Health.Max; }
 
-	/** セッター */
-	/** 体力を固定値にセットする処理 */
-	void SetHealth(float inCurrentHealth) { Health.SetCurrent(inCurrentHealth); }
+	/** 攻撃の倍率を取得 */
+	float GetAttackScaling()const { return Attack.Scaling; }
 
-	/** 体力を加算する処理 */
-	void AddHealth(float Amount) { SetHealth(Health.Current + Amount); }
+	/** 基礎攻撃力とスケール値から最終的な攻撃力を算出 */
+	float GetFinalAttackPower(float Scaling)  { return Attack.GetFinalPower() * Scaling; }
+	float GetCharacterAttackPower();
+	/* End Getters~*/
+	
+	/** 効果種別ごとの現在倍率を取得（未設定なら 1.0） */
+	float GetEffectMultiplier(EUpgradeEffectType Type) const;
 
 protected:
 
@@ -89,4 +124,7 @@ protected:
 	/** 攻撃力関連Runtimeデータ構造体 */
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	FAttackRuntimeData Attack;
+	
+	/** 効果種別 -> 現在の倍率。効果を増やしてもここに項目が増えるだけで済む */
+	TMap<EUpgradeEffectType, float> EffectMultipliers;
 };

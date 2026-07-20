@@ -8,14 +8,39 @@
 /** 進行ベクトルが変更された時に呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMoveDirChanged,		const FVector&	/*MoveDir*/);
 
+/** ノックバック時に呼び出される */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetLocationChanged,const FVector&/*TargetLocation*/);
+
 /** ステートEnumが変更された時に呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnStateEnumChanged,	EEnemyState		/*StateEnum*/);
 
 /** ターゲットとの距離が変更された時にに呼び出される */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTargetDistChanged,	float			/*DistSqr*/);
 
+/** ダメージを受けたときに呼び出される */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDamageRatioChanged,	float			/*DamageRatio*/);
+
 /** 敵のHPが0を下回った時に呼び出される*/
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnIsAliveChanged,		bool			/*IsKnockBack*/);
+
+/** CPUカウンタ用*/
+USTRUCT(BlueprintType)
+struct FCPUAnimMonitor
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyRuntime")
+	int32	AnimIndex	= 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyRuntime")
+	bool	bLooping	= true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyRuntime")
+	bool	bFinished	= false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyRuntime")
+	float	ElapsedTime = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyRuntime")
+	float	Duration	= 0.0f;
+};
 
 /**
  * 敵のランタイムな値を管理する
@@ -29,13 +54,6 @@ public:
 
 	UEnemyRuntimeData();
 
-	void UpdateAnimation(float DeltaTime, float BlendSpeed);
-
-	/** アニメーションブレンド完了*/
-	void ComplateAnimBlend();
-
-	void AnimationReset();
-
 	//~ Begin Setter
 
 	/**
@@ -45,6 +63,13 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
 	void CalcDistanceToTarget(const FVector& a_TargetPos, const FVector& a_OwnerPos);
+
+	/**
+	 * @brief 受けたダメージを最大体力に対する割合として算出する
+	 * @param InReciveDamage 受けたダメージ量
+	 */
+	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
+	void CalclateDamageToMaxHealthRatio(const float InReciveDamage);
 
 	/**
 	 * @brief				ステートタイプを切り替える
@@ -57,45 +82,48 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemyPara")
 	void ChangedIsAlive(const bool a_IsAlive);
 
-	/** アニメーションのループフラグ変更*/
-	void ChangeAnimRoopFlg(bool Flg) { AnimRoopFlg = Flg; }
-
 	/** Updateのインターバルを設定*/
 	void ChangeUpdateInterval(int32 Interval) { UpdateInterval = Interval; }
 
-	/** アニメーションチェンジ開始フラグ（これがtrueになるとアニメーションブレンドに入る）*/
-	void SetAnimChangeFlg(bool Flg)				{ AnimChangeFlg = Flg; }
+	void StartAnimMonitor(
+		int32 AnimIndex,
+		bool bLooping,
+		float Duration);
 
-	/** 次のアニメーションに使用するデータを設定*/
-	/*			次のアニメーションのインデックス, ループフラグ,アニメーションチェンジフラグ*/
-	void SetNextAnimData(int32 NextIndex, bool AnimRoopFlg, bool AnimChangeFlg);
+	/**
+	 * @brief 攻撃が終了した瞬間の時間をセット
+	 * @param InLastTime 時間(秒)
+	 */
+	void SetAttackFinishTime(float InLastTime);
 
-	void NotifyAnimFinished() { bAnimFinished = true; }
-	void ResetAnimFinished() { bAnimFinished = false; }
+	void UpdateAnimationMonitor(float DeltaTime);
+	void NotifyAnimFinished()	{ CPUAnim.bFinished = true; }
+	void ResetAnimFinished()	{ CPUAnim.bFinished = false; }
+	bool GetAnimFinished()const { return CPUAnim.bFinished; }
 
+	/**
+	 * @brief ターゲットの座標をセット
+	 * @param InTargetLocation ターゲットの座標
+	 */
+	void SetTargetLocation(const FVector& InTargetLocation);
+
+	/**
+	 * @brief 最終的なHP
+	 * @param InFinalHP 計算後の最終HP
+	 */
+	void SetFinalHP(float InFinalHP);
+
+	/**
+	 * @brief 基礎攻撃力のセット
+	 * @param InBasePower 基礎攻撃力
+	 */
+	void SetBaseAttackPower(float InBasePower);
 	//~ End Setter
 
 	//~ Start Getter
 
 	/** プレイヤーとの距離を返す*/
-	float GetTargetDistanceSqr() { return TargetDistanceSqr; }
-
-	/** アニメーションのループフラグを返す*/
-	bool GetAnimRoopFlg()			{ return AnimRoopFlg; }
-
-	/** AnimToTexture用：アニメーションの現在の再生時間*/
-	float GetAnimTime()				const { return AnimTime; }
-	float GetBeginAnimTime()		const { return PrevAnimTime; }
-	/** AnimToTexture用：再生中のアニメーションのインデックス*/
-	int32 GetAnimIndex()			const { return AnimIndex; }
-	float GetAnimNumFrames()	const { return AnimNumFrames; }
-	int32 GetNextAnimIndex()		const { return NextAnimIndex; }
-	float GetNextAnimTime()		const { return NextAnimTime; }
-	float GetAnimBlendWeight()	const { return AnimBlendWeight; }
-	bool GetAnimChangeFlg()				 { return AnimChangeFlg; }
-
-	/** アニメーション終了フラグ（非ループアニメが１週したらtrueにする）*/
-	bool GetAnimFinished()			const { return bAnimFinished; }
+	float GetTargetDistanceSqr()		 { return TargetDistanceSqr; }
 
 	int32 GetUpdateInterval()		const { return UpdateInterval; }
 	
@@ -115,8 +143,14 @@ public:
 	/** 進行方向が変更された時に呼び出される */
 	FOnMoveDirChanged		OnMoveDirChanged;
 
+	/**	 */
+	FOnTargetLocationChanged OnTargetLocationChanged;
+
 	/** ターゲットとの距離が変更された時に呼び出される */
 	FOnTargetDistChanged	OnTargetDistChanged;
+
+	/** ダメージを受けたときに呼び出される */
+	FOnDamageRatioChanged	OnDamageRatioChanged;
 
 	/**	ノックバック状態が変更された時に呼び出される */
 	FOnStateEnumChanged		OnStateEnumChanged;
@@ -130,9 +164,21 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	FVector	MoveDir = FVector::ZeroVector;
 
+	/**	ターゲットの座標 */
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	FVector TargetLocation = FVector::ZeroVector;
+
 	/** ターゲットとの距離の二乗値 */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	float	TargetDistanceSqr = 0.0f;
+
+	/**	最大HPに対して受けたダメージ割合 */
+	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
+	float	DamageToMaxHealthRatio = 0.f;
+
+	/**	攻撃が終了した瞬間の時間(秒) */
+	UPROPERTY()
+	float AttackFinishTime = 0.f;
 
 	/**	ステートEnum */
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
@@ -142,43 +188,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
 	bool	IsAlive = true;
 
-	/**	アニメーション情報*/
-	/** アニメーションループ判定*/
-	UPROPERTY(VisibleAnywhere, Category = "EnemyRuntime")
-	bool AnimRoopFlg = false;
-
-	/** アニメーションチェンジフラグ*/
-	bool AnimChangeFlg = false;
-
-	/** 進行アニメーション時間*/
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float AnimTime = 0.0f;
-	/** １つ前のアニメーション時間*/
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float PrevAnimTime = 0.0f;
-
-	/** 現在のアニメーション番号*/
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	int32 AnimIndex = 1;
-	/** 次のアニメーション番号*/
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	int32 NextAnimIndex = 0;
-
-	/** 次のアニメーションの開始時間*/
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float NextAnimTime = 0.0f;
-
-	/** アニメーションの総フレーム数*/
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float AnimNumFrames = 0.0f;
-
-	/** アニメーションブレンドの進行率*/
-	UPROPERTY(EditAnywhere, Category = "AnimBlend")
-	float AnimBlendWeight = 0.0f;
-
-	/** アニメーション終了確認フラグ*/
-	bool bAnimFinished = false;
-
 	/** Updateのインターバルに利用する変数*/
 	int32 UpdateInterval = 1;
+
+	FCPUAnimMonitor CPUAnim;
 };

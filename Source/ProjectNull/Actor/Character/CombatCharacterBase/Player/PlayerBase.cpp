@@ -1,30 +1,23 @@
 ﻿#include "PlayerBase.h"
 
-#include "Camera/CameraComponent.h"
 #include "CineCameraComponent.h"
 
 #include <GameFramework/SpringArmComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/SphereComponent.h"
-
+#include "Camera/CameraComponent.h"
 #include <ProjectNull/Component/PlayerGearComponent/PlayerGearComponent.h>
 #include <ProjectNull/Component/TargetSearchComponent/TargetSearchComponent.h>
-
-#include <ProjectNull/UI/PlayerHUDWidget/PlayerHUDWidget.h>
-#include <ProjectNull/System/Controller/RobotController/RobotController.h>
+#include <ProjectNull/Component/HitStopComponent/HitStopComponent.h>
+#include <ProjectNull/Component/GroundAlignmentComponent/GroundAlignmentComponent.h>
 #include <ProjectNull/System/Combat/Attack/AutoAttack/AutoAttack.h>
-#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
-#include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/System/AnimInstance/PlayerAnimInstance/PlayerAnimInstance.h>
 #include <ProjectNull/System/Material/PlayerMaterialCollectionUpdater/PlayerMaterialCollectionUpdater.h>
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 #include <ProjectNull/Component/PlayerCutsceneComponent/PlayerCutsceneComponent.h>
+#include <ProjectNull/Core/NullGameplayTags.h>
 
 
 APlayerBase::APlayerBase():
@@ -33,9 +26,15 @@ APlayerBase::APlayerBase():
 		CineCameraComponent(nullptr),
 		GearComponent(nullptr),
 		TargetSearchComponent(nullptr),
+		HitStopComponent(nullptr),
+		GroundAlignmentComponent(nullptr),
 		AutoAttack(nullptr),
 		MaterialCollectionUpdater(nullptr),
-		SuperGameInstance(nullptr)
+		CutsceneComponent(nullptr),
+		SuperGameInstance(nullptr),
+		NormalStateCameraLagSpeed(0.f),
+		TargetCameraLagSpeed(0.f),
+		CameraLagInterpSpeed(0.f)
 {
 	// ================================================================
 	// プレイヤーの初期化
@@ -66,9 +65,9 @@ APlayerBase::APlayerBase():
 	CineCameraComponent->SetupAttachment(SpringArmComponent);
 	CineCameraComponent->Deactivate();
 
-	/// ================================================================
+	// ================================================================
 	// カットシーン再生用コンポーネントの初期化
-	//  ================================================================
+	// ================================================================
 	CutsceneComponent = CreateDefaultSubobject<UPlayerCutsceneComponent>("Cutscene");
 
 	// ================================================================
@@ -80,6 +79,16 @@ APlayerBase::APlayerBase():
 	// 対象検索コンポーネントの初期化
 	// ================================================================
 	TargetSearchComponent = CreateDefaultSubobject<UTargetSearchComponent>("TargetSearch");
+
+	// ================================================================
+	// ヒットストップコンポーネントの初期化
+	// ================================================================
+	HitStopComponent = CreateDefaultSubobject<UHitStopComponent>("HitStop");
+
+	// ================================================================
+	// 地面の法線に合わせてRootComponentの姿勢を更新するコンポーネント初期化
+	// ================================================================
+	GroundAlignmentComponent = CreateDefaultSubobject<UGroundAlignmentComponent>("GroundAlignment");
 
 	// Material Parameter Collectionの更新処理クラスの生成
 	MaterialCollectionUpdater = NewObject<UPlayerMaterialCollectionUpdater>();
@@ -93,7 +102,14 @@ void APlayerBase::BeginPlay()
 	// ゲーム全体で共有されるデータや機能を管理するクラスの初期化
 	// ================================================================
 	SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance) { return; }
 
+	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (!PlayerRuntimeData) { return; }
+	PlayerRuntimeData->SetOwner(this);
+	PlayerRuntimeData->Initialize();
+	PlayerRuntimeData->UpdateStatus();
+	
 	// ================================================================
 	// 自動攻撃の初期化
 	// ================================================================
@@ -107,30 +123,25 @@ void APlayerBase::BeginPlay()
 	GetWorld()->GetFirstPlayerController()->InputComponent->BindKey(
 		EKeys::K, IE_Pressed, this, &APlayerBase::StartCutscene);
 
-	/*GetWorld()->GetTimerManager().SetTimer(
-		AlignFloorTimerHandle,
-		this,
-		&APlayerBase::AlignFloor,
-		0.1f,
-		true);*/
-	CurrentGroundTraceLength = GroundTraceLength;
+	if (!SpringArmComponent) { return; }
+
+	NormalStateCameraLagSpeed = SpringArmComponent->CameraLagSpeed;
+	ResetTargetCameraLagSpeed();
 }
 
 void APlayerBase::Tick(float DeltaTime)
 {
-	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-	if (!EnemyManager) { return; }
-
 	ACombatCharacterBase::Tick(DeltaTime);
-
+	
 	// 自動攻撃の更新
 	if (AutoAttack) { AutoAttack->Update(DeltaTime); }
 
 	// Material Parameter Collectionの更新処理クラスの更新
 	if (MaterialCollectionUpdater) { MaterialCollectionUpdater->Update(DeltaTime); }
 
-	//AlignFloor();
-	
+	UpdateModelAfterimageTrailEffect(DeltaTime);
+
+	UpdateCameraData(DeltaTime);
 }
 
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -139,18 +150,25 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 }
 
+float APlayerBase::GetFinalAttackPower() const
+{
+	if (!SuperGameInstance) { return 1.f; }
+
+	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (PlayerRuntimeData)	{ return 1.f; }
+
+	return PlayerRuntimeData->GetCharacterAttackPower();
+}
+
 void APlayerBase::ApplyDamaged(float InDamage)
 {
-	auto GameInstance = Cast<USuperGameInstance>(GetWorld()->GetGameInstance());
+	if (!SuperGameInstance) { return; }
 
-	if (GameInstance&& GameInstance->GetPlayerRuntimeData())
-	{
-		auto PlayerRuntimeData = GameInstance->GetPlayerRuntimeData();
+	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (!IsValid(PlayerRuntimeData))	{ return; }
 
-		PlayerRuntimeData->SubtractHealth(InDamage);
-
-		UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
-	}
+	PlayerRuntimeData->SubtractHealth(InDamage);
+	UE_LOG(LogTemp, Warning, TEXT("PlayerHP : %f"), PlayerRuntimeData->GetHealth());
 }
 
 void APlayerBase::Move(const FVector2d& InputVector)
@@ -174,7 +192,12 @@ void APlayerBase::ChangeGear()
 void APlayerBase::StartCutscene()
 {
 	if (!CutsceneComponent) { return; }
-	CutsceneComponent->PlayCutscene();
+	CutsceneComponent->PlayCutScene(NullGameplayTags::Cutscene_Intro);
+}
+
+void APlayerBase::ResetTargetCameraLagSpeed()
+{
+	TargetCameraLagSpeed = NormalStateCameraLagSpeed;
 }
 
 int32 APlayerBase::GetCurrentGearLevel() const
@@ -185,20 +208,29 @@ int32 APlayerBase::GetCurrentGearLevel() const
 
 bool APlayerBase::GetCurrentFloorNormal(FVector& OutCurrentFloorNormal)
 {
-	auto CharacterMovementComp = GetCharacterMovement();
+	const auto CharacterMovementComp = GetCharacterMovement();
 	if (!CharacterMovementComp) { return false; }
 	OutCurrentFloorNormal = CharacterMovementComp->CurrentFloor.HitResult.ImpactNormal;
 	return true;
 }
 
+USceneComponent* APlayerBase::GetGroundAlignmentRootComponent() const
+{
+	if (!GroundAlignmentComponent) { return nullptr; }
+	const auto RootComp = GroundAlignmentComponent->GetRootComponent();
+	
+	return RootComp;
+}
+
 UPlayerAnimInstance* APlayerBase::GetPlayerAnimInstance() const
 {
-	if (!GetMesh()) { return nullptr; }
+	const auto PlayerMesh = GetMesh();
+	if (!PlayerMesh)	{ return nullptr; }
 
-	auto AnimInstance = GetMesh()->GetAnimInstance();
-	if (!AnimInstance) { return nullptr; }
+	const auto AnimInstance = PlayerMesh->GetAnimInstance();
+	if (!AnimInstance)	{ return nullptr; }
 
-	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
+	const auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
 	return PlayerAnimInstance;
 }
 
@@ -206,12 +238,13 @@ FPoseSnapshot& APlayerBase::GetPlayerPoseSnapshot()
 {
 	FPoseSnapshot PoseSnapshot;
 
-	if (!GetMesh())				{ return PoseSnapshot; }
+	const auto PlayerMesh = GetMesh();
+	if (!PlayerMesh)			{ return PoseSnapshot; }
 
-	auto AnimInstance = GetMesh()->GetAnimInstance();
+	const auto AnimInstance = PlayerMesh->GetAnimInstance();
 	if (!AnimInstance)			{ return PoseSnapshot; }
 
-	auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
+	const auto PlayerAnimInstance = Cast<UPlayerAnimInstance>(AnimInstance);
 	if (!PlayerAnimInstance)	{ return PoseSnapshot; }
 
 	return PlayerAnimInstance->GetPlayerPoseSnapshot();
@@ -227,122 +260,34 @@ bool APlayerBase::CanMove()
 	return true;
 }
 
-void APlayerBase::AlignFloor()
+void APlayerBase::UpdateCameraData(float DeltaTime)
 {
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
+	if (!SpringArmComponent) { return; }
+
+	SpringArmComponent->CameraLagSpeed = FMath::FInterpTo(
+		SpringArmComponent->CameraLagSpeed,
+		TargetCameraLagSpeed,
+		DeltaTime,
+		CameraLagInterpSpeed
+		);
+}
+
+void APlayerBase::UpdateModelAfterimageTrailEffect(float DeltaTime)
+{
+	const auto PlayerMesh = GetMesh();
+	if (!PlayerMesh)					{ return; }
 	
-	//----------------------------------------
-	// Ground Trace
-	//----------------------------------------
+	const auto PlayerAnimInstance = GetPlayerAnimInstance();
+	if (!PlayerAnimInstance)			{ return; }
 
-	FHitResult Hit;	
+	if (!ModelAfterimageTrailEffect)	{ return; }
 
-	const FVector Start = GetActorLocation();
-	const FVector End = Start - GetActorUpVector() * CurrentGroundTraceLength;
-
-	DrawDebugLine(GetWorld(), Start, End,FColor::Green);
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	const bool bHit = GetWorld()->LineTraceSingleByChannel(
-			Hit,
-			Start,
-			End,
-			ECC_Visibility,
-			Params);
-
-	if (!bHit)
-	{
-		/*MoveComp->SetMovementMode(
-			MOVE_Falling);*/
-		/*MoveComp->SetGravityDirection(
-			FVector::DownVector);*/
-		CurrentGroundTraceLength += 50.0f;
-		return;
-	}
-	else {
-		CurrentGroundTraceLength = GroundTraceLength;
-	}
-
-	//----------------------------------------
-	// Normal
-	//----------------------------------------
-
-	const FVector TargetNormal =
-		Hit.ImpactNormal.GetSafeNormal();
-
-	CurrentGroundNormal = FMath::VInterpNormalRotationTo(
-			CurrentGroundNormal,
-			TargetNormal,
-			DeltaTime,
-			NormalInterpSpeed);
-
-	//----------------------------------------
-	// Walkable Angle
-	//----------------------------------------
-
-	/*const FVector UpDir =
-		-MoveComp->GetGravityDirection();*/
-
-	const float Dot =
-		FVector::DotProduct(
-			TargetNormal,
-			FVector::UpVector);
-
-	const float WalkableDot = FMath::Cos(
-			FMath::DegreesToRadians(MaxGroundAngle));
-	//UE_LOG(LogTemp, Display, TEXT("WalkableDot %.2f"), WalkableDot);
-	//UE_LOG(LogTemp, Display, TEXT("Dot %.2f"), Dot);
-
-	FVector Gravity = -CurrentGroundNormal;
-
-	const bool Walkable = Dot >= WalkableDot;
-
-	if (!Walkable)
-	{
-	/*	MoveComp->SetMovementMode(
-			MOVE_Falling);*/
-		//MoveComp->SetGravityDirection(FVector::DownVector);
-		/*FVector SlideDir =
-			FVector::VectorPlaneProject(
-				FVector(0, 0, -1),
-				CurrentGroundNormal).GetSafeNormal();
-
-		AddMovementInput(
-			SlideDir.GetSafeNormal(),
-			SlideSpeed);*/
-
-		Gravity = FVector::DownVector;
-	}
-	
-	/*DrawDebugCapsule(
-		GetWorld(),
-		GetActorLocation(),
-		WalkCapsuleHalfHeight,
-		WalkCapsuleRadius,
-		GetActorQuat(),
-		FColor::Magenta);
-
-	DrawDebugCapsule(
-		GetWorld(),
-		GetActorLocation(),
-		FallCapsuleHalfHeight,
-		FallCapsuleRadius,
-		GetActorQuat(),
-		FColor::Orange);*/
-
-
-	//----------------------------------------
-	// Gravity
-	//----------------------------------------
-
-	//MoveComp->SetGravityDirection(Gravity);
-
-	//----------------------------------------
-	// Rotation
-	//----------------------------------------
-
-	
+	ModelAfterimageTrailEffect->Update(
+		DeltaTime,
+		GetActorTransform(),
+		PlayerMesh->GetSkeletalMeshAsset(),
+		PlayerAnimInstance->GetPlayerPoseSnapshot()
+	);
 }
 
 

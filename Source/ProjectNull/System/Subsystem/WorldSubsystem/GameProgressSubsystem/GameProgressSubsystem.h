@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
@@ -6,54 +6,88 @@
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPhaseChanged, int);
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnKillCount, int,int);
+
 /// <summary>
-/// ƒQ[ƒ€‚ÌisŠÇ—ƒNƒ‰ƒX
+/// ã‚²ãƒ¼ãƒ ã®é€²è¡Œç®¡ç†ã‚¯ãƒ©ã‚¹
 /// </summary>
 UCLASS()
-class PROJECTNULL_API UGameProgressSubsystem : public UWorldSubsystem
+class PROJECTNULL_API UGameProgressSubsystem : public UTickableWorldSubsystem
 {
 	GENERATED_BODY()
 	
 public:
 
+	virtual void Initialize(
+		FSubsystemCollectionBase& Collection
+	) override;
+
+	virtual void Deinitialize() override;
+
+	virtual void Tick(float DeltaTime) override;
+
+	virtual TStatId GetStatId() const override
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(
+			UGameProgressSubsystem,
+			STATGROUP_Tickables
+		);
+	}
+
 	/// <summary>
-	/// “G‚ğ“|‚µ‚½Û‚É“|‚µ‚½“G”‚ğ‰ÁZ
+	/// æ•µã‚’å€’ã—ãŸéš›ã«å€’ã—ãŸæ•µæ•°ã‚’åŠ ç®—
 	/// </summary>
-	/// <param name="Value">‰ÁZ‚µ‚½‚¢“G”</param>
+	/// <param name="Value">åŠ ç®—ã—ãŸã„æ•µæ•°</param>
 	void AddKillCount(int32 Value = 1);
+	void AddTyuuBossCount(int32 Value = 1);
+	void AddKillBossCount(int32 Value = 1);
 
 	int32 GetKillCount() const { return KillCount; }
 
 	int32 GetPhase() const { return Phase; }
+	int32 GetPhaseThresholds() { return PhaseThresholds; }
 
 	/// <summary>
-	/// ƒtƒF[ƒY‚ğ’Ê’m‚·‚é
+	/// ãƒ•ã‚§ãƒ¼ã‚ºã‚’é€šçŸ¥ã™ã‚‹
 	/// </summary>
 	FOnPhaseChanged OnPhaseChanged;
 
+	FOnKillCount OnKillCountChanged;
+
 	void SetPhase(int NewPhase);
 
-	/// <summary>
-	/// ƒtƒF[ƒY‚Ì‹«ŠE‚ğ’è‹`‚·‚é“|‚µ‚½“G”è‡’l
-	/// </summary>
-	UPROPERTY(EditAnywhere)
-	TArray<int32> PhaseThresholds;
+	void SetPhaseThresholds(int32 Num);
+
+	void SetFinalWave(bool _flg) { FinalWave = _flg; }
+	void SetBossWave(bool _flg) { BossWave = _flg; FinalWave = false; }
 
 private:
 
 	/// <summary>
-	/// “G‚ğ“|‚µ‚½”
+	/// æ•µã‚’å€’ã—ãŸæ•°
 	/// </summary>
 	int32 KillCount = 0;
 
 	/// <summary>
-	///	ƒQ[ƒ€‚ÌƒtƒF[ƒY”
+	///	ã‚²ãƒ¼ãƒ ã®ãƒ•ã‚§ãƒ¼ã‚ºæ•°
 	/// </summary>
 	int32 Phase = 0;
 
+	// ãƒ•ã‚§ãƒ¼ã‚ºã®å¢ƒç•Œã‚’å®šç¾©ã™ã‚‹å€’ã—ãŸæ•µæ•°é–¾å€¤ï¼ˆSpawnerã‹ã‚‰ãƒ•ã‚§ãƒ¼ã‚ºã«å¤‰æ›´ãŒã‚ã£ãŸéš›ã«ãƒ‡ãƒ¼ã‚¿ã‚’æ¸¡ã™ï¼‰
+	int32 PhaseThresholds = 1;
+
+	bool FinalWave = false;
+
+	bool BossWave = false;
+
 	/// <summary>
-	/// ƒQ[ƒ€‚ÌƒtƒF[ƒYXV
-	/// ¦–ˆƒtƒŒ[ƒ€ŒÄ‚Ôƒƒ\ƒbƒh‚Å‚Í‚È‚¢
+	/// ã‚²ãƒ¼ãƒ ã®ãƒ•ã‚§ãƒ¼ã‚ºæ›´æ–°
+	/// â€»æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‘¼ã¶ãƒ¡ã‚½ãƒƒãƒ‰ã§ã¯ãªã„
 	/// </summary>
 	void UpdatePhase();
+
+	bool GameClearFlg = false;
+	float ClearCountDuration	= 3.0f;
+	float ClearCountTime		= 0.0f;
+
 };

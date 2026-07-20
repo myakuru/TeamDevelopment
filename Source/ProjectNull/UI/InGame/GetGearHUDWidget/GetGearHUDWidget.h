@@ -6,7 +6,7 @@
 
 class UTextBlock;
 class UImage;
-class UButton;
+class UButtonBaseWidget;
 
 /**
  * 
@@ -18,7 +18,7 @@ class PROJECTNULL_API UGetGearHUDWidget : public UUserWidget
 
 public:
 
-	void SetGearData(const FText& inGearName);
+	void SetGearData(const FName& inGearName);
 
 	UFUNCTION()
 	void OpenUI();
@@ -32,6 +32,9 @@ private:
 	UFUNCTION()
     void RemoveSelf();
 
+	UFUNCTION()
+	void OnFadeOutAnimFinished();
+
 	/** UIパーツ */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> GearName;
@@ -40,5 +43,12 @@ private:
 	TObjectPtr<UImage> GearImage;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> CloseUIButton;
+	TObjectPtr<UButtonBaseWidget> CloseUIButton;
+
+	/** アニメーション */
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> FadeInAnim;
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> FadeOutAnim;
 };

@@ -36,7 +36,6 @@ class PROJECTNULL_API UFloatingWeaponEffect : public UObject
 
 public:
 	UFloatingWeaponEffect();
-public:
 	
 	/**
 	 * @brief 初期化
@@ -72,6 +71,8 @@ public:
 	inline void SetOwnerAttack(UFloatingWeaponAttack* Owner)		{ OwnerAttack = Owner; }
 	inline void SetOwnerActor(AActor* SetOwnerActor)				{ OwnerActor = SetOwnerActor; }
 	inline void SetRelativeTransform(const FTransform& a_RelativeTransform)	{ RelativeTransform = a_RelativeTransform; }
+	void		SetVisibility(bool bVisibility);
+
 	
 	/** ゲッター */
 	inline UFloatingWeaponAttack* GetOwnerAttack() const	{ return OwnerAttack; }

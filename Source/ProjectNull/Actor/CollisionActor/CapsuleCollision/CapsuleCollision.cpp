@@ -3,7 +3,8 @@
 #include "Components\CapsuleComponent.h"
 
 // Sets default values
-ACapsuleCollision::ACapsuleCollision()
+ACapsuleCollision::ACapsuleCollision():
+	CapsuleComponent(nullptr)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -14,7 +15,7 @@ ACapsuleCollision::ACapsuleCollision()
 	{
 		CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("Capsule");
 		if (!CapsuleComponent) { return; }
-		CapsuleComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		CapsuleComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);	
 		CapsuleComponent->SetupAttachment(RootComponent);
 	}
 }

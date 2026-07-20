@@ -1,21 +1,48 @@
 ﻿#include "PlayerGearComponent.h"
 
-#include <ProjectNull/System/Gear/GearBase.h>
+#include <ProjectNull/Component/HitStopComponent/HitStopComponent.h>
+
+#include <ProjectNull/Actor/Effect/EffectBase.h>
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
-#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBase.h>
+
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
+
 #include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
 #include <ProjectNull/Data/CharacterParameterData/PlayerParameterData/PlayerParameterData.h>
-#include <ProjectNull/System/Subsystem/WorldSubsystem/EnemyManagerSubsystem/EnemyManagerSubsystem.h>
+
+#include <ProjectNull/System/Gear/GearBase.h>
+
+#include <GameFramework/CharacterMovementComponent.h>
+
+#include <ProjectNull/Weapon/Manager/WeaponManager.h>
+#include <ProjectNull/Weapon/Data/WeaponData.h>
+#include <ProjectNull/Weapon/Instance/WeaponInstance.h>
+#include "NiagaraComponent.h"
+#include "Components/SphereComponent.h"
 
 
 UPlayerGearComponent::UPlayerGearComponent():
 		OwnerPlayer(nullptr),
-		PlayerGears(TArray<UGearBase*>()),
-		CurrentGearLevel(1)
+		PlayerRuntimeData(nullptr),
+		PlayerParameterData(nullptr),
+		PlayerGears(TArray<TObjectPtr<UGearBase>>()),
+		GearChangeSphereComp(nullptr),
+		InvincibleEffect(nullptr),
+		CurrentGearLevel(1),
+		HitStopDuration(0.f),
+		HitStopTimeDilation(0.f),
+		InvincibilityTimerHandle(FTimerHandle()),
+		InvincibilityAttackPowerScale(1.f),
+		CoolTimeScale(0.8f),
+		SpeedScale(1.4f),
+		TargetEffectScale(1.f),
+		EffectScaleInterpSpeed(1.f),
+		EffectDeactivateScaleThreshold(0.1f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
+	
+	GearChangeSphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("GearChangeSphere"));
+	
 }
 
 void UPlayerGearComponent::BeginPlay()
@@ -24,21 +51,41 @@ void UPlayerGearComponent::BeginPlay()
 
 	OwnerPlayer = Cast<APlayerBase>(GetOwner());
 
-	auto SuperGameInstance = GetWorld()->GetGameInstance<USuperGameInstance>();
-	if (!SuperGameInstance) { return; }
+	const auto SuperGameInstance	= GetWorld()->GetGameInstance<USuperGameInstance>();
+	if (!SuperGameInstance)		{ return; }
 
-	const TObjectPtr<UPlayerParameterData> ParameterData
-		= SuperGameInstance->GetPlayerParameterData();
+	PlayerParameterData = SuperGameInstance->GetPlayerParameterData();
+	if (!PlayerParameterData) { return; }
+
+	PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
+	if (!PlayerRuntimeData) { return; }
+
+	InitializeSphereCollision();
+
+	
+	//↓のコードで装備してるギアのTSubclassOf<UGearBase>が三つ手に入る。
+	//データテーブルにクラスが設定されてないか装備しているセーブデータがないと取得できない。
+	const auto WeaponManager = SuperGameInstance->GetWeaponManager();
+	if (!WeaponManager) { return; }
+	
+	FWeaponInstance WeaponInstance;
+	FWeaponData		WeaponData;
+	
+	for (int i = 0; i < 3; i++)
+	{
+		if (!WeaponManager->GetEquippedWeapon(WeaponInstance, i)) { continue; }
+		if (!WeaponManager->GetWeaponMaster(WeaponInstance.WeaponId, WeaponData)) { continue;}
+
+		PlayerGears[i] = NewObject<UGearBase>(this,WeaponData.Gear);
+	}
 
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
 		if (!PlayerGears[Index]) { continue; }
 		PlayerGears[Index]->Initialize(OwnerPlayer, this);
 		PlayerGears[Index]->SetGearIndex(Index);
-		//ParameterData->SetSkillCooldownTime(Index, PlayerGears[Index]->GetGearCoolTime(CurrentGearLevel));
-		ParameterData->ResetSkillCooldown(Index);
+		PlayerParameterData->ResetSkillCooldown(Index);
 	}
-
 }
 
 void UPlayerGearComponent::TickComponent(
@@ -50,20 +97,24 @@ void UPlayerGearComponent::TickComponent(
 
 	UpdateGearWidget(DeltaTime);
 
-	for(auto& Gear : PlayerGears) {
+	for (auto& Gear : PlayerGears)
+	{
 		if (!Gear) { continue; }
 		Gear->Update(DeltaTime);
 	}
 
 	UpdateCollisionByInvincibility();
-
+	
+	UpdateEffectScale(DeltaTime);
 }
 
 bool UPlayerGearComponent::IsMovementBlockedByGear() const
 {
-	for (auto& Gear : PlayerGears) {
+	for (auto& Gear : PlayerGears)
+	{
 		if (!Gear) { continue; }
-		if (Gear->BlocksMovement()) {
+		if (Gear->BlocksMovement())
+		{
 			return true;
 		}
 	}
@@ -72,70 +123,149 @@ bool UPlayerGearComponent::IsMovementBlockedByGear() const
 
 void UPlayerGearComponent::ExecuteGear(int32 GearIndex)
 {
-	if (PlayerGears.IsValidIndex(GearIndex)) {
-		if (PlayerGears[GearIndex]) {
+	if (!PlayerGears.IsValidIndex(GearIndex) ||
+		!PlayerGears[GearIndex]) { return; }
+
+
+	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
+	{
+		auto& Gear = PlayerGears[Index];
+		if (!IsValid(Gear) ||
+			Index == GearIndex) { continue; }
+
+		if (Gear->AllowOtherGearActivation())
+		{
 			PlayerGears[GearIndex]->Execute(CurrentGearLevel);
+			return;
 		}
 	}
+
 }
 
 void UPlayerGearComponent::ChangeGear()
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
-		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()
-		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData()) {
-		return;
-	}
+	if (!OwnerPlayer ||
+		!PlayerRuntimeData ||
+		!PlayerParameterData) { return; }
+
 	if (!CanChangeGear()) { return; }
-	const TObjectPtr<UPlayerRuntimeData> RuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
-	RuntimeData->ResetDataOnGearChange(CurrentGearLevel);
-	
 
-	// プレイヤーのパラメータデータ取得
-	const TObjectPtr<UPlayerParameterData> ParameterData = OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
-	RuntimeData->CalculateInvincibilityTime(ParameterData->GetGearData());
+	PlayerRuntimeData->ResetDataOnGearChange(CurrentGearLevel);
+
+	// プレイヤーのギアパラメータデータ取得
+	const auto GearParameterData = PlayerParameterData->GetGearData();
+
+	PlayerRuntimeData->CalculateInvincibilityTime(GearParameterData);
 	CurrentGearLevel = (CurrentGearLevel % 4 + 1);
-	UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
-
-	//for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
-	//{
-	//	const TObjectPtr<const UGearBase> Gear = PlayerGears[Index];
-	//	if (!Gear) { continue; }
-
-	//	//UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"), RemainTime);
-	//	ParameterData->SetSkillCooldownTime(Index, Gear->GetGearCoolTime(CurrentGearLevel));
-	//}
+	//UE_LOG(LogTemp, Warning, TEXT("hi level %d"), CurrentGearLevel);
 
 	OnInvincibilityStart();
 }
 
-void UPlayerGearComponent::SetIsInvincible(bool SetFlg)
+void UPlayerGearComponent::OnGearBeginOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
 {
-	if (!GetWorld()->GetGameInstance<USuperGameInstance>()
-		|| !GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData()) { return; }
-	const TObjectPtr<UPlayerRuntimeData> RuntimeData = GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData();
-	RuntimeData->SetIsInvincible(SetFlg);
+	if (!OtherActor || 
+		!OwnerPlayer ||
+		!PlayerRuntimeData) { return; }
+
+	// キャラクターインターフェースを実装しているか
+	if (auto* Interface = Cast<ICharacterInterface>(OtherActor))
+	{
+		Interface->ApplyDamaged(InvincibilityAttackPowerScale + PlayerRuntimeData->GetCharacterAttackPower());
+		Interface->ApplyKnockBack(OwnerPlayer->GetActorLocation());
+	}
+	
+	// const auto HitStopComp = OwnerPlayer->GetHitStopComponent();
+	// if (!HitStopComp) { return; }
+	//
+	// HitStopComp->StartHitStop(
+	// 	HitStopDuration,
+	// 	HitStopTimeDilation
+	// );
+}
+
+void UPlayerGearComponent::InitializeSphereCollision()
+{
+	if (!GearChangeSphereComp ||
+		!IsValid(OwnerPlayer)) { return; }
+	
+	GearChangeSphereComp->AttachToComponent(OwnerPlayer->GetRootComponent(),
+											FAttachmentTransformRules::KeepRelativeTransform);
+	GearChangeSphereComp->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+	GearChangeSphereComp->OnComponentBeginOverlap.AddDynamic(
+		this,
+		&UPlayerGearComponent::OnGearBeginOverlap);
+	
+}
+
+void UPlayerGearComponent::UpdateSkillCooldown(
+	int32 Index,
+	UGearBase* Gear)
+{
+	if (!PlayerParameterData ||
+		!Gear) { return; }
+
+	const FTimerHandle	CoolTimerHandle		= Gear->GetCoolTimerHandle();
+	const FTimerManager&TimerManager		= GetWorld()->GetTimerManager();
+	const bool			IsCooldownActive	= TimerManager.IsTimerActive(CoolTimerHandle);
+	const float			RemainTime			= IsCooldownActive ? TimerManager.GetTimerRemaining(CoolTimerHandle) : 0.f;
+
+	PlayerParameterData->UpdateSkillCooldown(
+		Index,
+		RemainTime,
+		Gear->GetGearCoolTime(Index));
+}
+
+void UPlayerGearComponent::SetIsInvincible(bool bInIsInvincible)
+{
+	if (!PlayerRuntimeData ||
+		!GearChangeSphereComp) { return; }
+
+	PlayerRuntimeData->SetIsInvincible(bInIsInvincible);
+
+	const ECollisionEnabled::Type CollisionType = bInIsInvincible
+	? ECollisionEnabled::Type::QueryAndPhysics
+	: ECollisionEnabled::Type::NoCollision;
+	
+	GearChangeSphereComp->SetCollisionEnabled(CollisionType);
+	
+	if (bInIsInvincible)
+	{
+		StartInvincibleEffect();
+	}
+	else
+	{
+		DeactivateEffect();
+	}
+}
+
+void UPlayerGearComponent::SetPlayerGears(
+	UGearBase* InGear,
+	int32 Index)
+{
+	if (!PlayerGears.IsValidIndex(Index)) { return; }
+	PlayerGears[Index] = InGear;
 }
 
 bool UPlayerGearComponent::CanChangeGear() const
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance() || !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()) {
-		return false;
-	}
-
-	const TObjectPtr<UPlayerRuntimeData> PlayerRuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
+	if (!PlayerRuntimeData) { return false; }
 	return PlayerRuntimeData->CanChangeGear(CurrentGearLevel);
 }
 
 void UPlayerGearComponent::OnInvincibilityStart()
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
-		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData())
-	{
-		return;
-	}
+	if (!PlayerRuntimeData ||
+		!PlayerParameterData ||
+		!OwnerPlayer) { return; }
 
-	const TObjectPtr<UPlayerRuntimeData> RuntimeData = OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData();
+	const auto& GearRuntimeData = PlayerRuntimeData->GetGearData();
 
 	SetIsInvincible(true);
 
@@ -143,102 +273,107 @@ void UPlayerGearComponent::OnInvincibilityStart()
 		InvincibilityTimerHandle,
 		this,
 		&UPlayerGearComponent::OnInvincibilityEnd,
-		RuntimeData->GetGearData().GearChangeInvincibilityTime,
+		GearRuntimeData.GearChangeInvincibilityTime,
 		false);
+
+	const auto& CharacterMovement = OwnerPlayer->GetCharacterMovement();
+	if (!CharacterMovement) { return; }
+
+	if (PlayerRuntimeData->IsInvincible()) { return; }
+	
+	CharacterMovement->MaxWalkSpeed *= SpeedScale;
+	
+	SetIsInvincible(true);
+	//UE_LOG(LogTemp, Warning, TEXT("hi MaxWalkSpeed %.0f"),SpeedRuntimeData.Final);
 }
 
 void UPlayerGearComponent::OnInvincibilityEnd()
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
-		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData())
+	if (!PlayerRuntimeData ||
+		!PlayerParameterData ||
+		!OwnerPlayer) { return; }
+
+	const auto& SpeedRuntimeData = PlayerRuntimeData->GetSpeed();
+	const auto& SpeedParameterData = PlayerParameterData->GetSpeedData();
+
+	if (CurrentGearLevel == kMaxGearLevel)
 	{
-		return;
-	}
-
-
-	if (CurrentGearLevel == kMaxGearLevel) {
 		CurrentGearLevel = 1;
-		OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()->LevelUp();
+		PlayerRuntimeData->LevelUp();
 	}
 
+	const auto& CharacterMovement = OwnerPlayer->GetCharacterMovement();
+	if (!CharacterMovement) { return; }
+	
+	PlayerRuntimeData->CalculateFinalSpeed(SpeedParameterData,CurrentGearLevel);
+	CharacterMovement->MaxWalkSpeed = SpeedRuntimeData.Final;
+	
 	SetIsInvincible(false);
 }
 
 void UPlayerGearComponent::UpdateCollisionByInvincibility()
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
-		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()
-		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData()) {
-		return;
-	}
+	if (!OwnerPlayer ||
+		!PlayerRuntimeData) { return; }
 
-	const TObjectPtr<UPlayerRuntimeData> RuntimeData = GetWorld()->GetGameInstance<USuperGameInstance>()->GetPlayerRuntimeData();
-	const TObjectPtr<UPlayerParameterData> ParameterData = OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
+	if (!PlayerRuntimeData->IsInvincible()) { return; }
+	//UE_LOG(LogTemp, Warning, TEXT("hi addmove"));
 
-	if (!RuntimeData->IsInvincible()) { return; }
-	
-	const FVector PlayerLocation = OwnerPlayer->GetActorLocation();
-	const float InvincibilityCollisionRadiusSquared = ParameterData->GetGearData().InvincibilityCollisionRadiusSquared;
-	auto* EnemyManager = GetWorld()->GetSubsystem<UEnemyManagerSubsystem>();
-
-	const FRotator	YawRotation = { 0.f, OwnerPlayer->GetControlRotation().Yaw, 0.f };
-	const FVector	Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FRotator YawRotation = {0.f, OwnerPlayer->GetControlRotation().Yaw, 0.f};
+	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 	OwnerPlayer->AddMovementInput(Forward);
+}
 
-	if (!EnemyManager) { return; }
-
-	for (const auto& Enemy : EnemyManager->GetEnemyList())
+void UPlayerGearComponent::UpdateEffectScale(float InDeltaTime)
+{
+	if (!PlayerRuntimeData ||
+		!InvincibleEffect)					{ return; }
+	
+	const auto EffectComp = InvincibleEffect->GetEffectComponent();
+	if (!EffectComp) { return; }
+	
+	const bool IsInvincible = PlayerRuntimeData->IsInvincible();
+	
+	const FVector TargetScale = IsInvincible
+	? FVector(TargetEffectScale, TargetEffectScale, TargetEffectScale)
+	: FVector::ZeroVector;
+	
+	const FVector ResultScale = FMath::VInterpTo(
+		EffectComp->GetRelativeScale3D(),
+		TargetScale,
+		InDeltaTime,
+		EffectScaleInterpSpeed);
+	
+	if (!IsInvincible && ResultScale.X < EffectDeactivateScaleThreshold)
 	{
-		if (!Enemy) { continue; }
-
-		const float DistSq = FVector::DistSquared(PlayerLocation, Enemy->GetActorLocation());
-
-		if (DistSq <= InvincibilityCollisionRadiusSquared)
-		{
-			// キャラクターインターフェースを実装しているか
-			if (auto* interface = Cast<ICharacterInterface>(Enemy))
-			{
-				interface->ApplyDamaged();
-				interface->ApplyKnockBack(PlayerLocation);
-			}
-		}
+		DeactivateEffect();
 	}
-
-	DrawDebugSphere(
-		GetWorld(),
-		OwnerPlayer->GetActorLocation(),
-		FMath::Sqrt(InvincibilityCollisionRadiusSquared),
-		16,
-		FColor::Green,
-		false,
-		0.1f);
-
+	
+	EffectComp->SetRelativeScale3D(ResultScale);
 }
 
 void UPlayerGearComponent::UpdateGearWidget(float DeltaTime)
 {
-	if (!OwnerPlayer || !OwnerPlayer->GetSuperGameInstance()
-		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerRuntimeData()
-		|| !OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData()) {
-		return;
-	}
-	TObjectPtr<UPlayerParameterData> ParameterData
-		= OwnerPlayer->GetSuperGameInstance()->GetPlayerParameterData();
-	ffff -= DeltaTime;
 	for (int32 Index = 0; Index < PlayerGears.Num(); ++Index)
 	{
-		const TObjectPtr<const UGearBase> Gear = PlayerGears[Index];
-		if (!Gear) { continue; }
-		const FTimerHandle CoolTimerHandle = Gear->GetCoolTimerHandle();
-		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-		const bool IsCooldownActive = TimerManager.IsTimerActive(CoolTimerHandle);
-		const float RemainTime = IsCooldownActive ? TimerManager.GetTimerRemaining(CoolTimerHandle) : 0.f;
-		//UE_LOG(LogTemp, Display, TEXT("RemainTime %.2f"),RemainTime);
-		//UE_LOG(LogTemp, Display, TEXT("ffff %.2f"), ffff);
-		//ParameterData->SetSkillCooldownTime(Index, RemainTime);
-		ParameterData->UpdateSkillCooldown(Index, RemainTime,Gear->GetGearCoolTime(Index));
+		UpdateSkillCooldown(Index, PlayerGears[Index]);
 	}
-
 }
 
+void UPlayerGearComponent::StartInvincibleEffect()
+{
+	if (!InvincibleEffect ||
+		!OwnerPlayer) { return; }
+
+	const auto RootComp = OwnerPlayer->GetRootComponent();
+	if (!RootComp) { return; }
+
+	InvincibleEffect->Start(RootComp);
+}
+
+void UPlayerGearComponent::DeactivateEffect()
+{
+	if (!InvincibleEffect) { return; }
+	InvincibleEffect->DeactivateImmediateEffect();
+}

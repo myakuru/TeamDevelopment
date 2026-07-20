@@ -1,6 +1,9 @@
 ﻿
 #include "AfterImageAttackEffect.h"
 
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/Sound/SoundManager.h>
+
 #include <ProjectNull/Actor/GhostActor/GhostActor.h>
 #include <ProjectNull/Actor/Effect/ModelAfterimageTrailEffect/ModelAfterimageTrailEffect.h>
 
@@ -55,10 +58,28 @@ float UAfterImageAttackEffect::GetMaxTime()
 	return MaxTime;
 }
 
-void UAfterImageAttackEffect::UpdateAfterimageAttackData(float DeltaTime, float ElapsedTime, FAfterImageAttackData& Data)
+void UAfterImageAttackEffect::SetSESound(USoundBase* inSound)
+{
+	DashSESound = inSound;
+}
+
+void UAfterImageAttackEffect::UpdateAfterimageAttackData(
+	float DeltaTime,
+	float ElapsedTime,
+	FAfterImageAttackData& Data)
 {
 	// 残像を追加
-	Data.SetEnableSpawn(true);
+	if (Data.SetEnableSpawn(true))
+	{
+		//ダッシュ効果音
+		GetWorld()->GetGameInstance<USuperGameInstance>()->
+			GetSoundManager()->Play2D(DashSESound);
+		
+		if (DashSESound == nullptr)
+		{
+			UE_LOG(LogTemp, Warning,TEXT("DashSESound nullptr"));
+		}
+	}
 
 	// 開始時のトランフォーム情報から行列と座標を取得する
 	const FVector Location	= StartTransfrom.GetLocation();
@@ -88,17 +109,24 @@ void UAfterImageAttackEffect::UpdateAfterimageAttackData(float DeltaTime, float 
 
 	if (!Data.ModelAfterimageTrailEffect) { return; }
 
-	Data.ModelAfterimageTrailEffect->Update(DeltaTime, Data.Transform, SkeletalMesh, AnimationAsset, Data.PoseTime);
+	Data.ModelAfterimageTrailEffect->Update(
+		DeltaTime,
+		Data.Transform,
+		SkeletalMesh,
+		AnimationAsset,
+		Data.PoseTime);
 }
 
-void FAfterImageAttackData::SetEnableSpawn(bool bInEnableSpawn) const
+bool FAfterImageAttackData::SetEnableSpawn(bool bInEnableSpawn) const
 {
 	// フラグ変更可能なときのみ実行できる
 	if (!ModelAfterimageTrailEffect
 		|| ModelAfterimageTrailEffect->EnableSpawn() == bInEnableSpawn)
 	{
-		return;
+		return false;
 	}
 
 	ModelAfterimageTrailEffect->SetEnableSpawn(bInEnableSpawn);
+	
+	return true;
 }

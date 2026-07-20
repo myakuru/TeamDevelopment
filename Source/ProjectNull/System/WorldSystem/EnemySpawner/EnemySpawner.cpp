@@ -7,6 +7,8 @@
 #include "EnemySpawnPattern/EnemySpawnPatternBase.h"
 
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyGrunt/EnemyGruntBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyMidBossBase/EnemyMidBossBase.h>
 
 #include <ProjectNull/System/Subsystem/WorldSubsystem/GameProgressSubsystem/GameProgressSubsystem.h>
 #include <ProjectNull/System/WorldSystem/EnemySpawner/EnemyPhaseSpawnTable.h>
@@ -17,6 +19,22 @@ AEnemySpawner::AEnemySpawner()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+}
+
+void AEnemySpawner::SetFinalPhase()
+{
+	if (FinalPhase) { return; }
+	FinalPhase = true;
+
+	ApplySpawnModeByPhase(PhaseSpawnTable->FinalWave);
+}
+
+void AEnemySpawner::SetBossPhase()
+{
+	if (BossPhase) { return; }
+	BossPhase = true;
+
+	ApplySpawnModeByPhase(PhaseSpawnTable->BossWave);
 }
 
 void AEnemySpawner::BeginPlay()
@@ -59,6 +77,12 @@ void AEnemySpawner::BeginPlay()
 	{
 		CachedSubsystem->OnPhaseChanged.AddUObject(this, &AEnemySpawner::HandlePhaseChanged);
 		HandlePhaseChanged(CachedSubsystem->GetPhase());
+		
+		CachedSubsystem = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
+		if (CachedSubsystem)
+		{
+			CachedSubsystem->SetPhaseThresholds(PhaseSpawnTable->PhaseWaves[0].PhaseUpDeathEnemyCount);
+		}
 	}
 }
 
@@ -75,6 +99,8 @@ void AEnemySpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AEnemySpawner::SpawnEnemy()
 {
+	if (SpawnStop) 
+	{ return; }
 	// 出現対象が存在しなかったら実行しない
 	//if (!EnemyClass) { return; }
 
@@ -82,7 +108,7 @@ void AEnemySpawner::SpawnEnemy()
 
 	if (!CurrentWaveData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("WaveData is null"));
+		//UE_LOG(LogTemp, Error, TEXT("WaveData is null"));
 		return;
 	}
 
@@ -117,7 +143,6 @@ void AEnemySpawner::SpawnEnemy()
 		{
 			Accumulated += Unit.CreateProbability;
 
-			// 累積確率を超えたらこの敵を選択
 			// 乱数よりも敵生成確率が低ければ次の敵に移って再生成
 			// 累積確率を超えたらこの敵を選択
 			if (Roll < Accumulated)
@@ -142,7 +167,7 @@ void AEnemySpawner::SpawnEnemy()
 						{
 							if (poolSubSystem->IsPoolFull(Unit.PoolConfig))
 							{
-								UE_LOG(LogTemp, Warning, TEXT("[Spawner] Pool is full. Skip spawn: %s"), *Unit.PoolConfig->GetName());
+								//UE_LOG(LogTemp, Warning, TEXT("[Spawner] Pool is full. Skip spawn: %s"), *Unit.PoolConfig->GetName());
 								continue;
 							}
 
@@ -185,7 +210,7 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 {
 	if (!PhaseSpawnTable)
 	{
-		UE_LOG(LogTemp, Error, TEXT("PhaseSpawnTable is null"));
+		//UE_LOG(LogTemp, Error, TEXT("PhaseSpawnTable is null"));
 		CurrentWaveData = nullptr;
 		return;
 	}
@@ -193,14 +218,69 @@ void AEnemySpawner::ApplySpawnModeByPhase(int NewPhase)
 	// 新しいウェーブデータを取得
 	UEnemyWaveDataAsset* NewWaveData = 
 		const_cast<UEnemyWaveDataAsset*>(PhaseSpawnTable->FindWaveDataByPhase(NewPhase));
-	
+
 	if (!NewWaveData)
 	{
-		UE_LOG(LogTemp, Error, TEXT("No WaveData found Phase : %d"), NewPhase);
-		CurrentWaveData = nullptr;
+		//UE_LOG(LogTemp, Error, TEXT("No WaveData found Phase : %d"), NewPhase);
+		//CurrentWaveData = nullptr;
 		return;
 	}
 
 	CurrentWaveData = NewWaveData;
+	SpawnParams.SpawnInterval = PhaseSpawnTable->PhaseWaves[NewPhase].PhaseInterval;
 	NowPhase = NewPhase;
+
+	CachedSubsystem = GetWorld()->GetSubsystem<UGameProgressSubsystem>();
+	if (CachedSubsystem)
+	{
+		CachedSubsystem->SetPhaseThresholds(PhaseSpawnTable->PhaseWaves[NewPhase].PhaseUpDeathEnemyCount);
+		if (NewPhase == PhaseSpawnTable->FinalWave)
+		{
+			CachedSubsystem->SetFinalWave(true);
+		}
+		if (NewPhase == PhaseSpawnTable->BossWave)
+		{
+			CachedSubsystem->SetBossWave(true);
+		}
+	}
+
+	// 中ボス出現
+	if (PhaseSpawnTable->FinalWave == NewPhase)
+	{
+		FinalPhase = true;
+
+		if (PhaseSpawnTable->StageTyuuBoss)
+		{
+
+			AEnemyMidBossBase* MidBoss = GetWorld()->SpawnActor<AEnemyMidBossBase>(
+				PhaseSpawnTable->StageTyuuBoss,
+				GetActorLocation(),
+				GetActorRotation());
+
+			if (!IsValid(MidBoss))
+			{
+				return;
+			}
+		}
+	}
+
+	// ボス出現
+	if (PhaseSpawnTable->BossWave == NewPhase)
+	{
+		BossPhase = true;
+
+		if (PhaseSpawnTable->StageBoss)
+		{
+
+			AEnemyBossBase* Boss = GetWorld()->SpawnActor<AEnemyBossBase>(
+				PhaseSpawnTable->StageBoss,
+				GetActorLocation(),
+				GetActorRotation());
+
+			if (!IsValid(Boss))
+			{
+				return;
+			}
+		}
+	}
 }

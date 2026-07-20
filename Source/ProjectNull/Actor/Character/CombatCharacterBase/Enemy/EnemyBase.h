@@ -2,20 +2,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
-#include "../../../../System/DataTable/KnockBackData/KnockBackData.h"
-#include "../../../../System/Interface/CharacterInterface/CharacterInterface.h"
-#include "../../../../System/Interface/CharacterInterface/EnemyInterface/EnemyInterface.h"
+#include "ProjectNull/System/Interface/CharacterInterface/CharacterInterface.h"
 #include "EnemyDataStruct.h"
-#include "../CombatCharacterBase.h"
-#include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
 #include "EnemyBase.generated.h"
 
 // 前方宣言
 class UCapsuleComponent;
 class UStateTreeComponent;
-class USkeletalMeshComponent;
 class UPrimitiveComponent;
 class UEnemyDataAsset;
 class AEnemyISMManager;
@@ -51,8 +45,6 @@ class UEnemyRuntimeData;
 
 /// <summary>
 /// 敵の中間基底クラス
-/// メモ：Characterクラスを継承しているがコンポーネントが多く、
-///	重くなる可能性があるためActorを継承する可能性大
 /// </summary>
 UCLASS()
 class PROJECTNULL_API AEnemyBase:	public AActor
@@ -63,67 +55,74 @@ class PROJECTNULL_API AEnemyBase:	public AActor
 public:
 
 	AEnemyBase();
-	~AEnemyBase() override;
+	virtual ~AEnemyBase() override;
 
 public:
 
 	/** Poolから取り出されるときに呼ぶ*/
-	virtual void Activate(const FVector& LocalPos, UEnemyDataAsset* InData);
+	virtual void Activate(const FVector& InLocalPos, UEnemyDataAsset* InData);
 
 	/** Poolに返却するときに呼ぶ*/
 	virtual void Deactivate();
 
-	//~ Begin Setter
+	/**
+	 * @brief 今、攻撃可能距離内にいるかを返す
+	 * @return 範囲内ならtrue
+	 */
+	virtual bool IsInAttackDistance();
 
 	/**
-	 * @brief 敵（自身）が吹き飛ばされる処理
-	 * @param playerLocation プレイヤーの座標
-	 * @param AttackPower 攻撃力
-	 * @param EnemyWeight 敵の重さ
+	 * @brief 今、追跡可能距離内にいるかを返す
+	 * @return 範囲内ならtrue
 	 */
-	virtual void SetKnockBackData(const FVector& PlayerLocation, float AttackPower, float EnemyWeight);
+	virtual bool IsInChaseDistance();
 
+	//~ Begin Setter
 	/**
 	 * @brief 移動方向のセット
-	 * @param MoveDir 移動方向
+	 * @param InMoveDir 移動方向
 	 */
-	virtual void SetMoveDir(const FVector& a_MoveDir) { EnemyStatus.MoveDir = a_MoveDir; }
+	virtual void SetMoveDir(const FVector& InMoveDir) { EnemyStatus.MoveDir = InMoveDir; }
 
 	/**
 	 * @brief ターゲットとの距離の二乗値セット
-	 * @param DistSqr 距離の二乗値
+	 * @param InDistSqr 距離の二乗値
 	 */
-	virtual void SetTargetDistanceSqr(float a_DistSqr) { EnemyStatus.TargetDistanceSqr = a_DistSqr; }
+	virtual void SetTargetDistanceSqr(const float InDistSqr) { EnemyStatus.TargetDistanceSqr = InDistSqr; }
 
 	/**
 	* @brief 生存状態をセット
 	*/
-	virtual void SetIsAlive(bool a_IsAlive) { EnemyStatus.IsAlive = a_IsAlive; }
+	virtual void SetIsAlive(const bool InIsAlive) { EnemyStatus.IsAlive = InIsAlive; }
 
 	/**
 	 * @brief 状態タイプをセット
-	 * @param a_State 変更先ステート
+	 * @param InTargetState 変更先ステート
 	 */
-	virtual void SetEnemyState(EEnemyState a_TargetState);
+	virtual void SetEnemyState(EEnemyState InTargetState);
+
+	/**
+	 * @brief 攻撃が終了した瞬間の時間を登録
+	 */
+	virtual void NotfyAttackFinishTime();
 
 	/**
 	 * @brief 外部からステートEnum変更を通知
-	 * @param a_TargetState 変更先ステート
+	 * @param InTargetState 変更先ステート
 	 */
-	virtual void NotifyChangedStateEnum(EEnemyState a_TargetState);
+	virtual void NotifyChangedStateEnum(EEnemyState InTargetState);
 
 	/**
 	 * @brief 所持する当たり判定チャンネルのレスポンス設定を変更
-	 * @param Channel 変更対象チャンネル(WorldStatic,Pawn,etc..)
-	 * @param NewResponse レスポンスタイプ(Block・Overlap・Ignore)
+	 * @param InChannel 変更対象チャンネル(WorldStatic,Pawn,etc..)
+	 * @param InNewResponse レスポンスタイプ(Block・Overlap・Ignore)
 	 */
-	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel Channel, ECollisionResponse NewResponse);
+	virtual void NotifyChangedCollisionResponseToChannel(ECollisionChannel InChannel, ECollisionResponse InNewResponse);
 
 	//~ End Setter
 
 
 	//~ Begin Getter
-
 	/** ノックバック時の重さを取得 */
 	float GetKnockBackWeight()const { return EnemyStatus.KnockBackWeight; }
 
@@ -165,6 +164,12 @@ public:
 		return EnemyAttackComponent;
 	}
 
+	/** ISMInstanceIndexを返す*/
+	uint32 GetISMInstanceIndex() const
+	{
+		return ISMInstanceIndex;
+	}
+
 	/** ターゲットとの距離を返す*/
 	float GetTargetDistanceSqr()const { return EnemyStatus.TargetDistanceSqr; }
 
@@ -177,37 +182,26 @@ public:
 		return GameProgress;
 	}
 
-	/**
-	 * @brief 汎用的なEnumビット(uint8型)上昇処理
-	 * @tparam T クラス(Enum Class名etc)
-	 * @param a_currentBit  元のBit
-	 * @param a_targetBit	上げたいBit
-	 */
-	template<typename T>
-	void UpEnumBit(uint8 a_CurrentBit, T a_TargetBit)
-	{
-		a_CurrentBit |= static_cast<uint8>(a_TargetBit);
-	}
-
-	/**
-	 * @brief 汎用的なEnumビット(uint8型)下降処理
-	 * @tparam T クラス(Enum Class名etc)
-	 * @param a_currentBit  元のBit
-	 * @param a_targetBit	下げたいBit
-	 */
-	template<typename T>
-	void DownEnumBit(uint8 a_CurrentBit, T a_TargetBit)
-	{
-		a_CurrentBit &= ~static_cast<uint8>(a_TargetBit);
-	}
-
-	bool GetAliveFlg() { return EnemyStatus.IsAlive; }
+	bool GetAliveFlg() const { return EnemyStatus.IsAlive; }
 
 	//~ End Getter
 
-	/* Begin Character Interface.*/
-	virtual void ApplyDamaged(float a_Damage = 1.f)override;
 
+	/* Begin Character Interface.*/
+	/**	最終的を取得 */
+	virtual float GetFinalAttackPower()const override;
+
+	/**
+	 * @brief ダメージを受ける処理
+	 * @param InDamaged ダメージ量
+	 */
+	virtual void ApplyDamaged(float InDamaged)override;
+
+	/**
+	 * @brief ノックバックを受ける処理
+	 * @param InOwnerLocation 攻撃者の位置
+	 */
+	virtual void ApplyKnockBack(const FVector& InOwnerLocation)override;
 	/* End Character Interface.*/
 
 protected:
@@ -229,9 +223,6 @@ protected:
 	/** 敵のStateTree*/
 	UPROPERTY(VisibleAnywhere, Category = "StateTree")
 	TObjectPtr<UStateTreeComponent> StateTreeComponent;
-
-	/** 敵が吹き飛ばされている状態の処理 */
-	virtual void MoveToKnockBack(const FVector& KnockBackDir, float KnockBackPower, float DeltaTime);
 
 	/** DataTable 参照 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "KnockBack")
@@ -272,7 +263,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UEnemyDataAsset> EnemyDataAsset;
-
+	
 public:
 	virtual void Tick(float DeltaTime) override {}
 
@@ -288,12 +279,12 @@ public:
 	/// <summary>
 	/// 自身が死んだ際の処理
 	/// </summary>
-	virtual void OnDeath(){ SetEnemyState(EEnemyState::Death); }
+	virtual void OnDeath(){ NotifyChangedStateEnum(EEnemyState::Death); }
 
 	/**
 	 * @brief 被弾時にステートを切り替える
 	 */
-	virtual void OnHit(){ SetEnemyState(EEnemyState::Hit); }
+	virtual void OnHit(){ NotifyChangedStateEnum(EEnemyState::Hit); }
 
 	/**
 	 * @brief 死亡を確定させる処理(StateTree側から呼ぶ)
@@ -305,21 +296,16 @@ public:
 	/// </summary>
 	virtual void CheckCanAttack();
 
-	/** 敵が死んださいにパーティクルを出すだけ*/
+	/** 敵が死んだ際にパーティクルを出すだけ*/
 	virtual void SpawnDeathEffect();
 
-	/** 敵が死んださいに経験値を出す*/
+	/** 敵が死んだ際に経験値を出す*/
 	virtual void SpawnDeathExperience();
 
 	/** アニメーションの変更*/
-	virtual void PlayAnimation(int32 NextAnimIndex, bool bLoop);
+	virtual void PlayAnimation(int32 InNextAnimIndex, bool InbLoop,float InBlendSpeed);
 
 protected:
-
-	/**
-	 * @brief 坂道範囲内に入った時の通知処理
-	 */
-	virtual void OnEnterSlope()/*override*/;
 
 	float AnimFinishTime = 0.0f;
 
@@ -334,9 +320,6 @@ public:
 	void SetAnimSequence(UAnimSequence* InAnimSequence, bool LoopFlg);
 
 public:
-
-	/** アニメーション*/
-	//void PlayAnimationMontage();
 
 
 	/** ISMのどのインスタンスに対応するかを示すインデックス*/

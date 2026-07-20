@@ -96,9 +96,9 @@ public:
 
 struct FUpgradeState
 {
-	FName UpgradeId;
+	FName UpgradeId = FName("");
 
-	int32 Level = 0;
+	FName Level = "0";
 
 };
 
@@ -115,9 +115,7 @@ public:
 		GearChangeEnergyCost(TArray<float>())
 	{
 	}
-
-public:
-
+	
 	inline bool CanChangeGear(int32 CurrentGearLevel)
 	{
 		const int32 Index = --CurrentGearLevel;
@@ -135,11 +133,11 @@ public:
 		const int32 Index = --CurrentGearLevel;
 		if (!GearChangeEnergyCost.IsValidIndex(Index)) { return; }
 		const float EnergyCost = GearChangeEnergyCost[Index];
-		UE_LOG(LogTemp, Warning, TEXT("hi EnergyCost %.0f"), EnergyCost);
+		//UE_LOG(LogTemp, Warning, TEXT("hi EnergyCost %.0f"), EnergyCost);
 		ExcessRatio = (GearEnergy / EnergyCost) - 1.0f;
-		UE_LOG(LogTemp, Warning, TEXT("hi ExcessRatio %.2f"), ExcessRatio);
+		//UE_LOG(LogTemp, Warning, TEXT("hi ExcessRatio %.2f"), ExcessRatio);
 
-		GearEnergy -= EnergyCost;
+		GearEnergy = 0.f;
 
 	}
 	
@@ -185,18 +183,15 @@ struct FExperienceParameterData;
 /** ギアパラメータ構造体 */
 struct FGearParameterData;
 
-struct FUpgradeState;
 
 /** プレイヤーのRuntimeデータクラス */
 UCLASS(Blueprintable, EditInlineNew)
 class PROJECTNULL_API UPlayerRuntimeData final : public UCharacterRuntimeData
 {
 	GENERATED_BODY()
-
 public:
 	UPlayerRuntimeData();
 
-public:
 	void Initialize() override;
 
 	/**
@@ -222,16 +217,29 @@ public:
 	void ResetDataOnGearChange(int32 CurrentGearLevel);
 
 	void CalculateInvincibilityTime(const FGearParameterData& Data);
+	
+	/**
+	 * @brief 最終的な速度計算処理
+	 */
+	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
+
+	/**
+	 * @brief プレイヤーの攻撃力を計算する
+	 * @return 計算された攻撃力
+	 */
+	float GetPlayerAttackDamage();
 
 	/**
 	 * @brief レベルアップ処理
 	 */
 	void LevelUp();
 
-	inline void SetIsInvincible(bool SetFlg) { bIsInvincible = SetFlg; }
+	inline void SetOwner(APlayerBase* InOwner) { Owner = InOwner; }
+	inline void SetIsInvincible(bool bInIsInvincible) { bIsInvincible = bInIsInvincible; }
 
 	inline bool IsInvincible() const { return bIsInvincible; }
 	inline FGearRuntimeData& GetGearData() { return Gear; }
+	inline FSpeedRuntimeData& GetSpeed() { return Speed; }
 
 	/** 経験値が変更されたときに呼び出されるデリゲート */
 	UPROPERTY(BlueprintAssignable)
@@ -245,17 +253,46 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnGearEnergyChanged OnGearEnergyChanged;
 
-
+	UPROPERTY()
 	TObjectPtr<ARobotController> RobotController;
 
-	/** Widget側で呼び出す */
+	/**
+	 * @brief UIに提示する強化候補を Count 件つくる。
+	 *        DataTableの抽選・レベル判定はここに集約し、UIは表示するだけにする。
+	 * @param Count 抽選する件数
+	 * @return 提示可能だった候補の配列（無効な行は除外されるため Count 未満になり得る）
+	 */
+	TArray<FValidUpgradeInfo> BuildUpgradeChoices(int32 Count);
+
+	/**
+	 * @brief UIで選択された強化を適用する（強化レベルの加算＋効果の反映）。
+	 *        効果の反映は EffectType で振り分けるため、Id ごとの分岐は不要。
+	 * @param Id 選択された強化の行名
+	 */
+	void ApplySelectedUpgrade(FName Id);
+
+	FName GetUpgradeLevel(FName Id) const;
+
+	void UpgradeAttackMultiplier(FName Id,float InMultiplier);
+
+	/**
+	 * @brief レベルアップ時のプレイヤーステータスを更新（計算、適用）
+	 */
+	void UpdateStatus();
+	
+private:
+	/** 強化レベルを1段進める */
 	void UpdateUpgradeStates(FName Id);
 
-	int32 GetUpgradeLevel(FName Id) const;
-
-private:
-
+	/**
+	 * @brief 効果種別に応じて倍率を反映する（Idごとの分岐を持たない共通処理）
+	 * @param Type 効果種別
+	 * @param Value 反映する倍率
+	 */
+	void ApplyUpgradeEffect(EUpgradeEffectType Type, float Value);
 	
+	/** 指定Idの「現在レベル」の効果データを DataTable から取得（無ければ nullptr） */
+	FExpUpgradeLevelData* FindCurrentLevelData(FName Id);
 
 	/**
 	 * @brief HPの更新処理
@@ -269,26 +306,15 @@ private:
 	 */
 	void CalculateExperience(const FExperienceParameterData& Data);
 
-	/**
-	 * @brief 最終的な速度計算処理
-	 */
-	void CalculateFinalSpeed(const FSpeedParameterData& Data,int32 CurrentGearLevel);
-
 	
-
 	/**
 	 * @brief 計算済みの速度をCharacterMovementに適用する
 	 */
 	void ApplyMovementSpeed();
 
-	/**
-	 * @brief レベルアップ時のプレイヤーステータスを更新（計算、適用）
-	 */
-	void UpdateStatus();
-	
 	/** 持ち主のクラス */
 	UPROPERTY()
-	APlayerBase* Owner;
+	TObjectPtr<APlayerBase> Owner;
 
 	/** 経験値関連Runtimeデータ構造体 */
 	UPROPERTY(EditAnywhere, Category = "Experience")
