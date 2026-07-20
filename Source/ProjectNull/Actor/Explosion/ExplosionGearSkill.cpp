@@ -4,6 +4,8 @@
 #include "ExplosionGearSkill.h"
 
 #include "../Character/CombatCharacterBase/Enemy/EnemyBase.h"
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyMidBossBase/EnemyMidBossBase.h>
 #include "Components/SphereComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
@@ -149,13 +151,20 @@ void AExplosionGearSkill::Explode()
 	// 検索したActorからEnemyBaseを見つけてヒット処理を行う
 	for (AActor* actor : actors) {
 		AEnemyBase* enemy = Cast<AEnemyBase>(actor);
-		if (!enemy) {
+		AEnemyMidBossBase* midBoss = Cast<AEnemyMidBossBase>(actor);
+		AEnemyBossBase* boss = Cast<AEnemyBossBase>(actor);
+		if (!enemy && !midBoss && !boss) {
 			UE_LOG(LogTemp, Warning, TEXT("Not Enemy"));
 			continue;
 		}
 		
+		ICharacterInterface* interface = nullptr;
+		if (enemy)interface = Cast<ICharacterInterface>(enemy);
+		if (midBoss)interface = Cast<ICharacterInterface>(midBoss);
+		if(boss)interface = Cast<ICharacterInterface>(boss);
+
 		// キャラクターインターフェースを実装しているか
-		if (auto* interface = Cast<ICharacterInterface>(enemy))
+		if (interface)
 		{
 			interface->ApplyDamaged(Data.Damage + PlayerRuntimeData->GetCharacterAttackPower());
 			interface->ApplyKnockBack(GetActorLocation());
