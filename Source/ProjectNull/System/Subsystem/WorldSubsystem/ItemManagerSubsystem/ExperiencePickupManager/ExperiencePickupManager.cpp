@@ -67,6 +67,13 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 		NiagaraComp->SetAsset(LoadedNiagaraSystem);
 		NiagaraComp->Activate();
 	}
+	NiagaraComp->SetSystemFixedBounds(
+		FBox(
+			FVector(-50000.0f, -50000.0f, -50000.0f),
+			FVector(50000.0f, 50000.0f, 50000.0f)
+		)
+	);
+
 	NiagaraComponent = NiagaraComp;
 }
 

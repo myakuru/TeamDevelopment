@@ -79,6 +79,7 @@ void UGameProgressSubsystem::UpdatePhase()
 	{
 		SetPhase(Phase + 1);
 		KillCount = 0;
+		return;
 	}
 
 	if (BossWave)
@@ -94,6 +95,7 @@ void UGameProgressSubsystem::UpdatePhase()
 		{
 			EnemySpawner->SetSpawnStop(true);
 		}
+		return;
 	}
 
 
