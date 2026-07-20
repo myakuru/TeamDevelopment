@@ -28,16 +28,22 @@ void UExplosionGearStateBase::SpawnExplosions()
 	if (!ExplosionClass ||
 		!Player)return;
 
-	for (const FExplosionSpawnData& data : ExplosionDatas) {
-		FTransform SpawnTransform;
-		FVector spawnLocation = Player->GetActorTransform().TransformPosition(data.Offset);
+	const auto rootComp = Player->GetGroundAlignmentRootComponent();
+	if (!rootComp) { return; }
+	FRotator groundRot = rootComp->GetComponentQuat().Rotator();
+	FRotator fowordRot = Player->GetActorForwardVector().Rotation();
 
-		const auto RootComp = Player->GetGroundAlignmentRootComponent();
-		if (!RootComp) { return; }
-		const FQuat SpawnQuat = RootComp->GetComponentQuat();
+	for (const FExplosionSpawnData& data : ExplosionDatas) {
+		
+		FTransform SpawnTransform;
+		FVector offset = groundRot.RotateVector(fowordRot.RotateVector(data.Offset));
+		FVector spawnLocation = Player->GetActorLocation() + offset;
+
+		SpawnTransform.SetLocation(spawnLocation);
+		SpawnTransform.SetRotation(rootComp->GetComponentQuat());
 		
 		SpawnTransform.SetLocation(spawnLocation);
-		SpawnTransform.SetRotation(SpawnQuat);
+		SpawnTransform.SetRotation(rootComp->GetComponentQuat());
 		AExplosionGearSkill* Explosion =
 			GetWorld()->SpawnActorDeferred<AExplosionGearSkill>(
 				ExplosionClass,
@@ -50,6 +56,7 @@ void UExplosionGearStateBase::SpawnExplosions()
 		initializeData.IgnitionDelay = data.IgnitionDelay;
 		initializeData.Scale = data.Scale;
 		Explosion->Initialize(initializeData);
+		Explosion->StartExplosionSequence();
 
 		UGameplayStatics::FinishSpawningActor(
 			Explosion,
@@ -64,15 +71,17 @@ void UExplosionGearStateBase::SpawnExplosion(const FExplosionSpawnData& Explosio
 
 	if (!ExplosionClass)return;
 	
-	FTransform SpawnTransform;
-	FVector spawnLocation = Player->GetActorTransform().TransformPosition(ExplosionData.Offset);
+	const auto rootComp = Player->GetGroundAlignmentRootComponent();
+	if (!rootComp) { return; }
+	FRotator groundRot = rootComp->GetComponentQuat().Rotator();
+	FRotator fowordRot = Player->GetActorForwardVector().Rotation();
 
-	const auto RootComp = Player->GetGroundAlignmentRootComponent();
-	if (!RootComp) { return; }
-	const FQuat SpawnQuat = RootComp->GetComponentQuat();
-		
+	FTransform SpawnTransform;
+	FVector offset = groundRot.RotateVector(fowordRot.RotateVector(ExplosionData.Offset));
+	FVector spawnLocation = Player->GetActorLocation() + offset;
+
 	SpawnTransform.SetLocation(spawnLocation);
-	SpawnTransform.SetRotation(SpawnQuat);
+	SpawnTransform.SetRotation(rootComp->GetComponentQuat());
 	
 	AExplosionGearSkill* Explosion =
 		GetWorld()->SpawnActorDeferred<AExplosionGearSkill>(
@@ -86,6 +95,7 @@ void UExplosionGearStateBase::SpawnExplosion(const FExplosionSpawnData& Explosio
 	initializeData.IgnitionDelay = ExplosionData.IgnitionDelay;
 	initializeData.Scale = ExplosionData.Scale;
 	Explosion->Initialize(initializeData);
+	Explosion->StartExplosionSequence();
 
 	UGameplayStatics::FinishSpawningActor(
 		Explosion,
@@ -107,19 +117,18 @@ void UExplosionGearStateBase::SpawnExplosionsInCircle(
 
 		float angle = (360.0f / Count) * i;
 
-		const auto RootComp = Player->GetGroundAlignmentRootComponent();
-		if (!RootComp) { return; }
-		FRotator SpawnRotator = RootComp->GetComponentQuat().Rotator();
-		FVector Forward = Player->GetActorForwardVector();
-		//SpawnRotator.Yaw = angle;
-		FVector offset2 = FRotator(0.f,angle,0.f).RotateVector(FVector(CircleRadius, 0.0f, 0.0f));
-		FVector offset1 = SpawnRotator.RotateVector(offset2);
+		const auto rootComp = Player->GetGroundAlignmentRootComponent();
+		if (!rootComp) { return; }
+		FRotator groundRot = rootComp->GetComponentQuat().Rotator();
+		FRotator fowordRot = Player->GetActorForwardVector().Rotation();
+
+		FVector offset = groundRot.RotateVector(fowordRot.RotateVector(FRotator(0.f, angle, 0.f).RotateVector(FVector(CircleRadius, 0.0f, 0.0f))));
 		
 		FTransform SpawnTransform;
-		FVector spawnLocation = Player->GetActorTransform().TransformPosition(offset1);
+		FVector spawnLocation = Player->GetActorLocation() + offset;
 
 		SpawnTransform.SetLocation(spawnLocation);
-		//SpawnTransform.SetRotation(SpawnQuat);
+		SpawnTransform.SetRotation(rootComp->GetComponentQuat());
 
 		AExplosionGearSkill* Explosion =
 			GetWorld()->SpawnActorDeferred<AExplosionGearSkill>(
@@ -133,6 +142,7 @@ void UExplosionGearStateBase::SpawnExplosionsInCircle(
 		initializeData.IgnitionDelay = ExplosionData.IgnitionDelay;
 		initializeData.Scale = ExplosionData.Scale;
 		Explosion->Initialize(initializeData);
+		Explosion->StartExplosionSequence();
 
 		UGameplayStatics::FinishSpawningActor(
 			Explosion,

@@ -46,11 +46,17 @@ public:
 
 	void Initialize(const FExplosionData& InData);
 
+	UFUNCTION(BlueprintCallable)
+	void StartExplosionSequence();
+
+	UFUNCTION(BlueprintCallable)
+	void Explode();
+
 private:
 
 	void ApplyData();
 
-	void Explode();
+	
 
 	/** スフィアコリジョンコンポーネント */
 	UPROPERTY(VisibleAnywhere)
