@@ -2,7 +2,6 @@
 
 #include "Components/SphereComponent.h"
 #include "Components/TextRenderComponent.h"
-#include "Tests/ToolMenusTestUtilities.h"
 
 // Sets default values
 ASphereCollision::ASphereCollision()
