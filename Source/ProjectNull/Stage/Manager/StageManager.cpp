@@ -173,7 +173,10 @@ void UStageManager::InGameFinalize()
 	
 	//BGM停止
 	if (InGameBGMSoundComponent && InGameBGMSoundComponent->IsPlaying())
+	{
 		InGameBGMSoundComponent->Stop();
+		InGameBGMSoundComponent = nullptr;
+	}
 }
 
 void UStageManager::OutGameInitialize()
@@ -199,7 +202,11 @@ void UStageManager::OutGameInitialize()
 void UStageManager::OutGameFinalize()
 {
 	//BGM停止
-	if (OutGameBGMSoundComponent && OutGameBGMSoundComponent->IsPlaying())OutGameBGMSoundComponent->Stop();
+	if (OutGameBGMSoundComponent && OutGameBGMSoundComponent->IsPlaying())
+	{
+		OutGameBGMSoundComponent->Stop();
+		OutGameBGMSoundComponent = nullptr;
+	}
 }
 
 void UStageManager::ChangeStageInvestigation(UWorld* LoadedWorld)

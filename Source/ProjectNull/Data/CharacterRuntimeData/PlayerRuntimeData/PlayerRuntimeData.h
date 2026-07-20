@@ -96,7 +96,7 @@ public:
 
 struct FUpgradeState
 {
-	FName UpgradeId;
+	FName UpgradeId = FName("");
 
 	FName Level = "0";
 

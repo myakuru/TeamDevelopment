@@ -107,6 +107,7 @@ void APlayerBase::BeginPlay()
 	const auto PlayerRuntimeData = SuperGameInstance->GetPlayerRuntimeData();
 	if (!PlayerRuntimeData) { return; }
 	PlayerRuntimeData->SetOwner(this);
+	PlayerRuntimeData->Initialize();
 	PlayerRuntimeData->UpdateStatus();
 	
 	// ================================================================

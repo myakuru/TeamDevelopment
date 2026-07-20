@@ -38,6 +38,7 @@ void FGameTimer::StopTimer()
 	if (World.IsValid())
 	{
 		World->GetTimerManager().ClearTimer(CountdownTimerHandle);
+		RemainingTime = 0.0f;
 	}
 }
 
