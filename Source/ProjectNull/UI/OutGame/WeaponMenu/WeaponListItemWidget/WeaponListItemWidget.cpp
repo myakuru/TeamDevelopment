@@ -9,6 +9,15 @@
 #include <ProjectNull/GameInstance/SuperGameInstance.h>
 #include <ProjectNull/Weapon/Manager/WeaponManager.h>
 
+void UWeaponListItemWidget::NativeConstruct()
+{
+	if (Button) {
+		Button->OnClicked.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonClicked);
+		Button->OnHovered.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonHovered);
+		Button->OnUnhovered.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonUnHovered);
+	}
+}
+
 bool UWeaponListItemWidget::Initialize()
 {
 	Super::Initialize();
@@ -18,11 +27,7 @@ bool UWeaponListItemWidget::Initialize()
 	if(BackGround)BackGround->SetBrushColor(UnselectedBackGroundColor);
 	if(Overlay)Overlay->SetBrushColor(UnHoveredOverlayColor);
 
-	if (Button) {
-		Button->OnClicked.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonClicked);
-		Button->OnHovered.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonHovered);
-		Button->OnUnhovered.AddUniqueDynamic(this, &UWeaponListItemWidget::OnButtonUnHovered);
-	}
+	
 
 	return false;
 }

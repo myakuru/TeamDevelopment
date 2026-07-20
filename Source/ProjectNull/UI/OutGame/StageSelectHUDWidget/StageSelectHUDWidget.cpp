@@ -62,10 +62,6 @@ void UStageSelectHUDWidget::NativeConstruct()
 		PlayAnimation(FadeAnim);
 	}
 
-	if (BackAnim) {
-		PlayAnimation(BackAnim, 0.f, 0);
-	}
-
 	if (MissionAnim) {
 		PlayAnimation(MissionAnim,0.f,0);
 	}

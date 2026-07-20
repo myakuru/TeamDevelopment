@@ -6,6 +6,13 @@
 #include <Components/TextBlock.h>
 #include <ProjectNull/Weapon/Data/EffectData.h>
 
+void UEffectListItem::NativeConstruct()
+{
+	if (Button) {
+		Button->OnClicked.AddUniqueDynamic(this, &UEffectListItem::OnClickedButton);
+	}
+}
+
 bool UEffectListItem::Initialize()
 {
 	Super::Initialize();
@@ -13,9 +20,7 @@ bool UEffectListItem::Initialize()
 	EffectName->SetText(FText());
 	EffectLevel->SetText(FText());
 
-	if (Button) {
-		Button->OnClicked.AddDynamic(this, &UEffectListItem::OnClickedButton);
-	}
+	
 	return false;
 }
 

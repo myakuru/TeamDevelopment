@@ -138,8 +138,5 @@ protected:
 	TObjectPtr<UWidgetAnimation> FadeAnim;
 
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
-	TObjectPtr<UWidgetAnimation> BackAnim;
-
-	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	TObjectPtr<UWidgetAnimation> MissionAnim;
 };
