@@ -123,6 +123,11 @@ void AEnemyMidBossBase::Tick(float InDeltaTime)
 		return;
 	}
 
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::J))
+	{
+		EnemyMidBossRuntimeData->AddHealthDebug();
+	}
+
 	// プレイヤーの座標を取得
 	{
 		TObjectPtr<APawn> PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);

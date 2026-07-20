@@ -82,6 +82,7 @@ public:
 
 	/** 体力を加算する処理 */
 	void AddHealth(float Amount) { SetHealth(Health.Current + Amount); }
+	void AddHealthDebug() { SetHealth(1.0f); }
 
 public:
 

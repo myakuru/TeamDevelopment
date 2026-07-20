@@ -216,10 +216,16 @@ protected:
 	TObjectPtr<UNiagaraComponent> BreathEffect;
 
 	UPROPERTY(EditAnywhere, Category = "VFX")
+	TObjectPtr<UNiagaraComponent> SpawnedDeathEffect;
+
+	UPROPERTY(EditAnywhere, Category = "VFX")
 	TObjectPtr<UNiagaraSystem> DeathEffect;
+		
 
 	UPROPERTY(EditAnywhere, Category = "VFX")
 	TObjectPtr<UNiagaraSystem> DestroyEffect;
+
+
 
 	UPROPERTY(EditAnywhere, Category = "Material")
 	float MaterialCount = 0.0f;
