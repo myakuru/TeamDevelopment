@@ -1,10 +1,12 @@
 ﻿#include "WarningShapeActor.h"
 
+#include "ComponentUtils.h"
+
 // Sets default values
 AWarningShapeActor::AWarningShapeActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	if (!IsValid(RootComponent)) { return; }
@@ -39,6 +41,16 @@ void AWarningShapeActor::DeActivate()
 
 	// スケール値リセット
 	VariableScaleMeshComponent->SetWorldScale3D(FVector::ZeroVector);
+}
+
+void AWarningShapeActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (!IsValid(GetRootComponent()->GetAttachParent()))
+	{
+		Destroy();
+	}
 }
 
 void AWarningShapeActor::Initialize()

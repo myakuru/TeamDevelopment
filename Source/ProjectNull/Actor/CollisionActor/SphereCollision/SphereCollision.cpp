@@ -9,9 +9,19 @@ ASphereCollision::ASphereCollision()
 	:	MaxActivationDelay(0.f)
 	,	MaxDuration(0.f)
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	if (!RootComponent) { return; }
+}
+
+void ASphereCollision::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	if (!OwnerActor.IsValid())
+	{
+		Destroy();
+	}
 }
 
 // Called when the game starts or when spawned
@@ -125,8 +135,6 @@ void ASphereCollision::UpdateBlinkingHitCheck(
 	}
 	
 	OutBlinkingHitElemental.bPrevBlinking = bCurrentActive;
-	
-	UE_LOG(LogTemp,Warning,TEXT("BlinkingHitElemental: Phase %d"),bCurrentActive);
 }
 
 void ASphereCollision::UpdateDefaultHitCheck(

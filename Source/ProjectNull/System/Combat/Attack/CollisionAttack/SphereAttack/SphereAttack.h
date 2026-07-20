@@ -23,7 +23,7 @@ class PROJECTNULL_API USphereAttack : public UCollisionAttack
 public:
 	
 	USphereAttack();
-
+	
 public:
 
 	/**

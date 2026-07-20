@@ -24,7 +24,9 @@ protected:
 	 */
 	virtual void DeActivate();
 	
+	
 public:
+	virtual void Tick( float DeltaTime )override;
 	
 	virtual void Initialize(); 
 	

@@ -20,12 +20,14 @@ void USphereAttack::Initialize(const TObjectPtr<AActor>& InOwner)
 		SphereCollision = GetWorld()->SpawnActor<ASphereCollision>(SubSphereCollision);
 		if (!SphereCollision) { return; }
 
+		SphereCollision->SetOwnerActor(InOwner);
+		
 		// 攻撃用スフィアアクターを親にアタッチ
 		SphereCollision->AttachToComponent(
 			GetRootComponent(),
 			FAttachmentTransformRules::KeepRelativeTransform
 		);
-
+		
 		// 攻撃の最大時間を加算して「攻撃の最大有効時間」として使う
 		SetDuration(SphereCollision->GetBaseAttackDuration());
 
