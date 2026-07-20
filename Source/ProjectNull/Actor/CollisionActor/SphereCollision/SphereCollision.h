@@ -89,6 +89,8 @@ public:
 	// Sets default values for this actor's properties
 	ASphereCollision();
 
+	virtual void Tick(float DeltaSeconds) override;
+	
 public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -113,7 +115,7 @@ public:
 	void SetAllCollisionResponseToChannel(
 		const ECollisionChannel InCollisionChannel,
 		const ECollisionResponse InCollisionResponse);
-
+	
 	/**
 	 * @brief コリジョン判定の有効無効の切り替え
 	 * @param InEnabled NoCollisionで無効
@@ -122,6 +124,12 @@ public:
 
 	/** 攻撃が有効化された瞬間の時間をセット */
 	void SetJustExecuteTime(const float InJustExecuteTime) { JustExecuteTime = InJustExecuteTime; }
+
+	/**	オーナーのセット */
+	void SetOwnerActor(const TObjectPtr<AActor> InOwnerActor)
+	{
+		OwnerActor = InOwnerActor;
+	}
 	/* End Setters~ */
 
 	/* ~Begin Getters */
@@ -182,6 +190,10 @@ private:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 private:
+	
+	UPROPERTY()
+	TWeakObjectPtr<AActor> OwnerActor;
+	
 	/**
 	 * @brief 球の情報を持つ構造体配列
 	 */

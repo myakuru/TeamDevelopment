@@ -99,16 +99,12 @@ protected:
 	/*End PrivateMember Setters~*/
 
 	/*~Begin PrivateMember Getters*/
-	/**
-	 * @brief 判定させたいコリジョンチャンネルを取得
-	 */
+	/** 判定させたいコリジョンチャンネルを取得 */
 	virtual TEnumAsByte<ECollisionChannel> GetTargetChannel() const { return TargetChannel; }
 
-	/**
-	 * @brief 指定したコリジョンチャンネルに対するレスポンスを取得 
-	 */
+	/** 指定したコリジョンチャンネルに対するレスポンスを取得  */
 	virtual TEnumAsByte<ECollisionResponse> GetTargetResponse() const { return TargetResponse; }
-
+	
 	/**	攻撃の最大継続時間を取得 */
 	virtual float GetMaxDuration() const { return MaxDuration; }
 
@@ -139,7 +135,7 @@ private:
 	 */
 	UPROPERTY(EditAnywhere)
 	TEnumAsByte<ECollisionResponse> TargetResponse;
-
+	
 	/**
 	 * @brief 攻撃の最大継続時間
 	 */

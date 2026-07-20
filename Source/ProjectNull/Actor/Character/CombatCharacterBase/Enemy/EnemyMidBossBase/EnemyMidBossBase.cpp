@@ -10,8 +10,6 @@
 #include <ProjectNull\Data\CharacterRuntimeData\EnemyMidBossRuntimeData\EnemyMidBossRuntimeData.h>
 #include <ProjectNull\System\Subsystem\WorldSubsystem\GameProgressSubsystem\GameProgressSubsystem.h>
 
-#include "GameFramework/CharacterMovementComponent.h"
-
 AEnemyMidBossBase::AEnemyMidBossBase()
 	:	EnemyDataAsset(nullptr)
 	,	EnemyStatus(FEnemyStatus())
@@ -131,8 +129,6 @@ void AEnemyMidBossBase::Tick(float InDeltaTime)
 		const FVector playerLocation = PPlayerPawn->GetActorLocation();
 		EnemyMidBossRuntimeData->CalcDistanceToTarget(playerLocation, GetActorLocation());
 	}
-	
-	UE_LOG(LogTemp,Warning,TEXT("MoveSpeed : %f"),GetCharacterMovement()->GetMaxSpeed());
 
 	// 攻撃可能化の判断処理
 	CheckCanAttack();
@@ -185,6 +181,8 @@ void AEnemyMidBossBase::ApplyDamaged(float InDamaged)
 {
 	if (!IsValid(EnemyMidBossRuntimeData)) { return; }
 
+	UE_LOG(LogTemp,Warning,TEXT("Damage: %f"),InDamaged);
+	
 	EnemyMidBossRuntimeData->AddHealth(-InDamaged);	// 渡された値分、FinalHPを減算
 
 	EnemyMidBossRuntimeData

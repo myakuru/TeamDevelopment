@@ -161,7 +161,6 @@ void AEnemyBase::ApplyDamaged(float InDamaged)
 	);
 
 	EnemyRuntimeData->AddHealth(-InDamaged);		// 渡された値分、FinalHPを減算
-	UE_LOG(LogTemp, Error, TEXT("Damage : %f"),InDamaged);
 
 	EnemyRuntimeData
 		->CalclateDamageToMaxHealthRatio(InDamaged);// 受けたダメージが最大体力に対して何割かを算出
