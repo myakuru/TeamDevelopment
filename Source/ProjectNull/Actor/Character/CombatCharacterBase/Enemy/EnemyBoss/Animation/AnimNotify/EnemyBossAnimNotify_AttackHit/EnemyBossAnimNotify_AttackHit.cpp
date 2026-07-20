@@ -9,7 +9,10 @@
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
 #include <ProjectNull/Actor/Character/CombatCharacterBase/Enemy/EnemyBoss/EnemyBossBase.h>
-#include <ProjectNull/System/Interface/DamageableInterface/DamageableInterface.h>
+#include <ProjectNull/Data/CharacterRuntimeData/PlayerRuntimeData/PlayerRuntimeData.h>
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/System/Interface/CharacterInterface/CharacterInterface.h>
+#include <ProjectNull/Actor/Character/CombatCharacterBase/Player/PlayerBase.h>
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
@@ -85,7 +88,7 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 		if (!IsValid(Target)) { continue; }
 
 		// IDamageableInterfaceを継承しているオブジェクトを判定
-		IDamageableInterface* DamageInterface = Cast<IDamageableInterface>(Target);
+		ICharacterInterface* DamageInterface = Cast<ICharacterInterface>(Target);
 		if (!DamageInterface) { continue; }
 
 		// この振りで当てていたActorはスキップ、ヒットしたらリストにActorを追加
@@ -93,8 +96,23 @@ void UEnemyBossAnimNotify_AttackHit::NotifyTick(USkeletalMeshComponent* MeshComp
 		HitActors.Add(Target);
 
 		int Damage = 10;
+		if (HitActor)
+		{
+			AEnemyBossBase* Chara = Cast<AEnemyBossBase>(HitActor);
+			if (Chara)
+			{
+				Damage = Chara->GetAttackDamage(UniqueAttackPower);
+			}
+			if (auto* Player = Cast<APlayerBase>(Target))
+			{
+				USuperGameInstance* GameInstance = World->GetGameInstance<USuperGameInstance>();
+				if (!GameInstance) { return; }
+				if (!GameInstance->GetPlayerRuntimeData()) { return; }
+				GameInstance->GetPlayerRuntimeData()->SubtractHealth(-Damage);
+			}
+		}
 
-		DamageInterface->ReceiveDamage(Damage);
+		DamageInterface->ApplyDamaged(Damage);
 	}
 
 	// デバッグ表示

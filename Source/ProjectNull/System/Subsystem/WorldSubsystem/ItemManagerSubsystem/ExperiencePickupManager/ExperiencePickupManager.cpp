@@ -49,8 +49,8 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 	if (!Owner) { return; }
 
 	//名前とラベルを変更
-	Owner->SetIsTemporarilyHiddenInEditor(true);
 #if WITH_EDITOR
+	Owner->SetIsTemporarilyHiddenInEditor(true);
 	Owner->SetActorLabel(TEXT("ExperienceNiagaraActor"));
 #endif
 
@@ -67,6 +67,13 @@ void FExperiencePickupManager::Initialize(UWorld* World)
 		NiagaraComp->SetAsset(LoadedNiagaraSystem);
 		NiagaraComp->Activate();
 	}
+	NiagaraComp->SetSystemFixedBounds(
+		FBox(
+			FVector(-50000.0f, -50000.0f, -50000.0f),
+			FVector(50000.0f, 50000.0f, 50000.0f)
+		)
+	);
+
 	NiagaraComponent = NiagaraComp;
 }
 

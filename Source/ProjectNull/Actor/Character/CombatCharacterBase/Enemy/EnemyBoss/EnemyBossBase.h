@@ -94,6 +94,7 @@ public:
 	const EBossActionType GetPrevAction()				const	{ return PrevAction; }
 	int32 GetHitIndex()									const	{ return EnemyBossRuntimeData->HitIndex; }			/** 連撃のインデックスのゲッター*/
 	const FBossAttackPattern& GetCurrentAttack()		const	{ return EnemyBossRuntimeData->CurrentAttack; }		/** 現在の攻撃を取得*/
+	const float GetAttackDamage(const float Mag)		const;
 	float GetNearRange()								const	{ return NearRange; }		/** 近距離攻撃範囲のゲッター*/
 	float GetStrafeChance()								const	{ return StrafeChance; }	/** 連撃確率のゲッター*/
 	float GetWalkSpeed()								const	{ return WalkSpeed; }		/** 歩く速度のゲッター*/
@@ -216,10 +217,16 @@ protected:
 	TObjectPtr<UNiagaraComponent> BreathEffect;
 
 	UPROPERTY(EditAnywhere, Category = "VFX")
+	TObjectPtr<UNiagaraComponent> SpawnedDeathEffect;
+
+	UPROPERTY(EditAnywhere, Category = "VFX")
 	TObjectPtr<UNiagaraSystem> DeathEffect;
+		
 
 	UPROPERTY(EditAnywhere, Category = "VFX")
 	TObjectPtr<UNiagaraSystem> DestroyEffect;
+
+
 
 	UPROPERTY(EditAnywhere, Category = "Material")
 	float MaterialCount = 0.0f;

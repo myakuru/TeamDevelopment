@@ -123,6 +123,11 @@ void AEnemyMidBossBase::Tick(float InDeltaTime)
 		return;
 	}
 
+	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::J))
+	{
+		EnemyMidBossRuntimeData->AddHealthDebug();
+	}
+
 	// プレイヤーの座標を取得
 	{
 		TObjectPtr<APawn> PPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
@@ -140,9 +145,9 @@ void AEnemyMidBossBase::Tick(float InDeltaTime)
 void AEnemyMidBossBase::FinalizeDeath()
 {
 	// 敵が死んだ際にゲームの進行管理クラス経由で倒した敵数を加算する
-	if (IsValid(GameProgress)) 
+	if (auto* Progress = GetWorld()->GetSubsystem<UGameProgressSubsystem>())
 	{
-		GameProgress->AddTyuuBossCount();
+		Progress->AddTyuuBossCount();
 	}
 
 	// ゲームインスタンス経由で、経験値とギアエネルギーをセット
