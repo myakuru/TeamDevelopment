@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -31,6 +31,8 @@ public:
 
 	/** 残り時間が0になったら呼ばれる */
 	FOnTimerFinished OnFinished;
+
+	float GetRemainingTime() { return RemainingTime; }
 
 private:
 	/** TimerManager から毎秒呼ばれる本体 */

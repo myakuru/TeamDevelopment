@@ -152,6 +152,9 @@ void UStageManager::InGameFinalize()
 			// デバッグ用にクリア条件を満たす
 			SetResultFlag(EResultFlag::ReachedFinalBoss);
 			SetResultFlag(EResultFlag::ReachedMidBoss);
+			
+			if (!StageDataAsset)return;
+			ResultData.ClearTime = StageDataAsset->GetStageTimerLimit() - StageTimer.GetRemainingTime();
 
 			// ResultDataに取得した武器のリストをセットしてResultManagerに渡す
 			ResultData.RewardWeaponIDs = AcquiredWeapons;
