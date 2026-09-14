@@ -5,6 +5,9 @@
 #include "Components/CanvasPanel.h"
 #include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
+#include <ProjectNull/GameInstance/SuperGameInstance.h>
+#include <ProjectNull/System/Result/ResultManager/ResultManager.h>
+#include <ProjectNull/Weapon/Instance/WeaponInstance.h>
 #include <ProjectNull/UI/OutGame/Result/EvaluationPanel/EvaluationPanel.h>
 #include <ProjectNull/UI/OutGame/Result/RewardPanel/RewardPanel.h>
 
@@ -55,8 +58,20 @@ bool UResultWidget::Initialize()
 
 void UResultWidget::NextPage()
 {
+
+	USuperGameInstance* gameInstance = GetGameInstance<USuperGameInstance>();
+	if (!gameInstance)UGameplayStatics::OpenLevel(this, "StageSelectLevel");
+
+	UResultManager* resultManager = gameInstance->GetResultManager();
+	if (!resultManager)UGameplayStatics::OpenLevel(this, "StageSelectLevel");
+
 	switch (CurrentPage) {
 	case EResultPage::Evaluation:
+		if (resultManager->GetRewardWeapons().IsEmpty()) {
+			UGameplayStatics::OpenLevel(this, "StageSelectLevel");
+			break;
+		}
+
 		ShowPage(EResultPage::Reward);
 		if (RewardPanel)RewardPanel->Initialize();
 		break;
