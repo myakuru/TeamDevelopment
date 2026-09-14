@@ -14,12 +14,6 @@ void UExpUpgradeWidgetBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (UpgradeText)
-	{
-		// 自動的に改行してもらう
-		UpgradeText->SetWrappingPolicy(ETextWrappingPolicy::AllowPerCharacterWrapping);
-	}
-
 	UIImageParameter.UiScale = UIImageParameter.UiScaleMin;
 	UITextParameter.UiScale = UITextParameter.UiScaleMin;
 }
@@ -90,6 +84,10 @@ void UExpUpgradeWidgetBase::SetDescriptionText(const FText& Description)
 {
 	if (UpgradeText)
 	{
+		
+		// 自動的に改行してもらう
+		//UpgradeText->SetWrappingPolicy(ETextWrappingPolicy::AllowPerCharacterWrapping);
+		
 		UpgradeText->SetText(Description);
 	}
 }
